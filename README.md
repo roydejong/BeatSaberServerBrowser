@@ -6,6 +6,8 @@
 ### Hosting games
 This mod, if enabled, shares your Server Code automatically, and lets users join with one click.
 
+![Host UI](https://user-images.githubusercontent.com/6772638/97474280-3d34a000-194c-11eb-8e1a-447a80b4d7bd.png)
+
 ### Joining games
 From the "Multiplayer" menu, press the new "Lobby Browser" button. You will now see a list of all custom party games that you can join.
 
