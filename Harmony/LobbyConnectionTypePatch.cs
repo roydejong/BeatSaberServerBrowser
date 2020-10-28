@@ -18,7 +18,7 @@ namespace LobbyBrowserMod.Harmony
         {
             ConnectionType = __instance.GetProperty<MultiplayerLobbyConnectionController.LobbyConnectionType, MultiplayerLobbyConnectionController>("connectionType");
 
-            Plugin.Log.Info($"Lobby state change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
+            Plugin.Log?.Info($"Lobby state change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
 
             LobbyStateManager.HandleUpdate();
         }

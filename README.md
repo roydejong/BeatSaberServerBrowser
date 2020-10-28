@@ -19,7 +19,6 @@ These libraries are required, install them with ModAssistant if you don't have t
 
 - BSIPA ^4.1.3
 - BeatSaberMarkupLanguage ^1.4.0
-- SiraUtil ^1.4.0
 
 ### Recommended
 🔥 The lobby browser supports [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom maps! You can see which games are "modded" in the browser.

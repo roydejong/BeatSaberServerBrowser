@@ -2,10 +2,6 @@
 using LobbyBrowserMod.UI;
 using LobbyBrowserMod.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LobbyBrowserMod.Core
@@ -14,7 +10,7 @@ namespace LobbyBrowserMod.Core
     {
         private static string _lobbyCode = null;
         private static bool _didAnnounce = false;
-        private static string _lastCodeAnnounced = null;
+        private static LobbyAnnounceInfo _lastCompleteAnnounce = null;
 
         public static string StatusText { get; private set; } = "Unknown status";
         public static bool HasErrored { get; private set; } = true;
@@ -23,7 +19,10 @@ namespace LobbyBrowserMod.Core
         {
             get
             {
-                return !String.IsNullOrEmpty(_lastCodeAnnounced) && _lastCodeAnnounced == _lobbyCode;
+                return _didAnnounce &&
+                    _lastCompleteAnnounce != null
+                    && !String.IsNullOrEmpty(_lobbyCode) 
+                    && _lastCompleteAnnounce.ServerCode == _lobbyCode;
             }
         }
 
@@ -31,7 +30,7 @@ namespace LobbyBrowserMod.Core
         {
             if (_lobbyCode != lobbyCode)
             {
-                Plugin.Log.Info($"Got lobby server code: \"{lobbyCode}\"");
+                Plugin.Log?.Info($"Got lobby server code: \"{lobbyCode}\"");
 
                 _lobbyCode = lobbyCode;
                 HandleUpdate();
@@ -40,6 +39,7 @@ namespace LobbyBrowserMod.Core
 
         public static void HandleUpdate()
         {
+#pragma warning disable CS4014
             if (!LobbyConnectionTypePatch.IsPartyMultiplayer || !LobbyConnectionTypePatch.IsPartyHost)
             {
                 // We are not in a party lobby, or we are not the host
@@ -49,14 +49,25 @@ namespace LobbyBrowserMod.Core
 
                 UnAnnounce();
 
-                LobbyConfigPanel.instance.UpdateState();
+                LobbyConfigPanel.UpdatePanelInstance();
+                return;
+            }
+
+            if (!Plugin.Config.LobbyAnnounceToggle)
+            {
+                // Toggle is off, do not proceed with announce
+                StatusText = "Lobby announces are toggled off.";
+                HasErrored = true;
+
+                UnAnnounce();
+
+                LobbyConfigPanel.UpdatePanelInstance();
                 return;
             }
 
             var sessionManager = GameMp.SessionManager;
-            var gameCode = _lobbyCode;
 
-            if (sessionManager == null || String.IsNullOrEmpty(gameCode) || !sessionManager.isConnectionOwner
+            if (sessionManager == null || String.IsNullOrEmpty(_lobbyCode) || !sessionManager.isConnectionOwner
                 || sessionManager.localPlayer == null || !sessionManager.isConnected || sessionManager.maxPlayerCount == 1)
             {
                 // We do not (yet) have the Server Code, or we're at an in-between state where things aren't ready yet
@@ -65,39 +76,54 @@ namespace LobbyBrowserMod.Core
 
                 UnAnnounce();
 
-                LobbyConfigPanel.instance.UpdateState();
+                LobbyConfigPanel.UpdatePanelInstance();
                 return;
             }
 
-            var playerCount = sessionManager.connectedPlayers.Count + 1; // + 1 for ourselves, the host
-            var playerLimit = sessionManager.maxPlayerCount;
-            var gameName = $"{sessionManager.localPlayer.userName}'s game";
-            var haveCustomSongsEnabled = sessionManager.localPlayer.HasState("modded")
-                && sessionManager.localPlayer.HasState("customsongs");
+            var lobbyAnnounce = new LobbyAnnounceInfo()
+            {
+                ServerCode = _lobbyCode,
+                GameName = $"{sessionManager.localPlayer.userName}'s game",
+                OwnerId = sessionManager.localPlayer.userId,
+                OwnerName = sessionManager.localPlayer.userName,
+                PlayerCount = sessionManager.connectedPlayers.Count + 1, // + 1 for the local player host
+                PlayerLimit = sessionManager.maxPlayerCount,
+                IsModded = sessionManager.localPlayer.HasState("modded") && sessionManager.localPlayer.HasState("customsongs")
+            };
 
-            StatusText = "Announcing your game to the world..." + "\r\n\r\n"
-                + gameName + "\r\n"
-                + $"{playerCount} / {playerLimit} players" + "\r\n" 
-                + (haveCustomSongsEnabled ? "Modded songs enabled" : "Vanilla lobby (no custom songs)");
+            StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
             HasErrored = false;
 
-            LobbyConfigPanel.instance.UpdateState();
+            LobbyConfigPanel.UpdatePanelInstance();
 
-            // TODO: Pack announce info into a single object and pass down to DoAnnounce
             // TODO: Announce only if we actually have a useful update (hash announce info object?)
 
-            DoAnnounce();
+            DoAnnounce(lobbyAnnounce);
+#pragma warning restore CS4014
         }
 
-        private static void DoAnnounce()
+        private static async Task DoAnnounce(LobbyAnnounceInfo announce)
         {
-            Plugin.Log.Info("Sending host announcement ...");
+            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}]");
 
-            if (MasterServerApi.SendAnnounce()) // TODO Actually implement this
+            if (await MasterServerApi.SendAnnounce(announce))
             {
                 _didAnnounce = true;
-                _lastCodeAnnounced = _lobbyCode;
+                _lastCompleteAnnounce = announce;
+
+                StatusText = $"Game announced!\r\n{announce.Describe()}";
+                HasErrored = false;
             }
+            else
+            {
+                _didAnnounce = false;
+                _lastCompleteAnnounce = null;
+
+                StatusText = $"Could not announce to master server!";
+                HasErrored = true;
+            }
+
+            LobbyConfigPanel.UpdatePanelInstance();
         }
 
         /// <summary>
@@ -105,12 +131,17 @@ namespace LobbyBrowserMod.Core
         ///  - If a previous announcement was made, a DELETE request is sent to the master server, removing it.
         ///  - If no previous announcement was made, or it was already deleted, this is a no-op.
         /// </summary>
-        public static void UnAnnounce()
+        public static async Task UnAnnounce()
         {
-            if (_didAnnounce)
+            if (_lastCompleteAnnounce != null)
             {
-                // TODO Actually implement this
-                Plugin.Log.Info("Cancelling host announcement ...");
+                Plugin.Log?.Info($"Cancelling host announcement: {_lastCompleteAnnounce.GameName}, {_lastCompleteAnnounce.ServerCode}");
+                
+                if (await MasterServerApi.SendDeleteAnnounce(_lastCompleteAnnounce))
+                {
+                    Plugin.Log?.Info($"Host announcement was deleted OK!");
+                    _didAnnounce = false;
+                }
             }
         }
     }

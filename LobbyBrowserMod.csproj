@@ -62,9 +62,6 @@
     <Reference Include="HMUI">
       <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMUI.dll</HintPath>
     </Reference>
-    <Reference Include="SiraUtil">
-      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Plugins\SiraUtil.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -114,6 +111,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\LobbyAnnounceInfo.cs" />
     <Compile Include="Core\LobbyStateManager.cs" />
     <Compile Include="Core\MasterServerApi.cs" />
     <Compile Include="Harmony\LobbyCodePatch.cs" />
@@ -134,6 +132,7 @@
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
     <EmbeddedResource Include="UI\LobbyConfigPanel.bsml" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

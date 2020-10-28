@@ -8,7 +8,7 @@ namespace LobbyBrowserMod.Harmony
     {
         static void Postfix(IConnectedPlayer player)
         {
-            Plugin.Log.Info($"Player state change: {player.userId}, {player.userName} (isConnectionOwner: {player.isConnectionOwner})");
+            Plugin.Log?.Info($"Player state change: {player.userId}, {player.userName} (isConnectionOwner: {player.isConnectionOwner})");
 
             LobbyStateManager.HandleUpdate();
         }

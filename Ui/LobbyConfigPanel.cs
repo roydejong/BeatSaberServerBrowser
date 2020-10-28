@@ -46,7 +46,15 @@ namespace LobbyBrowserMod.UI
         #region UI Update
         private MultiplayerSessionManager sessionManager = null;
 
-        public void UpdateState()
+        public static void UpdatePanelInstance()
+        {
+            if (LobbyConfigPanel.instance != null)
+            {
+                LobbyConfigPanel.instance.UpdatePanel();
+            }
+        }
+
+        public void UpdatePanel()
         {
             if (!LobbyConnectionTypePatch.IsPartyMultiplayer)
             {

@@ -30,8 +30,8 @@ namespace LobbyBrowserMod
             Log = logger;
             Config = conf.Generated<PluginConfig>();
 
-            Log.Info("Multiplayer Lobby Browser: initialized by IPA with config");
-            Log.Info($" → Lobby announce enabled: {Config.LobbyAnnounceToggle}");
+            Log?.Info("Multiplayer Lobby Browser: initialized by IPA with config");
+            Log?.Info($" → Lobby announce enabled: {Config.LobbyAnnounceToggle}");
 
             GameplaySetup.instance.AddTab("Lobby Browser", "LobbyBrowserMod.UI.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
         }
@@ -39,18 +39,18 @@ namespace LobbyBrowserMod
         [OnStart]
         public void OnApplicationStart()
         {
-            Log.Debug("OnApplicationStart");
+            Log?.Debug("OnApplicationStart");
 
             Harmony = new HarmonyLib.Harmony("mod.lobbybrowser");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            Log.Info($"Harmony patching complete.");
+            Log?.Info($"Harmony patching complete.");
         }
 
         [OnExit]
         public void OnApplicationQuit()
         {
-            Log.Debug("OnApplicationQuit");
+            Log?.Debug("OnApplicationQuit");
 
             // Try to cancel any host announcements we may have had
             LobbyStateManager.UnAnnounce();
