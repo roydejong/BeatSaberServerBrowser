@@ -1,13 +1,14 @@
-﻿using LobbyBrowserMod.Harmony;
-using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
+using LobbyBrowserMod.Core;
+using LobbyBrowserMod.Harmony;
+using LobbyBrowserMod.Utils;
 using System.Linq;
-using UnityEngine;
 using TMPro;
-using System;
+using UnityEngine;
 
-namespace LobbyBrowserMod.Ui
+namespace LobbyBrowserMod.UI
 {
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {
@@ -33,7 +34,7 @@ namespace LobbyBrowserMod.Ui
         public void SetLobbyAnnounceToggle(bool value)
         {
             LobbyAnnounceToggleValue = value;
-            UpdateState();
+            LobbyStateManager.HandleUpdate();
         }
         #endregion
 
@@ -47,7 +48,7 @@ namespace LobbyBrowserMod.Ui
 
         public void UpdateState()
         {
-            if (!LobbyJoinPatch.IsPartyMultiplayer)
+            if (!LobbyConnectionTypePatch.IsPartyMultiplayer)
             {
                 statusText.text = "Only supported for custom multiplayer games.";
                 statusText.color = Color.yellow;
@@ -57,9 +58,9 @@ namespace LobbyBrowserMod.Ui
                 return;
             }
 
-            sessionManager = Resources.FindObjectsOfTypeAll<MultiplayerSessionManager>().First();
+            sessionManager = GameMp.SessionManager;
 
-            if (!LobbyJoinPatch.IsPartyHost)
+            if (!LobbyConnectionTypePatch.IsPartyHost)
             {
                 // We are not the host
                 lobbyAnnounceToggle.interactable = false;
@@ -93,14 +94,23 @@ namespace LobbyBrowserMod.Ui
             if (!LobbyAnnounceToggleValue)
             {
                 // Currently disabled
-                statusText.text = "Flip the switch to share your Server Code to the world.";
-                statusText.color = Color.gray;
+                if (LobbyStateManager.DidLeakCurrentCode)
+                {
+                    statusText.text = "Announcement cancelled";
+                    statusText.color = Color.red;
+                }
+                else
+                {
+                    statusText.text = "Turn this on to show your game in the lobby browser";
+                    statusText.color = Color.yellow;
+                }
+                
                 return;
             }
 
             // Currently enabled
-            statusText.text = "Announcing...";
-            statusText.color = Color.green;
+            statusText.text = LobbyStateManager.StatusText;
+            statusText.color = LobbyStateManager.HasErrored ? Color.red : Color.green;
         }
         #endregion
     }

@@ -1,11 +1,12 @@
-﻿using LobbyBrowserMod.Ui;
+﻿using LobbyBrowserMod.UI;
 using HarmonyLib;
 using IPA.Utilities;
+using LobbyBrowserMod.Core;
 
 namespace LobbyBrowserMod.Harmony
 {
     [HarmonyPatch(typeof(MultiplayerLobbyConnectionController), "connectionType", MethodType.Setter)]
-    class LobbyJoinPatch
+    class LobbyConnectionTypePatch
     {
         public static MultiplayerLobbyConnectionController.LobbyConnectionType ConnectionType
         {
@@ -19,7 +20,7 @@ namespace LobbyBrowserMod.Harmony
 
             Plugin.Log.Info($"Lobby state change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
 
-            LobbyConfigPanel.instance.UpdateState();
+            LobbyStateManager.HandleUpdate();
         }
 
         public static bool IsPartyHost

@@ -1,4 +1,4 @@
-﻿using LobbyBrowserMod.Ui;
+﻿using LobbyBrowserMod.UI;
 using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config;
@@ -6,6 +6,7 @@ using IPA.Config.Stores;
 using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
 using HarmonyLib;
+using LobbyBrowserMod.Core;
 
 namespace LobbyBrowserMod
 {
@@ -32,7 +33,7 @@ namespace LobbyBrowserMod
             Log.Info("Multiplayer Lobby Browser: initialized by IPA with config");
             Log.Info($" → Lobby announce enabled: {Config.LobbyAnnounceToggle}");
 
-            GameplaySetup.instance.AddTab("Lobby Browser", "LobbyBrowserMod.Ui.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
+            GameplaySetup.instance.AddTab("Lobby Browser", "LobbyBrowserMod.UI.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
         }
 
         [OnStart]
@@ -50,6 +51,9 @@ namespace LobbyBrowserMod
         public void OnApplicationQuit()
         {
             Log.Debug("OnApplicationQuit");
+
+            // Try to cancel any host announcements we may have had
+            LobbyStateManager.UnAnnounce();
         }
     }
 }

@@ -46,9 +46,6 @@
     <Reference Include="BeatmapCore">
       <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
     </Reference>
-    <Reference Include="BeatSaverSharp">
-      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Libs\BeatSaverSharp.dll</HintPath>
-    </Reference>
     <Reference Include="BGNet">
       <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGNet.dll</HintPath>
     </Reference>
@@ -64,6 +61,9 @@
     </Reference>
     <Reference Include="HMUI">
       <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMUI.dll</HintPath>
+    </Reference>
+    <Reference Include="SiraUtil">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Plugins\SiraUtil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -114,12 +114,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Harmony\LobbyJoinPatch.cs" />
+    <Compile Include="Core\LobbyStateManager.cs" />
+    <Compile Include="Core\MasterServerApi.cs" />
+    <Compile Include="Harmony\LobbyCodePatch.cs" />
+    <Compile Include="Harmony\LobbyConnectionTypePatch.cs" />
+    <Compile Include="Harmony\LobbyPlayerConnectedPatch.cs" />
+    <Compile Include="Harmony\LobbyPlayerStatePatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ui\LobbyConfigPanel.cs" />
+    <Compile Include="UI\LobbyConfigPanel.cs" />
+    <Compile Include="Utils\GameMp.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -127,7 +133,7 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
-    <EmbeddedResource Include="Ui\LobbyConfigPanel.bsml" />
+    <EmbeddedResource Include="UI\LobbyConfigPanel.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
