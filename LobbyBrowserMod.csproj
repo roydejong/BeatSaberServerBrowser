@@ -8,8 +8,8 @@
     <ProjectGuid>{DC5955D7-A9A4-475C-90D6-CFB0340DD5C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BeatSaberLobbyBrowserMod</RootNamespace>
-    <AssemblyName>BeatSaberLobbyBrowserMod</AssemblyName>
+    <RootNamespace>LobbyBrowserMod</RootNamespace>
+    <AssemblyName>LobbyBrowserMod</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +40,31 @@
     <DisableZipRelease>True</DisableZipRelease>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Libs\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatmapCore">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatSaverSharp">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Libs\BeatSaverSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BGNet">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGNet.dll</HintPath>
+    </Reference>
+    <Reference Include="BSML, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Plugins\BSML.dll</HintPath>
+    </Reference>
+    <Reference Include="GameplayCore">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
+    </Reference>
+    <Reference Include="HMLib">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMLib.dll</HintPath>
+    </Reference>
+    <Reference Include="HMUI">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\HMUI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,14 +73,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="Main">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="HMLib">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="HMUI">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="IPA.Loader">
@@ -67,12 +84,17 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UI.dll</HintPath>
@@ -92,10 +114,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Harmony\LobbyJoinPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
-    <Compile Include="BeatSaberLobbyBrowserModController.cs" />
+    <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ui\LobbyConfigPanel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -103,7 +127,7 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
-    <None Include="BeatSaberLobbyBrowserMod.csproj.user" Condition="Exists('BeatSaberLobbyBrowserMod.csproj.user')" />
+    <EmbeddedResource Include="Ui\LobbyConfigPanel.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

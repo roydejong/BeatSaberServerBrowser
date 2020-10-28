@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using LobbyBrowserMod.Ui;
+using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
-using UnityEngine.SceneManagement;
-using UnityEngine;
+using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
+using HarmonyLib;
 
-namespace BeatSaberLobbyBrowserMod
+namespace LobbyBrowserMod
 {
-
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
+        internal static PluginConfig Config { get; private set; }
+        internal static HarmonyLib.Harmony Harmony { get; private set; }
 
         [Init]
         /// <summary>
@@ -24,39 +23,33 @@ namespace BeatSaberLobbyBrowserMod
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
-        public void Init(IPALogger logger)
+        public void Init(IPALogger logger, Config conf)
         {
             Instance = this;
             Log = logger;
+            Config = conf.Generated<PluginConfig>();
 
-            Log.Info("Multiplayer Lobby Browser mod initialized by IPA. <<<<<<<< >>>>>>>>>>>>>> 1");
-        }
+            Log.Info("Multiplayer Lobby Browser: initialized by IPA with config");
+            Log.Info($" → Lobby announce enabled: {Config.LobbyAnnounceToggle}");
 
-        #region BSIPA Config
-        //Uncomment to use BSIPA's config
-        /*
-        [Init]
-        public void InitWithConfig(Config conf)
-        {
-            Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
-            Log.Debug("Config loaded");
+            GameplaySetup.instance.AddTab("Lobby Browser", "LobbyBrowserMod.Ui.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
         }
-        */
-        #endregion
 
         [OnStart]
         public void OnApplicationStart()
         {
             Log.Debug("OnApplicationStart");
-            new GameObject("BeatSaberLobbyBrowserModController").AddComponent<BeatSaberLobbyBrowserModController>();
 
+            Harmony = new HarmonyLib.Harmony("mod.lobbybrowser");
+            Harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            Log.Info($"Harmony patching complete.");
         }
 
         [OnExit]
         public void OnApplicationQuit()
         {
             Log.Debug("OnApplicationQuit");
-
         }
     }
 }

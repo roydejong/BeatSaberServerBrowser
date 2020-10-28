@@ -1,0 +1,11 @@
+﻿<bg>
+  <vertical vertical-fit='Unconstrained'>
+    <horizontal pad-top='10' pad-bottom='4' horizontal-fit='PreferredSize'>
+      <text text='Multiplayer Lobby Browser Mod' align='Center' font-size='5.5'/>
+    </horizontal>
+    <modifier-container>
+      <toggle-setting id="LobbyAnnounceToggle" value='LobbyAnnounceToggle' on-change='LobbyAnnounceToggle' text='Share Server Code (let anyone join from the browser)' interactable='false' ></toggle-setting>
+      <text id="StatusText" text='Unknown status' color='#ff0000'></text>
+    </modifier-container>
+  </vertical>
+</bg>
