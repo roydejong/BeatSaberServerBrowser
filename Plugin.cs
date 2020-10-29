@@ -30,10 +30,10 @@ namespace LobbyBrowserMod
             Log = logger;
             Config = conf.Generated<PluginConfig>();
 
-            Log?.Info("Multiplayer Lobby Browser: initialized by IPA with config");
+            Log?.Info("Multiplayer Server Browser Mod: initialized by IPA with config");
             Log?.Info($" → Lobby announce enabled: {Config.LobbyAnnounceToggle}");
 
-            GameplaySetup.instance.AddTab("Lobby Browser", "LobbyBrowserMod.UI.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
+            GameplaySetup.instance.AddTab("Server Browser", "LobbyBrowserMod.UI.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
         }
 
         [OnStart]

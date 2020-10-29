@@ -19,31 +19,20 @@ namespace LobbyBrowserMod.Harmony
             btnGameBrowser.gameObject.SetActive(true);
 
             foreach (var comp in btnGameBrowser.GetComponents<Component>())
-            {
                 comp.gameObject.SetActive(true);
-            }
 
             if (firstActivation)
             {
+                // Reposition and enlarge the button a bit
                 var transform = btnGameBrowser.gameObject.transform;
-
-                // Move the button up a bit
                 transform.position = new Vector3(
                     transform.position.x,
                     transform.position.y + 0.25f,
                     transform.position.z
                 );
-
-                // Make it a little bit bigger
                 transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
-
-                // Change the label from "server browser" to "lobby browser" because consistency
-                var label = btnGameBrowser.GetComponentInChildren<CurvedTextMeshPro>();
-
-                if (label != null)
-                {
-                    label.SetText("Lobby Browser");
-                }
+                btnGameBrowser.GetComponentInChildren<CurvedTextMeshPro>()
+                    .SetText("Server Browser");
             }
         }
     }

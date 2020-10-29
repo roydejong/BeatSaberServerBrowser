@@ -49,34 +49,22 @@ namespace LobbyBrowserMod.Utils
                 LobbyBrowserViewController.Instance, null, ViewController.AnimationDirection.Horizontal, false
             });
 
+            FixLobbyBrowserTitle();
+        }
+        public static void FixLobbyBrowserTitle()
+        {
+            var mpFlowCoordinator = ModeSelectionFlowCoordinator;
+
             mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("SetTitle", new object[] {
-                "Lobby Browser", ViewController.AnimationType.In
+                "Server Browser", ViewController.AnimationType.In
             });
         }
 
-        public static void ShowModeSelectionError(string title, string message)
+        public static void OpenCreateServerMenu()
         {
-            //var mpFlowCoordinator = ModeSelectionFlowCoordinator;
-            ////var mpSimpleDialogPromptViewController = ReflectionUtil.GetField<SimpleDialogPromptViewController, MultiplayerModeSelectionFlowCoordinator>(mpFlowCoordinator, "_simpleDialogPromptViewController");
+            var mpFlowCoordinator = ModeSelectionFlowCoordinator;
 
-            //mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("PresentConnectionErrorDialog", new object[] {
-            //    ConnectionFailedReason.MasterServerNotAuthenticated
-            //});
-
-            //mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("DismissViewController", new object[] {
-            //    LobbyBrowserViewController.Instance, ViewController.AnimationDirection.Horizontal, null, false
-            //});
-
-            //mpSimpleDialogPromptViewController.Init(title, message, "OK", delegate (int btnId)
-            //{
-            //    mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("DismissViewController", new object[] {
-            //        mpSimpleDialogPromptViewController, ViewController.AnimationDirection.Vertical, null, false
-            //    });
-            //});
-
-            //mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController", new object[] {
-            //    mpSimpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical
-            //});
+            mpFlowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
     }
 }

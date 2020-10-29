@@ -78,7 +78,7 @@ namespace LobbyBrowserMod.Core
             }
         }
 
-        public static int PageNumber
+        public static int PageIndex
         {
             get
             {
@@ -86,11 +86,11 @@ namespace LobbyBrowserMod.Core
             }
         }
 
-        public static int PageCount
+        public static int TotalPageCount
         {
             get
             {
-                return (int)Math.Floor((double)TotalResultCount / (double)PageSize);
+                return (int)Math.Ceiling((double)TotalResultCount / (double)PageSize);
             }
         }
 

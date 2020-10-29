@@ -1,11 +1,9 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
-using HMUI;
 using LobbyBrowserMod.Core;
 using LobbyBrowserMod.Harmony;
 using LobbyBrowserMod.Utils;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -114,7 +112,7 @@ namespace LobbyBrowserMod.UI
                 }
                 else
                 {
-                    statusText.text = "Turn this on to show your game in the lobby browser";
+                    statusText.text = "Turn this on to announce your server to the world";
                     statusText.color = Color.yellow;
                 }
                 
