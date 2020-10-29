@@ -1,4 +1,5 @@
-﻿using IPA.Utilities;
+﻿using HMUI;
+using IPA.Utilities;
 using System.Linq;
 using UnityEngine;
 
@@ -15,11 +16,13 @@ namespace LobbyBrowserMod.Utils
         {
             var mpFlowCoordinator = Resources.FindObjectsOfTypeAll<MultiplayerModeSelectionFlowCoordinator>().First();
             var mpConnectionController = ReflectionUtil.GetField<MultiplayerLobbyConnectionController, MultiplayerModeSelectionFlowCoordinator>(mpFlowCoordinator, "_multiplayerLobbyConnectionController");
+            var mpJoiningLobbyViewController = ReflectionUtil.GetField<JoiningLobbyViewController, MultiplayerModeSelectionFlowCoordinator>(mpFlowCoordinator, "_joiningLobbyViewController");
 
             mpConnectionController.ConnectToParty(serverCode);
-
-            //this._joiningLobbyViewController.Init(Localization.Get("LABEL_JOINING_GAME"));
-            //base.ReplaceTopViewController(this._joiningLobbyViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
+            mpJoiningLobbyViewController.Init("ohhh its happening");
+            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController", new object[] {
+                mpJoiningLobbyViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical
+            });
         }
     }
 }
