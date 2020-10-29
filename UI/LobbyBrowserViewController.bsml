@@ -1,11 +1,11 @@
 ﻿<bg>
   <vertical vertical-fit="PreferredSize" anchor-pos-y="2">
-    <horizontal anchor-min-y="1" bg="panel-top" pad-left="5" pad-right="5" horizontal-fit="PreferredSize">
-      <text text="Lobby Browser" align="Center" font-size="6"></text>
+    <horizontal id="statusPanel" anchor-min-y="1" bg="panel-top" pad-left="5" pad-right="5" horizontal-fit="PreferredSize">
+      <text id="statusText" text="Loading..." align="Center" font-size="4"></text>
     </horizontal>
     <custom-list anchor-pos-x="25" id="lobby-list" contents="lobby-options" clickable-cells="false" list-width="100" visible-cells="7" cell-size="9">
-      <horizontal child-expand-width="true" child-control-width="false" anchor-pos-x="11" pref-width="80">
-        <button id="joinButton" on-click="joinClicked" ignore-layout="true" text="Join game" anchor-pos-x="0" anchor-pos-y="3.5" anchor-max-x="1.0" child-align="MiddleRight"></button>
+      <horizontal child-expand-width="true" child-control-width="false" anchor-pos-x="0" pref-width="100">
+        <button id="joinButton" on-click="joinClicked" ignore-layout="true" text="Join" anchor-pos-x="0" anchor-pos-y="3.5" anchor-max-x="1.0" child-align="MiddleRight"></button>
         <vertical anchor-pos-x="20" anchor-min-x="0" anchor-max-x="0" child-align="MiddleLeft" vertical-fit="PreferredSize">
           <text id="gameTitle" font-size="4" text="Game title"></text>
           <text id="gameSubTitle" font-size="3" text="Game subtitle"></text>

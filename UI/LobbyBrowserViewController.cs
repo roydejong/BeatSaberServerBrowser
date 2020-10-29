@@ -1,12 +1,11 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
-using HMUI;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components;
 using LobbyBrowserMod.Core;
 using LobbyBrowserMod.UI.Items;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TMPro;
+using UnityEngine;
 
 namespace LobbyBrowserMod.UI
 {
@@ -14,33 +13,77 @@ namespace LobbyBrowserMod.UI
     {
         public override string ResourceName => "LobbyBrowserMod.UI.LobbyBrowserViewController.bsml";
 
-        [UIValue("lobby-options")]
-        internal List<object> queueItems = new List<object>()
+        #region Lifecycle
+        private static LobbyBrowserViewController _instance;
+        public static LobbyBrowserViewController Instance
         {
-            new LobbyUiItem(new LobbyAnnounceInfo()
+            get
             {
-                GameName = "Game 1",
-                IsModded = true,
-                PlayerCount = 1,
-                PlayerLimit = 3,
-                ServerCode = "ABCDEF"
-            }),
-            new LobbyUiItem(new LobbyAnnounceInfo()
+                if (_instance == null)
+                    _instance = BeatSaberUI.CreateViewController<LobbyBrowserViewController>();
+
+                return _instance;
+            }
+        }
+
+        public override void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.__Activate(addedToHierarchy, screenSystemEnabling);
+
+            StatusText.text = "Loading...";
+            StatusText.color = Color.gray;
+
+            LobbyBrowser.OnUpdate += LobbyBrowser_OnUpdate;
+            LobbyBrowser.FullRefresh();
+        }
+
+        public override void __Deactivate(bool removedFromHierarchy, bool deactivateGameObject, bool screenSystemDisabling)
+        {
+            base.__Deactivate(removedFromHierarchy, deactivateGameObject, screenSystemDisabling);
+
+            LobbyBrowser.OnUpdate -= LobbyBrowser_OnUpdate;
+        }
+        #endregion
+
+        #region Components
+        [UIComponent("statusText")]
+        public TextMeshProUGUI StatusText;
+
+        [UIComponent("lobby-list")]
+        public CustomCellListTableData LobbyList;
+        #endregion
+
+        #region Data
+        [UIValue("lobby-options")]
+        public List<object> QueueItems = new List<object>(10);
+
+        private void LobbyBrowser_OnUpdate()
+        {
+            QueueItems.Clear();
+
+            if (!LobbyBrowser.ConnectionOk)
             {
-                GameName = "Game 2",
-                IsModded = true,
-                PlayerCount = 5,
-                PlayerLimit = 5,
-                ServerCode = "ABCDEF"
-            }),
-            new LobbyUiItem(new LobbyAnnounceInfo()
+                StatusText.text = "Could not get lobbies from server";
+                StatusText.color = Color.red;
+            }
+            else if (!LobbyBrowser.AnyResults)
             {
-                GameName = "Game 3",
-                IsModded = false,
-                PlayerCount = 3,
-                PlayerLimit = 5,
-                ServerCode = "ABCDEF"
-            }),
-        };
+                StatusText.text = "Sorry, no games found.";
+                StatusText.color = Color.red;
+            }
+            else
+            {
+                StatusText.text = $"Found {LobbyBrowser.TotalResultCount} servers";
+                StatusText.color = Color.green;
+
+                foreach (var lobby in LobbyBrowser.LobbiesOnPage)
+                {
+                    QueueItems.Add(new LobbyUiItem(lobby));
+                }
+            }
+
+            LobbyList?.tableView?.ReloadData();
+        }
+        #endregion
     }
 }

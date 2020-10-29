@@ -122,7 +122,7 @@ namespace LobbyBrowserMod.Core
 
         private static async Task DoAnnounce(LobbyAnnounceInfo announce)
         {
-            if (await MasterServerApi.SendAnnounce(announce))
+            if (await MasterServerApi.Announce(announce))
             {
                 _didAnnounce = true;
                 _lastCompleteAnnounce = announce;
@@ -151,10 +151,12 @@ namespace LobbyBrowserMod.Core
         {
             if (_lastCompleteAnnounce != null)
             {
-                if (await MasterServerApi.SendDeleteAnnounce(_lastCompleteAnnounce))
+                if (await MasterServerApi.UnAnnounce(_lastCompleteAnnounce))
                 {
                     Plugin.Log?.Info($"Host announcement was deleted OK!");
+
                     _didAnnounce = false;
+                    _lastCompleteAnnounce = null;
                 }
             }
         }

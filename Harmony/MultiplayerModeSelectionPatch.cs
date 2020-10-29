@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
 using HMUI;
 using IPA.Utilities;
-using LobbyBrowserMod.Core;
-using System.CodeDom;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,22 +25,24 @@ namespace LobbyBrowserMod.Harmony
 
             if (firstActivation)
             {
-                // Move the button up a bit
                 var transform = btnGameBrowser.gameObject.transform;
+
+                // Move the button up a bit
                 transform.position = new Vector3(
                     transform.position.x,
                     transform.position.y + 0.25f,
                     transform.position.z
                 );
-                transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
 
-                // Change the label from "server browser" to "lobby browser"
+                // Make it a little bit bigger
+                transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
+
+                // Change the label from "server browser" to "lobby browser" because consistency
                 var label = btnGameBrowser.GetComponentInChildren<CurvedTextMeshPro>();
 
                 if (label != null)
                 {
                     label.SetText("Lobby Browser");
-                    label.colorGradient = new TMPro.VertexGradient(Color.red, Color.blue, Color.red, Color.blue);
                 }
             }
         }

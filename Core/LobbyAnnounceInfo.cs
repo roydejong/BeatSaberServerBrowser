@@ -19,14 +19,6 @@ namespace LobbyBrowserMod.Core
         public int PlayerLimit { get; set; }
         public bool IsModded { get; set; }
 
-        public bool WasSentByServer
-        {
-            get
-            {
-                return this.Id.HasValue && this.Id.Value > 0;
-            }
-        }
-
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";

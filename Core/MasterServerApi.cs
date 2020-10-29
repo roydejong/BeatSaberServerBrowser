@@ -82,16 +82,16 @@ namespace LobbyBrowserMod.Core
         #endregion
 
         private static string _lastPayloadSent = null;
-        private static DateTime? _lastSuccesfulRequest = null;
+        private static DateTime? _lastSentAt = null;
         private const int ANNOUNCE_INTERVAL_MINS = 1;
 
-        public static async Task<bool> SendAnnounce(LobbyAnnounceInfo announce)
+        public static async Task<bool> Announce(LobbyAnnounceInfo announce)
         {
             var payload = announce.ToJson();
 
             var isDupeRequest = (_lastPayloadSent != null && _lastPayloadSent == payload);
-            var enoughTimeHasPassed = (_lastSuccesfulRequest == null
-                || (DateTime.Now - _lastSuccesfulRequest.Value).TotalMinutes >= ANNOUNCE_INTERVAL_MINS);
+            var enoughTimeHasPassed = (_lastSentAt == null
+                || (DateTime.Now - _lastSentAt.Value).TotalMinutes >= ANNOUNCE_INTERVAL_MINS);
 
             if (isDupeRequest && !enoughTimeHasPassed) {
                 // An identical payload was already sent out!
@@ -102,18 +102,13 @@ namespace LobbyBrowserMod.Core
             Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}]");
 
             _lastPayloadSent = payload;
+            _lastSentAt = DateTime.Now;
 
             var responseOk = await PerformWebRequest("POST", "/announce", payload) != null;
-
-            if (responseOk)
-            {
-                _lastSuccesfulRequest = DateTime.Now;
-            }
-
             return responseOk;
         }
 
-        public static async Task<bool> SendDeleteAnnounce(LobbyAnnounceInfo announce)
+        public static async Task<bool> UnAnnounce(LobbyAnnounceInfo announce)
         {
             Plugin.Log?.Info($"Cancelling host announcement: {announce.GameName}, {announce.ServerCode}");
 
@@ -121,6 +116,24 @@ namespace LobbyBrowserMod.Core
 
             var responseOk = await PerformWebRequest("POST", $"/unannounce?serverCode={announce.ServerCode}&ownerId={announce.OwnerId}") != null;
             return responseOk;
+        }
+
+        public static async Task<LobbyBrowseResult> Browse(int offset)
+        {
+            Plugin.Log?.Info($"Requesting lobbies");
+
+            var response = await PerformWebRequest("GET", $"/browse?offset={offset}");
+            var contentStr = await response.Content.ReadAsStringAsync();     
+
+            try
+            {
+                return LobbyBrowseResult.FromJson(contentStr);
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log?.Warn($"Error while parsing browse result: {ex}");
+                return null;
+            }
         }
     }
 }
