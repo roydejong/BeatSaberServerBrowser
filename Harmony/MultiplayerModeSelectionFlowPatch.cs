@@ -12,6 +12,8 @@ namespace LobbyBrowserMod.Harmony
     {
         static bool Prefix(MultiplayerModeSelectionFlowCoordinator __instance, MultiplayerModeSelectionViewController viewController, MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
+            // When the "GameBrowser" button is clicked, bypass the game's own (broken) code & open our view instead
+
             if (menuButton == MultiplayerModeSelectionViewController.MenuButton.GameBrowser)
             {
                 __instance.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("PresentViewController", new object[] {

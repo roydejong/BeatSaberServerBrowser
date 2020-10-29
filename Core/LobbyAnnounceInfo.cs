@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BeatSaberMarkupLanguage.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;

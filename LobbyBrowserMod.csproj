@@ -129,6 +129,7 @@
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Items\LobbyUiItem.cs" />
     <Compile Include="UI\LobbyBrowserViewController.cs" />
     <Compile Include="UI\LobbyConfigPanel.cs" />
     <Compile Include="Utils\GameMp.cs" />
