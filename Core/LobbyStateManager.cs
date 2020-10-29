@@ -11,6 +11,7 @@ namespace LobbyBrowserMod.Core
         private static string _lobbyCode = null;
         private static bool _didAnnounce = false;
         private static LobbyAnnounceInfo _lastCompleteAnnounce = null;
+        private static bool? _localPlayerStateValue = null;
 
         public static string StatusText { get; private set; } = "Unknown status";
         public static bool HasErrored { get; private set; } = true;
@@ -40,7 +41,10 @@ namespace LobbyBrowserMod.Core
         public static void HandleUpdate()
         {
 #pragma warning disable CS4014
-            if (!LobbyConnectionTypePatch.IsPartyMultiplayer || !LobbyConnectionTypePatch.IsPartyHost)
+            var sessionManager = GameMp.SessionManager;
+
+            if (sessionManager == null || !LobbyConnectionTypePatch.IsPartyMultiplayer
+                || !LobbyConnectionTypePatch.IsPartyHost)
             {
                 // We are not in a party lobby, or we are not the host
                 // Make sure any previous host announcements by us are cancelled and bail
@@ -53,22 +57,36 @@ namespace LobbyBrowserMod.Core
                 return;
             }
 
-            if (!Plugin.Config.LobbyAnnounceToggle)
+            if (Plugin.Config.LobbyAnnounceToggle)
             {
-                // Toggle is off, do not proceed with announce
+                // Toggle is on, ensure state is synced
+                if (!_localPlayerStateValue.HasValue || _localPlayerStateValue.Value == false)
+                {
+                    _localPlayerStateValue = true;
+                    sessionManager.SetLocalPlayerState("lobbyannounce", true); // NB: this calls another update
+                }
+            }
+            else
+            {
+                // Toggle is off, ensure state is synced & do not proceed with announce
                 StatusText = "Lobby announces are toggled off.";
                 HasErrored = true;
 
                 UnAnnounce();
 
+                if (!_localPlayerStateValue.HasValue || _localPlayerStateValue.Value == true)
+                {
+                    _localPlayerStateValue = false;
+                    sessionManager.SetLocalPlayerState("lobbyannounce", false); // NB: this calls another update
+                }
+
                 LobbyConfigPanel.UpdatePanelInstance();
                 return;
             }
 
-            var sessionManager = GameMp.SessionManager;
-
-            if (sessionManager == null || String.IsNullOrEmpty(_lobbyCode) || !sessionManager.isConnectionOwner
-                || sessionManager.localPlayer == null || !sessionManager.isConnected || sessionManager.maxPlayerCount == 1)
+            if (String.IsNullOrEmpty(_lobbyCode) || !sessionManager.isConnectionOwner
+                || sessionManager.localPlayer == null || !sessionManager.isConnected
+                || sessionManager.maxPlayerCount == 1)
             {
                 // We do not (yet) have the Server Code, or we're at an in-between state where things aren't ready yet
                 StatusText = "Can't send announcement (invalid lobby state).";
@@ -104,8 +122,6 @@ namespace LobbyBrowserMod.Core
 
         private static async Task DoAnnounce(LobbyAnnounceInfo announce)
         {
-            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}]");
-
             if (await MasterServerApi.SendAnnounce(announce))
             {
                 _didAnnounce = true;
@@ -135,8 +151,6 @@ namespace LobbyBrowserMod.Core
         {
             if (_lastCompleteAnnounce != null)
             {
-                Plugin.Log?.Info($"Cancelling host announcement: {_lastCompleteAnnounce.GameName}, {_lastCompleteAnnounce.ServerCode}");
-                
                 if (await MasterServerApi.SendDeleteAnnounce(_lastCompleteAnnounce))
                 {
                     Plugin.Log?.Info($"Host announcement was deleted OK!");

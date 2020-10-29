@@ -40,7 +40,7 @@ namespace LobbyBrowserMod.Core
             else
                 targetUrl += $"&rnd={guid}";
 
-            Plugin.Log?.Info($"{method} {targetUrl}");
+            Plugin.Log?.Info($"{method} {targetUrl} {json}");
 
             try
             {
@@ -52,10 +52,14 @@ namespace LobbyBrowserMod.Core
                         response = await client.GetAsync(targetUrl);
                         break;
                     case "POST":
-                        response = await client.PostAsync(targetUrl, new StringContent(json, Encoding.UTF8, "application/json"));
-                        break;
-                    case "DELETE":
-                        response = await client.DeleteAsync(targetUrl);
+                        if (String.IsNullOrEmpty(json))
+                        {
+                            response = await client.PostAsync(targetUrl, null);
+                        }
+                        else
+                        {
+                            response = await client.PostAsync(targetUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+                        }
                         break;
                     default:
                         throw new ArgumentException($"Invalid request method for the Master Server API: {method}");
@@ -77,14 +81,46 @@ namespace LobbyBrowserMod.Core
         }
         #endregion
 
+        private static string _lastPayloadSent = null;
+        private static DateTime? _lastSuccesfulRequest = null;
+        private const int ANNOUNCE_INTERVAL_MINS = 1;
+
         public static async Task<bool> SendAnnounce(LobbyAnnounceInfo announce)
         {
-            return await PerformWebRequest("POST", "/announce", "abc") != null;
+            var payload = announce.ToJson();
+
+            var isDupeRequest = (_lastPayloadSent != null && _lastPayloadSent == payload);
+            var enoughTimeHasPassed = (_lastSuccesfulRequest == null
+                || (DateTime.Now - _lastSuccesfulRequest.Value).TotalMinutes >= ANNOUNCE_INTERVAL_MINS);
+
+            if (isDupeRequest && !enoughTimeHasPassed) {
+                // An identical payload was already sent out!
+                // Do not send a dupe unless enough time has passed
+                return true;
+            }
+
+            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}]");
+
+            _lastPayloadSent = payload;
+
+            var responseOk = await PerformWebRequest("POST", "/announce", payload) != null;
+
+            if (responseOk)
+            {
+                _lastSuccesfulRequest = DateTime.Now;
+            }
+
+            return responseOk;
         }
 
         public static async Task<bool> SendDeleteAnnounce(LobbyAnnounceInfo announce)
         {
-            return await PerformWebRequest("DELETE", $"/announce?ownerId={announce.OwnerId}&serverCode={announce.ServerCode}") != null;
+            Plugin.Log?.Info($"Cancelling host announcement: {announce.GameName}, {announce.ServerCode}");
+
+            _lastPayloadSent = null;
+
+            var responseOk = await PerformWebRequest("POST", $"/unannounce?serverCode={announce.ServerCode}&ownerId={announce.OwnerId}") != null;
+            return responseOk;
         }
     }
 }

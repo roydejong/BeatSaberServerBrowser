@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
+using HMUI;
 using LobbyBrowserMod.Core;
 using LobbyBrowserMod.Harmony;
 using LobbyBrowserMod.Utils;
@@ -56,7 +57,15 @@ namespace LobbyBrowserMod.UI
 
         public void UpdatePanel()
         {
-            if (!LobbyConnectionTypePatch.IsPartyMultiplayer)
+            if (statusText == null || lobbyAnnounceToggle == null)
+            {
+                // Components not loaded yet
+                return;
+            }
+
+            sessionManager = GameMp.SessionManager;
+
+            if (sessionManager == null || !LobbyConnectionTypePatch.IsPartyMultiplayer)
             {
                 statusText.text = "Only supported for custom multiplayer games.";
                 statusText.color = Color.yellow;
@@ -65,8 +74,6 @@ namespace LobbyBrowserMod.UI
                 lobbyAnnounceToggle.Value = false;
                 return;
             }
-
-            sessionManager = GameMp.SessionManager;
 
             if (!LobbyConnectionTypePatch.IsPartyHost)
             {
@@ -94,8 +101,6 @@ namespace LobbyBrowserMod.UI
             }
 
             // We are the host, enable controls
-            sessionManager.SetLocalPlayerState("lobbyannounce", LobbyAnnounceToggleValue);
-
             lobbyAnnounceToggle.interactable = true;
             lobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
 
