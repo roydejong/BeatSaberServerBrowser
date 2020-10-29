@@ -122,11 +122,14 @@
     <Compile Include="Harmony\LobbyConnectionTypePatch.cs" />
     <Compile Include="Harmony\LobbyPlayerConnectedPatch.cs" />
     <Compile Include="Harmony\LobbyPlayerStatePatch.cs" />
+    <Compile Include="Harmony\MultiplayerModeSelectionFlowPatch.cs" />
+    <Compile Include="Harmony\MultiplayerModeSelectionPatch.cs" />
     <Compile Include="Harmony\SetLocalPlayerStatePatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\LobbyBrowserViewController.cs" />
     <Compile Include="UI\LobbyConfigPanel.cs" />
     <Compile Include="Utils\GameMp.cs" />
   </ItemGroup>
@@ -138,6 +141,7 @@
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
     <EmbeddedResource Include="UI\LobbyConfigPanel.bsml" />
     <None Include="README.md" />
+    <EmbeddedResource Include="UI\LobbyBrowserViewController.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

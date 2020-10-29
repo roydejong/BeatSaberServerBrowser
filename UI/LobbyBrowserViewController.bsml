@@ -1,0 +1,10 @@
+﻿<bg>
+  <vertical vertical-fit="PreferredSize" anchor-pos-y="2">
+    <horizontal anchor-min-y="1" bg="panel-top" pad-left="5" pad-right="5" horizontal-fit="PreferredSize">
+      <text text="Lobby Browser" align="Center" font-size="6"></text>
+    </horizontal>
+    <horizontal pref-width="100" pref-height="65">
+      <text-page text="Hi, this is some text. It can scroll, I think."></text-page>
+    </horizontal>
+  </vertical>
+</bg>
