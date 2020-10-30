@@ -7,6 +7,7 @@ using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
 using HarmonyLib;
 using LobbyBrowserMod.Core;
+using LobbyBrowserMod.Assets;
 
 namespace LobbyBrowserMod
 {
@@ -41,8 +42,10 @@ namespace LobbyBrowserMod
 
             Harmony = new HarmonyLib.Harmony("mod.lobbybrowser");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-
             Log?.Debug($"Harmony patching complete.");
+
+            Sprites.Initialize();
+            Log?.Debug($"Sprite conversion complete.");
         }
 
         [OnExit]

@@ -3,26 +3,19 @@
     <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0" anchor-max-x="0.5">
       <button id="createButton" pad="0" pref-height="8" pref-width="35" on-click="createButtonClick" text="Create server"></button>
       <button id="refreshButton" pad="0" pref-height="8" pref-width="25" on-click="refreshButtonClick" text="Refresh"></button>
+      <primary-button id="connectButton" pad="0" pref-height="8" pref-width="25" on-click="connectButtonClick" text="Connect"></primary-button>
     </horizontal>
     
     <modal id="loadingModal" show-event="loadingModalOpen" hide-event="loadingModalClose" move-to-center="true" size-delta-x="35" size-delta-y="25"></modal>
 
     <page-button id="pageUpButton" on-click="pageUpButtonClick" direction="Up"></page-button>
 
-    <custom-list id="lobbyList" contents="lobbyListContents" expand-cell="true" select-cell="listSelect" spacing="2">
-      <horizontal bg="panel-top" child-expand-width="true" child-control-width="false" anchor-pos-x="0" pref-width="100">
-        <button id="joinButton" on-click="joinClicked" ignore-layout="true" text="Join" anchor-pos-x="0" anchor-pos-y="3.5" anchor-max-x="1.0" child-align="MiddleRight"></button>
-        <vertical anchor-pos-x="20" anchor-min-x="0" anchor-max-x="0" child-align="MiddleLeft" vertical-fit="PreferredSize">
-          <text id="gameTitle" font-size="4" text="Game title"></text>
-          <text id="gameSubTitle" font-size="3" text="Game subtitle"></text>
-        </vertical>
-      </horizontal>
-    </custom-list>
+    <list id="lobbyList" expand-cell="true" select-cell="listSelect"></list>
 
     <page-button id="pageDownButton" on-click="pageDownButtonClick" direction="Down"></page-button>
 
     <horizontal id="statusPanel" anchor-min-y="1" bg="panel-top" pad-left="5" pad-right="5" horizontal-fit="PreferredSize">
-      <text id="statusText" text="Loading..." align="Center" font-size="4"></text>
+      <text id="statusText" text="Loading..." align="Center" font-size="4" color="#eee"></text>
     </horizontal>
 
   </vertical>

@@ -18,6 +18,102 @@ namespace LobbyBrowserMod.UI
     {
         public override string ResourceName => "LobbyBrowserMod.UI.LobbyBrowserViewController.bsml";
 
+        #region Data/UI updates
+        private LobbyAnnounceInfo _selectedLobby = null;
+
+        private void SetInitialUiState()
+        {
+            GameMp.FixLobbyBrowserTitle();
+
+            StatusText.text = "Loading...";
+            StatusText.color = Color.gray;
+
+            PageUpButton.interactable = false;
+            PageDownButton.interactable = false;
+            RefreshButton.interactable = false;
+
+            ClearSelection();
+            SetLoading(true);
+        }
+
+        private LoadingControl loadingSpinner;
+
+        private void ClearSelection()
+        {
+            LobbyList?.tableView?.ClearSelection();
+            ConnectButton.interactable = false;
+            _selectedLobby = null;
+        }
+
+        private void SetLoading(bool value)
+        {
+            if (value)
+            {
+                if (loadingSpinner == null)
+                {
+                    loadingSpinner = GameObject.Instantiate(Resources.FindObjectsOfTypeAll<LoadingControl>().First(), LoadingModal.transform);
+                }
+
+                Destroy(loadingSpinner.GetComponent<Touchable>());
+
+                parserParams.EmitEvent("loadingModalOpen");
+                loadingSpinner.ShowLoading("Fetching servers...");
+            }
+            else
+            {
+                parserParams.EmitEvent("loadingModalClose");
+
+                if (loadingSpinner != null)
+                {
+                    loadingSpinner.Hide();
+                    Destroy(loadingSpinner);
+                    loadingSpinner = null;
+                }
+            }
+
+            ClearSelection();
+        }
+
+        private void LobbyBrowser_OnUpdate()
+        {
+            LobbyList.data.Clear();
+
+            if (!LobbyBrowser.ConnectionOk)
+            {
+                StatusText.text = "Failed to get server list";
+                StatusText.color = Color.red;
+            }
+            else if (!LobbyBrowser.AnyResults)
+            {
+                StatusText.text = "Sorry, no servers found";
+                StatusText.color = Color.red;
+            }
+            else
+            {
+                StatusText.text = $"Found {LobbyBrowser.TotalResultCount} "
+                    + (LobbyBrowser.TotalResultCount == 1 ? "server" : "servers")
+                    + $" (Page {LobbyBrowser.PageIndex + 1} of {LobbyBrowser.TotalPageCount})";
+                StatusText.color = Color.green;
+
+                foreach (var lobby in LobbyBrowser.LobbiesOnPage)
+                {
+                    LobbyList.data.Add(new LobbyUiItem(lobby));
+                }
+            }
+
+            LobbyList.tableView.ReloadData();
+            LobbyList.tableView.selectionType = TableViewSelectionType.Single;
+
+            ClearSelection();
+
+            RefreshButton.interactable = true;
+            PageUpButton.interactable = LobbyBrowser.PageIndex > 0;
+            PageDownButton.interactable = LobbyBrowser.PageIndex < LobbyBrowser.TotalPageCount - 1;
+
+            SetLoading(false);
+        }
+        #endregion
+
         #region Lifecycle
         private static LobbyBrowserViewController _instance;
         public static LobbyBrowserViewController Instance
@@ -59,13 +155,16 @@ namespace LobbyBrowserMod.UI
         public TextMeshProUGUI StatusText;
 
         [UIComponent("lobbyList")]
-        public CustomCellListTableData LobbyList;
+        public CustomListTableData LobbyList;
 
         [UIComponent("createButton")]
         public Button CreateButton;
 
         [UIComponent("refreshButton")]
         public Button RefreshButton;
+
+        [UIComponent("connectButton")]
+        public Button ConnectButton;
 
         [UIComponent("pageUpButton")]
         private Button PageUpButton;
@@ -93,6 +192,36 @@ namespace LobbyBrowserMod.UI
             GameMp.OpenCreateServerMenu();
         }
 
+        [UIAction("connectButtonClick")]
+        internal void ConnectButtonClick()
+        {
+            if (_selectedLobby != null && !string.IsNullOrEmpty(_selectedLobby.ServerCode))
+            {
+                GameMp.JoinLobbyWithCode(_selectedLobby.ServerCode);
+            }
+            else
+            {
+                ClearSelection();
+            }   
+        }
+
+        [UIAction("listSelect")]
+        internal void Select(TableView tableView, int row)
+        {
+            var selectedRow = LobbyList.data[row];
+
+            if (selectedRow == null)
+            {
+                ClearSelection();
+                return;
+            }
+
+            var selectedLobbyItem = (LobbyUiItem)selectedRow;
+            _selectedLobby = selectedLobbyItem.LobbyInfo;
+
+            ConnectButton.interactable = true;
+        }
+
         [UIAction("pageUpButtonClick")]
         internal void PageUpButtonClick()
         {
@@ -111,90 +240,6 @@ namespace LobbyBrowserMod.UI
                 SetLoading(true);
                 LobbyBrowser.LoadPage((LobbyBrowser.PageIndex + 1) * LobbyBrowser.PageSize);
             }
-        }
-        #endregion
-
-        #region Data/UI updates
-        [UIValue("lobbyListContents")]
-        public List<object> QueueItems = new List<object>(10);
-
-        private void SetInitialUiState()
-        {
-            GameMp.FixLobbyBrowserTitle();
-
-            StatusText.text = "Loading...";
-            StatusText.color = Color.gray;
-
-            PageUpButton.interactable = false;
-            PageDownButton.interactable = false;
-            RefreshButton.interactable = false;
-
-            SetLoading(true);
-        }
-
-        private LoadingControl loadingSpinner;
-
-        private void SetLoading(bool value)
-        {
-            if (value)
-            {
-                if (loadingSpinner == null)
-                {
-                    loadingSpinner = GameObject.Instantiate(Resources.FindObjectsOfTypeAll<LoadingControl>().First(), LoadingModal.transform);
-                }
-
-                Destroy(loadingSpinner.GetComponent<Touchable>());
-
-                parserParams.EmitEvent("loadingModalOpen");
-                loadingSpinner.ShowLoading("Fetching servers...");
-            }
-            else
-            {
-                parserParams.EmitEvent("loadingModalClose");
-
-                if (loadingSpinner != null)
-                {
-                    loadingSpinner.Hide();
-                    Destroy(loadingSpinner);
-                    loadingSpinner = null;
-                }
-            }
-        }
-
-        private void LobbyBrowser_OnUpdate()
-        {
-            QueueItems.Clear();
-
-            if (!LobbyBrowser.ConnectionOk)
-            {
-                StatusText.text = "Failed to get server list";
-                StatusText.color = Color.red;
-            }
-            else if (!LobbyBrowser.AnyResults)
-            {
-                StatusText.text = "Sorry, no servers found";
-                StatusText.color = Color.red;
-            }
-            else
-            {
-                StatusText.text = $"Found {LobbyBrowser.TotalResultCount} "
-                    + (LobbyBrowser.TotalResultCount == 1 ? "server" : "servers")
-                    + $" (Page {LobbyBrowser.PageIndex + 1} of {LobbyBrowser.TotalPageCount})";
-                StatusText.color = Color.green;
-
-                foreach (var lobby in LobbyBrowser.LobbiesOnPage)
-                {
-                    QueueItems.Add(new LobbyUiItem(lobby));
-                }
-            }
-
-            LobbyList?.tableView?.ReloadData();
-
-            RefreshButton.interactable = true;
-            PageUpButton.interactable = LobbyBrowser.PageIndex > 0;
-            PageDownButton.interactable = LobbyBrowser.PageIndex < LobbyBrowser.TotalPageCount - 1;
-
-            SetLoading(false);
         }
         #endregion
     }

@@ -1,4 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components;
+using LobbyBrowserMod.Assets;
 using LobbyBrowserMod.Core;
 using LobbyBrowserMod.Utils;
 using TMPro;
@@ -7,46 +9,27 @@ using UnityEngine.UI;
 
 namespace LobbyBrowserMod.UI.Items
 {
-    public class LobbyUiItem
+    public class LobbyUiItem : CustomListTableData.CustomCellInfo
     {
-        private LobbyAnnounceInfo _lobbyInfo;
-
-        [UIComponent("gameTitle")]
-        private TextMeshProUGUI _gameTitle;
-
-        [UIComponent("gameSubTitle")]
-        private TextMeshProUGUI _gameSubTitle;
-
-        [UIComponent("joinButton")]
-        private Button _joinButton;
-
-        public LobbyUiItem(LobbyAnnounceInfo lobbyInfo)
+        public LobbyAnnounceInfo LobbyInfo
         {
-            _lobbyInfo = lobbyInfo;
+            get;
+            private set;
+        }
+
+        public LobbyUiItem(LobbyAnnounceInfo lobbyInfo) : base("Lobby", "Lobby info", Sprites.BeatSaverIcon)
+        {
+            LobbyInfo = lobbyInfo;
+
+            UpdateUi();
         }
 
         public void UpdateUi()
         {
-            var modeDescription = _lobbyInfo.IsModded ? "Modded" : "Vanilla";
+            var modeDescription = LobbyInfo.IsModded ? "Modded" : "Vanilla";
 
-            _gameTitle.text = _lobbyInfo.GameName;
-            _gameSubTitle.text = $"{_lobbyInfo.PlayerCount} / {_lobbyInfo.PlayerLimit} players, {modeDescription}";
-
-            _joinButton.interactable = !string.IsNullOrEmpty(_lobbyInfo.ServerCode);
-        }
-
-        [UIAction("#post-parse")]
-        internal void OnItemLoaded()
-        {
-            UpdateUi();
-        }
-
-
-        [UIAction("joinClicked")]
-        internal void JoinClicked()
-        {
-            Plugin.Log?.Info($"Requested join for lobby: {_lobbyInfo.GameName} / {_lobbyInfo.ServerCode}");
-            GameMp.JoinLobbyWithCode(_lobbyInfo.ServerCode);
+            this.text = LobbyInfo.GameName;
+            this.subtext = $"{LobbyInfo.PlayerCount} / {LobbyInfo.PlayerLimit} players, {modeDescription}";
         }
     }
 }
