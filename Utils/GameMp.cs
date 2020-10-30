@@ -46,7 +46,7 @@ namespace LobbyBrowserMod.Utils
             var mpFlowCoordinator = ModeSelectionFlowCoordinator;
 
             mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("PresentViewController", new object[] {
-                LobbyBrowserViewController.Instance, null, ViewController.AnimationDirection.Horizontal, false
+                LobbyBrowserViewController.Instance, null, ViewController.AnimationDirection.Vertical, false
             });
 
             FixLobbyBrowserTitle();

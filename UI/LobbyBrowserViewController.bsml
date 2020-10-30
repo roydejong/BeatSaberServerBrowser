@@ -5,9 +5,9 @@
       <button id="refreshButton" pad="0" pref-height="8" pref-width="25" on-click="refreshButtonClick" text="Refresh"></button>
     </horizontal>
     
-    <modal id="loadingModal" show-event="loadingModalOpen" hide-event="loadingModalClose" move-to-center="true" size-delta-y="35" size-delta-x="45"></modal>
+    <modal id="loadingModal" show-event="loadingModalOpen" hide-event="loadingModalClose" move-to-center="true" size-delta-x="35" size-delta-y="25"></modal>
 
-    <page-button id="pageUpButton" on-click="pageUpButtonClick" direction="Up" hover-hint="Previous page"></page-button>
+    <page-button id="pageUpButton" on-click="pageUpButtonClick" direction="Up"></page-button>
 
     <custom-list id="lobbyList" contents="lobbyListContents" expand-cell="true" select-cell="listSelect" spacing="2">
       <horizontal bg="panel-top" child-expand-width="true" child-control-width="false" anchor-pos-x="0" pref-width="100">
@@ -19,7 +19,7 @@
       </horizontal>
     </custom-list>
 
-    <page-button id="pageDownButton" on-click="pageDownButtonClick" direction="Down" hover-hint="Next page"></page-button>
+    <page-button id="pageDownButton" on-click="pageDownButtonClick" direction="Down"></page-button>
 
     <horizontal id="statusPanel" anchor-min-y="1" bg="panel-top" pad-left="5" pad-right="5" horizontal-fit="PreferredSize">
       <text id="statusText" text="Loading..." align="Center" font-size="4"></text>

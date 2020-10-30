@@ -31,17 +31,13 @@ namespace LobbyBrowserMod.UI
             }
         }
 
-        public override async void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
+        public override void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.__Activate(addedToHierarchy, screenSystemEnabling);
 
             LobbyBrowser.OnUpdate += LobbyBrowser_OnUpdate;
 
             SetInitialUiState();
-            SetLoading(false);
-
-            await Task.Delay(250); // wait a little while to avoid UI breaking during animation
-
             SetLoading(true);
             LobbyBrowser.FullRefresh();
         }
@@ -145,8 +141,9 @@ namespace LobbyBrowserMod.UI
                 if (loadingSpinner == null)
                 {
                     loadingSpinner = GameObject.Instantiate(Resources.FindObjectsOfTypeAll<LoadingControl>().First(), LoadingModal.transform);
-                    Destroy(loadingSpinner.GetComponent<Touchable>());
                 }
+
+                Destroy(loadingSpinner.GetComponent<Touchable>());
 
                 parserParams.EmitEvent("loadingModalOpen");
                 loadingSpinner.ShowLoading("Fetching servers...");
