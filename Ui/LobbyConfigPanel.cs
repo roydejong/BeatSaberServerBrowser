@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
+using BeatSaberMarkupLanguage.GameplaySetup;
 using LobbyBrowserMod.Core;
 using LobbyBrowserMod.Harmony;
 using LobbyBrowserMod.Utils;
@@ -11,6 +12,8 @@ namespace LobbyBrowserMod.UI
 {
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {
+        public const string ResourceName = "LobbyBrowserMod.UI.LobbyConfigPanel.bsml";
+
         #region LobbyAnnounceToggle
         [UIComponent("LobbyAnnounceToggle")]
         public ToggleSetting lobbyAnnounceToggle;
@@ -122,6 +125,21 @@ namespace LobbyBrowserMod.UI
             // Currently enabled
             statusText.text = LobbyStateManager.StatusText;
             statusText.color = LobbyStateManager.HasErrored ? Color.red : Color.green;
+        }
+        #endregion
+
+        #region BSML Modifier Tab
+        private const string TAB_NAME = "Server Browser";
+
+        private static bool _tabIsAdded = false;
+        public static void RegisterGameplayModifierTab()
+        {
+            if (!_tabIsAdded)
+            {
+                GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance);
+                Plugin.Log.Info("Added gameplay modifier tab (LobbyConfigPanel)");
+                _tabIsAdded = true;
+            }
         }
         #endregion
     }

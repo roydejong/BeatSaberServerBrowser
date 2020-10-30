@@ -11,7 +11,7 @@ namespace LobbyBrowserMod.Utils
     {
         public static MultiplayerSessionManager SessionManager
         {
-            get => Resources.FindObjectsOfTypeAll<MultiplayerSessionManager>().First();
+            get => Resources.FindObjectsOfTypeAll<MultiplayerSessionManager>().FirstOrDefault();
         }
 
         public static MultiplayerModeSelectionFlowCoordinator ModeSelectionFlowCoordinator

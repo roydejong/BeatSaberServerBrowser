@@ -30,10 +30,8 @@ namespace LobbyBrowserMod
             Log = logger;
             Config = conf.Generated<PluginConfig>();
 
-            Log?.Info("Multiplayer Server Browser Mod: initialized by IPA with config");
-            Log?.Info($" → Lobby announce enabled: {Config.LobbyAnnounceToggle}");
-
-            GameplaySetup.instance.AddTab("Server Browser", "LobbyBrowserMod.UI.LobbyConfigPanel.bsml", LobbyConfigPanel.instance);
+            // TODO one day figure out how to not do this in single player, doesn't currently seem possible to remove it conditionally though
+            LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
         [OnStart]
@@ -44,7 +42,7 @@ namespace LobbyBrowserMod
             Harmony = new HarmonyLib.Harmony("mod.lobbybrowser");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            Log?.Info($"Harmony patching complete.");
+            Log?.Debug($"Harmony patching complete.");
         }
 
         [OnExit]
