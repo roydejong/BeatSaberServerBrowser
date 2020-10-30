@@ -34,7 +34,12 @@ namespace LobbyBrowserMod.Core
                 Plugin.Log?.Info($"Got lobby server code: \"{lobbyCode}\"");
 
                 _lobbyCode = lobbyCode;
-                HandleUpdate();
+
+                if (!String.IsNullOrEmpty(_lobbyCode))
+                {
+                    // Lobby code changed and isn't empty; force an update now
+                    HandleUpdate();
+                }
             }
         }
 

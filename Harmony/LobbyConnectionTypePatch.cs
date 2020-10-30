@@ -15,11 +15,14 @@ namespace LobbyBrowserMod.Harmony
 
         public static void Prefix(MultiplayerLobbyConnectionController __instance)
         {
-            ConnectionType = __instance.GetProperty<MultiplayerLobbyConnectionController.LobbyConnectionType, MultiplayerLobbyConnectionController>("connectionType");
+            var nextConnectionType = __instance.GetProperty<MultiplayerLobbyConnectionController.LobbyConnectionType, MultiplayerLobbyConnectionController>("connectionType");
 
-            Plugin.Log?.Info($"Lobby state change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
-
-            LobbyStateManager.HandleUpdate();
+            if (nextConnectionType != ConnectionType)
+            {
+                ConnectionType = nextConnectionType;
+                Plugin.Log?.Info($"Lobby state change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
+                LobbyStateManager.HandleUpdate();
+            }
         }
 
         public static bool IsPartyHost

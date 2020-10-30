@@ -40,7 +40,7 @@ namespace LobbyBrowserMod.Core
             else
                 targetUrl += $"&rnd={guid}";
 
-            Plugin.Log?.Info($"{method} {targetUrl} {json}");
+            Plugin.Log?.Debug($"{method} {targetUrl} {json}");
 
             try
             {
@@ -70,7 +70,7 @@ namespace LobbyBrowserMod.Core
                     throw new Exception($"Expected HTTP 200 OK, got HTTP {response.StatusCode}");
                 }
 
-                Plugin.Log?.Info($"✔ 200 OK: {method} {targetUrl}");
+                Plugin.Log?.Debug($"✔ 200 OK: {method} {targetUrl}");
                 return response;
             }
             catch (Exception ex)
@@ -120,7 +120,7 @@ namespace LobbyBrowserMod.Core
 
         public static async Task<LobbyBrowseResult> Browse(int offset)
         {
-            Plugin.Log?.Info($"Requesting lobbies");
+            Plugin.Log?.Info($"Requesting lobbies from server (offset {offset})");
 
             var response = await PerformWebRequest("GET", $"/browse?offset={offset}");
             var contentStr = await response.Content.ReadAsStringAsync();     

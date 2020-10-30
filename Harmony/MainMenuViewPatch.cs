@@ -12,6 +12,7 @@ namespace LobbyBrowserMod.Harmony
     {
         static void Prefix(MainMenuViewController.MenuButton menuButton)
         {
+            // A main menu button was pressed
             LobbyStateManager.HandleUpdate();
         }
     }

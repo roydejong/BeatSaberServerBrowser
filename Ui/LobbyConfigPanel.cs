@@ -137,7 +137,7 @@ namespace LobbyBrowserMod.UI
             if (!_tabIsAdded)
             {
                 GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance);
-                Plugin.Log.Info("Added gameplay modifier tab (LobbyConfigPanel)");
+                Plugin.Log?.Debug("Added gameplay modifier tab (LobbyConfigPanel)");
                 _tabIsAdded = true;
             }
         }
