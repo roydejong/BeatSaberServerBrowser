@@ -1,15 +1,24 @@
 ﻿using BeatSaberMarkupLanguage.Components;
+using BeatSaverSharp;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TMPro;
+using UnityEngine;
 
 namespace ServerBrowser.UI.Items
 {
     public class HostedGameCell : CustomListTableData.CustomCellInfo
     {
         public HostedGameData Game
+        {
+            get;
+            private set;
+        }
+
+        public bool IsShowingInGame
         {
             get;
             private set;
@@ -47,46 +56,60 @@ namespace ServerBrowser.UI.Items
                 {
                     Plugin.Log?.Error($"Could not set cover art for level {Game.LevelId}: {ex}");
                 }
+
+                IsShowingInGame = true;
             }
             else
             {
                 this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}] {modeDescription} lobby";
+
+                IsShowingInGame = false;
             }
         }
 
         private async Task<bool> SetCoverArt(string levelId)
         {
-            var levelHash = SongCore.Collections.hashForLevelID(levelId);
-            var levelIsInstalled = SongCore.Collections.songWithHashPresent(levelHash);
+            var levelIsCustom = levelId.StartsWith("custom_", StringComparison.InvariantCultureIgnoreCase);
 
-            Plugin.Log?.Warn($"levelId: {levelId}, levelHash: {levelHash}, levelIsInstalled: {levelIsInstalled}");
-
-            if (levelIsInstalled)
+            if (levelIsCustom)
             {
-                // Native level, or installed custom level
+                var levelHash = SongCore.Collections.hashForLevelID(levelId);
+                var levelIsInstalled = SongCore.Collections.songWithHashPresent(levelHash);
+
+                if (levelIsInstalled)
+                {
+                    // Custom level - installed
+                    var level = SongCore.Loader.GetLevelByHash(levelHash);
+
+                    this.icon = await level.GetCoverImageAsync(_cancellationTokenSource.Token);
+                    _onContentChange(this);
+                    return true;
+                }
+                else
+                {
+                    // Custom level - not installed
+                    BeatSaverSharp.Beatmap beatSaverLevel = new BeatSaverSharp.Beatmap(Plugin.BeatSaver, levelHash);
+
+                    if (beatSaverLevel != null)
+                    {
+                        this.icon = Sprites.LoadSpriteRaw(await beatSaverLevel.FetchCoverImage());
+                        _onContentChange(this);
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                // Official level
                 var level = SongCore.Loader.GetLevelById(levelId);
-                Plugin.Log?.Warn($"??? 1");
+
                 this.icon = await level.GetCoverImageAsync(_cancellationTokenSource.Token);
-                Plugin.Log?.Warn($"cover art set! _onContentChange invoke...");
                 _onContentChange(this);
                 return true;
             }
-
-            Plugin.Log?.Warn($"??? 2");
-
-            // TODO Download from beat saver if needed
-            // TODO Test with official
-            // TODO Test with installed custom
-
+            
+            // Failed to get level info, can't set cover art, too bad, very sad
             return false;
-        }
-
-        private async void SetImageFromBeatSaverSong(BeatSaverSharp.Beatmap song)
-        {
-            var imageBytes = await song.FetchCoverImage();
-            var icon = Sprites.LoadSpriteRaw(imageBytes);
-
-            this.icon = icon;
         }
     }
 }

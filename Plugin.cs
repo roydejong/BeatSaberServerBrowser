@@ -8,6 +8,8 @@ using IPALogger = IPA.Logging.Logger;
 using HarmonyLib;
 using ServerBrowser.Core;
 using ServerBrowser.Assets;
+using BeatSaverSharp;
+using System.IO;
 
 namespace ServerBrowser
 {
@@ -20,6 +22,7 @@ namespace ServerBrowser
         internal static IPALogger Log { get; private set; }
         internal static PluginConfig Config { get; private set; }
         internal static HarmonyLib.Harmony Harmony { get; private set; }
+        internal static BeatSaverSharp.BeatSaver BeatSaver { get; private set; }
 
         [Init]
         /// <summary>
@@ -42,12 +45,21 @@ namespace ServerBrowser
         {
             Log?.Debug("OnApplicationStart");
 
+            // Harmony
             Harmony = new HarmonyLib.Harmony(HarmonyId);
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log?.Debug($"Harmony patching complete.");
 
+            // Assets
             Sprites.Initialize();
             Log?.Debug($"Sprite conversion complete.");
+
+            // BeatSaver client
+            BeatSaver = new BeatSaverSharp.BeatSaver(new BeatSaverSharp.HttpOptions()
+            {
+                ApplicationName = "ServerBrowser",
+                Version = Assembly.GetExecutingAssembly().GetName().Version,
+            });
         }
 
         [OnExit]

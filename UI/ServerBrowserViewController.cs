@@ -39,8 +39,6 @@ namespace ServerBrowser.UI
 
         private void CancelImageDownloads(bool reset = true)
         {
-            Plugin.Log.Error("CancelImageDownloads");
-
             if (_imageDownloadCancellation != null)
             {
                 _imageDownloadCancellation.Cancel();
@@ -227,24 +225,24 @@ namespace ServerBrowser.UI
             }
         }
 
-        internal void CellUpdateCallback(CustomListTableData.CustomCellInfo cell)
+        internal void CellUpdateCallback(HostedGameCell cell)
         {
-            Plugin.Log.Warn(cell.text);
-
             foreach (var visibleCell in GameList.tableView.visibleCells)
             {
                 // This is some BSML witchcraft. BSML made our cell a clone of the game's LevelListTableCell, where
                 //   the title component is _songNameText, which we use for finding the right cell to update.
 
                 var frankenCell = visibleCell as LevelListTableCell;
+                var titleTextComponent = frankenCell.GetField<TextMeshProUGUI>("_songNameText");
 
-                if (frankenCell.GetField<TextMeshProUGUI>("_songNameText")?.text == cell.text)
+                if (titleTextComponent != null)
                 {
-                    GameList.tableView.RefreshCellsContent();
-                    return;
+                    if (titleTextComponent.text == cell.text)
+                    {
+                        GameList.tableView.RefreshCellsContent();
+                        return;
+                    }
                 }
-
-                Plugin.Log.Warn(frankenCell.GetField<TextMeshProUGUI>("_songNameText")?.text);
             }
         }
         #endregion

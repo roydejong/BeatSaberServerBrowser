@@ -168,8 +168,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\BeatSaver.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\BSML\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
