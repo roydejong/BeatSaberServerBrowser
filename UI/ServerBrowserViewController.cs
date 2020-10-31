@@ -5,7 +5,8 @@ using HMUI;
 using ServerBrowser.Core;
 using ServerBrowser.UI.Items;
 using ServerBrowser.Utils;
-using System.Linq;
+using SongCore.Utilities;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,7 @@ namespace ServerBrowser.UI
         public override string ResourceName => "ServerBrowser.UI.ServerBrowserViewController.bsml";
 
         #region Data/UI updates
+        internal CancellationTokenSource _imageDownloadCancellation;
         private HostedGameData _selectedLobby = null;
 
         private void SetInitialUiState()
@@ -32,20 +34,37 @@ namespace ServerBrowser.UI
             ConnectButton.interactable = false;
 
             ClearSelection();
+            CancelImageDownloads();
         }
 
-        private LoadingControl loadingSpinner;
+        private void CancelImageDownloads(bool reset = true)
+        {
+            Plugin.Log.Error("CancelImageDownloads");
+
+            if (_imageDownloadCancellation != null)
+            {
+                _imageDownloadCancellation.Cancel();
+                _imageDownloadCancellation.Dispose();
+                _imageDownloadCancellation = null;
+            }
+
+            if (reset)
+            {
+                _imageDownloadCancellation = new CancellationTokenSource();
+            }
+        }
 
         private void ClearSelection()
         {
-            LobbyList?.tableView?.ClearSelection();
+            GameList?.tableView?.ClearSelection();
             ConnectButton.interactable = false;
             _selectedLobby = null;
         }
 
         private void LobbyBrowser_OnUpdate()
         {
-            LobbyList.data.Clear();
+            GameList.data.Clear();
+            CancelImageDownloads();
 
             if (!HostedGameBrowser.ConnectionOk)
             {
@@ -66,12 +85,12 @@ namespace ServerBrowser.UI
 
                 foreach (var lobby in HostedGameBrowser.LobbiesOnPage)
                 {
-                    LobbyList.data.Add(new LobbyUiItem(lobby));
+                    GameList.data.Add(new HostedGameCell(_imageDownloadCancellation, CellUpdateCallback, lobby));
                 }
             }
 
-            LobbyList.tableView.ReloadData();
-            LobbyList.tableView.selectionType = TableViewSelectionType.Single;
+            GameList.tableView.ReloadData();
+            GameList.tableView.selectionType = TableViewSelectionType.Single;
 
             ClearSelection();
 
@@ -110,6 +129,8 @@ namespace ServerBrowser.UI
 
             HostedGameBrowser.OnUpdate -= LobbyBrowser_OnUpdate;
             parserParams.EmitEvent("loadingModalClose");
+
+            CancelImageDownloads(false);
         }
         #endregion
 
@@ -121,7 +142,7 @@ namespace ServerBrowser.UI
         public TextMeshProUGUI StatusText;
 
         [UIComponent("lobbyList")]
-        public CustomListTableData LobbyList;
+        public CustomListTableData GameList;
 
         [UIComponent("createButton")]
         public Button CreateButton;
@@ -147,7 +168,6 @@ namespace ServerBrowser.UI
         internal void RefreshButtonClick()
         {
             SetInitialUiState();
-
             HostedGameBrowser.FullRefresh();
         }
 
@@ -173,7 +193,7 @@ namespace ServerBrowser.UI
         [UIAction("listSelect")]
         internal void Select(TableView tableView, int row)
         {
-            var selectedRow = LobbyList.data[row];
+            var selectedRow = GameList.data[row];
 
             if (selectedRow == null)
             {
@@ -181,8 +201,8 @@ namespace ServerBrowser.UI
                 return;
             }
 
-            var selectedLobbyItem = (LobbyUiItem)selectedRow;
-            _selectedLobby = selectedLobbyItem.LobbyInfo;
+            var selectedLobbyItem = (HostedGameCell)selectedRow;
+            _selectedLobby = selectedLobbyItem.Game;
 
             ConnectButton.interactable = true;
         }
@@ -192,6 +212,7 @@ namespace ServerBrowser.UI
         {
             if (HostedGameBrowser.PageIndex > 0)
             {
+                CancelImageDownloads();
                 HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize);
             }
         }
@@ -201,7 +222,29 @@ namespace ServerBrowser.UI
         {
             if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
             {
+                CancelImageDownloads();
                 HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize);
+            }
+        }
+
+        internal void CellUpdateCallback(CustomListTableData.CustomCellInfo cell)
+        {
+            Plugin.Log.Warn(cell.text);
+
+            foreach (var visibleCell in GameList.tableView.visibleCells)
+            {
+                // This is some BSML witchcraft. BSML made our cell a clone of the game's LevelListTableCell, where
+                //   the title component is _songNameText, which we use for finding the right cell to update.
+
+                var frankenCell = visibleCell as LevelListTableCell;
+
+                if (frankenCell.GetField<TextMeshProUGUI>("_songNameText")?.text == cell.text)
+                {
+                    GameList.tableView.RefreshCellsContent();
+                    return;
+                }
+
+                Plugin.Log.Warn(frankenCell.GetField<TextMeshProUGUI>("_songNameText")?.text);
             }
         }
         #endregion

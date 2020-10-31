@@ -19,8 +19,6 @@ namespace ServerBrowser.Core
         public int PlayerCount { get; set; }
         public int PlayerLimit { get; set; }
         public bool IsModded { get; set; }
-        public int FirstSeen { get; set; }
-        public int LastUpdate { get; set; }
         public MultiplayerLobbyState LobbyState { get; set; } = MultiplayerLobbyState.None;
         public string LevelId { get; set; } = null;
         public string SongName { get; set; } = null;
@@ -31,12 +29,8 @@ namespace ServerBrowser.Core
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
             var stateDescr = MpLobbyStatePatch.IsInGame ? "In game" : "In lobby";
-            var songDescr = "No song";
 
-            if (LevelId != null)
-                songDescr = $"{SongAuthor} - {SongName}";
-
-            return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {stateDescr}, {moddedDescr}, {songDescr})";
+            return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {stateDescr}, {moddedDescr})";
         }
 
         public string ToJson()
