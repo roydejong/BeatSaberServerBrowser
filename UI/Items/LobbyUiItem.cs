@@ -1,11 +1,6 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Components;
+﻿using BeatSaberMarkupLanguage.Components;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
-using ServerBrowser.Utils;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Items
 {
@@ -29,7 +24,21 @@ namespace ServerBrowser.UI.Items
             var modeDescription = LobbyInfo.IsModded ? "Modded" : "Vanilla";
 
             this.text = LobbyInfo.GameName;
-            this.subtext = $"{LobbyInfo.PlayerCount} / {LobbyInfo.PlayerLimit} players, {modeDescription}";
+
+            if (LobbyInfo.LobbyState == MultiplayerLobbyState.GameRunning && LobbyInfo.LevelId != null)
+            {
+                this.subtext = $"[{LobbyInfo.PlayerCount} / {LobbyInfo.PlayerLimit}] {LobbyInfo.SongAuthor} - {LobbyInfo.SongName} ({LobbyInfo.Difficulty})";
+                SetCoverArt(LobbyInfo.LevelId);
+            }
+            else
+            {
+                this.subtext = $"[{LobbyInfo.PlayerCount} / {LobbyInfo.PlayerLimit}] {modeDescription} lobby";
+            }
+        }
+
+        public void SetCoverArt(string levelId)
+        {
+            // TODO Load cover art via game, or BeatSaver, somehow.
         }
     }
 }

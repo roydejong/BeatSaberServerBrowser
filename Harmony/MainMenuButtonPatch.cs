@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using ServerBrowser.Core;
-using ServerBrowser.Core;
 
 namespace ServerBrowser.Harmony
 {

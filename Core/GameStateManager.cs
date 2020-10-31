@@ -9,9 +9,14 @@ namespace ServerBrowser.Core
     public static class GameStateManager
     {
         private static string _lobbyCode = null;
+        private static bool? _didSetLocalPlayerState = null;
+
         private static bool _didAnnounce = false;
+        private static bool _sentUnAnnounce = false;
         private static HostedGameData _lastCompleteAnnounce = null;
-        private static bool? _localPlayerStateValue = null;
+
+        private static IPreviewBeatmapLevel _level = null;
+        private static BeatmapDifficulty? _difficulty = null;
 
         public static string StatusText { get; private set; } = "Unknown status";
         public static bool HasErrored { get; private set; } = true;
@@ -27,8 +32,23 @@ namespace ServerBrowser.Core
             }
         }
 
+        public static void HandleSongSelected(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
+            BeatmapCharacteristicSO beatmapCharacteristic, GameplayModifiers gameplayModifiers)
+        {
+            if (!MpLobbyConnectionTypePatch.IsPartyHost)
+                return;
+
+            _level = previewBeatmapLevel;
+            _difficulty = beatmapDifficulty;
+
+            HandleUpdate();
+        }
+
         public static void HandleLobbyCode(string lobbyCode)
         {
+            if (!MpLobbyConnectionTypePatch.IsPartyHost)
+                return;
+
             if (_lobbyCode != lobbyCode)
             {
                 Plugin.Log?.Info($"Got lobby server code: \"{lobbyCode}\"");
@@ -48,8 +68,10 @@ namespace ServerBrowser.Core
 #pragma warning disable CS4014
             var sessionManager = GameMp.SessionManager;
 
-            if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer
-                || !MpLobbyConnectionTypePatch.IsPartyHost)
+            if (sessionManager == null
+                || !MpLobbyConnectionTypePatch.IsPartyMultiplayer
+                || !MpLobbyConnectionTypePatch.IsPartyHost
+                || !MpLobbyStatePatch.IsValidMpState)
             {
                 // We are not in a party lobby, or we are not the host
                 // Make sure any previous host announcements by us are cancelled and bail
@@ -65,9 +87,9 @@ namespace ServerBrowser.Core
             if (Plugin.Config.LobbyAnnounceToggle)
             {
                 // Toggle is on, ensure state is synced
-                if (!_localPlayerStateValue.HasValue || _localPlayerStateValue.Value == false)
+                if (!_didSetLocalPlayerState.HasValue || _didSetLocalPlayerState.Value == false)
                 {
-                    _localPlayerStateValue = true;
+                    _didSetLocalPlayerState = true;
                     sessionManager.SetLocalPlayerState("lobbyannounce", true); // NB: this calls another update
                 }
             }
@@ -79,9 +101,9 @@ namespace ServerBrowser.Core
 
                 UnAnnounce();
 
-                if (!_localPlayerStateValue.HasValue || _localPlayerStateValue.Value == true)
+                if (!_didSetLocalPlayerState.HasValue || _didSetLocalPlayerState.Value == true)
                 {
-                    _localPlayerStateValue = false;
+                    _didSetLocalPlayerState = false;
                     sessionManager.SetLocalPlayerState("lobbyannounce", false); // NB: this calls another update
                 }
 
@@ -111,7 +133,12 @@ namespace ServerBrowser.Core
                 OwnerName = sessionManager.localPlayer.userName,
                 PlayerCount = sessionManager.connectedPlayers.Count + 1, // + 1 for the local player host
                 PlayerLimit = sessionManager.maxPlayerCount,
-                IsModded = sessionManager.localPlayer.HasState("modded") && sessionManager.localPlayer.HasState("customsongs")
+                IsModded = sessionManager.localPlayer.HasState("modded") && sessionManager.localPlayer.HasState("customsongs"),
+                LobbyState = MpLobbyStatePatch.LobbyState,
+                LevelId = _level?.levelID,
+                SongName = _level?.songName,
+                SongAuthor = _level?.songAuthorName,
+                Difficulty = _difficulty
             };
 
             StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
@@ -127,6 +154,8 @@ namespace ServerBrowser.Core
 
         private static async Task DoAnnounce(HostedGameData announce)
         {
+            _sentUnAnnounce = false;
+
             if (await MasterServerAPI.Announce(announce))
             {
                 _didAnnounce = true;
@@ -154,8 +183,10 @@ namespace ServerBrowser.Core
         /// </summary>
         public static async Task UnAnnounce()
         {
-            if (_lastCompleteAnnounce != null)
+            if (_lastCompleteAnnounce != null && !_sentUnAnnounce)
             {
+                _sentUnAnnounce = true;
+
                 if (await MasterServerAPI.UnAnnounce(_lastCompleteAnnounce))
                 {
                     Plugin.Log?.Info($"Host announcement was deleted OK!");

@@ -1,5 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using Newtonsoft.Json;
+using ServerBrowser.Harmony;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,24 @@ namespace ServerBrowser.Core
         public int PlayerCount { get; set; }
         public int PlayerLimit { get; set; }
         public bool IsModded { get; set; }
+        public int FirstSeen { get; set; }
+        public int LastUpdate { get; set; }
+        public MultiplayerLobbyState LobbyState { get; set; } = MultiplayerLobbyState.None;
+        public string LevelId { get; set; } = null;
+        public string SongName { get; set; } = null;
+        public string SongAuthor { get; set; } = null;
+        public BeatmapDifficulty? Difficulty { get; set; }
 
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
-            return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {moddedDescr})";
+            var stateDescr = MpLobbyStatePatch.IsInGame ? "In game" : "In lobby";
+            var songDescr = "No song";
+
+            if (LevelId != null)
+                songDescr = $"{SongAuthor} - {SongName}";
+
+            return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {stateDescr}, {moddedDescr}, {songDescr})";
         }
 
         public string ToJson()

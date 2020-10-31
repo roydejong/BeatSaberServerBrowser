@@ -20,7 +20,7 @@ namespace ServerBrowser.Harmony
             if (nextConnectionType != ConnectionType)
             {
                 ConnectionType = nextConnectionType;
-                Plugin.Log?.Info($"Lobby state change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
+                Plugin.Log?.Info($"Lobby connection type change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
                 GameStateManager.HandleUpdate();
             }
         }

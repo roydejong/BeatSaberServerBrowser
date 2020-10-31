@@ -110,12 +110,12 @@ namespace ServerBrowser.UI
                 // Currently disabled
                 if (GameStateManager.DidLeakCurrentCode)
                 {
-                    statusText.text = "Announcement cancelled";
+                    statusText.text = "Cancelled, now removed from browser\r\nNOTE: Your server code may have been seen already";
                     statusText.color = Color.red;
                 }
                 else
                 {
-                    statusText.text = "Turn this on to announce your server to the world";
+                    statusText.text = "Turn me on to list your server in the browser ↑";
                     statusText.color = Color.yellow;
                 }
                 
