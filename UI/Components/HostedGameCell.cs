@@ -6,7 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ServerBrowser.UI.Items
+namespace ServerBrowser.UI.Components
 {
     public class HostedGameCell : CustomListTableData.CustomCellInfo
     {

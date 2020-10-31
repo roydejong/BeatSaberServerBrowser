@@ -8,11 +8,11 @@ using ServerBrowser.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace ServerBrowser.UI
+namespace ServerBrowser.UI.Components
 {
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {
-        public const string ResourceName = "ServerBrowser.UI.LobbyConfigPanel.bsml";
+        public const string ResourceName = "ServerBrowser.UI.BSML.LobbyConfigPanel.bsml";
 
         #region LobbyAnnounceToggle
         [UIComponent("LobbyAnnounceToggle")]

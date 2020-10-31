@@ -139,9 +139,10 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\Items\HostedGameCell.cs" />
-    <Compile Include="UI\ServerBrowserViewController.cs" />
-    <Compile Include="UI\LobbyConfigPanel.cs" />
+    <Compile Include="UI\Components\HostedGameCell.cs" />
+    <Compile Include="UI\PluginUi.cs" />
+    <Compile Include="UI\ViewControllers\ServerBrowserViewController.cs" />
+    <Compile Include="UI\Components\LobbyConfigPanel.cs" />
     <Compile Include="Utils\BeatSaverHelper.cs" />
     <Compile Include="Utils\GameMp.cs" />
   </ItemGroup>
@@ -151,9 +152,9 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
-    <EmbeddedResource Include="UI\LobbyConfigPanel.bsml" />
+    <EmbeddedResource Include="UI\BSML\LobbyConfigPanel.bsml" />
     <None Include="README.md" />
-    <EmbeddedResource Include="UI\ServerBrowserViewController.bsml" />
+    <EmbeddedResource Include="UI\BSML\ServerBrowserViewController.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">

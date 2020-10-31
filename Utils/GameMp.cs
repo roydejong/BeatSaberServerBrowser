@@ -2,6 +2,7 @@
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.UI;
+using ServerBrowser.UI.ViewControllers;
 using System.Linq;
 using UnityEngine;
 
@@ -38,26 +39,6 @@ namespace ServerBrowser.Utils
 
             mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController", new object[] {
                 mpJoiningLobbyViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical
-            });
-        }
-
-        public static void PresentServerBrowserView()
-        {
-            var mpFlowCoordinator = ModeSelectionFlowCoordinator;
-
-            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("PresentViewController", new object[] {
-                ServerBrowserViewController.Instance, null, ViewController.AnimationDirection.Vertical, false
-            });
-
-            FixLobbyBrowserTitle();
-        }
-
-        public static void FixLobbyBrowserTitle()
-        {
-            var mpFlowCoordinator = ModeSelectionFlowCoordinator;
-
-            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("SetTitle", new object[] {
-                "Server Browser", ViewController.AnimationType.In
             });
         }
 

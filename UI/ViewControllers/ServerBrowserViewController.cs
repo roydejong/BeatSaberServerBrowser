@@ -2,8 +2,9 @@
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using HMUI;
+using IPA.Utilities;
 using ServerBrowser.Core;
-using ServerBrowser.UI.Items;
+using ServerBrowser.UI.Components;
 using ServerBrowser.Utils;
 using SongCore.Utilities;
 using System.Threading;
@@ -11,11 +12,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ServerBrowser.UI
+namespace ServerBrowser.UI.ViewControllers
 {
     public class ServerBrowserViewController : BeatSaberMarkupLanguage.ViewControllers.BSMLResourceViewController
     {
-        public override string ResourceName => "ServerBrowser.UI.ServerBrowserViewController.bsml";
+        public override string ResourceName => "ServerBrowser.UI.BSML.ServerBrowserViewController.bsml";
 
         #region Data/UI updates
         internal CancellationTokenSource _imageDownloadCancellation;
@@ -23,7 +24,7 @@ namespace ServerBrowser.UI
 
         private void SetInitialUiState()
         {
-            GameMp.FixLobbyBrowserTitle();
+            UpdateTitle();
 
             StatusText.text = "Loading...";
             StatusText.color = Color.gray;
@@ -35,6 +36,15 @@ namespace ServerBrowser.UI
 
             ClearSelection();
             CancelImageDownloads();
+        }
+
+        private static void UpdateTitle()
+        {
+            var mpFlowCoordinator = GameMp.ModeSelectionFlowCoordinator;
+
+            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("SetTitle", new object[] {
+                "Server Browser", ViewController.AnimationType.In
+            });
         }
 
         private void CancelImageDownloads(bool reset = true)
@@ -99,18 +109,6 @@ namespace ServerBrowser.UI
         #endregion
 
         #region Lifecycle
-        private static ServerBrowserViewController _instance;
-        public static ServerBrowserViewController Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = BeatSaberUI.CreateViewController<ServerBrowserViewController>();
-
-                return _instance;
-            }
-        }
-
         public override void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.__Activate(addedToHierarchy, screenSystemEnabling);

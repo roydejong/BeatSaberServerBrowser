@@ -14,10 +14,9 @@ namespace ServerBrowser.Harmony
         static bool Prefix(MultiplayerModeSelectionFlowCoordinator __instance, MultiplayerModeSelectionViewController viewController, MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
             // When the "GameBrowser" button is clicked, bypass the game's own incomplete code & open our view instead
-
             if (menuButton == MultiplayerModeSelectionViewController.MenuButton.GameBrowser)
             {
-                GameMp.PresentServerBrowserView();
+                PluginUi.LaunchServerBrowser();
                 return false;
             }
 

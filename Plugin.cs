@@ -4,6 +4,7 @@ using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.UI;
+using ServerBrowser.UI.Components;
 using System.Net.Http;
 using System.Reflection;
 using IPALogger = IPA.Logging.Logger;

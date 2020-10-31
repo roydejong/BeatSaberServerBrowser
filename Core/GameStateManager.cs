@@ -1,5 +1,5 @@
 ﻿using ServerBrowser.Harmony;
-using ServerBrowser.UI;
+using ServerBrowser.UI.Components;
 using ServerBrowser.Utils;
 using System;
 using System.Threading.Tasks;
