@@ -19,7 +19,7 @@ To show your game in the server browser, you must have the mod installed and fli
 ![Host UI](https://user-images.githubusercontent.com/6772638/97474280-3d34a000-194c-11eb-8e1a-447a80b4d7bd.png)
 
 ## Installation
-Download the latest build from the [Releases](https://github.com/roydejong/BeatSaberLobbyBrowserMod/releases) page, and extract it to your Beat Saber folder.
+Download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.
 
 *If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 

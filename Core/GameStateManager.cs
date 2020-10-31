@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ServerBrowser.Core
 {
-    public static class LobbyStateManager
+    public static class GameStateManager
     {
         private static string _lobbyCode = null;
         private static bool _didAnnounce = false;
-        private static LobbyAnnounceInfo _lastCompleteAnnounce = null;
+        private static HostedGameData _lastCompleteAnnounce = null;
         private static bool? _localPlayerStateValue = null;
 
         public static string StatusText { get; private set; } = "Unknown status";
@@ -48,8 +48,8 @@ namespace ServerBrowser.Core
 #pragma warning disable CS4014
             var sessionManager = GameMp.SessionManager;
 
-            if (sessionManager == null || !LobbyConnectionTypePatch.IsPartyMultiplayer
-                || !LobbyConnectionTypePatch.IsPartyHost)
+            if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer
+                || !MpLobbyConnectionTypePatch.IsPartyHost)
             {
                 // We are not in a party lobby, or we are not the host
                 // Make sure any previous host announcements by us are cancelled and bail
@@ -103,7 +103,7 @@ namespace ServerBrowser.Core
                 return;
             }
 
-            var lobbyAnnounce = new LobbyAnnounceInfo()
+            var lobbyAnnounce = new HostedGameData()
             {
                 ServerCode = _lobbyCode,
                 GameName = $"{sessionManager.localPlayer.userName}'s game",
@@ -125,9 +125,9 @@ namespace ServerBrowser.Core
 #pragma warning restore CS4014
         }
 
-        private static async Task DoAnnounce(LobbyAnnounceInfo announce)
+        private static async Task DoAnnounce(HostedGameData announce)
         {
-            if (await MasterServerApi.Announce(announce))
+            if (await MasterServerAPI.Announce(announce))
             {
                 _didAnnounce = true;
                 _lastCompleteAnnounce = announce;
@@ -156,7 +156,7 @@ namespace ServerBrowser.Core
         {
             if (_lastCompleteAnnounce != null)
             {
-                if (await MasterServerApi.UnAnnounce(_lastCompleteAnnounce))
+                if (await MasterServerAPI.UnAnnounce(_lastCompleteAnnounce))
                 {
                     Plugin.Log?.Info($"Host announcement was deleted OK!");
 

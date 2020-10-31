@@ -25,7 +25,7 @@ namespace ServerBrowser.Utils
             private set;
         }
 
-        public static void JoinLobbyWithCode(string serverCode)
+        public static void ConnectToServerCode(string serverCode)
         {
             var mpFlowCoordinator = ModeSelectionFlowCoordinator;
             var mpConnectionController = ReflectionUtil.GetField<MultiplayerLobbyConnectionController, MultiplayerModeSelectionFlowCoordinator>(mpFlowCoordinator, "_multiplayerLobbyConnectionController");
@@ -41,16 +41,17 @@ namespace ServerBrowser.Utils
             });
         }
 
-        public static void ShowLobbyBrowser()
+        public static void PresentServerBrowserView()
         {
             var mpFlowCoordinator = ModeSelectionFlowCoordinator;
 
             mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("PresentViewController", new object[] {
-                LobbyBrowserViewController.Instance, null, ViewController.AnimationDirection.Vertical, false
+                ServerBrowserViewController.Instance, null, ViewController.AnimationDirection.Vertical, false
             });
 
             FixLobbyBrowserTitle();
         }
+
         public static void FixLobbyBrowserTitle()
         {
             var mpFlowCoordinator = ModeSelectionFlowCoordinator;

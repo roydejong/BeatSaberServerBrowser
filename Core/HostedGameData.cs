@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ServerBrowser.Core
 {
-    public class LobbyAnnounceInfo
+    public class HostedGameData
     {
         public int? Id { get; set; }
         public string ServerCode { get; set; }

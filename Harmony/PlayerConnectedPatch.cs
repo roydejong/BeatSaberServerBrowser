@@ -2,7 +2,7 @@
 using ServerBrowser;
 using ServerBrowser.Core;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
     class PlayerConnectedPatch
     {
@@ -13,7 +13,7 @@ namespace LobbyBrowserMod.Harmony
         static void Postfix(IConnectedPlayer player)
         {
             Plugin.Log?.Info($"Player connected: {player.userId}, {player.userName}");
-            LobbyStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate();
         }
     }
 }

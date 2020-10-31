@@ -2,7 +2,7 @@
 using ServerBrowser;
 using ServerBrowser.Core;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
     class PlayerDisconnectedPatch
     {
@@ -13,7 +13,7 @@ namespace LobbyBrowserMod.Harmony
         static void Postfix(IConnectedPlayer player)
         {
             Plugin.Log?.Info($"Player disconnected: {player.userId}, {player.userName}");
-            LobbyStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate();
         }
     }
 }

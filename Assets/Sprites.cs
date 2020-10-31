@@ -14,7 +14,7 @@ namespace ServerBrowser.Assets
 
         public static void Initialize()
         {
-            BeatSaverIcon = LoadSpriteFromResources("LobbyBrowserMod.Assets.Sprites.BeatSaver.png");
+            BeatSaverIcon = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
         }
 
         public static Texture2D LoadTextureRaw(byte[] file)

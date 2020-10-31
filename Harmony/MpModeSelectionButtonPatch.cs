@@ -9,7 +9,7 @@ namespace ServerBrowser.Harmony
 {
 
     [HarmonyPatch(typeof(MultiplayerModeSelectionFlowCoordinator), "HandleMultiplayerLobbyControllerDidFinish", MethodType.Normal)]
-    class MultiplayerModeSelectionFlowPatch
+    class MpModeSelectionButtonPatch
     {
         static bool Prefix(MultiplayerModeSelectionFlowCoordinator __instance, MultiplayerModeSelectionViewController viewController, MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
@@ -17,7 +17,7 @@ namespace ServerBrowser.Harmony
 
             if (menuButton == MultiplayerModeSelectionViewController.MenuButton.GameBrowser)
             {
-                GameMp.ShowLobbyBrowser();
+                GameMp.PresentServerBrowserView();
                 return false;
             }
 

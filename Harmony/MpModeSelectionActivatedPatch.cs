@@ -8,7 +8,7 @@ namespace ServerBrowser.Harmony
 {
 
     [HarmonyPatch(typeof(MultiplayerModeSelectionViewController), "DidActivate", MethodType.Normal)]
-    class MultiplayerModeSelectionPatch
+    class MpModeSelectionActivatedPatch
     {
         static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {

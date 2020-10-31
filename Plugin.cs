@@ -14,6 +14,8 @@ namespace ServerBrowser
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
+        public const string HarmonyId = "mod.serverbrowser";
+
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
         internal static PluginConfig Config { get; private set; }
@@ -40,7 +42,7 @@ namespace ServerBrowser
         {
             Log?.Debug("OnApplicationStart");
 
-            Harmony = new HarmonyLib.Harmony("mod.lobbybrowser");
+            Harmony = new HarmonyLib.Harmony(HarmonyId);
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log?.Debug($"Harmony patching complete.");
 
@@ -54,7 +56,7 @@ namespace ServerBrowser
             Log?.Debug("OnApplicationQuit");
 
             // Try to cancel any host announcements we may have had
-            LobbyStateManager.UnAnnounce();
+            GameStateManager.UnAnnounce();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace ServerBrowser.UI
 {
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {
-        public const string ResourceName = "LobbyBrowserMod.UI.LobbyConfigPanel.bsml";
+        public const string ResourceName = "ServerBrowser.UI.LobbyConfigPanel.bsml";
 
         #region LobbyAnnounceToggle
         [UIComponent("LobbyAnnounceToggle")]
@@ -36,7 +36,7 @@ namespace ServerBrowser.UI
         public void SetLobbyAnnounceToggle(bool value)
         {
             LobbyAnnounceToggleValue = value;
-            LobbyStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate();
         }
         #endregion
 
@@ -66,7 +66,7 @@ namespace ServerBrowser.UI
 
             sessionManager = GameMp.SessionManager;
 
-            if (sessionManager == null || !LobbyConnectionTypePatch.IsPartyMultiplayer)
+            if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer)
             {
                 statusText.text = "Only supported for custom multiplayer games.";
                 statusText.color = Color.yellow;
@@ -76,7 +76,7 @@ namespace ServerBrowser.UI
                 return;
             }
 
-            if (!LobbyConnectionTypePatch.IsPartyHost)
+            if (!MpLobbyConnectionTypePatch.IsPartyHost)
             {
                 // We are not the host
                 lobbyAnnounceToggle.interactable = false;
@@ -108,7 +108,7 @@ namespace ServerBrowser.UI
             if (!LobbyAnnounceToggleValue)
             {
                 // Currently disabled
-                if (LobbyStateManager.DidLeakCurrentCode)
+                if (GameStateManager.DidLeakCurrentCode)
                 {
                     statusText.text = "Announcement cancelled";
                     statusText.color = Color.red;
@@ -123,8 +123,8 @@ namespace ServerBrowser.UI
             }
 
             // Currently enabled
-            statusText.text = LobbyStateManager.StatusText;
-            statusText.color = LobbyStateManager.HasErrored ? Color.red : Color.green;
+            statusText.text = GameStateManager.StatusText;
+            statusText.color = GameStateManager.HasErrored ? Color.red : Color.green;
         }
         #endregion
 

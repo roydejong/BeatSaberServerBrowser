@@ -1,4 +1,4 @@
-﻿using LobbyBrowserMod.Core;
+﻿using ServerBrowser.Core;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace ServerBrowser.Core
 {
-    public static class MasterServerApi
+    public static class MasterServerAPI
     {
         #region Shared/HTTP
         private const string BASE_URL = "https://bs-lobby-master.roydejong.net/api/v1";
         private static readonly HttpClient client;
 
-        static MasterServerApi()
+        static MasterServerAPI()
         {
             client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
@@ -26,7 +26,7 @@ namespace ServerBrowser.Core
             get
             {
                 var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                return $"LobbyBrowserMod/{assemblyVersion}";
+                return $"ServerBrowser/{assemblyVersion}";
             }
         }
 
@@ -86,7 +86,7 @@ namespace ServerBrowser.Core
         private static DateTime? _lastSentAt = null;
         private const int ANNOUNCE_INTERVAL_MINS = 1;
 
-        public static async Task<bool> Announce(LobbyAnnounceInfo announce)
+        public static async Task<bool> Announce(HostedGameData announce)
         {
             var payload = announce.ToJson();
 
@@ -109,7 +109,7 @@ namespace ServerBrowser.Core
             return responseOk;
         }
 
-        public static async Task<bool> UnAnnounce(LobbyAnnounceInfo announce)
+        public static async Task<bool> UnAnnounce(HostedGameData announce)
         {
             Plugin.Log?.Info($"Cancelling host announcement: {announce.GameName}, {announce.ServerCode}");
 
@@ -119,7 +119,7 @@ namespace ServerBrowser.Core
             return responseOk;
         }
 
-        public static async Task<LobbyBrowseResult> Browse(int offset)
+        public static async Task<ServerBrowseResult> Browse(int offset)
         {
             Plugin.Log?.Info($"Requesting lobbies from server (offset {offset})");
 
@@ -128,7 +128,7 @@ namespace ServerBrowser.Core
 
             try
             {
-                return LobbyBrowseResult.FromJson(contentStr);
+                return ServerBrowseResult.FromJson(contentStr);
             }
             catch (Exception ex)
             {

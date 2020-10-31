@@ -15,7 +15,7 @@ namespace ServerBrowser.Harmony
             if (state == "customsongs" || state == "modded")
             {
                 Plugin.Log?.Info($"Local player state change (MultiplayerExtensions): {state}");
-                LobbyStateManager.HandleUpdate();
+                GameStateManager.HandleUpdate();
             }
             else
             {

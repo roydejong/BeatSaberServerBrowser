@@ -3,22 +3,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LobbyBrowserMod.Core
+namespace ServerBrowser.Core
 {
-    public static class LobbyBrowser
+    public static class HostedGameBrowser
     {
         public static event Action OnUpdate;
 
-        private static LobbyBrowseResult _lastServerResult;
-        private static Dictionary<int, LobbyAnnounceInfo> _lobbyObjects;
-        private static List<LobbyAnnounceInfo> _lobbiesOnPage;
+        private static ServerBrowseResult _lastServerResult;
+        private static Dictionary<int, HostedGameData> _lobbyObjects;
+        private static List<HostedGameData> _lobbiesOnPage;
         private static int _offset;
 
         public static async Task FullRefresh()
         {
             _lastServerResult = null;
-            _lobbyObjects = new Dictionary<int, LobbyAnnounceInfo>(10);
-            _lobbiesOnPage = new List<LobbyAnnounceInfo>(10);
+            _lobbyObjects = new Dictionary<int, HostedGameData>(10);
+            _lobbiesOnPage = new List<HostedGameData>(10);
 
             await LoadPage(0);
         }
@@ -26,14 +26,14 @@ namespace LobbyBrowserMod.Core
         public static async Task LoadPage(int offset)
         {
             // Send API request
-            var result = await MasterServerApi.Browse(offset);
+            var result = await MasterServerAPI.Browse(offset);
 
             // Update state
             _offset = offset;
             _lastServerResult = result;
 
             // If we got results, process and index the lobby info
-            var nextLobbiesOnPage = new List<LobbyAnnounceInfo>();
+            var nextLobbiesOnPage = new List<HostedGameData>();
 
             if (_lastServerResult != null)
             {
@@ -98,11 +98,11 @@ namespace LobbyBrowserMod.Core
             }
         }
 
-        public static List<LobbyAnnounceInfo> LobbiesOnPage
+        public static List<HostedGameData> LobbiesOnPage
         {
             get
             {
-                return new List<LobbyAnnounceInfo>(_lobbiesOnPage);
+                return new List<HostedGameData>(_lobbiesOnPage);
             }
         }
     }

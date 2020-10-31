@@ -11,13 +11,13 @@ namespace ServerBrowser.UI.Items
 {
     public class LobbyUiItem : CustomListTableData.CustomCellInfo
     {
-        public LobbyAnnounceInfo LobbyInfo
+        public HostedGameData LobbyInfo
         {
             get;
             private set;
         }
 
-        public LobbyUiItem(LobbyAnnounceInfo lobbyInfo) : base("Lobby", "Lobby info", Sprites.BeatSaverIcon)
+        public LobbyUiItem(HostedGameData lobbyInfo) : base("Lobby", "Lobby info", Sprites.BeatSaverIcon)
         {
             LobbyInfo = lobbyInfo;
 

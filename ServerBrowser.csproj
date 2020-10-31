@@ -116,26 +116,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
-    <Compile Include="Core\LobbyAnnounceInfo.cs" />
-    <Compile Include="Core\LobbyBrowser.cs" />
-    <Compile Include="Core\LobbyBrowseResult.cs" />
-    <Compile Include="Core\LobbyStateManager.cs" />
-    <Compile Include="Core\MasterServerApi.cs" />
-    <Compile Include="Harmony\LobbyCodePatch.cs" />
-    <Compile Include="Harmony\LobbyConnectionTypePatch.cs" />
-    <Compile Include="Harmony\LobbyPlayerStatePatch.cs" />
-    <Compile Include="Harmony\MainMenuViewPatch.cs" />
-    <Compile Include="Harmony\MultiplayerModeSelectionFlowPatch.cs" />
-    <Compile Include="Harmony\MultiplayerModeSelectionPatch.cs" />
+    <Compile Include="Core\HostedGameData.cs" />
+    <Compile Include="Core\HostedGameBrowser.cs" />
+    <Compile Include="Core\ServerBrowseResult.cs" />
+    <Compile Include="Core\GameStateManager.cs" />
+    <Compile Include="Core\MasterServerAPI.cs" />
+    <Compile Include="Harmony\SetLobbyCodePatch.cs" />
+    <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
+    <Compile Include="Harmony\MpPlayerStateChangedPatch.cs" />
+    <Compile Include="Harmony\MainMenuButtonPatch.cs" />
+    <Compile Include="Harmony\MpModeSelectionButtonPatch.cs" />
+    <Compile Include="Harmony\MpModeSelectionActivatedPatch.cs" />
     <Compile Include="Harmony\PlayerConnectedPatch.cs" />
     <Compile Include="Harmony\PlayerDisconnectedPatch.cs" />
     <Compile Include="Harmony\SetLocalPlayerStatePatch.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Items\LobbyUiItem.cs" />
-    <Compile Include="UI\LobbyBrowserViewController.cs" />
+    <Compile Include="UI\ServerBrowserViewController.cs" />
     <Compile Include="UI\LobbyConfigPanel.cs" />
     <Compile Include="Utils\GameMp.cs" />
   </ItemGroup>
@@ -147,7 +146,7 @@
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
     <EmbeddedResource Include="UI\LobbyConfigPanel.bsml" />
     <None Include="README.md" />
-    <EmbeddedResource Include="UI\LobbyBrowserViewController.bsml" />
+    <EmbeddedResource Include="UI\ServerBrowserViewController.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -157,7 +156,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Sprites\BeatSaver.png" />
+    <EmbeddedResource Include="Assets\Sprites\BeatSaver.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\BSML\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
