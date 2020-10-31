@@ -46,10 +46,6 @@
     <Reference Include="BeatmapCore">
       <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
     </Reference>
-    <Reference Include="BeatSaverSharp, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Libs\BeatSaverSharp.dll</HintPath>
-    </Reference>
     <Reference Include="BGNet">
       <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Beat Saber_Data\Managed\BGNet.dll</HintPath>
     </Reference>
@@ -146,6 +142,7 @@
     <Compile Include="UI\Items\HostedGameCell.cs" />
     <Compile Include="UI\ServerBrowserViewController.cs" />
     <Compile Include="UI\LobbyConfigPanel.cs" />
+    <Compile Include="Utils\BeatSaverHelper.cs" />
     <Compile Include="Utils\GameMp.cs" />
   </ItemGroup>
   <ItemGroup>

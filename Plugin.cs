@@ -1,15 +1,11 @@
-﻿using ServerBrowser.UI;
-using BeatSaberMarkupLanguage.GameplaySetup;
-using IPA;
+﻿using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
+using ServerBrowser.Assets;
+using ServerBrowser.Core;
+using ServerBrowser.UI;
 using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
-using HarmonyLib;
-using ServerBrowser.Core;
-using ServerBrowser.Assets;
-using BeatSaverSharp;
-using System.IO;
 
 namespace ServerBrowser
 {
@@ -22,7 +18,17 @@ namespace ServerBrowser
         internal static IPALogger Log { get; private set; }
         internal static PluginConfig Config { get; private set; }
         internal static HarmonyLib.Harmony Harmony { get; private set; }
-        internal static BeatSaverSharp.BeatSaver BeatSaver { get; private set; }
+
+        public static string UserAgent
+        {
+            get
+            {
+                var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                var bsVersion = IPA.Utilities.UnityGame.GameVersion.ToString();
+
+                return $"ServerBrowser/{assemblyVersion} (BeatSaber/{bsVersion})";
+            }
+        }
 
         [Init]
         /// <summary>
@@ -36,7 +42,6 @@ namespace ServerBrowser
             Log = logger;
             Config = conf.Generated<PluginConfig>();
 
-            // TODO one day figure out how to not do this in single player, doesn't currently seem possible to remove it conditionally though
             LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
@@ -44,6 +49,7 @@ namespace ServerBrowser
         public void OnApplicationStart()
         {
             Log?.Debug("OnApplicationStart");
+            Log?.Info(UserAgent);
 
             // Harmony
             Harmony = new HarmonyLib.Harmony(HarmonyId);
@@ -53,13 +59,6 @@ namespace ServerBrowser
             // Assets
             Sprites.Initialize();
             Log?.Debug($"Sprite conversion complete.");
-
-            // BeatSaver client
-            BeatSaver = new BeatSaverSharp.BeatSaver(new BeatSaverSharp.HttpOptions()
-            {
-                ApplicationName = "ServerBrowser",
-                Version = Assembly.GetExecutingAssembly().GetName().Version,
-            });
         }
 
         [OnExit]

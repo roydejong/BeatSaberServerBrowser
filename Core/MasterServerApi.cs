@@ -17,17 +17,8 @@ namespace ServerBrowser.Core
         static MasterServerAPI()
         {
             client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+            client.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             client.DefaultRequestHeaders.Add("X-BSLBM", "✔");
-        }
-
-        private static string UserAgent
-        {
-            get
-            {
-                var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                return $"ServerBrowser/{assemblyVersion}";
-            }
         }
 
         private static async Task<HttpResponseMessage> PerformWebRequest(string method, string endpoint, string json = null)

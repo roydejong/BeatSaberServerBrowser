@@ -28,7 +28,6 @@ These libraries are required, install them using ModAssistant if you don't have 
 
 - BSIPA ^4.1.3
 - BeatSaberMarkupLanguage ^1.4.0
-- BeatSaverSharp ^1.6.0
 - SongCore ^3.0.0
 
 ### Recommended

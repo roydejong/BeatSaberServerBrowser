@@ -134,6 +134,9 @@ namespace ServerBrowser.UI
         private static bool _tabIsAdded = false;
         public static void RegisterGameplayModifierTab()
         {
+            // TODO one day figure out how to NOT do this in single player,
+            //   doesn't currently seem possible to remove it conditionally though
+
             if (!_tabIsAdded)
             {
                 GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance);
