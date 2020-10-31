@@ -29,9 +29,9 @@ namespace ServerBrowser.UI
             PageUpButton.interactable = false;
             PageDownButton.interactable = false;
             RefreshButton.interactable = false;
+            ConnectButton.interactable = false;
 
             ClearSelection();
-            SetLoading(true);
         }
 
         private LoadingControl loadingSpinner;
@@ -41,35 +41,6 @@ namespace ServerBrowser.UI
             LobbyList?.tableView?.ClearSelection();
             ConnectButton.interactable = false;
             _selectedLobby = null;
-        }
-
-        private void SetLoading(bool value)
-        {
-            if (value)
-            {
-                if (loadingSpinner == null)
-                {
-                    loadingSpinner = GameObject.Instantiate(Resources.FindObjectsOfTypeAll<LoadingControl>().First(), LoadingModal.transform);
-                }
-
-                Destroy(loadingSpinner.GetComponent<Touchable>());
-
-                parserParams.EmitEvent("loadingModalOpen");
-                loadingSpinner.ShowLoading("Fetching servers...");
-            }
-            else
-            {
-                parserParams.EmitEvent("loadingModalClose");
-
-                if (loadingSpinner != null)
-                {
-                    loadingSpinner.Hide();
-                    Destroy(loadingSpinner);
-                    loadingSpinner = null;
-                }
-            }
-
-            ClearSelection();
         }
 
         private void LobbyBrowser_OnUpdate()
@@ -107,8 +78,6 @@ namespace ServerBrowser.UI
             RefreshButton.interactable = true;
             PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;
             PageDownButton.interactable = HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1;
-
-            SetLoading(false);
         }
         #endregion
 
@@ -132,7 +101,6 @@ namespace ServerBrowser.UI
             HostedGameBrowser.OnUpdate += LobbyBrowser_OnUpdate;
 
             SetInitialUiState();
-            SetLoading(true);
             HostedGameBrowser.FullRefresh();
         }
 
@@ -179,7 +147,6 @@ namespace ServerBrowser.UI
         internal void RefreshButtonClick()
         {
             SetInitialUiState();
-            SetLoading(true);
 
             HostedGameBrowser.FullRefresh();
         }
@@ -225,7 +192,6 @@ namespace ServerBrowser.UI
         {
             if (HostedGameBrowser.PageIndex > 0)
             {
-                SetLoading(true);
                 HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize);
             }
         }
@@ -235,7 +201,6 @@ namespace ServerBrowser.UI
         {
             if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
             {
-                SetLoading(true);
                 HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize);
             }
         }
