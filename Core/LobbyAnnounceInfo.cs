@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LobbyBrowserMod.Core
+namespace ServerBrowser.Core
 {
     public class LobbyAnnounceInfo
     {

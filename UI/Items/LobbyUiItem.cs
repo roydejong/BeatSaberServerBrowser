@@ -1,13 +1,13 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
-using LobbyBrowserMod.Assets;
-using LobbyBrowserMod.Core;
-using LobbyBrowserMod.Utils;
+using ServerBrowser.Assets;
+using ServerBrowser.Core;
+using ServerBrowser.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LobbyBrowserMod.UI.Items
+namespace ServerBrowser.UI.Items
 {
     public class LobbyUiItem : CustomListTableData.CustomCellInfo
     {

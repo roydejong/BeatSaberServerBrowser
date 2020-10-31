@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using LobbyBrowserMod.Core;
+using ServerBrowser.Core;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
     /// <summary>
     /// This patch is helpful as it fires when MultiplayerExtensions has a settings change.

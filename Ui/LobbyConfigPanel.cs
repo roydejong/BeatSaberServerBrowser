@@ -2,13 +2,13 @@
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.GameplaySetup;
-using LobbyBrowserMod.Core;
-using LobbyBrowserMod.Harmony;
-using LobbyBrowserMod.Utils;
+using ServerBrowser.Core;
+using ServerBrowser.Harmony;
+using ServerBrowser.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace LobbyBrowserMod.UI
+namespace ServerBrowser.UI
 {
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {

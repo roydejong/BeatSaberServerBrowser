@@ -2,10 +2,10 @@
 using HarmonyLib;
 using HMUI;
 using IPA.Utilities;
-using LobbyBrowserMod.UI;
-using LobbyBrowserMod.Utils;
+using ServerBrowser.UI;
+using ServerBrowser.Utils;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
 
     [HarmonyPatch(typeof(MultiplayerModeSelectionFlowCoordinator), "HandleMultiplayerLobbyControllerDidFinish", MethodType.Normal)]

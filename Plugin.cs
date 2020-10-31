@@ -1,4 +1,4 @@
-﻿using LobbyBrowserMod.UI;
+﻿using ServerBrowser.UI;
 using BeatSaberMarkupLanguage.GameplaySetup;
 using IPA;
 using IPA.Config;
@@ -6,10 +6,10 @@ using IPA.Config.Stores;
 using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
 using HarmonyLib;
-using LobbyBrowserMod.Core;
-using LobbyBrowserMod.Assets;
+using ServerBrowser.Core;
+using ServerBrowser.Assets;
 
-namespace LobbyBrowserMod
+namespace ServerBrowser
 {
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin

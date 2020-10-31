@@ -4,7 +4,7 @@ using IPA.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
 
     [HarmonyPatch(typeof(MultiplayerModeSelectionViewController), "DidActivate", MethodType.Normal)]

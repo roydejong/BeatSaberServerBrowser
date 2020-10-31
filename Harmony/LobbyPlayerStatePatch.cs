@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using LobbyBrowserMod.Core;
+using ServerBrowser.Core;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
     [HarmonyPatch(typeof(MultiplayerSessionManager), "HandlePlayerStateChanged", MethodType.Normal)]
     class LobbyPlayerStatePatch

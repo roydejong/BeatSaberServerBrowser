@@ -8,8 +8,8 @@
     <ProjectGuid>{DC5955D7-A9A4-475C-90D6-CFB0340DD5C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LobbyBrowserMod</RootNamespace>
-    <AssemblyName>LobbyBrowserMod</AssemblyName>
+    <RootNamespace>ServerBrowser</RootNamespace>
+    <AssemblyName>ServerBrowser</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <DebugSymbols>true</DebugSymbols>
@@ -115,15 +115,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\LobbyAnnounceInfo.cs" />
+    <Compile Include="Core\LobbyBrowser.cs" />
+    <Compile Include="Core\LobbyBrowseResult.cs" />
     <Compile Include="Core\LobbyStateManager.cs" />
     <Compile Include="Core\MasterServerApi.cs" />
     <Compile Include="Harmony\LobbyCodePatch.cs" />
     <Compile Include="Harmony\LobbyConnectionTypePatch.cs" />
-    <Compile Include="Harmony\LobbyPlayerConnectedPatch.cs" />
     <Compile Include="Harmony\LobbyPlayerStatePatch.cs" />
+    <Compile Include="Harmony\MainMenuViewPatch.cs" />
     <Compile Include="Harmony\MultiplayerModeSelectionFlowPatch.cs" />
     <Compile Include="Harmony\MultiplayerModeSelectionPatch.cs" />
+    <Compile Include="Harmony\PlayerConnectedPatch.cs" />
+    <Compile Include="Harmony\PlayerDisconnectedPatch.cs" />
     <Compile Include="Harmony\SetLocalPlayerStatePatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
@@ -150,6 +155,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Sprites\BeatSaver.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

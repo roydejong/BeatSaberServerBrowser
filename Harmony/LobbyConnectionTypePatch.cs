@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
 using IPA.Utilities;
-using LobbyBrowserMod.Core;
+using ServerBrowser.Core;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
     /// <summary>
     /// This patch lets us query information about the multiplayer lobby.

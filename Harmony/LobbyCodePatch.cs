@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using LobbyBrowserMod.Core;
+using ServerBrowser.Core;
 
-namespace LobbyBrowserMod.Harmony
+namespace ServerBrowser.Harmony
 {
     /// <summary>
     /// This patch lets us retrieve the Server Code for the current lobby.

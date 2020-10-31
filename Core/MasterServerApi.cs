@@ -1,11 +1,12 @@
-﻿using System;
+﻿using LobbyBrowserMod.Core;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LobbyBrowserMod.Core
+namespace ServerBrowser.Core
 {
     public static class MasterServerApi
     {

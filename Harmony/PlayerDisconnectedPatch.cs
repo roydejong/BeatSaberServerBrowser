@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
-using LobbyBrowserMod.Core;
+using ServerBrowser;
+using ServerBrowser.Core;
 
 namespace LobbyBrowserMod.Harmony
 {

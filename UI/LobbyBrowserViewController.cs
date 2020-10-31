@@ -3,8 +3,9 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using HMUI;
 using LobbyBrowserMod.Core;
-using LobbyBrowserMod.UI.Items;
-using LobbyBrowserMod.Utils;
+using ServerBrowser.Core;
+using ServerBrowser.UI.Items;
+using ServerBrowser.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LobbyBrowserMod.UI
+namespace ServerBrowser.UI
 {
     public class LobbyBrowserViewController : BeatSaberMarkupLanguage.ViewControllers.BSMLResourceViewController
     {

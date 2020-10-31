@@ -1,10 +1,10 @@
-﻿using LobbyBrowserMod.Harmony;
-using LobbyBrowserMod.UI;
-using LobbyBrowserMod.Utils;
+﻿using ServerBrowser.Harmony;
+using ServerBrowser.UI;
+using ServerBrowser.Utils;
 using System;
 using System.Threading.Tasks;
 
-namespace LobbyBrowserMod.Core
+namespace ServerBrowser.Core
 {
     public static class LobbyStateManager
     {

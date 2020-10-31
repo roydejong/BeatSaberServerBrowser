@@ -1,11 +1,11 @@
 ﻿using BeatSaberMarkupLanguage;
 using HMUI;
 using IPA.Utilities;
-using LobbyBrowserMod.UI;
+using ServerBrowser.UI;
 using System.Linq;
 using UnityEngine;
 
-namespace LobbyBrowserMod.Utils
+namespace ServerBrowser.Utils
 {
     public static class GameMp
     {
