@@ -35,10 +35,16 @@ namespace ServerBrowser.UI.Items
             var modeDescription = Game.IsModded ? "Modded" : "Vanilla";
 
             this.text = Game.GameName;
+            this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}]";
 
             if (Game.LobbyState == MultiplayerLobbyState.GameRunning && Game.LevelId != null)
             {
-                this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}] {Game.SongAuthor} - {Game.SongName} ({Game.Difficulty})";
+                if (!String.IsNullOrEmpty(Game.SongAuthor))
+                {
+                    this.subtext += $" {Game.SongAuthor} -";
+                }
+
+                this.subtext += $" {Game.SongName}";
 
                 try
                 {
@@ -51,7 +57,12 @@ namespace ServerBrowser.UI.Items
             }
             else
             {
-                this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}] {modeDescription} lobby";
+                this.subtext += $" {modeDescription} lobby";
+            }
+
+            if (Game.Difficulty.HasValue)
+            {
+                this.subtext += $" ({Game.Difficulty})";
             }
         }
 
