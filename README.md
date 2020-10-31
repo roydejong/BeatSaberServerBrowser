@@ -1,20 +1,27 @@
-# Multiplayer Lobby Browser Mod for Beat Saber
-✨ **This is a modification for Beat Saber 1.12.2+ that adds a browser for custom multiplayer games.**
+# Server Browser Mod for Beat Saber
+✨ **This is a Beat Saber mod that adds a Server Browser for multiplayer games!**
 
-## How it works
+## Overview
+- If you have this mod and host a game, you can share it in the Server Browser with a single switch.
+- Browse games in-game and join them with one click, no need to exchange server codes!
+- Supports modded / custom song lobbies via [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions)
 
-### Hosting games
-This mod, if enabled, shares your Server Code automatically, and lets users join with one click.
-
-![Host UI](https://user-images.githubusercontent.com/6772638/97474280-3d34a000-194c-11eb-8e1a-447a80b4d7bd.png)
+![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97654900-3436f200-1a64-11eb-98e3-818db3dd16aa.png)
 
 ### Joining games
-From the "Multiplayer" menu, press the new "Lobby Browser" button. You will now see a list of all custom party games that you can join.
+After installing the mod, you can find the Server Browser in the Multiplayer menu.
+
+From there, simply select a game and click Connect to join up.
+
+### For hosts
+To show your game in the server browser, you must have the mod installed and flip the switch:
+
+![Host UI](https://user-images.githubusercontent.com/6772638/97474280-3d34a000-194c-11eb-8e1a-447a80b4d7bd.png)
 
 ## Installation
 Download the latest build from the [Releases](https://github.com/roydejong/BeatSaberLobbyBrowserMod/releases) page, and extract it to your Beat Saber folder.
 
-(If the mod was successfully installed, you will have `LobbyBrowserMod.dll` in your `Plugins` directory.)
+*If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 
 ### Requirements
 These libraries are required, install them with ModAssistant if you don't have them yet.
@@ -23,4 +30,4 @@ These libraries are required, install them with ModAssistant if you don't have t
 - BeatSaberMarkupLanguage ^1.4.0
 
 ### Recommended
-🔥 The lobby browser supports [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom maps! You can see which games are "modded" in the browser.
+I highly recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom maps! You can see which games are "modded" in the browser.
