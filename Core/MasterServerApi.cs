@@ -1,9 +1,8 @@
-﻿using ServerBrowser.Core;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ServerBrowser.Core
@@ -12,26 +11,10 @@ namespace ServerBrowser.Core
     {
         #region Shared/HTTP
         private const string BASE_URL = "https://bs-lobby-master.roydejong.net/api/v1";
-        private static readonly HttpClient client;
-
-        static MasterServerAPI()
-        {
-            client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
-            client.DefaultRequestHeaders.Add("X-BSLBM", "✔");
-        }
 
         private static async Task<HttpResponseMessage> PerformWebRequest(string method, string endpoint, string json = null)
         {
             var targetUrl = BASE_URL + endpoint;
-
-            // Add a GUID to the URL (for some reason requests get stuck if they're not unique???)
-            var guid = Guid.NewGuid().ToString().Replace("-", "");
-            if (!targetUrl.Contains("?"))
-                targetUrl += $"?rnd={guid}";
-            else
-                targetUrl += $"&rnd={guid}";
-
             Plugin.Log?.Debug($"{method} {targetUrl} {json}");
 
             try
@@ -41,16 +24,17 @@ namespace ServerBrowser.Core
                 switch (method)
                 {
                     case "GET":
-                        response = await client.GetAsync(targetUrl);
+                        response = await Plugin.HttpClient.GetAsync(targetUrl).ConfigureAwait(false);
                         break;
                     case "POST":
                         if (String.IsNullOrEmpty(json))
                         {
-                            response = await client.PostAsync(targetUrl, null);
+                            response = await Plugin.HttpClient.PostAsync(targetUrl, null).ConfigureAwait(false);
                         }
                         else
                         {
-                            response = await client.PostAsync(targetUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+                            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                            response = await Plugin.HttpClient.PostAsync(targetUrl, content).ConfigureAwait(false);
                         }
                         break;
                     default:
@@ -64,6 +48,10 @@ namespace ServerBrowser.Core
 
                 Plugin.Log?.Debug($"✔ 200 OK: {method} {targetUrl}");
                 return response;
+            }
+            catch (TaskCanceledException ex)
+            {
+                return null;
             }
             catch (Exception ex)
             {

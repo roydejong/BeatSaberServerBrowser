@@ -194,6 +194,10 @@ namespace ServerBrowser.Core
                     _didAnnounce = false;
                     _lastCompleteAnnounce = null;
                 }
+                else
+                {
+                    _sentUnAnnounce = false;
+                }
             }
         }
     }

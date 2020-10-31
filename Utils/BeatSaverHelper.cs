@@ -9,15 +9,7 @@ namespace ServerBrowser.Utils
 {
     public static class BeatSaverHelper
     {
-        private static HttpClient _client;
-        private static Dictionary<string, string> _hashToCoverURLCache;
-
-        static BeatSaverHelper()
-        {
-            _client = new HttpClient();
-            _client.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
-            _hashToCoverURLCache = new Dictionary<string, string>();
-        }
+        private static Dictionary<string, string> _hashToCoverURLCache = new Dictionary<string, string>();
 
         public static async Task<byte[]> FetchCoverArtBytes(string levelId, CancellationToken token)
         {
@@ -40,7 +32,7 @@ namespace ServerBrowser.Utils
 
                 try
                 {
-                    var response = await _client.GetAsync(targetUrl, token).ConfigureAwait(false);
+                    var response = await Plugin.HttpClient.GetAsync(targetUrl, token).ConfigureAwait(false);
                     var content = JObject.Parse(await response.Content.ReadAsStringAsync());
                     coverURL = content["coverURL"].ToString();
 
@@ -48,6 +40,10 @@ namespace ServerBrowser.Utils
                     {
                         _hashToCoverURLCache.Add(levelHash, coverURL);
                     }
+                }
+                catch (TaskCanceledException ex)
+                {
+                    return null;
                 }
                 catch (Exception ex)
                 {
@@ -63,8 +59,12 @@ namespace ServerBrowser.Utils
 
                 try
                 {
-                    var coverResponse = await _client.GetAsync(targetUrl, token).ConfigureAwait(false);
+                    var coverResponse = await Plugin.HttpClient.GetAsync(targetUrl, token).ConfigureAwait(false);
                     return await coverResponse.Content.ReadAsByteArrayAsync();
+                }
+                catch (TaskCanceledException ex)
+                {
+                    return null;
                 }
                 catch (Exception ex)
                 {

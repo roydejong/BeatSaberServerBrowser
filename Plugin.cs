@@ -4,6 +4,7 @@ using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.UI;
+using System.Net.Http;
 using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
 
@@ -17,7 +18,9 @@ namespace ServerBrowser
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
         internal static PluginConfig Config { get; private set; }
+
         internal static HarmonyLib.Harmony Harmony { get; private set; }
+        internal static HttpClient HttpClient { get; private set; }
 
         public static string UserAgent
         {
@@ -42,6 +45,7 @@ namespace ServerBrowser
             Log = logger;
             Config = conf.Generated<PluginConfig>();
 
+            // Modifiers tab (in-lobby)
             LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
@@ -49,7 +53,13 @@ namespace ServerBrowser
         public void OnApplicationStart()
         {
             Log?.Debug("OnApplicationStart");
+
+            // HTTP client
             Log?.Info(UserAgent);
+
+            HttpClient = new HttpClient();
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
+            HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
             // Harmony
             Harmony = new HarmonyLib.Harmony(HarmonyId);
