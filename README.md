@@ -6,7 +6,7 @@
 - Browse games in-game and join them with one click, no need to exchange server codes!
 - Supports modded / custom song lobbies via [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions)
 
-![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97654900-3436f200-1a64-11eb-98e3-818db3dd16aa.png)
+![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97787980-d31f3380-1bb5-11eb-8169-9887b8ade093.png)
 
 ### Joining games
 After installing the mod, you can find the Server Browser in the Multiplayer menu.
@@ -14,7 +14,9 @@ After installing the mod, you can find the Server Browser in the Multiplayer men
 From there, simply select a game and click Connect to join up.
 
 ### For hosts
-To show your game in the server browser, you must have the mod installed and flip the switch:
+To show your game in the server browser, you must have the mod installed. 
+
+You can then make your game visible by flipping the switch under Gameplay Setup:
 
 ![Host UI](https://user-images.githubusercontent.com/6772638/97474280-3d34a000-194c-11eb-8e1a-447a80b4d7bd.png)
 
