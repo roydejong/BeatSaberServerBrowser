@@ -130,6 +130,7 @@
     <Compile Include="Core\ServerBrowseResult.cs" />
     <Compile Include="Core\GameStateManager.cs" />
     <Compile Include="Core\MasterServerAPI.cs" />
+    <Compile Include="Core\UpdateTimer.cs" />
     <Compile Include="Harmony\MpLobbyStatePatch.cs" />
     <Compile Include="Harmony\SetLobbyCodePatch.cs" />
     <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />

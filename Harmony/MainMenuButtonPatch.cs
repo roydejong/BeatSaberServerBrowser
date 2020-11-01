@@ -5,7 +5,7 @@ namespace ServerBrowser.Harmony
 {
     /// <summary>
     /// This patch updates the UI so it doesn't look broken outside of multiplayer.
-    /// This won't be needed anymore if we figure out how to hide our modifier panel in non-multiplayer menus.
+    /// This won't be needed anymore if we figure out how to hide our modifier panel in non-multiplayer menus (issue #3).
     /// </summary>
     [HarmonyPatch(typeof(MainMenuViewController), "HandleMenuButton", MethodType.Normal)]
     public class MainMenuButtonPatch

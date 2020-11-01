@@ -6,6 +6,7 @@ using ServerBrowser.Core;
 using ServerBrowser.UI.Components;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using IPALogger = IPA.Logging.Logger;
 
@@ -71,6 +72,9 @@ namespace ServerBrowser
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
+            // Start update timer
+            UpdateTimer.Start();
+
             // Detect platform
             // Note - currently (will be fixed in BS utils soon!): if the health warning is skipped (like in fpfc mode),
             //  this await will hang until a song is played, so the platform will be stuck on "unknown" til then
@@ -81,6 +85,9 @@ namespace ServerBrowser
         public void OnApplicationQuit()
         {
             Log?.Debug("OnApplicationQuit");
+
+            // Cancel update timer
+            UpdateTimer.Stop();
 
             // Try to cancel any host announcements we may have had
             GameStateManager.UnAnnounce();
