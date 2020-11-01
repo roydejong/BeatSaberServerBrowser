@@ -36,3 +36,15 @@ These libraries are required, install them using ModAssistant if you don't have 
 
 ### Recommended
 I **highly** recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom maps in multiplayer! You can see which games are "modded" in the browser.
+
+## FAQs / Troubleshooting
+
+### Does cross-play work?
+No. We currently use the official matchmaking servers, and they won't connect cross-play games.
+
+This mod detects your platform as either Steam or Oculus, and will only show you games on your platform.
+
+### Are Quick Play servers supported?
+No. Right now, only "Create Server" games (those that have a Server Code) can be listed on the server browser.
+
+Note, the host must have this mod installed and turned on as well.

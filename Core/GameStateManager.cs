@@ -164,15 +164,14 @@ namespace ServerBrowser.Core
                 LevelId = _level?.levelID,
                 SongName = _level?.songName,
                 SongAuthor = _level?.songAuthorName,
-                Difficulty = _difficulty
+                Difficulty = _difficulty,
+                Platform = Plugin.PlatformId
             };
 
             StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
             HasErrored = false;
 
             LobbyConfigPanel.UpdatePanelInstance();
-
-            // TODO: Announce only if we actually have a useful update (hash announce info object?)
 
             DoAnnounce(lobbyAnnounce);
 #pragma warning restore CS4014

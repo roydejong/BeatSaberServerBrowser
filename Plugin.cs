@@ -3,10 +3,10 @@ using IPA.Config;
 using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
-using ServerBrowser.UI;
 using ServerBrowser.UI.Components;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 using IPALogger = IPA.Logging.Logger;
 
 namespace ServerBrowser
@@ -51,16 +51,9 @@ namespace ServerBrowser
         }
 
         [OnStart]
-        public void OnApplicationStart()
+        public async void OnApplicationStart()
         {
             Log?.Debug("OnApplicationStart");
-
-            // HTTP client
-            Log?.Info(UserAgent);
-
-            HttpClient = new HttpClient();
-            HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
-            HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
             // Harmony
             Harmony = new HarmonyLib.Harmony(HarmonyId);
@@ -70,6 +63,18 @@ namespace ServerBrowser
             // Assets
             Sprites.Initialize();
             Log?.Debug($"Sprite conversion complete.");
+
+            // HTTP client
+            Log?.Info(UserAgent);
+
+            HttpClient = new HttpClient();
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
+            HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
+
+            // Detect platform
+            // Note - currently (will be fixed in BS utils soon!): if the health warning is skipped (like in fpfc mode),
+            //  this await will hang until a song is played, so the platform will be stuck on "unknown" til then
+            await DetectPlatform();
         }
 
         [OnExit]
@@ -80,5 +85,30 @@ namespace ServerBrowser
             // Try to cancel any host announcements we may have had
             GameStateManager.UnAnnounce();
         }
+
+        #region Platform detection
+        public const string PLATFORM_UNKNOWN = "unknown";
+        public const string PLATFORM_STEAM = "steam";
+        public const string PLATFORM_OCULUS = "oculus";
+
+        public static string PlatformId { get; private set; } = PLATFORM_UNKNOWN;
+
+        private async Task DetectPlatform()
+        {
+            PlatformId = PLATFORM_UNKNOWN;
+            
+            var userInfo = await BS_Utils.Gameplay.GetUserInfo.GetUserAsync().ConfigureAwait(false);
+            Plugin.Log.Info($"Got platform user info: {userInfo.platform} / UID {userInfo.platformUserId}");
+
+            if (userInfo.platform == UserInfo.Platform.Oculus)
+            {
+                PlatformId = PLATFORM_OCULUS;
+            }
+            else
+            {
+                PlatformId = PLATFORM_STEAM;
+            }
+        }
+        #endregion
     }
 }

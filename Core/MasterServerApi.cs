@@ -113,7 +113,7 @@ namespace ServerBrowser.Core
                 searchQueryEncoded = HttpUtility.UrlEncode(searchQuery);
             }
 
-            var response = await PerformWebRequest("GET", $"/browse?offset={offset}&query={searchQueryEncoded}");
+            var response = await PerformWebRequest("GET", $"/browse?platform={Plugin.PlatformId}&offset={offset}&query={searchQueryEncoded}");
             var contentStr = await response.Content.ReadAsStringAsync();     
 
             try
