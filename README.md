@@ -1,12 +1,14 @@
 # Server Browser Mod for Beat Saber
 ✨ **This is a Beat Saber mod that adds a Server Browser for multiplayer games!**
 
+⚠ This is a test version, please try it out and report any issues. 
+
 ## Overview
 - If you have this mod and host a game, you can share it in the Server Browser with a single switch.
 - Browse games in-game and join them with one click, no need to exchange server codes!
 - Supports modded / custom song lobbies via [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions)
 
-![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97787980-d31f3380-1bb5-11eb-8169-9887b8ade093.png)
+![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97793891-9cb3d980-1bf2-11eb-8785-ed99c11f6db6.png)
 
 ### Joining games
 After installing the mod, you can find the Server Browser in the Multiplayer menu.
@@ -18,7 +20,7 @@ To show your game in the server browser, you must have the mod installed.
 
 You can then make your game visible by flipping the switch under Gameplay Setup:
 
-![Host UI](https://user-images.githubusercontent.com/6772638/97788072-56408980-1bb6-11eb-8e5d-55f956522f00.png)
+![Host UI](https://user-images.githubusercontent.com/6772638/97793912-f7e5cc00-1bf2-11eb-9302-0d9292a64288.png)
 
 ## Installation
 Download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.
