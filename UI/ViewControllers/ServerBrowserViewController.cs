@@ -113,7 +113,7 @@ namespace ServerBrowser.UI.ViewControllers
             }
             else if (!HostedGameBrowser.AnyResults)
             {
-                if (!IsSearching)
+                if (IsSearching)
                 {
                     StatusText.text = "No servers found matching your search";
                 }
