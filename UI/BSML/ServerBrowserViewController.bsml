@@ -7,10 +7,10 @@
   <vertical id="mainContentRoot">
 
     <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0" anchor-max-x="0.5">
-      <button id="refreshButton" pad="0" pref-height="8" pref-width="20" on-click="refreshButtonClick" text="Refresh"></button>
-      <button id="searchButton" pad="0" pref-height="8" pref-width="20" on-click="searchButtonClick" text="Search"></button>
-      <button id="createButton" pad="0" pref-height="8" pref-width="27" on-click="createButtonClick" text="Create server"></button>
-      <primary-button id="connectButton" pad="0" pref-height="8" pref-width="27" on-click="connectButtonClick" text="Connect"></primary-button>
+      <button id="refreshButton" pad="0" pref-height="8" pref-width="18" on-click="refreshButtonClick" text="Refresh"></button>
+      <button id="searchButton" pad="0" pref-height="8" pref-width="18" on-click="searchButtonClick" text="Search"></button>
+      <button id="createButton" pad="0" pref-height="8" pref-width="26" on-click="createButtonClick" text="Create server"></button>
+      <primary-button id="connectButton" pad="0" pref-height="8" pref-width="26" on-click="connectButtonClick" text="Connect"></primary-button>
     </horizontal>
     
     <page-button id="pageUpButton" on-click="pageUpButtonClick" direction="Up"></page-button>

@@ -19,118 +19,6 @@ namespace ServerBrowser.UI.ViewControllers
     {
         public override string ResourceName => "ServerBrowser.UI.BSML.ServerBrowserViewController.bsml";
 
-        #region Data/UI updates
-        internal CancellationTokenSource _imageDownloadCancellation;
-        private HostedGameData _selectedLobby = null;
-
-        private void SetInitialUiState()
-        {
-            UpdateTitle();
-
-            StatusText.text = "Loading...";
-            StatusText.color = Color.gray;
-
-            RefreshButton.interactable = false;
-            SearchButton.interactable = false;
-            ConnectButton.interactable = false;
-
-            PageUpButton.interactable = false;
-            PageDownButton.interactable = false;
-
-            ClearSelection();
-            CancelImageDownloads();
-        }
-
-        private static void UpdateTitle()
-        {
-            var mpFlowCoordinator = GameMp.ModeSelectionFlowCoordinator;
-
-            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("SetTitle", new object[] {
-                "Server Browser", ViewController.AnimationType.In
-            });
-        }
-
-        private void CancelImageDownloads(bool reset = true)
-        {
-            if (_imageDownloadCancellation != null)
-            {
-                _imageDownloadCancellation.Cancel();
-                _imageDownloadCancellation.Dispose();
-                _imageDownloadCancellation = null;
-            }
-
-            if (reset)
-            {
-                _imageDownloadCancellation = new CancellationTokenSource();
-            }
-        }
-
-        private void ClearSelection()
-        {
-            GameList?.tableView?.ClearSelection();
-            ConnectButton.interactable = false;
-            _selectedLobby = null;
-        }
-
-        private void ClearSearch()
-        {
-            SearchValue = "";
-        }
-
-        private void LobbyBrowser_OnUpdate()
-        {
-            GameList.data.Clear();
-            CancelImageDownloads();
-
-            if (!HostedGameBrowser.ConnectionOk)
-            {
-                StatusText.text = "Failed to get server list";
-                StatusText.color = Color.red;
-            }
-            else if (!HostedGameBrowser.AnyResults)
-            {
-                if (!String.IsNullOrEmpty(SearchValue))
-                {
-                    StatusText.text = "No servers found matching your search";
-                }
-                else
-                {
-                    StatusText.text = "Sorry, no servers found";
-                }
-
-                StatusText.color = Color.red;
-            }
-            else
-            {
-                StatusText.text = $"Found {HostedGameBrowser.TotalResultCount} "
-                    + (HostedGameBrowser.TotalResultCount == 1 ? "server" : "servers")
-                    + $" (Page {HostedGameBrowser.PageIndex + 1} of {HostedGameBrowser.TotalPageCount})";
-
-                StatusText.color = Color.green;
-
-                if (!String.IsNullOrEmpty(SearchValue))
-                {
-                    StatusText.text += " (Filtered)";
-                }
-
-                foreach (var lobby in HostedGameBrowser.LobbiesOnPage)
-                {
-                    GameList.data.Add(new HostedGameCell(_imageDownloadCancellation, CellUpdateCallback, lobby));
-                }
-            }
-
-            GameList.tableView.ReloadData();
-            GameList.tableView.selectionType = TableViewSelectionType.Single;
-
-            ClearSelection();
-
-            RefreshButton.interactable = true;
-            SearchButton.interactable = true;
-
-            PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;
-            PageDownButton.interactable = HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1;
-        }
-        #endregion
 
         #region Lifecycle
         public override void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
@@ -151,7 +39,127 @@ namespace ServerBrowser.UI.ViewControllers
 
             parserParams.EmitEvent("closeSearchKeyboard");
 
-            CancelImageDownloads(false);
+            CancelImageLoading(false);
+        }
+        #endregion
+
+        #region Data/UI updates
+        internal CancellationTokenSource _imageLoadCancellation;
+        private HostedGameData _selectedLobby = null;
+
+        private void SetInitialUiState()
+        {
+            UpdateTitle();
+
+            StatusText.text = "Loading...";
+            StatusText.color = Color.gray;
+
+            RefreshButton.interactable = false;
+            SearchButton.interactable = false;
+            ConnectButton.interactable = false;
+
+            PageUpButton.interactable = false;
+            PageDownButton.interactable = false;
+
+            ClearSelection();
+            CancelImageLoading();
+        }
+
+        private static void UpdateTitle()
+        {
+            var mpFlowCoordinator = GameMp.ModeSelectionFlowCoordinator;
+
+            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("SetTitle", new object[] {
+                "Server Browser", ViewController.AnimationType.In
+            });
+        }
+
+        private void CancelImageLoading(bool reset = true)
+        {
+            if (_imageLoadCancellation != null)
+            {
+                _imageLoadCancellation.Cancel();
+                _imageLoadCancellation.Dispose();
+                _imageLoadCancellation = null;
+            }
+
+            if (reset)
+            {
+                _imageLoadCancellation = new CancellationTokenSource();
+            }
+        }
+
+        private void ClearSelection()
+        {
+            GameList?.tableView?.ClearSelection();
+            ConnectButton.interactable = false;
+            _selectedLobby = null;
+        }
+
+        private void ClearSearch()
+        {
+            SearchValue = "";
+        }
+
+        private void LobbyBrowser_OnUpdate()
+        {
+            GameList.data.Clear();
+            CancelImageLoading();
+
+            if (!HostedGameBrowser.ConnectionOk)
+            {
+                StatusText.text = "Failed to get server list";
+                StatusText.color = Color.red;
+            }
+            else if (!HostedGameBrowser.AnyResults)
+            {
+                if (!IsSearching)
+                {
+                    StatusText.text = "No servers found matching your search";
+                }
+                else
+                {
+                    StatusText.text = "Sorry, no servers found";
+                }
+
+                StatusText.color = Color.red;
+            }
+            else
+            {
+                StatusText.text = $"Found {HostedGameBrowser.TotalResultCount} "
+                    + (HostedGameBrowser.TotalResultCount == 1 ? "server" : "servers")
+                    + $" (Page {HostedGameBrowser.PageIndex + 1} of {HostedGameBrowser.TotalPageCount})";
+
+                StatusText.color = Color.green;
+
+                if (IsSearching)
+                {
+                    StatusText.text += " (Filtered)";
+                }
+
+                foreach (var lobby in HostedGameBrowser.LobbiesOnPage)
+                {
+                    GameList.data.Add(new HostedGameCell(_imageLoadCancellation, CellUpdateCallback, lobby));
+                }
+            }
+
+            GameList.tableView.ReloadData();
+            GameList.tableView.selectionType = TableViewSelectionType.Single;
+
+            ClearSelection();
+
+            RefreshButton.interactable = true;
+
+            SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResults);
+            SearchButton.SetButtonText(IsSearching ? "<color=#ff0000>Search</color>" : "Search");
+
+            PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;
+            PageDownButton.interactable = HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1;
+        }
+
+        public bool IsSearching
+        {
+            get => !String.IsNullOrEmpty(SearchValue);
         }
         #endregion
 
@@ -275,7 +283,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             if (HostedGameBrowser.PageIndex > 0)
             {
-                CancelImageDownloads();
+                CancelImageLoading();
                 HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, SearchValue);
             }
         }
@@ -285,7 +293,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
             {
-                CancelImageDownloads();
+                CancelImageLoading();
                 HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, SearchValue);
             }
         }
