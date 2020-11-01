@@ -28,11 +28,12 @@ Download the latest build from the [Releases](https://github.com/roydejong/BeatS
 *If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 
 ### Requirements
-These libraries are required, install them using ModAssistant if you don't have them yet (but you *probably* already do):
+These libraries are required, install them [from BeatMods](https://beatmods.com/#/mods) or [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet:
 
-- BSIPA ^4.1.3
-- BeatSaberMarkupLanguage ^1.4.0
-- SongCore ^3.0.0
+- BSIPA: v4.1.3+
+- BeatSaberMarkupLanguage: v1.4.0+
+- SongCore: v3.0.0+
+- BS Utils: v1.6.1+
 
 ### Recommended
 I **highly** recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom maps in multiplayer! You can see which games are "modded" in the browser.
