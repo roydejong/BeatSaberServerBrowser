@@ -9,6 +9,7 @@ namespace ServerBrowser.Core
     public static class GameStateManager
     {
         private static string _lobbyCode = null;
+        private static string _customGameName = null;
         private static bool? _didSetLocalPlayerState = null;
 
         private static bool _didAnnounce = false;
@@ -60,6 +61,20 @@ namespace ServerBrowser.Core
                     // Lobby code changed and isn't empty; force an update now
                     HandleUpdate();
                 }
+            }
+        }
+        
+        public static void HandleCustomGameName(string name)
+        {
+            if (!MpLobbyConnectionTypePatch.IsPartyHost)
+                return;
+
+            if (name != _customGameName)
+            {
+                Plugin.Log?.Info($"Got custom game name: \"{name}\"");
+
+                _customGameName = name;
+                HandleUpdate();
             }
         }
 
@@ -125,10 +140,21 @@ namespace ServerBrowser.Core
                 return;
             }
 
+            string finalGameName = $"{sessionManager.localPlayer.userName}'s game";
+
+            if (!String.IsNullOrEmpty(_customGameName))
+            {
+                finalGameName = _customGameName;
+            }
+            else if (!String.IsNullOrEmpty(Plugin.Config.CustomGameName))
+            {
+                finalGameName = Plugin.Config.CustomGameName;
+            }
+
             var lobbyAnnounce = new HostedGameData()
             {
                 ServerCode = _lobbyCode,
-                GameName = $"{sessionManager.localPlayer.userName}'s game",
+                GameName = finalGameName,
                 OwnerId = sessionManager.localPlayer.userId,
                 OwnerName = sessionManager.localPlayer.userName,
                 PlayerCount = sessionManager.connectedPlayers.Count + 1, // + 1 for the local player host

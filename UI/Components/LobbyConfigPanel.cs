@@ -2,11 +2,13 @@
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.GameplaySetup;
+using BeatSaberMarkupLanguage.Parser;
 using ServerBrowser.Core;
 using ServerBrowser.Harmony;
 using ServerBrowser.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Components
 {
@@ -15,10 +17,10 @@ namespace ServerBrowser.UI.Components
         public const string ResourceName = "ServerBrowser.UI.BSML.LobbyConfigPanel.bsml";
 
         #region LobbyAnnounceToggle
-        [UIComponent("LobbyAnnounceToggle")]
-        public ToggleSetting lobbyAnnounceToggle;
+        [UIComponent("lobbyAnnounceToggle")]
+        public ToggleSetting LobbyAnnounceToggle;
 
-        [UIValue("LobbyAnnounceToggle")]
+        [UIValue("lobbyAnnounceToggle")]
         public bool LobbyAnnounceToggleValue
         {
             get
@@ -32,7 +34,7 @@ namespace ServerBrowser.UI.Components
             }
         }
 
-        [UIAction("LobbyAnnounceToggle")]
+        [UIAction("lobbyAnnounceToggle")]
         public void SetLobbyAnnounceToggle(bool value)
         {
             LobbyAnnounceToggleValue = value;
@@ -41,8 +43,54 @@ namespace ServerBrowser.UI.Components
         #endregion
 
         #region StatusText
-        [UIComponent("StatusText")]
-        public TextMeshProUGUI statusText;
+        [UIComponent("statusText")]
+        public TextMeshProUGUI StatusText;
+        #endregion
+
+        #region Set Game Name
+        [UIParams]
+        public BSMLParserParams ParserParams;
+
+        [UIComponent("mainContentRoot")]
+        public VerticalLayoutGroup MainContentRoot;
+
+        private string _nameValue = "";
+        [UIValue("nameValue")]
+        public string NameValue
+        {
+            get => Plugin.Config.CustomGameName;
+
+            set
+            {
+
+                Plugin.Config.CustomGameName = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UIAction("nameKeyboardSubmit")]
+        private async void NameKeyboardSubmit(string text)
+        {
+            Plugin.Log?.Info($"Set custom game name to: \"{text}\"");
+
+            NameValue = text;
+
+            // Make main content visible again
+            MainContentRoot.gameObject.SetActive(true);
+
+            // Trigger update
+            GameStateManager.HandleCustomGameName(text);
+        }
+
+
+        [UIComponent("nameButton")]
+        public Button NameButton;
+
+        [UIAction("nameButtonClick")]
+        private void NameButtonClick()
+        {
+            ParserParams.EmitEvent("openNameKeyboard");
+        }
         #endregion
 
         #region UI Update
@@ -58,7 +106,7 @@ namespace ServerBrowser.UI.Components
 
         public void UpdatePanel()
         {
-            if (statusText == null || lobbyAnnounceToggle == null)
+            if (StatusText == null || LobbyAnnounceToggle == null || NameButton == null)
             {
                 // Components not loaded yet
                 return;
@@ -68,63 +116,68 @@ namespace ServerBrowser.UI.Components
 
             if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer)
             {
-                statusText.text = "Only supported for custom multiplayer games.";
-                statusText.color = Color.yellow;
+                StatusText.text = "Only supported for custom multiplayer games.";
+                StatusText.color = Color.yellow;
 
-                lobbyAnnounceToggle.interactable = false;
-                lobbyAnnounceToggle.Value = false;
+                LobbyAnnounceToggle.interactable = false;
+                LobbyAnnounceToggle.Value = false;
+                NameButton.interactable = false;
                 return;
             }
 
             if (!MpLobbyConnectionTypePatch.IsPartyHost)
             {
                 // We are not the host
-                lobbyAnnounceToggle.interactable = false;
+                LobbyAnnounceToggle.interactable = false;
 
                 var theHost = sessionManager.connectionOwner;
 
                 if (theHost != null && theHost.HasState("lobbyannounce"))
                 {
-                    lobbyAnnounceToggle.Value = true;
+                    LobbyAnnounceToggle.Value = true;
 
-                    statusText.text = "The host has announced this lobby.";
-                    statusText.color = Color.green;
+                    StatusText.text = "The host has announced this lobby.";
+                    StatusText.color = Color.green;
                 }
                 else
                 {
-                    lobbyAnnounceToggle.Value = false;
+                    LobbyAnnounceToggle.Value = false;
 
-                    statusText.text = "The host has not announced this lobby.";
-                    statusText.color = Color.red;
+                    StatusText.text = "The host has not announced this lobby.";
+                    StatusText.color = Color.red;
                 }
 
+                NameButton.interactable = false;
                 return;
             }
 
             // We are the host, enable controls
-            lobbyAnnounceToggle.interactable = true;
-            lobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
+            LobbyAnnounceToggle.interactable = true;
+            LobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
 
             if (!LobbyAnnounceToggleValue)
             {
-                // Currently disabled
+                // Toggle is disabled, however
                 if (GameStateManager.DidLeakCurrentCode)
                 {
-                    statusText.text = "Cancelled, now removed from browser\r\nNOTE: Your server code may have been seen already";
-                    statusText.color = Color.red;
+                    StatusText.text = "Cancelled, now removed from browser\r\nNOTE: Your server code may have been seen already";
+                    StatusText.color = Color.red;
                 }
                 else
                 {
-                    statusText.text = "Turn me on to list your server in the browser ↑";
-                    statusText.color = Color.yellow;
+                    StatusText.text = "Turn me on to list your server in the browser ↑";
+                    StatusText.color = Color.yellow;
                 }
-                
+
+                NameButton.interactable = false;
                 return;
             }
 
-            // Currently enabled
-            statusText.text = GameStateManager.StatusText;
-            statusText.color = GameStateManager.HasErrored ? Color.red : Color.green;
+            // Fallthrough: enabled & all good to go
+            StatusText.text = GameStateManager.StatusText;
+            StatusText.color = GameStateManager.HasErrored ? Color.red : Color.green;
+
+            NameButton.interactable = true;
         }
         #endregion
 
