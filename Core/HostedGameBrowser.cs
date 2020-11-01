@@ -14,19 +14,19 @@ namespace ServerBrowser.Core
         private static List<HostedGameData> _lobbiesOnPage;
         private static int _offset;
 
-        public static async Task FullRefresh()
+        public static async Task FullRefresh(string searchQuery)
         {
             _lastServerResult = null;
             _lobbyObjects = new Dictionary<int, HostedGameData>(10);
             _lobbiesOnPage = new List<HostedGameData>(10);
 
-            await LoadPage(0);
+            await LoadPage(0, searchQuery);
         }
 
-        public static async Task LoadPage(int offset)
+        public static async Task LoadPage(int offset, string searchQuery)
         {
             // Send API request
-            var result = await MasterServerAPI.Browse(offset);
+            var result = await MasterServerAPI.Browse(offset, searchQuery);
 
             // Update state
             _offset = offset;

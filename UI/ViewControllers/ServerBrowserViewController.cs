@@ -7,6 +7,7 @@ using ServerBrowser.Core;
 using ServerBrowser.UI.Components;
 using ServerBrowser.Utils;
 using SongCore.Utilities;
+using System;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -29,10 +30,12 @@ namespace ServerBrowser.UI.ViewControllers
             StatusText.text = "Loading...";
             StatusText.color = Color.gray;
 
+            RefreshButton.interactable = false;
+            SearchButton.interactable = false;
+            ConnectButton.interactable = false;
+
             PageUpButton.interactable = false;
             PageDownButton.interactable = false;
-            RefreshButton.interactable = false;
-            ConnectButton.interactable = false;
 
             ClearSelection();
             CancelImageDownloads();
@@ -69,6 +72,11 @@ namespace ServerBrowser.UI.ViewControllers
             _selectedLobby = null;
         }
 
+        private void ClearSearch()
+        {
+            SearchValue = "";
+        }
+
         private void LobbyBrowser_OnUpdate()
         {
             GameList.data.Clear();
@@ -81,7 +89,15 @@ namespace ServerBrowser.UI.ViewControllers
             }
             else if (!HostedGameBrowser.AnyResults)
             {
-                StatusText.text = "Sorry, no servers found";
+                if (!String.IsNullOrEmpty(SearchValue))
+                {
+                    StatusText.text = "No servers found matching your search";
+                }
+                else
+                {
+                    StatusText.text = "Sorry, no servers found";
+                }
+
                 StatusText.color = Color.red;
             }
             else
@@ -89,7 +105,13 @@ namespace ServerBrowser.UI.ViewControllers
                 StatusText.text = $"Found {HostedGameBrowser.TotalResultCount} "
                     + (HostedGameBrowser.TotalResultCount == 1 ? "server" : "servers")
                     + $" (Page {HostedGameBrowser.PageIndex + 1} of {HostedGameBrowser.TotalPageCount})";
+
                 StatusText.color = Color.green;
+
+                if (!String.IsNullOrEmpty(SearchValue))
+                {
+                    StatusText.text += " (Filtered)";
+                }
 
                 foreach (var lobby in HostedGameBrowser.LobbiesOnPage)
                 {
@@ -103,6 +125,8 @@ namespace ServerBrowser.UI.ViewControllers
             ClearSelection();
 
             RefreshButton.interactable = true;
+            SearchButton.interactable = true;
+
             PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;
             PageDownButton.interactable = HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1;
         }
@@ -116,7 +140,7 @@ namespace ServerBrowser.UI.ViewControllers
             HostedGameBrowser.OnUpdate += LobbyBrowser_OnUpdate;
 
             SetInitialUiState();
-            HostedGameBrowser.FullRefresh();
+            HostedGameBrowser.FullRefresh(SearchValue);
         }
 
         public override void __Deactivate(bool removedFromHierarchy, bool deactivateGameObject, bool screenSystemDisabling)
@@ -124,7 +148,8 @@ namespace ServerBrowser.UI.ViewControllers
             base.__Deactivate(removedFromHierarchy, deactivateGameObject, screenSystemDisabling);
 
             HostedGameBrowser.OnUpdate -= LobbyBrowser_OnUpdate;
-            parserParams.EmitEvent("loadingModalClose");
+
+            parserParams.EmitEvent("closeSearchKeyboard");
 
             CancelImageDownloads(false);
         }
@@ -134,17 +159,26 @@ namespace ServerBrowser.UI.ViewControllers
         [UIParams]
         public BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams;
 
+        [UIComponent("mainContentRoot")]
+        public VerticalLayoutGroup MainContentRoot;
+
+        [UIComponent("searchKeyboard")]
+        public ModalKeyboard SearchKeyboard;
+
         [UIComponent("statusText")]
         public TextMeshProUGUI StatusText;
 
         [UIComponent("lobbyList")]
         public CustomListTableData GameList;
 
-        [UIComponent("createButton")]
-        public Button CreateButton;
-
         [UIComponent("refreshButton")]
         public Button RefreshButton;
+
+        [UIComponent("searchButton")]
+        public Button SearchButton;
+
+        [UIComponent("createButton")]
+        public Button CreateButton;
 
         [UIComponent("connectButton")]
         public Button ConnectButton;
@@ -160,21 +194,54 @@ namespace ServerBrowser.UI.ViewControllers
         #endregion
 
         #region UI Events
+        private string _searchValue = "";
+
+        [UIValue("searchValue")]
+        public string SearchValue
+        {
+            get => _searchValue;
+            set
+            {
+                _searchValue = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UIAction("searchKeyboardSubmit")]
+        private async void SearchKeyboardSubmit(string text)
+        {
+            Plugin.Log?.Debug($"Set server search query to: {text}");
+            SearchValue = text;
+
+            // Make main content visible again
+            MainContentRoot.gameObject.SetActive(true);
+
+            // Hit refresh
+            RefreshButtonClick();
+        }
+
         [UIAction("refreshButtonClick")]
-        internal void RefreshButtonClick()
+        private void RefreshButtonClick()
         {
             SetInitialUiState();
-            HostedGameBrowser.FullRefresh();
+            HostedGameBrowser.FullRefresh(SearchValue);
+        }
+
+        [UIAction("searchButtonClick")]
+        private void SearchButtonClick()
+        {
+            ClearSelection();
+            parserParams.EmitEvent("openSearchKeyboard");
         }
 
         [UIAction("createButtonClick")]
-        internal void CreateButtonClick()
+        private void CreateButtonClick()
         {
             GameMp.OpenCreateServerMenu();
         }
 
         [UIAction("connectButtonClick")]
-        internal void ConnectButtonClick()
+        private void ConnectButtonClick()
         {
             if (_selectedLobby != null && !string.IsNullOrEmpty(_selectedLobby.ServerCode))
             {
@@ -187,7 +254,7 @@ namespace ServerBrowser.UI.ViewControllers
         }
 
         [UIAction("listSelect")]
-        internal void Select(TableView tableView, int row)
+        private void ListSelect(TableView tableView, int row)
         {
             var selectedRow = GameList.data[row];
 
@@ -204,26 +271,26 @@ namespace ServerBrowser.UI.ViewControllers
         }
 
         [UIAction("pageUpButtonClick")]
-        internal void PageUpButtonClick()
+        private void PageUpButtonClick()
         {
             if (HostedGameBrowser.PageIndex > 0)
             {
                 CancelImageDownloads();
-                HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize);
+                HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, SearchValue);
             }
         }
 
         [UIAction("pageDownButtonClick")]
-        internal void PageDownButtonClick()
+        private void PageDownButtonClick()
         {
             if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
             {
                 CancelImageDownloads();
-                HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize);
+                HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, SearchValue);
             }
         }
 
-        internal void CellUpdateCallback(HostedGameCell cell)
+        private void CellUpdateCallback(HostedGameCell cell)
         {
             foreach (var visibleCell in GameList.tableView.visibleCells)
             {

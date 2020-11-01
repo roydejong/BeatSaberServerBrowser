@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace ServerBrowser.Core
 {
@@ -98,11 +99,21 @@ namespace ServerBrowser.Core
             return responseOk;
         }
 
-        public static async Task<ServerBrowseResult> Browse(int offset)
+        public static async Task<ServerBrowseResult> Browse(int offset, string searchQuery)
         {
-            Plugin.Log?.Info($"Requesting lobbies from server (offset {offset})");
+            var searchQueryEncoded = "";
 
-            var response = await PerformWebRequest("GET", $"/browse?offset={offset}");
+            if (String.IsNullOrEmpty(searchQuery))
+            {
+                Plugin.Log?.Info($"Requesting lobbies from server (offset {offset})");
+            }
+            else
+            {
+                Plugin.Log?.Info($"Requesting lobbies from server, searching for \"{searchQuery}\" (offset {offset})");
+                searchQueryEncoded = HttpUtility.UrlEncode(searchQuery);
+            }
+
+            var response = await PerformWebRequest("GET", $"/browse?offset={offset}&query={searchQueryEncoded}");
             var contentStr = await response.Content.ReadAsStringAsync();     
 
             try
