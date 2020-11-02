@@ -3,7 +3,7 @@
   "id": "ServerBrowser",
   "name": "ServerBrowser",
   "author": "LookAtHippo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adds a browser for custom multiplayer games.",
   "gameVersion": "1.12.2",
   "dependsOn": {
