@@ -60,7 +60,7 @@ namespace ServerBrowser.UI.Components
                 this.subtext += $" {modeDescription} lobby";
             }
 
-            if (Game.Difficulty.HasValue)
+            if (Game.Difficulty.HasValue && !String.IsNullOrEmpty(Game.LevelId))
             {
                 this.subtext += $" ({Game.Difficulty})";
             }
