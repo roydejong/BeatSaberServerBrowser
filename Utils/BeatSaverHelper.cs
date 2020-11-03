@@ -33,6 +33,12 @@ namespace ServerBrowser.Utils
                 try
                 {
                     var response = await Plugin.HttpClient.GetAsync(targetUrl, token).ConfigureAwait(false);
+
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        return null;
+                    }
+
                     var content = JObject.Parse(await response.Content.ReadAsStringAsync());
                     coverURL = content["coverURL"].ToString();
 
