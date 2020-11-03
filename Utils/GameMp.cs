@@ -44,8 +44,10 @@ namespace ServerBrowser.Utils
 
         public static void OpenCreateServerMenu()
         {
-            var mpFlowCoordinator = ModeSelectionFlowCoordinator;
+            // If we are initiating the server menu from our UI, let's assume the intent is to host a game
+            Plugin.Config.LobbyAnnounceToggle = true;
 
+            var mpFlowCoordinator = ModeSelectionFlowCoordinator;
             mpFlowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
     }
