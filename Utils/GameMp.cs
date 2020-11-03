@@ -26,6 +26,15 @@ namespace ServerBrowser.Utils
             private set;
         }
 
+        public static bool LocalPlayerIsModded
+        {
+            get
+            {
+                var mpSessionManager = SessionManager;
+                return mpSessionManager != null && mpSessionManager.LocalPlayerHasState("modded");
+            }
+        }
+
         public static void ConnectToServerCode(string serverCode)
         {
             var mpFlowCoordinator = ModeSelectionFlowCoordinator;

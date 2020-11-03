@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ServerBrowser.Harmony;
+using ServerBrowser.Utils;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -101,19 +103,22 @@ namespace ServerBrowser.Core
 
         public static async Task<ServerBrowseResult> Browse(int offset, string searchQuery)
         {
-            var searchQueryEncoded = "";
+            // Prepare query string
+            var queryString = HttpUtility.ParseQueryString("");
 
-            if (String.IsNullOrEmpty(searchQuery))
-            {
-                Plugin.Log?.Info($"Requesting lobbies from server (offset {offset})");
-            }
-            else
-            {
-                Plugin.Log?.Info($"Requesting lobbies from server, searching for \"{searchQuery}\" (offset {offset})");
-                searchQueryEncoded = HttpUtility.UrlEncode(searchQuery);
-            }
+            if (Plugin.PlatformId != Plugin.PLATFORM_UNKNOWN)
+                queryString.Add("platform", Plugin.PlatformId);
 
-            var response = await PerformWebRequest("GET", $"/browse?platform={Plugin.PlatformId}&offset={offset}&query={searchQueryEncoded}");
+            if (offset > 0)
+                queryString.Add("offset", offset.ToString());
+
+            if (!String.IsNullOrEmpty(searchQuery))
+                queryString.Add("query", searchQuery);
+
+            if (!GameMp.LocalPlayerIsModded)
+                queryString.Add("vanilla", "1");
+
+            var response = await PerformWebRequest("GET", $"/browse?{queryString}");
             var contentStr = await response.Content.ReadAsStringAsync();     
 
             try
