@@ -1,12 +1,12 @@
-﻿using IPA;
-using IPA.Config;
+﻿using BS_Utils.Utilities;
+using IPA;
 using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
+using ServerBrowser.UI;
 using ServerBrowser.UI.Components;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using IPALogger = IPA.Logging.Logger;
 
@@ -41,11 +41,11 @@ namespace ServerBrowser
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
-        public void Init(IPALogger logger, Config conf)
+        public void Init(IPALogger logger, IPA.Config.Config config)
         {
             Instance = this;
             Log = logger;
-            Config = conf.Generated<PluginConfig>();
+            Config = config.Generated<PluginConfig>();
 
             // Modifiers tab (in-lobby)
             LobbyConfigPanel.RegisterGameplayModifierTab();
@@ -72,6 +72,9 @@ namespace ServerBrowser
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
+            // Events
+            BSEvents.menuSceneLoadedFresh += OnMenuSceneLoadedFresh;
+
             // Start update timer
             UpdateTimer.Start();
 
@@ -81,10 +84,18 @@ namespace ServerBrowser
             await DetectPlatform();
         }
 
+        private void OnMenuSceneLoadedFresh()
+        {
+            FloatingNotification.Instance.ShowMessage("You just started the game!", "And I hope you have a great day!");
+        }
+
         [OnExit]
         public void OnApplicationQuit()
         {
             Log?.Debug("OnApplicationQuit");
+
+            // Events
+            BSEvents.menuSceneLoadedFresh -= OnMenuSceneLoadedFresh;
 
             // Cancel update timer
             UpdateTimer.Stop();
