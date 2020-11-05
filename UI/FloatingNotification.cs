@@ -10,23 +10,21 @@ namespace ServerBrowser.UI
         #region Creation / Instance
         private const string GameObjectName = "ServerBrowserFloatingNotification";
 
-        private static FloatingNotification _instance;
         public static FloatingNotification Instance
         {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = Create();
-                }
-
-                return _instance; 
-            }
+            get;
+            private set;
         }
 
-        private static FloatingNotification Create()
+        public static FloatingNotification SetUp()
         {
-            return new GameObject(GameObjectName).AddComponent<FloatingNotification>();
+            if (Instance == null)
+            {
+                Instance = new GameObject(GameObjectName).AddComponent<FloatingNotification>();
+                Instance.DismissMessage();
+            }
+
+            return Instance;
         }
         #endregion
 
@@ -38,12 +36,22 @@ namespace ServerBrowser.UI
 
         public void ShowMessage(string title, string message, float time = 5.0f)
         {
+            Plugin.Log.Info($" -----> ShowMessage: {title}, {message}, {time} sec");
+
             _requestedStart = true;
             _title = title;
             _message = message;
             _time = time;
+            _currentStep = NotificationStep.Hidden;
+            _updateTimerTally = 0.0f;
 
             gameObject.SetActive(true);
+        }
+
+        public void DismissMessage()
+        {
+            _requestedStart = false;
+            _currentStep = NotificationStep.Hidden;
         }
         #endregion
 
@@ -69,6 +77,8 @@ namespace ServerBrowser.UI
 
         private void Awake()
         {
+            Plugin.Log.Info($" -----> AWAKE");
+
             ////////////////////////////////////////////////////////////////////////////////////////
             /// Hello!
             /// Please don't look at this code because cloning such a huge object is kinda gross
@@ -82,6 +92,7 @@ namespace ServerBrowser.UI
             var mainScreen = screenController.transform.parent;
 
             _clonedMainScreen = UnityEngine.Object.Instantiate(mainScreen);
+            _clonedMainScreen.name = "SBFNMainScreen";
             _clonedMainScreen.parent = gameObject.transform;
 
             _canvasGroup = _clonedMainScreen.gameObject.AddComponent<CanvasGroup>();
@@ -118,8 +129,8 @@ namespace ServerBrowser.UI
             }
 
             // Grab the level bar, which is what will hold our notification content
-            _levelBar = GameObject.Find("ServerBrowserFloatingNotification/MainScreen(Clone)/CenterStageScreenController/NextLevel/BeatmapWithModifiersNonEditable/BeatmapSelection/LevelBarSimple");
-            _levelBar.SetActive(true);
+            _levelBar = GameObject.Find("ServerBrowserFloatingNotification/SBFNMainScreen/CenterStageScreenController/NextLevel/BeatmapWithModifiersNonEditable/BeatmapSelection/LevelBarSimple");
+            Destroy(_levelBar.transform.Find("BeatmapDataContainer").gameObject);
 
             _bgImage = _levelBar.transform.parent.GetComponentInChildren<ImageView>();
             _bgImage.color = new Color(52f/255f, 31f/255f, 151f/255f);
@@ -132,11 +143,13 @@ namespace ServerBrowser.UI
             _subTitleTextMesh = subTitleText.GetComponent<CurvedTextMeshPro>();
             _subTitleTextMesh.text = "NOTIFICATION_MESSAGE";
 
-            var modifierIndicator = _levelBar.transform.Find("BeatmapDataContainer");
-            modifierIndicator.gameObject.SetActive(false);
+            _levelBar.SetActive(true);
 
             // Keep our object alive across scenes so we can display ingame
             DontDestroyOnLoad(gameObject);
+
+            // Activate, we want to trigger at least one update
+            gameObject.SetActive(true);
         }
 
         private const float ANIMATE_TIME = 0.15f;
@@ -164,7 +177,7 @@ namespace ServerBrowser.UI
                 }
                 else
                 {
-                    // We have nothing left to do, end our suffering
+                    // Nothing to show, suicide
                     gameObject.SetActive(false);
                 }
 

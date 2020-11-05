@@ -10,11 +10,6 @@ namespace ServerBrowser.Utils
 {
     public static class GameMp
     {
-        public static MultiplayerSessionManager SessionManager
-        {
-            get => Resources.FindObjectsOfTypeAll<MultiplayerSessionManager>().FirstOrDefault();
-        }
-
         public static MultiplayerModeSelectionFlowCoordinator ModeSelectionFlowCoordinator
         {
             get => Resources.FindObjectsOfTypeAll<MultiplayerModeSelectionFlowCoordinator>().First();
@@ -24,15 +19,6 @@ namespace ServerBrowser.Utils
         {
             get;
             private set;
-        }
-
-        public static bool LocalPlayerIsModded
-        {
-            get
-            {
-                var mpSessionManager = SessionManager;
-                return mpSessionManager != null && mpSessionManager.LocalPlayerHasState("modded");
-            }
         }
 
         public static void ConnectToServerCode(string serverCode)

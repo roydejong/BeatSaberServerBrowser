@@ -20,6 +20,7 @@ namespace ServerBrowser.Harmony
             {
                 LobbyState = nextState;
                 Plugin.Log?.Info($"Lobby state change: {LobbyState}");
+
                 GameStateManager.HandleUpdate();
             }
         }

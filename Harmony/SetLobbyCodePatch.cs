@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using ServerBrowser.Core;
+using ServerBrowser.UI;
 
 namespace ServerBrowser.Harmony
 {
@@ -12,6 +13,7 @@ namespace ServerBrowser.Harmony
         static void Postfix(string code)
         {
             GameStateManager.HandleLobbyCode(code);
+            FloatingNotification.Instance.ShowMessage("Lobby code", code);
         }
     }
 }

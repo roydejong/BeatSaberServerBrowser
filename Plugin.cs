@@ -3,6 +3,7 @@ using IPA;
 using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
+using ServerBrowser.Game;
 using ServerBrowser.UI;
 using ServerBrowser.UI.Components;
 using System.Net.Http;
@@ -31,10 +32,11 @@ namespace ServerBrowser
                 var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 var bsVersion = IPA.Utilities.UnityGame.GameVersion.ToString();
 
-                return $"ServerBrowser/{assemblyVersion} (BeatSaber/{bsVersion})";
+                return $"ServerBrowser/{assemblyVersion} (BeatSaber/{bsVersion}) ({PlatformId})";
             }
         }
 
+        #region Lifecycle
         [Init]
         /// <summary>
         /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
@@ -47,7 +49,8 @@ namespace ServerBrowser
             Log = logger;
             Config = config.Generated<PluginConfig>();
 
-            // Modifiers tab (in-lobby)
+            // Modifiers tab (in-lobby) - register needs to happen really early for now
+            // (https://github.com/monkeymanboy/BeatSaberMarkupLanguage/issues/67)
             LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
@@ -72,8 +75,8 @@ namespace ServerBrowser
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
-            // Events
-            BSEvents.menuSceneLoadedFresh += OnMenuSceneLoadedFresh;
+            // BS Events
+            BSEvents.lateMenuSceneLoadedFresh += OnLateMenuSceneLoadedFresh;
 
             // Start update timer
             UpdateTimer.Start();
@@ -84,25 +87,36 @@ namespace ServerBrowser
             await DetectPlatform();
         }
 
-        private void OnMenuSceneLoadedFresh()
-        {
-            FloatingNotification.Instance.ShowMessage("You just started the game!", "And I hope you have a great day!");
-        }
-
         [OnExit]
         public void OnApplicationQuit()
         {
             Log?.Debug("OnApplicationQuit");
 
-            // Events
-            BSEvents.menuSceneLoadedFresh -= OnMenuSceneLoadedFresh;
-
             // Cancel update timer
             UpdateTimer.Stop();
+
+            // Clean up events
+            BSEvents.lateMenuSceneLoadedFresh -= OnLateMenuSceneLoadedFresh;
+            MpSession.Stop();
 
             // Try to cancel any host announcements we may have had
             GameStateManager.UnAnnounce();
         }
+        #endregion
+
+        #region Core events
+        private void OnLateMenuSceneLoadedFresh(ScenesTransitionSetupDataSO obj)
+        {
+            // Bind multiplayer session events
+            MpSession.Start();
+
+            // UI setup
+            PluginUi.SetUp();
+
+            // Initial state update
+            GameStateManager.HandleUpdate();
+        }
+        #endregion
 
         #region Platform detection
         public const string PLATFORM_UNKNOWN = "unknown";
@@ -116,7 +130,6 @@ namespace ServerBrowser
             PlatformId = PLATFORM_UNKNOWN;
             
             var userInfo = await BS_Utils.Gameplay.GetUserInfo.GetUserAsync().ConfigureAwait(false);
-            Plugin.Log.Info($"Got platform user info: {userInfo.platform} / UID {userInfo.platformUserId}");
 
             if (userInfo.platform == UserInfo.Platform.Oculus)
             {
@@ -126,6 +139,8 @@ namespace ServerBrowser
             {
                 PlatformId = PLATFORM_STEAM;
             }
+
+            Plugin.Log?.Debug($"Got platform user info: {userInfo.platform} / UID {userInfo.platformUserId}");
         }
         #endregion
     }

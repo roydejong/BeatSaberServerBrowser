@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using ServerBrowser.Core;
+using ServerBrowser.UI;
 using System;
 
 namespace ServerBrowser.Harmony
@@ -15,6 +16,8 @@ namespace ServerBrowser.Harmony
         {
             Plugin.Log?.Info($"StartMultiplayerLevel: [{previewBeatmapLevel.levelID}] {previewBeatmapLevel.songAuthorName} - {previewBeatmapLevel.songName} on {beatmapDifficulty}");
             GameStateManager.HandleSongSelected(previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, gameplayModifiers);
+
+            FloatingNotification.Instance.ShowMessage("StartMultiplayerLevel", previewBeatmapLevel.songName);
         }
     }
 }

@@ -136,15 +136,12 @@
     <Compile Include="Core\GameStateManager.cs" />
     <Compile Include="Core\MasterServerAPI.cs" />
     <Compile Include="Core\UpdateTimer.cs" />
+    <Compile Include="Game\MpSession.cs" />
     <Compile Include="Harmony\MpLobbyStatePatch.cs" />
     <Compile Include="Harmony\SetLobbyCodePatch.cs" />
     <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
-    <Compile Include="Harmony\MpPlayerStateChangedPatch.cs" />
-    <Compile Include="Harmony\MainMenuButtonPatch.cs" />
     <Compile Include="Harmony\MpModeSelectionButtonPatch.cs" />
     <Compile Include="Harmony\MpModeSelectionActivatedPatch.cs" />
-    <Compile Include="Harmony\PlayerConnectedPatch.cs" />
-    <Compile Include="Harmony\PlayerDisconnectedPatch.cs" />
     <Compile Include="Harmony\SetLocalPlayerStatePatch.cs" />
     <Compile Include="Harmony\StartMultiplayerLevelPatch.cs" />
     <Compile Include="Plugin.cs" />

@@ -1,4 +1,5 @@
-﻿using ServerBrowser.Harmony;
+﻿using ServerBrowser.Game;
+using ServerBrowser.Harmony;
 using ServerBrowser.Utils;
 using System;
 using System.Net;
@@ -115,7 +116,7 @@ namespace ServerBrowser.Core
             if (!String.IsNullOrEmpty(searchQuery))
                 queryString.Add("query", searchQuery);
 
-            if (!GameMp.LocalPlayerIsModded)
+            if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
                 queryString.Add("vanilla", "1");
 
             var response = await PerformWebRequest("GET", $"/browse?{queryString}");

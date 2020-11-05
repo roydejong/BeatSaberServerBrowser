@@ -4,6 +4,7 @@ using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.GameplaySetup;
 using BeatSaberMarkupLanguage.Parser;
 using ServerBrowser.Core;
+using ServerBrowser.Game;
 using ServerBrowser.Harmony;
 using ServerBrowser.Utils;
 using TMPro;
@@ -112,7 +113,7 @@ namespace ServerBrowser.UI.Components
                 return;
             }
 
-            sessionManager = GameMp.SessionManager;
+            sessionManager = MpSession.SessionManager;
 
             if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer)
             {

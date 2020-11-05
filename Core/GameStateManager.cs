@@ -1,4 +1,5 @@
-﻿using ServerBrowser.Harmony;
+﻿using ServerBrowser.Game;
+using ServerBrowser.Harmony;
 using ServerBrowser.UI.Components;
 using ServerBrowser.Utils;
 using System;
@@ -81,7 +82,7 @@ namespace ServerBrowser.Core
         public static void HandleUpdate()
         {
 #pragma warning disable CS4014
-            var sessionManager = GameMp.SessionManager;
+            var sessionManager = MpSession.SessionManager;
 
             if (sessionManager == null
                 || !MpLobbyConnectionTypePatch.IsPartyMultiplayer
@@ -157,8 +158,8 @@ namespace ServerBrowser.Core
                 GameName = finalGameName,
                 OwnerId = sessionManager.localPlayer.userId,
                 OwnerName = sessionManager.localPlayer.userName,
-                PlayerCount = sessionManager.connectedPlayers.Count + 1, // + 1 for the local player host
-                PlayerLimit = sessionManager.maxPlayerCount,
+                PlayerCount = MpSession.GetPlayerCount(),
+                PlayerLimit = MpSession.GetPlayerLimit(),
                 IsModded = sessionManager.localPlayer.HasState("modded") && sessionManager.localPlayer.HasState("customsongs"),
                 LobbyState = MpLobbyStatePatch.LobbyState,
                 LevelId = _level?.levelID,

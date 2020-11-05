@@ -12,6 +12,12 @@ namespace ServerBrowser.UI
     {
         private static ServerBrowserViewController _serverBrowserViewController;
 
+        public static void SetUp()
+        {
+            FloatingNotification.SetUp();
+            FloatingNotification.Instance.ShowMessage("Hello world!", "Have a poggers day!");
+        }
+
         public static void LaunchServerBrowser() 
         {
             if (_serverBrowserViewController == null)

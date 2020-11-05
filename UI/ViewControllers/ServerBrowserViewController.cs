@@ -4,6 +4,7 @@ using BeatSaberMarkupLanguage.Components;
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
+using ServerBrowser.Game;
 using ServerBrowser.UI.Components;
 using ServerBrowser.Utils;
 using SongCore.Utilities;
@@ -143,7 +144,7 @@ namespace ServerBrowser.UI.ViewControllers
                 }
             }
 
-            if (!GameMp.LocalPlayerIsModded)
+            if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
             {
                 StatusText.text += "\r\nMultiplayerExtensions not detected, hiding custom games";
                 StatusText.color = Color.yellow;
