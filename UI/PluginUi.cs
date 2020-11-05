@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage;
 using HMUI;
 using IPA.Utilities;
+using ServerBrowser.Assets;
 using ServerBrowser.UI.ViewControllers;
 using ServerBrowser.Utils;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace ServerBrowser.UI
                 "Hello world!",
                 "I hope you are doing well.",
                 FloatingNotification.NotificationStyle.Yellow,
-                10.0f
+                Sprites.BeatSaverIcon
             );
         }
 

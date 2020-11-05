@@ -1,6 +1,8 @@
 ﻿using HMUI;
+using ServerBrowser.Assets;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using VRUIControls;
 
 namespace ServerBrowser.UI
@@ -51,10 +53,11 @@ namespace ServerBrowser.UI
         private string _message;
         private float _time;
         private NotificationStyle _style;
+        private Sprite _sprite;
 
-        public void ShowMessage(string title, string message, NotificationStyle style = NotificationStyle.Blue, float time = 5.0f)
+        public void ShowMessage(string title, string message, NotificationStyle style = NotificationStyle.Blue, Sprite sprite = null, float time = 5.0f)
         {
-            Plugin.Log.Info($" -----> ShowMessage: {title}, {message}, {time} sec");
+            Plugin.Log?.Info($"ShowMessage: {title}, {message}, {time} sec");
 
             _requestedStart = true;
 
@@ -63,6 +66,7 @@ namespace ServerBrowser.UI
             _style = style;
             _time = time;
             _currentStep = NotificationStep.Hidden;
+            _sprite = sprite ? sprite : Sprites.PortalUser;
 
             gameObject.SetActive(true);
         }
@@ -83,6 +87,7 @@ namespace ServerBrowser.UI
         private ImageView _bgImage;
         private CurvedTextMeshPro _titleTextMesh;
         private CurvedTextMeshPro _subTitleTextMesh;
+        private Image _notificationImage;
 
         private const float ANIMATE_TIME = 0.15f;
         private const float ANIMATE_Y_OFFSET = -0.5f;
@@ -92,8 +97,6 @@ namespace ServerBrowser.UI
 
         private void Awake()
         {
-            Plugin.Log.Info($" -----> AWAKE");
-
             ////////////////////////////////////////////////////////////////////////////////////////
             /// Hello!
             /// Please don't look at this code because cloning such a huge object is kinda gross
@@ -157,6 +160,10 @@ namespace ServerBrowser.UI
             _subTitleTextMesh = subTitleText.GetComponent<CurvedTextMeshPro>();
             _subTitleTextMesh.text = "NOTIFICATION_MESSAGE";
 
+            var songArtwork =_levelBar.transform.Find("SongArtwork");
+            _notificationImage = songArtwork.GetComponent<Image>();
+            _notificationImage.sprite = Assets.Sprites.Portal;
+
             _levelBar.SetActive(true);
 
             // Keep our object alive across scenes so we can display ingame
@@ -168,6 +175,7 @@ namespace ServerBrowser.UI
             _updateTimerTally = 0.0f;
             _currentStep = NotificationStep.Appearing;
 
+            _notificationImage.sprite = _sprite;
             _titleTextMesh.SetText(_title);
             _subTitleTextMesh.SetText(_message);
 

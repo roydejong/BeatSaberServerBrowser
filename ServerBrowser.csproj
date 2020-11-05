@@ -175,6 +175,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\BeatSaver.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Sprites\Portal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

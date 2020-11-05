@@ -1,4 +1,5 @@
-﻿using ServerBrowser.Core;
+﻿using ServerBrowser.Assets;
+using ServerBrowser.Core;
 using ServerBrowser.Harmony;
 using ServerBrowser.UI;
 using System.Linq;
@@ -83,7 +84,8 @@ namespace ServerBrowser.Game
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} joined!",
                     $"{GetPlayerCount()}/{GetPlayerLimit()} players connected",
-                    FloatingNotification.NotificationStyle.Blue
+                    FloatingNotification.NotificationStyle.Blue,
+                    Sprites.PortalUser
                 );
             }
         }
@@ -102,7 +104,8 @@ namespace ServerBrowser.Game
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} disconnected",
                     $"{GetPlayerCount()}/{GetPlayerLimit()} players connected",
-                    FloatingNotification.NotificationStyle.Red
+                    FloatingNotification.NotificationStyle.Red,
+                    Sprites.Portal
                 );
             }
         }

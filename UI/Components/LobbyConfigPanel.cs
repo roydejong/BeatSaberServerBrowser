@@ -3,10 +3,10 @@ using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.GameplaySetup;
 using BeatSaberMarkupLanguage.Parser;
+using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.Harmony;
-using ServerBrowser.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -122,7 +122,8 @@ namespace ServerBrowser.UI.Components
                 FloatingNotification.Instance.ShowMessage(
                     "Notifications enabled",
                     "You'll be notified if players join or leave",
-                    FloatingNotification.NotificationStyle.Blue
+                    FloatingNotification.NotificationStyle.Blue,
+                    Sprites.Portal
                 );
             }
             else

@@ -11,10 +11,19 @@ namespace ServerBrowser.Assets
     internal static class Sprites
     {
         public static Sprite BeatSaverIcon;
+        public static Sprite Portal;
+        public static Sprite PortalUser;
 
         public static void Initialize()
         {
             BeatSaverIcon = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
+
+            /// Technology - Straight Line icon set by designforeat
+            /// https://www.iconfinder.com/iconsets/technology-straight-line
+            /// License: CC BY 3.0
+            
+            Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
+            PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
         }
 
         public static Texture2D LoadTextureRaw(byte[] file)

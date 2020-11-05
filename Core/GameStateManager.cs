@@ -53,13 +53,12 @@ namespace ServerBrowser.Core
 
             if (_lobbyCode != lobbyCode)
             {
-                Plugin.Log?.Info($"Got lobby server code: \"{lobbyCode}\"");
-
                 _lobbyCode = lobbyCode;
 
                 if (!String.IsNullOrEmpty(_lobbyCode))
                 {
                     // Lobby code changed and isn't empty; force an update now
+                    Plugin.Log?.Info($"Got lobby server code: \"{lobbyCode}\"");
                     HandleUpdate();
                 }
             }
