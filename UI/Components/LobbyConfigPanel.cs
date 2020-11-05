@@ -94,6 +94,44 @@ namespace ServerBrowser.UI.Components
         }
         #endregion
 
+        #region JoinNotificationsEnabled
+        [UIComponent("joinNotificationsEnabled")]
+        public ToggleSetting JoinNotificationsEnabled;
+
+        [UIValue("joinNotificationsEnabled")]
+        public bool JoinNotificationsEnabledValue
+        {
+            get
+            {
+                return Plugin.Config.JoinNotificationsEnabled;
+            }
+
+            set
+            {
+                Plugin.Config.JoinNotificationsEnabled = value;
+            }
+        }
+
+        [UIAction("joinNotificationsEnabled")]
+        public void SetJoinNotificationsEnabled(bool value)
+        {
+            JoinNotificationsEnabledValue = value;
+
+            if (value)
+            {
+                FloatingNotification.Instance.ShowMessage(
+                    "Notifications enabled",
+                    "You'll be notified if players join or leave",
+                    FloatingNotification.NotificationStyle.Blue
+                );
+            }
+            else
+            {
+                FloatingNotification.Instance.DismissMessage();
+            }
+        }
+        #endregion
+
         #region UI Update
         private MultiplayerSessionManager sessionManager = null;
 
