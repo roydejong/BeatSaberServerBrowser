@@ -1,7 +1,13 @@
 ﻿using HMUI;
 using ServerBrowser.Assets;
+using ServerBrowser.Utils;
+using System;
+using System.Collections;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 using VRUIControls;
 
@@ -54,10 +60,24 @@ namespace ServerBrowser.UI
         private float _time;
         private NotificationStyle _style;
         private Sprite _sprite;
+        private bool _runningCoroutine = false;
+
+        public void DismissMessage()
+        {
+            _requestedStart = false;
+            _currentStep = NotificationStep.Hidden;
+
+            StopAllCoroutines();
+            _runningCoroutine = false;
+
+            gameObject.SetActive(false);
+        }
 
         public void ShowMessage(string title, string message, NotificationStyle style = NotificationStyle.Blue, Sprite sprite = null, float time = 5.0f)
         {
-            Plugin.Log?.Info($"ShowMessage: {title}, {message}, {time} sec");
+            Plugin.Log?.Info($"ShowMessage: {title}, {message}");
+
+            DismissMessage();
 
             _requestedStart = true;
 
@@ -71,10 +91,32 @@ namespace ServerBrowser.UI
             gameObject.SetActive(true);
         }
 
-        public void DismissMessage()
+        public async Task ShowMessageWithImageDownload(string title, string message, string imageUrl, NotificationStyle style = NotificationStyle.Blue, Sprite spriteFallback = null, float time = 5.0f)
         {
-            _requestedStart = false;
-            _currentStep = NotificationStep.Hidden;
+            _runningCoroutine = true;
+            gameObject.SetActive(true);
+
+            StartCoroutine(ShowMessageWithImageCoroutine(title, message, imageUrl, style, spriteFallback, time));
+        }
+
+        private IEnumerator ShowMessageWithImageCoroutine(string title, string message, string imageUrl, NotificationStyle style, Sprite sprite, float time)
+        {
+            var request = UnityWebRequestTexture.GetTexture(imageUrl);
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Plugin.Log?.Warn($"⚠ Notification image load failed: {imageUrl}");
+            }
+            else
+            {
+                var texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                sprite = Sprites.LoadSpriteFromTexture(texture);
+            }
+
+            ShowMessage(title, message, style, sprite, time);
+            _runningCoroutine = false;
         }
         #endregion
 
@@ -210,8 +252,11 @@ namespace ServerBrowser.UI
                 }
                 else
                 {
-                    // Nothing to show, suicide
-                    gameObject.SetActive(false);
+                    // Nothing to show, nothing to do, suicide
+                    if (!_runningCoroutine)
+                    {
+                        gameObject.SetActive(false);
+                    }
                 }
 
                 return;

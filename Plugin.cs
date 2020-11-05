@@ -128,7 +128,10 @@ namespace ServerBrowser
         private async Task DetectPlatform()
         {
             PlatformId = PLATFORM_UNKNOWN;
-            
+
+            // Attempt to detect platform
+            // --> NOTE: Currently this can hang for a long time (possibly until a level is finished), depending on which mods the user is using
+            // --> This should be fixed in BS_Utils v1.6.2+
             var userInfo = await BS_Utils.Gameplay.GetUserInfo.GetUserAsync().ConfigureAwait(false);
 
             if (userInfo.platform == UserInfo.Platform.Oculus)

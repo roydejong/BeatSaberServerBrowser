@@ -17,11 +17,13 @@ namespace ServerBrowser.UI
         {
             FloatingNotification.SetUp();
 
-            FloatingNotification.Instance.ShowMessage(
+            FloatingNotification.Instance.ShowMessageWithImageDownload(
                 "Hello world!",
-                "I hope you are doing well.",
-                FloatingNotification.NotificationStyle.Yellow,
-                Sprites.BeatSaverIcon
+                "Do you like art?",
+                "https://cdn.britannica.com/s:700x500/87/2087-004-264616BB/Mona-Lisa-oil-wood-panel-Leonardo-da.jpg",
+                FloatingNotification.NotificationStyle.Red,
+                Sprites.BeatSaverIcon,
+                10.0f
             );
         }
 
