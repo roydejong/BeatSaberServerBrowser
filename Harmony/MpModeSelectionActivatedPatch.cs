@@ -6,11 +6,10 @@ using UnityEngine.UI;
 
 namespace ServerBrowser.Harmony
 {
-
     [HarmonyPatch(typeof(MultiplayerModeSelectionViewController), "DidActivate", MethodType.Normal)]
-    class MpModeSelectionActivatedPatch
+    public static class MpModeSelectionActivatedPatch
     {
-        static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        public static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             // Enable the "game browser" button (it was left in the game but unused currently)
             var btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");

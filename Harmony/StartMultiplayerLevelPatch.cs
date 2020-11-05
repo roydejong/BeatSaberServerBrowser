@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using ServerBrowser.Core;
 using ServerBrowser.UI;
-using System;
 
 namespace ServerBrowser.Harmony
 {
@@ -14,10 +13,14 @@ namespace ServerBrowser.Harmony
         public static void Postfix(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
             BeatmapCharacteristicSO beatmapCharacteristic, GameplayModifiers gameplayModifiers)
         {
-            Plugin.Log?.Info($"StartMultiplayerLevel: [{previewBeatmapLevel.levelID}] {previewBeatmapLevel.songAuthorName} - {previewBeatmapLevel.songName} on {beatmapDifficulty}");
+            Plugin.Log?.Debug($"StartMultiplayerLevel: [{previewBeatmapLevel.levelID}] {previewBeatmapLevel.songAuthorName} - {previewBeatmapLevel.songName} on {beatmapDifficulty}");
             GameStateManager.HandleSongSelected(previewBeatmapLevel, beatmapDifficulty, beatmapCharacteristic, gameplayModifiers);
 
-            FloatingNotification.Instance.ShowMessage("StartMultiplayerLevel", previewBeatmapLevel.songName);
+            FloatingNotification.Instance.ShowMessage(
+                "Starting multiplayer level",
+                previewBeatmapLevel.songName,
+                FloatingNotification.NotificationStyle.Yellow
+            );
         }
     }
 }

@@ -8,7 +8,7 @@ namespace ServerBrowser.Harmony
     /// This patch lets us determine lobby state changes (from lobby to in-game, and vice versa).
     /// </summary>
     [HarmonyPatch(typeof(LobbyGameStateController), "state", MethodType.Setter)]
-    class MpLobbyStatePatch
+    public static class MpLobbyStatePatch
     {
         public static MultiplayerLobbyState LobbyState { get; private set; } = MultiplayerLobbyState.None;
 
@@ -19,7 +19,7 @@ namespace ServerBrowser.Harmony
             if (nextState != LobbyState)
             {
                 LobbyState = nextState;
-                Plugin.Log?.Info($"Lobby state change: {LobbyState}");
+                Plugin.Log?.Debug($"Lobby state change: {LobbyState}");
 
                 GameStateManager.HandleUpdate();
             }

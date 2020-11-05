@@ -7,6 +7,23 @@ namespace ServerBrowser.UI
 {
     public class FloatingNotification : MonoBehaviour
     {
+        #region Enums
+        public enum NotificationStyle
+        {
+            Blue = 0,
+            Red = 1,
+            Yellow = 2
+        }
+
+        private enum NotificationStep
+        {
+            Hidden,
+            Appearing,
+            Normal,
+            Disappearing
+        }
+        #endregion
+
         #region Creation / Instance
         private const string GameObjectName = "ServerBrowserFloatingNotification";
 
@@ -33,17 +50,19 @@ namespace ServerBrowser.UI
         private string _title;
         private string _message;
         private float _time;
+        private NotificationStyle _style;
 
-        public void ShowMessage(string title, string message, float time = 5.0f)
+        public void ShowMessage(string title, string message, NotificationStyle style = NotificationStyle.Blue, float time = 5.0f)
         {
             Plugin.Log.Info($" -----> ShowMessage: {title}, {message}, {time} sec");
 
             _requestedStart = true;
+
             _title = title;
             _message = message;
+            _style = style;
             _time = time;
             _currentStep = NotificationStep.Hidden;
-            _updateTimerTally = 0.0f;
 
             gameObject.SetActive(true);
         }
@@ -56,14 +75,6 @@ namespace ServerBrowser.UI
         #endregion
 
         #region Unity / Rendering
-        enum NotificationStep
-        {
-            Hidden,
-            Appearing,
-            Normal,
-            Disappearing
-        }
-
         private NotificationStep _currentStep = NotificationStep.Hidden;
 
         private Transform _clonedMainScreen;
@@ -73,6 +84,10 @@ namespace ServerBrowser.UI
         private CurvedTextMeshPro _titleTextMesh;
         private CurvedTextMeshPro _subTitleTextMesh;
 
+        private const float ANIMATE_TIME = 0.15f;
+        private const float ANIMATE_Y_OFFSET = -0.5f;
+
+        private float _updateTimerTally = 0.0f;
         private float _basePosY = 3.0f;
 
         private void Awake()
@@ -133,7 +148,6 @@ namespace ServerBrowser.UI
             Destroy(_levelBar.transform.Find("BeatmapDataContainer").gameObject);
 
             _bgImage = _levelBar.transform.parent.GetComponentInChildren<ImageView>();
-            _bgImage.color = new Color(52f/255f, 31f/255f, 151f/255f);
             
             var titleText = _levelBar.transform.Find("SongNameText");
             _titleTextMesh = titleText.GetComponent<CurvedTextMeshPro>();
@@ -147,15 +161,32 @@ namespace ServerBrowser.UI
 
             // Keep our object alive across scenes so we can display ingame
             DontDestroyOnLoad(gameObject);
-
-            // Activate, we want to trigger at least one update
-            gameObject.SetActive(true);
         }
 
-        private const float ANIMATE_TIME = 0.15f;
-        private const float ANIMATE_Y_OFFSET = -0.5f;
+        private void PresentNextMessage()
+        {
+            _updateTimerTally = 0.0f;
+            _currentStep = NotificationStep.Appearing;
 
-        private float _updateTimerTally = 0.0f;
+            _titleTextMesh.SetText(_title);
+            _subTitleTextMesh.SetText(_message);
+
+            switch (_style)
+            {
+                default:
+                case NotificationStyle.Blue:
+                    _bgImage.color = new Color(52f / 255f, 31f / 255f, 151f / 255f);
+                    break;
+                case NotificationStyle.Red:
+                    _bgImage.color = new Color(238f / 255f, 82f / 255f, 83f / 255f);
+                    break;
+                case NotificationStyle.Yellow:
+                    _bgImage.color = new Color(254f / 255f, 202f / 255f, 87f / 255f);
+                    break;
+            }
+
+            _requestedStart = false;
+        }
 
         private void Update()
         {
@@ -167,13 +198,7 @@ namespace ServerBrowser.UI
                 if (_requestedStart)
                 {
                     // New notification requested, begin appear animation from zero
-                    _updateTimerTally = 0.0f;
-                    _currentStep = NotificationStep.Appearing;
-
-                    _titleTextMesh.SetText(_title);
-                    _subTitleTextMesh.SetText(_message);
-
-                    _requestedStart = false;
+                    PresentNextMessage();
                 }
                 else
                 {

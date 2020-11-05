@@ -8,7 +8,7 @@ namespace ServerBrowser.Harmony
     /// This patch lets us query information about the multiplayer lobby.
     /// </summary>
     [HarmonyPatch(typeof(MultiplayerLobbyConnectionController), "connectionType", MethodType.Setter)]
-    class MpLobbyConnectionTypePatch
+    public static class MpLobbyConnectionTypePatch
     {
         public static MultiplayerLobbyConnectionController.LobbyConnectionType ConnectionType { get; private set; }
             = MultiplayerLobbyConnectionController.LobbyConnectionType.None;
@@ -20,7 +20,7 @@ namespace ServerBrowser.Harmony
             if (nextConnectionType != ConnectionType)
             {
                 ConnectionType = nextConnectionType;
-                Plugin.Log?.Info($"Lobby connection type change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
+                Plugin.Log?.Debug($"Lobby connection type change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
                 GameStateManager.HandleUpdate();
             }
         }

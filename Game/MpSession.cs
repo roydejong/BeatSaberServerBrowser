@@ -82,7 +82,8 @@ namespace ServerBrowser.Game
             {
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} joined!",
-                    $"{GetPlayerCount()}/{GetPlayerLimit()} players connected"
+                    $"{GetPlayerCount()}/{GetPlayerLimit()} players connected",
+                    FloatingNotification.NotificationStyle.Blue
                 );
             }
         }
@@ -100,7 +101,8 @@ namespace ServerBrowser.Game
             {
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} disconnected",
-                    $"{GetPlayerCount()}/{GetPlayerLimit()} players connected"
+                    $"{GetPlayerCount()}/{GetPlayerLimit()} players connected",
+                    FloatingNotification.NotificationStyle.Red
                 );
             }
         }

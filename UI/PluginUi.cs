@@ -15,7 +15,13 @@ namespace ServerBrowser.UI
         public static void SetUp()
         {
             FloatingNotification.SetUp();
-            FloatingNotification.Instance.ShowMessage("Hello world!", "Have a poggers day!");
+
+            FloatingNotification.Instance.ShowMessage(
+                "Hello world!",
+                "I hope you are doing well.",
+                FloatingNotification.NotificationStyle.Yellow,
+                10.0f
+            );
         }
 
         public static void LaunchServerBrowser() 
