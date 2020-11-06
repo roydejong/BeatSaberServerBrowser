@@ -83,7 +83,7 @@ namespace ServerBrowser.Game
             {
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} joined!",
-                    $"{GetPlayerCount()}/{GetPlayerLimit()} players connected",
+                    $"{GetPlayerCount()} players connected",
                     FloatingNotification.NotificationStyle.Blue,
                     Sprites.PortalUser
                 );
@@ -103,7 +103,7 @@ namespace ServerBrowser.Game
             {
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} disconnected",
-                    $"{GetPlayerCount()}/{GetPlayerLimit()} players connected",
+                    $"{GetPlayerCount()} players remaining",
                     FloatingNotification.NotificationStyle.Red,
                     Sprites.Portal
                 );
@@ -130,16 +130,12 @@ namespace ServerBrowser.Game
         {
             switch (MpLobbyConnectionTypePatch.ConnectionType)
             {
-                case LobbyConnectionType.PartyClient:
                 case LobbyConnectionType.PartyHost:
                     // Custom lobby with its own player limit
                     return SessionManager.maxPlayerCount;
 
-                case LobbyConnectionType.QuickPlay:
-                case LobbyConnectionType.None:
                 default:
-                    // Not connected yet, or in QuickPlay, assume 5
-                    // (QuickPlay doesn't seem to set this value)
+                    // maxPlayerCount isn't getting set for clients, only hosts, assume 5
                     return 5;
             }
         }
