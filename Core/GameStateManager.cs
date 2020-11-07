@@ -165,7 +165,8 @@ namespace ServerBrowser.Core
                 SongName = _level?.songName,
                 SongAuthor = _level?.songAuthorName,
                 Difficulty = _difficulty,
-                Platform = Plugin.PlatformId
+                Platform = Plugin.PlatformId,
+                MasterServer = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null
             };
 
             StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();

@@ -21,6 +21,7 @@ namespace ServerBrowser.Core
         public string SongAuthor { get; set; } = null;
         public BeatmapDifficulty? Difficulty { get; set; }
         public string Platform { get; set; } = Plugin.PLATFORM_UNKNOWN;
+        public string MasterServer { get; set; } = null;
 
         public string Describe()
         {
@@ -95,7 +96,7 @@ namespace ServerBrowser.Core
 
         public void Join()
         {
-            MpModeSelection.ConnectToServerCode(ServerCode);
+            MpConnect.Join(this);
         }
 
         public void Join(string password)

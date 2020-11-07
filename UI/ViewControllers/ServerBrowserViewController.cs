@@ -251,7 +251,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             if (_selectedLobby != null && !string.IsNullOrEmpty(_selectedLobby.ServerCode))
             {
-                MpModeSelection.ConnectToServerCode(_selectedLobby.ServerCode);
+                _selectedLobby.Join();
             }
             else
             {
