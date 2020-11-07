@@ -63,6 +63,7 @@ namespace ServerBrowser.UI
         {
             _requestedStart = false;
             _currentStep = NotificationStep.Hidden;
+            _canvasGroup.alpha = 0;
 
             StopAllCoroutines();
             _runningCoroutine = false;
