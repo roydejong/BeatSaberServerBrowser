@@ -97,7 +97,7 @@ namespace ServerBrowser
 
             // Clean up events
             BSEvents.lateMenuSceneLoadedFresh -= OnLateMenuSceneLoadedFresh;
-            MpSession.Stop();
+            MpSession.TearDown();
 
             // Try to cancel any host announcements we may have had
             GameStateManager.UnAnnounce();
@@ -108,7 +108,7 @@ namespace ServerBrowser
         private void OnLateMenuSceneLoadedFresh(ScenesTransitionSetupDataSO obj)
         {
             // Bind multiplayer session events
-            MpSession.Start();
+            MpSession.SetUp();
 
             // UI setup
             PluginUi.SetUp();

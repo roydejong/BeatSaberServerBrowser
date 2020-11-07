@@ -24,7 +24,7 @@ namespace ServerBrowser.Game
         public static DisconnectedReason DisconnectedReason { get; private set; } = DisconnectedReason.Unknown;
 
         #region Lifecycle
-        public static void Start()
+        public static void SetUp()
         {
             /** 
              * Note: The game creates one session manager in MainSystemInit.InstallBindings(), so
@@ -44,12 +44,15 @@ namespace ServerBrowser.Game
             SessionManager.playerDisconnectedEvent += OnSessionPlayerDisconnected;
         }
 
-        public static void Stop()
+        public static void TearDown()
         {
-            SessionManager.connectedEvent -= OnSessionConnected;
-            SessionManager.disconnectedEvent -= OnSessionDisconnected;
-            SessionManager.playerConnectedEvent -= OnSessionPlayerConnected;
-            SessionManager.playerDisconnectedEvent -= OnSessionPlayerDisconnected;
+            if (SessionManager != null)
+            {
+                SessionManager.connectedEvent -= OnSessionConnected;
+                SessionManager.disconnectedEvent -= OnSessionDisconnected;
+                SessionManager.playerConnectedEvent -= OnSessionPlayerConnected;
+                SessionManager.playerDisconnectedEvent -= OnSessionPlayerDisconnected;
+            }
         }
         #endregion
 
