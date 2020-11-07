@@ -79,6 +79,7 @@ namespace ServerBrowser.Game
 
             // Notification if enabled (and fully connected, because all players raise this on connect)
             var isFullyConnected = IsConnected && MpLobbyConnectionTypePatch.ConnectionType != LobbyConnectionType.None;
+
             if (isFullyConnected && Plugin.Config.JoinNotificationsEnabled)
             {
                 FloatingNotification.Instance.ShowMessage(
@@ -99,11 +100,14 @@ namespace ServerBrowser.Game
 
             // Notification if enabled (and connected, because all players raise this on disconnect)
             var isFullyConnected = IsConnected && MpLobbyConnectionTypePatch.ConnectionType != LobbyConnectionType.None;
+
             if (isFullyConnected && Plugin.Config.JoinNotificationsEnabled)
             {
+                var playerCount = GetPlayerCount();
+
                 FloatingNotification.Instance.ShowMessage(
                     $"{player.userName} disconnected",
-                    $"{GetPlayerCount()} players remaining",
+                    playerCount > 1 ? $"{playerCount} players remaining" : "You're all alone",
                     FloatingNotification.NotificationStyle.Red,
                     Sprites.Portal
                 );
