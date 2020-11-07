@@ -71,6 +71,9 @@ namespace ServerBrowser.Game
 
             IsConnected = false;
             DisconnectedReason = reason;
+
+            // Restore the user's preferred master server
+            MpConnect.ClearMasterServerOverride();
         }
 
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
