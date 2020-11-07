@@ -109,6 +109,7 @@ namespace ServerBrowser
         {
             // Bind multiplayer session events
             MpSession.SetUp();
+            MpModeSelection.SetUp();
 
             // UI setup
             PluginUi.SetUp();

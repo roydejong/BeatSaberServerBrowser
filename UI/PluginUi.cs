@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage;
 using HMUI;
 using IPA.Utilities;
+using ServerBrowser.Game;
 using ServerBrowser.UI.ViewControllers;
 using ServerBrowser.Utils;
 
@@ -15,18 +16,32 @@ namespace ServerBrowser.UI
             FloatingNotification.SetUp();
         }
 
-        public static void LaunchServerBrowser() 
+        public static void LaunchServerBrowser()
         {
-            if (_serverBrowserViewController == null)
+            ViewController viewToMount;
+
+            if (Plugin.Config.UseNativeBrowserPreview)
             {
-                _serverBrowserViewController = BeatSaberUI.CreateViewController<ServerBrowserViewController>();
+                // Native browser preview (in development)
+                NativeServerBrowser.SetUp();
+
+                viewToMount = NativeServerBrowser.ViewController;
+            }
+            else
+            {
+                // Original custom BSML based browser
+                if (_serverBrowserViewController == null)
+                {
+                    _serverBrowserViewController = BeatSaberUI.CreateViewController<ServerBrowserViewController>();
+                }
+
+                viewToMount = _serverBrowserViewController;
             }
 
-            var mpFlowCoordinator = GameMp.ModeSelectionFlowCoordinator;
-
-            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("PresentViewController", new object[] {
-                _serverBrowserViewController, null, ViewController.AnimationDirection.Vertical, false
-            });
+            if (viewToMount != null)
+            {
+                MpModeSelection.PresentViewController(viewToMount);
+            }
         }
     }
 }

@@ -50,7 +50,7 @@ namespace ServerBrowser.UI.ViewControllers
 
         private void SetInitialUiState()
         {
-            UpdateTitle();
+            MpModeSelection.SetTitle("Server Browser");
 
             StatusText.text = "Loading...";
             StatusText.color = Color.gray;
@@ -64,15 +64,6 @@ namespace ServerBrowser.UI.ViewControllers
 
             ClearSelection();
             CancelImageLoading();
-        }
-
-        private static void UpdateTitle()
-        {
-            var mpFlowCoordinator = GameMp.ModeSelectionFlowCoordinator;
-
-            mpFlowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("SetTitle", new object[] {
-                "Server Browser", ViewController.AnimationType.In
-            });
         }
 
         private void CancelImageLoading(bool reset = true)
@@ -252,7 +243,7 @@ namespace ServerBrowser.UI.ViewControllers
         [UIAction("createButtonClick")]
         private void CreateButtonClick()
         {
-            GameMp.OpenCreateServerMenu();
+            MpModeSelection.OpenCreateServerMenu();
         }
 
         [UIAction("connectButtonClick")]
@@ -260,7 +251,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             if (_selectedLobby != null && !string.IsNullOrEmpty(_selectedLobby.ServerCode))
             {
-                GameMp.ConnectToServerCode(_selectedLobby.ServerCode);
+                MpModeSelection.ConnectToServerCode(_selectedLobby.ServerCode);
             }
             else
             {

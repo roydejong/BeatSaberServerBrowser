@@ -137,6 +137,16 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\VRUI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="Zenject, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Zenject-usage, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject-usage.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
@@ -146,6 +156,7 @@
     <Compile Include="Core\GameStateManager.cs" />
     <Compile Include="Core\MasterServerAPI.cs" />
     <Compile Include="Core\UpdateTimer.cs" />
+    <Compile Include="Game\MpModeSelection.cs" />
     <Compile Include="Game\MpSession.cs" />
     <Compile Include="Harmony\MpLobbyStatePatch.cs" />
     <Compile Include="Harmony\SetLobbyCodePatch.cs" />
@@ -158,12 +169,13 @@
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Components\HostedGameCell.cs" />
+    <Compile Include="UI\Data\ServerBrowserTableViewDataSource.cs" />
+    <Compile Include="UI\NativeServerBrowser.cs" />
     <Compile Include="UI\PluginUi.cs" />
     <Compile Include="UI\FloatingNotification.cs" />
     <Compile Include="UI\ViewControllers\ServerBrowserViewController.cs" />
     <Compile Include="UI\Components\LobbyConfigPanel.cs" />
     <Compile Include="Utils\BeatSaverHelper.cs" />
-    <Compile Include="Utils\GameMp.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
