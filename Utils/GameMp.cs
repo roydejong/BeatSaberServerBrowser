@@ -1,8 +1,5 @@
-﻿using BeatSaberMarkupLanguage;
-using HMUI;
+﻿using HMUI;
 using IPA.Utilities;
-using ServerBrowser.UI;
-using ServerBrowser.UI.ViewControllers;
 using System.Linq;
 using UnityEngine;
 

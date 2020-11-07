@@ -1,11 +1,8 @@
 ﻿using BeatSaberMarkupLanguage;
 using HMUI;
 using IPA.Utilities;
-using ServerBrowser.Assets;
 using ServerBrowser.UI.ViewControllers;
 using ServerBrowser.Utils;
-using System.Linq;
-using UnityEngine;
 
 namespace ServerBrowser.UI
 {
@@ -16,15 +13,6 @@ namespace ServerBrowser.UI
         public static void SetUp()
         {
             FloatingNotification.SetUp();
-
-            FloatingNotification.Instance.ShowMessageWithImageDownload(
-                "Hello world!",
-                "Do you like art?",
-                "https://cdn.britannica.com/s:700x500/87/2087-004-264616BB/Mona-Lisa-oil-wood-panel-Leonardo-da.jpg",
-                FloatingNotification.NotificationStyle.Red,
-                Sprites.BeatSaverIcon,
-                10.0f
-            );
         }
 
         public static void LaunchServerBrowser() 
