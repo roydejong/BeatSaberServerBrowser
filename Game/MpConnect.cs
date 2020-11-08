@@ -4,9 +4,13 @@ namespace ServerBrowser.Game
 {
     public static class MpConnect
     {
+        public const string OFFICIAL_MASTER_SUFFIX = ".mp.beatsaber.com";
+        public const string OFFICIAL_MASTER_OCULUS = "oculus.production.mp.beatsaber.com";
+        public const string OFFICIAL_MASTER_STEAM = "steam.production.mp.beatsaber.com";
+
         public static void Join(HostedGameData game)
         {
-            if (game.MasterServer == null || game.MasterServer.Contains(".mp.beatsaber.com"))
+            if (game.MasterServer == null || game.MasterServer.EndsWith(OFFICIAL_MASTER_SUFFIX))
             {
                 // Game is hosted on the player platform's official master server
                 if (_usingModdedServer || _officialEndPoint == null)
@@ -14,11 +18,11 @@ namespace ServerBrowser.Game
                     // If we normally use a modded server, we need to fall back to official servers manually
                     if (Plugin.PlatformId == Plugin.PLATFORM_OCULUS)
                     {
-                        SetMasterServerOverride("oculus.production.mp.beatsaber.com");
+                        SetMasterServerOverride(OFFICIAL_MASTER_OCULUS);
                     }
                     else
                     {
-                        SetMasterServerOverride("steam.production.mp.beatsaber.com");
+                        SetMasterServerOverride(OFFICIAL_MASTER_STEAM);
                     }
                 }
                 else
@@ -59,7 +63,7 @@ namespace ServerBrowser.Game
 
             var hostName = currentEndPoint.hostName;
 
-            if (hostName.EndsWith(".mp.beatsaber.com"))
+            if (hostName.EndsWith(OFFICIAL_MASTER_SUFFIX))
             {
                 // This is the official / default master server (likely not using a server mod)
                 _officialEndPoint = currentEndPoint;

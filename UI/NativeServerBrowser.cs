@@ -2,8 +2,7 @@
 using IPA.Utilities;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
-using ServerBrowser.UI.Data;
-using System.Collections.Generic;
+using ServerBrowser.UI.Components;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,9 +79,9 @@ namespace ServerBrowser.UI
             _tableView.SetData(HostedGameBrowser.LobbiesOnPage, true);
         }
 
-        private void OnJoinPressed(INetworkPlayer item)
+        private void OnJoinPressed(INetworkPlayer game)
         {
-            ((HostedGameData)item).Join();
+            ((HostedGameData)game).Join();
         }
         #endregion
 
@@ -149,7 +148,7 @@ namespace ServerBrowser.UI
             _mainLoadingControl = transform.Find("GameServersListTableView/TableView/Viewport/MainLoadingControl").GetComponent<LoadingControl>();
             _mainLoadingControl.ShowLoading("Initializing");
 
-            // Table view
+            // Custom table view
             _tableView = transform.Find("GameServersListTableView").GetComponent<GameServersListTableView>();
         }
         #endregion

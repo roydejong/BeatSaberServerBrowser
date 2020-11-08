@@ -31,6 +31,53 @@ namespace ServerBrowser.Core
             return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {stateDescr}, {moddedDescr})";
         }
 
+        public string DescribeType()
+        {
+            string masterServerDescr;
+            string moddedDescr;
+
+            if (String.IsNullOrEmpty(MasterServer) || MasterServer == MpConnect.OFFICIAL_MASTER_STEAM)
+            {
+                masterServerDescr = "Steam";
+            }
+            else if (MasterServer == MpConnect.OFFICIAL_MASTER_OCULUS)
+            {
+                masterServerDescr = "Oculus";
+            }
+            else if (MasterServer.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX))
+            {
+                masterServerDescr = "Official-unknown";
+            }
+            else
+            {
+                masterServerDescr = "Cross-play";
+            }
+
+            if (IsModded)
+            {
+                moddedDescr = "Modded";
+            }
+            else
+            {
+                moddedDescr = "Vanilla";
+            }
+
+            return $"{masterServerDescr}, {moddedDescr}";
+        }
+
+        public string DescribeDifficulty()
+        {
+            switch (Difficulty)
+            {
+                case null:
+                    return "-";
+                default:
+                    return Difficulty.ToString();
+                case BeatmapDifficulty.ExpertPlus:
+                    return "Expert+";
+            }
+        }
+
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);

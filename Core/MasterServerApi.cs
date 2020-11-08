@@ -113,11 +113,14 @@ namespace ServerBrowser.Core
             if (offset > 0)
                 queryString.Add("offset", offset.ToString());
 
-            if (!String.IsNullOrEmpty(searchQuery))
-                queryString.Add("query", searchQuery);
+            if (Plugin.Config.UseNativeBrowserPreview)
+                queryString.Add("limit", "max");
 
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
                 queryString.Add("vanilla", "1");
+
+            if (!String.IsNullOrEmpty(searchQuery))
+                queryString.Add("query", searchQuery);
 
             var response = await PerformWebRequest("GET", $"/browse?{queryString}");
             var contentStr = await response.Content.ReadAsStringAsync();     
