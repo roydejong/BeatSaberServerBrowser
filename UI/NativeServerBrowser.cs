@@ -13,6 +13,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using BeatSaberMarkupLanguage.Tags;
+using BeatSaberMarkupLanguage.Parser;
+using System.Text;
 
 namespace ServerBrowser.UI
 {
@@ -50,6 +53,8 @@ namespace ServerBrowser.UI
         #endregion
 
         #region Core / Data
+        private string _searchQuery = null;
+
         private void OnEnable()
         {
             MpModeSelection.SetTitle("Server Browser");
@@ -73,7 +78,7 @@ namespace ServerBrowser.UI
 
             _mainLoadingControl.ShowLoading("Loading server list");
 
-            HostedGameBrowser.FullRefresh(null);
+            HostedGameBrowser.FullRefresh(_searchQuery);
         }
 
         private void OnBrowserUpdate()
@@ -81,14 +86,82 @@ namespace ServerBrowser.UI
             _refreshButton.interactable = true;
             _filterButton.interactable = true;
 
-            _mainLoadingControl.Hide();
-
             _tableView.SetData(HostedGameBrowser.LobbiesOnPage, true);
+
+            UpdateLoadingControl();
+            UpdateFilterButton();
+        }
+
+        private void UpdateLoadingControl()
+        {
+            if (!HostedGameBrowser.ConnectionOk)
+            {
+                _mainLoadingControl.ShowText("Failed to get server list", true);
+            }
+            else if (!HostedGameBrowser.AnyResults)
+            {
+                var isSearching = !String.IsNullOrEmpty(_searchQuery);
+
+                if (isSearching)
+                {
+                    _mainLoadingControl.ShowText("No servers found matching your search", false);
+                }
+                else
+                {
+                    _mainLoadingControl.ShowText("No servers found", true);
+                }
+            }
+            else
+            {
+                _mainLoadingControl.Hide();
+            }
+        }
+
+        private void UpdateFilterButton()
+        {
+            var nextLabel = new StringBuilder();
+
+            // Current constraints list
+            if (!String.IsNullOrEmpty(_searchQuery))
+            {
+                nextLabel.Append($"Search: \"{_searchQuery}\"");
+            }
+            else
+            {
+                nextLabel.Append("All servers");
+            }
+
+            // No MpEx?
+            if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
+            {
+                nextLabel.Append(", no modded games");
+            }
+
+            // (X results)
+            var resultCount = HostedGameBrowser.TotalResultCount;
+            var resultUnit = resultCount == 1 ? "result" : "results";
+            nextLabel.Append($" ({resultCount} {resultUnit})");
+
+            // Apply
+            _filterButtonLabel.SetText(nextLabel.ToString());
         }
 
         private void OnJoinPressed(INetworkPlayer game)
         {
             ((HostedGameData)game).Join();
+        }
+
+        private void OnModalKeyboardSubmit(string searchValue)
+        {
+            if (_searchQuery != searchValue)
+            {
+                _searchQuery = searchValue;
+                DoFullRefresh();
+            }
+        }
+        private void OnRefreshPressed()
+        {
+            DoFullRefresh();
         }
         #endregion
 
@@ -102,8 +175,18 @@ namespace ServerBrowser.UI
         #endregion
 
         #region Awake (UI Setup)
+        private ModalKeyboard _modalKeyboard;
+
         private void Awake()
         {
+            // Create ModalKeyboard (BSML)
+            var modalKeyboardTag = new ModalKeyboardTag();
+            var modalKeyboardObj = modalKeyboardTag.CreateObject(transform);
+
+            _modalKeyboard = modalKeyboardObj.GetComponent<ModalKeyboard>();
+            _modalKeyboard.clearOnOpen = false;
+            _modalKeyboard.keyboard.EnterPressed += OnModalKeyboardSubmit;
+
             // Create server button
             var createServerButtonTransform = transform.Find("CreateServerButton");
             createServerButtonTransform.localPosition = new Vector3(-76.50f, 40.0f, 0.0f);
@@ -125,27 +208,28 @@ namespace ServerBrowser.UI
             _filterButton = filterButtonTransform.GetComponent<Button>();
             _filterButton.onClick.AddListener(delegate
             {
-                // TODO Filter click
-                MpModeSelection.SetTitle("FILTER CLICK");
+                _modalKeyboard.keyboard.KeyboardText.text = !String.IsNullOrEmpty(_searchQuery) ? _searchQuery : "";
+                //_modalKeyboard.keyboard.KeyboardText.fontSize = 4;
+
+                _modalKeyboard.modalView.Show(true, true, null);
             });
 
             // Filters lable
             _filterButtonLabel = transform.Find("Filters/FilterButton/Content/Text").GetComponent<CurvedTextMeshPro>();
             _filterButtonLabel.text = "Hello world!";
 
-            // Hide top-right loading spinner
+            // Hide top-right loading spinners
             Destroy(transform.Find("Filters/SmallLoadingControl/LoadingContainer").gameObject);
             Destroy(transform.Find("Filters/SmallLoadingControl/DownloadingContainer").gameObject);
 
-            // Refresh button
-            var refreshContainer = transform.Find("Filters/SmallLoadingControl/RefreshContainer");
+            // Refresh button (add listener, make visible)
+            var smallLoadingControl = transform.Find("Filters/SmallLoadingControl").GetComponent<LoadingControl>();
+            smallLoadingControl.didPressRefreshButtonEvent += OnRefreshPressed;
+
+            var refreshContainer = smallLoadingControl.transform.Find("RefreshContainer");
             refreshContainer.gameObject.SetActive(true);
 
             _refreshButton = refreshContainer.Find("RefreshButton").GetComponent<Button>();
-            _refreshButton.onClick.AddListener(delegate
-            {
-                DoFullRefresh();
-            });
 
             // Change "Music Packs" table header to "Type"
             transform.Find("GameServersListTableView/GameServerListTableHeader/LabelsContainer/MusicPack").GetComponent<CurvedTextMeshPro>()
@@ -153,6 +237,8 @@ namespace ServerBrowser.UI
 
             // Main loading control
             _mainLoadingControl = transform.Find("GameServersListTableView/TableView/Viewport/MainLoadingControl").GetComponent<LoadingControl>();
+            _mainLoadingControl.didPressRefreshButtonEvent += OnRefreshPressed;
+
             _mainLoadingControl.ShowLoading("Initializing");
 
             // Table view
