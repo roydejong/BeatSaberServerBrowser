@@ -1,8 +1,15 @@
-﻿using HMUI;
+﻿using BeatSaberMarkupLanguage.Components;
+using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.UI.Components;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
+using HMUI;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -148,8 +155,30 @@ namespace ServerBrowser.UI
             _mainLoadingControl = transform.Find("GameServersListTableView/TableView/Viewport/MainLoadingControl").GetComponent<LoadingControl>();
             _mainLoadingControl.ShowLoading("Initializing");
 
-            // Custom table view
+            // Table view
             _tableView = transform.Find("GameServersListTableView").GetComponent<GameServersListTableView>();
+
+            // Modify content cell prefab (add a background)
+            var contentCellPrefab = _tableView.GetField<GameServerListTableCell, GameServersListTableView>("_gameServerListCellPrefab");
+
+            var backgroundBase = Resources.FindObjectsOfTypeAll<ImageView>().First(x => x.gameObject?.name == "Background"
+                && x.sprite != null && x.sprite.name.StartsWith("RoundRect10"));
+
+            var backgroundClone = UnityEngine.Object.Instantiate(backgroundBase);
+            backgroundClone.transform.SetParent(contentCellPrefab.transform, false);
+            backgroundClone.transform.SetAsFirstSibling();
+            backgroundClone.name = "Background";
+
+            var backgroundTransform = backgroundClone.transform as RectTransform;
+            backgroundTransform.anchorMin = new Vector2(0.0f, 0.0f);
+            backgroundTransform.anchorMax = new Vector2(0.95f, 1.0f);
+            backgroundTransform.offsetMin = new Vector2(0.5f, 0.0f);
+            backgroundTransform.offsetMax = new Vector2(5.0f, 0.0f);
+            backgroundTransform.sizeDelta = new Vector2(4.50f, 0.0f);
+
+            var cellBackgroundHelper = contentCellPrefab.gameObject.AddComponent<CellBackgroundHelper>();
+            cellBackgroundHelper.Cell = contentCellPrefab;
+            cellBackgroundHelper.Background = backgroundClone;
         }
         #endregion
     }

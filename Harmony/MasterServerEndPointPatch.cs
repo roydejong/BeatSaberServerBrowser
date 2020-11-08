@@ -2,7 +2,7 @@
 using ServerBrowser.Game;
 using System;
 
-namespace ServerBrowser.Core
+namespace ServerBrowser.Harmony
 {
     [HarmonyPatch(typeof(NetworkConfigSO))]
     public class MasterServerEndPointPatch

@@ -20,23 +20,16 @@ namespace ServerBrowser.Harmony
             {
                 var game = (HostedGameData)player;
 
-                // --
-
+                // Difficulty
                 var txtDifficulty = __instance.GetField<CurvedTextMeshPro>("_difficultiesText");
                 txtDifficulty.SetText(game.DescribeDifficulty());
 
-                // --
-
+                // Type (Music Packs)
                 var txtType = __instance.GetField<CurvedTextMeshPro>("_musicPackText");
                 txtType.SetText(game.DescribeType());
+                txtType.color = game.IsModded ? Color.white : Color.green;
 
-                if (!game.IsModded)
-                {
-                    txtType.color = Color.green;
-                }
-
-                // --
-
+                // Player Count
                 var txtPlayerCount = __instance.GetField<CurvedTextMeshPro>("_playerCount");
                 txtPlayerCount.color = (game.PlayerCount >= game.PlayerLimit) ? Color.gray : Color.white;
             }

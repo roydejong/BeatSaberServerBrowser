@@ -151,7 +151,7 @@ namespace ServerBrowser.UI
 
             _clonedMainScreen = UnityEngine.Object.Instantiate(mainScreen);
             _clonedMainScreen.name = "SBFNMainScreen";
-            _clonedMainScreen.parent = gameObject.transform;
+            _clonedMainScreen.SetParent(gameObject.transform, false);
 
             _canvasGroup = _clonedMainScreen.gameObject.AddComponent<CanvasGroup>();
             _canvasGroup.enabled = true;

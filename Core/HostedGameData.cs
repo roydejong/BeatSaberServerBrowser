@@ -67,6 +67,12 @@ namespace ServerBrowser.Core
 
         public string DescribeDifficulty()
         {
+            if (String.IsNullOrEmpty(this.LevelId))
+            {
+                // Only empty if we've never played a level, in which case we shouldn't display a difficulty
+                return "-";
+            }
+
             switch (Difficulty)
             {
                 case null:

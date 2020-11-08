@@ -152,7 +152,7 @@
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\HostedGameData.cs" />
     <Compile Include="Core\HostedGameBrowser.cs" />
-    <Compile Include="Core\MasterServerEndPointPatch.cs" />
+    <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\ServerBrowseResult.cs" />
     <Compile Include="Core\GameStateManager.cs" />
     <Compile Include="Core\MasterServerAPI.cs" />
@@ -171,6 +171,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Components\CellBackgroundHelper.cs" />
     <Compile Include="UI\Components\HostedGameCell.cs" />
     <Compile Include="UI\NativeServerBrowser.cs" />
     <Compile Include="UI\PluginUi.cs" />
