@@ -14,7 +14,7 @@ namespace ServerBrowser.Core
     public static class MasterServerAPI
     {
         #region Shared/HTTP
-        private const string BASE_URL = "https://bs-lobby-master.roydejong.net/api/v1";
+        private const string BASE_URL = "https://bssb.app/api/v1";
 
         private static async Task<HttpResponseMessage> PerformWebRequest(string method, string endpoint, string json = null)
         {
