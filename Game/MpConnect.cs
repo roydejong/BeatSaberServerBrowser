@@ -10,7 +10,7 @@ namespace ServerBrowser.Game
 
         public static void Join(HostedGameData game)
         {
-            if (game.MasterServer == null || game.MasterServer.EndsWith(OFFICIAL_MASTER_SUFFIX))
+            if (game.MasterServerHost == null || game.MasterServerHost.EndsWith(OFFICIAL_MASTER_SUFFIX))
             {
                 // Game is hosted on the player platform's official master server
                 if (_usingModdedServer || _officialEndPoint == null)
@@ -34,7 +34,7 @@ namespace ServerBrowser.Game
             else
             {
                 // Game is hosted on a custom master server, we need to override
-                SetMasterServerOverride(game.MasterServer);
+                SetMasterServerOverride(game.MasterServerHost, game.MasterServerPort);
             }
 
             // Trigger the actual join via server code
