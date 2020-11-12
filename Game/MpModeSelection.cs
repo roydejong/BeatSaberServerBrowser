@@ -31,7 +31,12 @@ namespace ServerBrowser.Game
 
         public static void OpenCreateServerMenu()
         {
-            Plugin.Config.LobbyAnnounceToggle = true; // If we are initiating the server menu from our UI, let's assume the intent is to host a game
+            // Make sure any overrides are cleared when we're going to host
+            MpConnect.ClearMasterServerOverride();
+
+            // If we are initiating the server menu from our UI, assume the intent is to host a game
+            Plugin.Config.LobbyAnnounceToggle = true;
+
             _flowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
