@@ -1,11 +1,8 @@
 ﻿using ServerBrowser.Game;
-using ServerBrowser.Harmony;
-using ServerBrowser.Utils;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -14,7 +11,7 @@ namespace ServerBrowser.Core
     public static class MasterServerAPI
     {
         #region Shared/HTTP
-        private const string BASE_URL = "https://bs-lobby-master.roydejong.net/api/v1";
+        private const string BASE_URL = "https://bssb.app/api/v1";
 
         private static async Task<HttpResponseMessage> PerformWebRequest(string method, string endpoint, string json = null)
         {
@@ -83,12 +80,20 @@ namespace ServerBrowser.Core
                 return true;
             }
 
-            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}]");
+            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}] for code {announce.ServerCode}");
 
             _lastPayloadSent = payload;
             _lastSentAt = DateTime.Now;
 
             var responseOk = await PerformWebRequest("POST", "/announce", payload) != null;
+
+            if (!responseOk)
+            {
+                // Request failed, allow immediate retry
+                _lastPayloadSent = null;
+                _lastSentAt = null;
+            }
+
             return responseOk;
         }
 
@@ -122,18 +127,19 @@ namespace ServerBrowser.Core
             if (!String.IsNullOrEmpty(searchQuery))
                 queryString.Add("query", searchQuery);
 
-            var response = await PerformWebRequest("GET", $"/browse?{queryString}");
-            var contentStr = await response.Content.ReadAsStringAsync();     
-
             try
             {
+                var response = await PerformWebRequest("GET", $"/browse?{queryString}");
+                var contentStr = await response.Content.ReadAsStringAsync();
+
                 return ServerBrowseResult.FromJson(contentStr);
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Warn($"Error while parsing browse result: {ex}");
+                Plugin.Log?.Warn($"Error in browse request: {ex}");
                 return null;
             }
         }
     }
 }
+

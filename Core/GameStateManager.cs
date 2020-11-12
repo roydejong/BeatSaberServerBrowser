@@ -49,7 +49,10 @@ namespace ServerBrowser.Core
         public static void HandleLobbyCode(string lobbyCode)
         {
             if (!MpLobbyConnectionTypePatch.IsPartyHost)
+            {
+                _lobbyCode = null;
                 return;
+            }
 
             if (_lobbyCode != lobbyCode)
             {
@@ -63,7 +66,7 @@ namespace ServerBrowser.Core
                 }
             }
         }
-        
+
         public static void HandleCustomGameName(string name)
         {
             if (!MpLobbyConnectionTypePatch.IsPartyHost)
@@ -166,7 +169,8 @@ namespace ServerBrowser.Core
                 SongAuthor = _level?.songAuthorName,
                 Difficulty = _difficulty,
                 Platform = Plugin.PlatformId,
-                MasterServer = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null
+                MasterServerHost = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null,
+                MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT
             };
 
             StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();

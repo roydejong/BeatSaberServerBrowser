@@ -21,7 +21,9 @@ namespace ServerBrowser.Core
         public string SongAuthor { get; set; } = null;
         public BeatmapDifficulty? Difficulty { get; set; }
         public string Platform { get; set; } = Plugin.PLATFORM_UNKNOWN;
-        public string MasterServer { get; set; } = null;
+        public string MasterServerHost { get; set; } = null;
+        public int? MasterServerPort { get; set; } = null;
+        public string CoverUrl { get; set; } = null;
 
         public string Describe()
         {
@@ -36,15 +38,15 @@ namespace ServerBrowser.Core
             string masterServerDescr;
             string moddedDescr;
 
-            if (String.IsNullOrEmpty(MasterServer) || MasterServer == MpConnect.OFFICIAL_MASTER_STEAM)
+            if (String.IsNullOrEmpty(MasterServerHost) || MasterServerHost == MpConnect.OFFICIAL_MASTER_STEAM)
             {
                 masterServerDescr = "Steam";
             }
-            else if (MasterServer == MpConnect.OFFICIAL_MASTER_OCULUS)
+            else if (MasterServerHost == MpConnect.OFFICIAL_MASTER_OCULUS)
             {
                 masterServerDescr = "Oculus";
             }
-            else if (MasterServer.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX))
+            else if (MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX))
             {
                 masterServerDescr = "Official-unknown";
             }
@@ -121,7 +123,7 @@ namespace ServerBrowser.Core
         [JsonIgnoreAttribute]
         public bool canJoin => true;
         [JsonIgnoreAttribute]
-        public bool requiresPassword => false;
+        public bool requiresPassword => true;
         [JsonIgnoreAttribute]
         public bool isWaitingOnJoin => false;
         [JsonIgnoreAttribute]

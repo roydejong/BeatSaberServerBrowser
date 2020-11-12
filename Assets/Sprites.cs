@@ -40,7 +40,10 @@ namespace ServerBrowser.Assets
         public static Sprite LoadSpriteFromTexture(Texture2D SpriteTexture, float PixelsPerUnit = 100.0f)
         {
             if (SpriteTexture)
+            {
                 return Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(0, 0), PixelsPerUnit);
+            }
+
             return null;
         }
 
@@ -51,7 +54,9 @@ namespace ServerBrowser.Assets
 
         public static Sprite LoadSpriteFromResources(string resourcePath, float PixelsPerUnit = 100.0f)
         {
-            return LoadSpriteRaw(GetResource(Assembly.GetCallingAssembly(), resourcePath), PixelsPerUnit);
+            var sprite = LoadSpriteRaw(GetResource(Assembly.GetCallingAssembly(), resourcePath), PixelsPerUnit);
+            sprite.name = resourcePath;
+            return sprite;
         }
 
         public static byte[] GetResource(Assembly asm, string ResourceName)

@@ -68,27 +68,15 @@ namespace ServerBrowser.UI.Components
 
         private async Task<bool> SetCoverArt()
         {
-            var level = SongCore.Loader.GetLevelById(Game.LevelId);
+            var coverArtSprite = await CoverArtGrabber.GetCoverArtSprite(Game, _cancellationTokenSource.Token);
 
-            if (level != null)
+            if (coverArtSprite != null)
             {
-                // Official level, or installed custom level found
-                this.icon = await level.GetCoverImageAsync(_cancellationTokenSource.Token);
+                this.icon = coverArtSprite;
                 _onContentChange(this);
                 return true;
             }
 
-            // Level not found locally; ask Beat Saver for cover art
-            var downloadedCover = await BeatSaverHelper.FetchCoverArtBytes(Game.LevelId, _cancellationTokenSource.Token);
-
-            if (downloadedCover != null)
-            {
-                this.icon = Sprites.LoadSpriteRaw(downloadedCover);
-                _onContentChange(this);
-                return true;
-            }
-
-            // Failed to get level info, can't set cover art, too bad, very sad
             return false;
         }
     }
