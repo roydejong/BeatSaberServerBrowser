@@ -191,7 +191,7 @@ namespace ServerBrowser.Core
                 _didAnnounce = true;
                 _lastCompleteAnnounce = announce;
 
-                StatusText = $"Game announced!\r\n{announce.Describe()}";
+                StatusText = $"Players can now join from the browser!\r\n{announce.Describe()}";
                 HasErrored = false;
             }
             else
