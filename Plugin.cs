@@ -29,10 +29,12 @@ namespace ServerBrowser
         {
             get
             {
-                var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                var assemblyVersionStr = $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
+
                 var bsVersion = IPA.Utilities.UnityGame.GameVersion.ToString();
 
-                return $"ServerBrowser/{assemblyVersion} (BeatSaber/{bsVersion}) ({PlatformId})";
+                return $"ServerBrowser/{assemblyVersionStr} (BeatSaber/{bsVersion}) ({PlatformId})";
             }
         }
 
