@@ -74,6 +74,9 @@ namespace ServerBrowser.Game
 
             // Restore the user's preferred master server
             MpConnect.ClearMasterServerOverride();
+
+            // Clear any notifications
+            FloatingNotification.Instance.DismissMessage();
         }
 
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
