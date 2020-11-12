@@ -68,7 +68,7 @@ namespace ServerBrowser.UI.Components
 
         private async Task<bool> SetCoverArt()
         {
-            var coverArtSprite = await CoverArtGrabber.GetCoverArtSprite(Game.LevelId, _cancellationTokenSource.Token);
+            var coverArtSprite = await CoverArtGrabber.GetCoverArtSprite(Game, _cancellationTokenSource.Token);
 
             if (coverArtSprite != null)
             {

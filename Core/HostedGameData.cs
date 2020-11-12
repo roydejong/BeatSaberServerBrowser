@@ -23,6 +23,7 @@ namespace ServerBrowser.Core
         public string Platform { get; set; } = Plugin.PLATFORM_UNKNOWN;
         public string MasterServerHost { get; set; } = null;
         public int? MasterServerPort { get; set; } = null;
+        public string CoverUrl { get; set; } = null;
 
         public string Describe()
         {
