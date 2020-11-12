@@ -80,7 +80,7 @@ namespace ServerBrowser.Core
                 return true;
             }
 
-            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}]");
+            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}] for code {announce.ServerCode}");
 
             _lastPayloadSent = payload;
             _lastSentAt = DateTime.Now;

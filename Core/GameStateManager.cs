@@ -49,7 +49,10 @@ namespace ServerBrowser.Core
         public static void HandleLobbyCode(string lobbyCode)
         {
             if (!MpLobbyConnectionTypePatch.IsPartyHost)
+            {
+                _lobbyCode = null;
                 return;
+            }
 
             if (_lobbyCode != lobbyCode)
             {
@@ -63,7 +66,7 @@ namespace ServerBrowser.Core
                 }
             }
         }
-        
+
         public static void HandleCustomGameName(string name)
         {
             if (!MpLobbyConnectionTypePatch.IsPartyHost)
