@@ -127,16 +127,16 @@ namespace ServerBrowser.Core
             if (!String.IsNullOrEmpty(searchQuery))
                 queryString.Add("query", searchQuery);
 
-            var response = await PerformWebRequest("GET", $"/browse?{queryString}");
-            var contentStr = await response.Content.ReadAsStringAsync();
-
             try
             {
+                var response = await PerformWebRequest("GET", $"/browse?{queryString}");
+                var contentStr = await response.Content.ReadAsStringAsync();
+
                 return ServerBrowseResult.FromJson(contentStr);
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Warn($"Error while parsing browse result: {ex}");
+                Plugin.Log?.Warn($"Error in browse request: {ex}");
                 return null;
             }
         }
