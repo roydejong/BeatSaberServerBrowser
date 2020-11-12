@@ -167,7 +167,7 @@ namespace ServerBrowser.Core
                 Difficulty = _difficulty,
                 Platform = Plugin.PlatformId,
                 MasterServerHost = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null,
-                MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : 2328
+                MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT
             };
 
             StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();

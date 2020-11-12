@@ -1,11 +1,8 @@
 ﻿using ServerBrowser.Game;
-using ServerBrowser.Harmony;
-using ServerBrowser.Utils;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -123,7 +120,7 @@ namespace ServerBrowser.Core
                 queryString.Add("query", searchQuery);
 
             var response = await PerformWebRequest("GET", $"/browse?{queryString}");
-            var contentStr = await response.Content.ReadAsStringAsync();     
+            var contentStr = await response.Content.ReadAsStringAsync();
 
             try
             {
@@ -137,3 +134,4 @@ namespace ServerBrowser.Core
         }
     }
 }
+

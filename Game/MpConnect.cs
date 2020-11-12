@@ -8,6 +8,8 @@ namespace ServerBrowser.Game
         public const string OFFICIAL_MASTER_OCULUS = "oculus.production.mp.beatsaber.com";
         public const string OFFICIAL_MASTER_STEAM = "steam.production.mp.beatsaber.com";
 
+        public const int DEFAULT_MASTER_PORT = 2328;
+
         public static void Join(HostedGameData game)
         {
             if (game.MasterServerHost == null || game.MasterServerHost.EndsWith(OFFICIAL_MASTER_SUFFIX))
@@ -34,7 +36,7 @@ namespace ServerBrowser.Game
             else
             {
                 // Game is hosted on a custom master server, we need to override
-                SetMasterServerOverride(game.MasterServerHost, game.MasterServerPort);
+                SetMasterServerOverride(game.MasterServerHost, game.MasterServerPort.HasValue ? game.MasterServerPort.Value : DEFAULT_MASTER_PORT);
             }
 
             // Trigger the actual join via server code
@@ -87,7 +89,7 @@ namespace ServerBrowser.Game
             }
         }
 
-        public static void SetMasterServerOverride(string hostName, int port = 2328)
+        public static void SetMasterServerOverride(string hostName, int port = DEFAULT_MASTER_PORT)
         {
             SetMasterServerOverride(new MasterServerEndPoint(hostName, port));
         }

@@ -22,7 +22,7 @@ namespace ServerBrowser.Core
         public BeatmapDifficulty? Difficulty { get; set; }
         public string Platform { get; set; } = Plugin.PLATFORM_UNKNOWN;
         public string MasterServerHost { get; set; } = null;
-        public int MasterServerPort { get; set; } = 2328;
+        public int? MasterServerPort { get; set; } = null;
 
         public string Describe()
         {
