@@ -35,6 +35,15 @@ namespace ServerBrowser.UI.Components
         {
             this.text = Game.GameName;
 
+            if (Game.OwnerId == "SERVER_MSG")
+            {
+                // Special case: the server can inject a fake game here as a message, e.g. to notify that an update is available
+                this.text = $"<color=#cf0389>{Game.GameName}</color>";
+                this.subtext = Game.SongName;
+                this.icon = Sprites.Portal;
+                return;
+            }
+
             if (Game.IsModded)
             {
                 this.text += " (Modded)";

@@ -44,7 +44,7 @@ namespace ServerBrowser.UI.ViewControllers
 
         #region Data/UI updates
         internal CancellationTokenSource _imageLoadCancellation;
-        private HostedGameData _selectedLobby = null;
+        private HostedGameData _selectedGame = null;
 
         private void SetInitialUiState()
         {
@@ -83,7 +83,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             GameList?.tableView?.ClearSelection();
             ConnectButton.interactable = false;
-            _selectedLobby = null;
+            _selectedGame = null;
         }
 
         private void ClearSearch()
@@ -255,9 +255,9 @@ namespace ServerBrowser.UI.ViewControllers
         [UIAction("connectButtonClick")]
         private void ConnectButtonClick()
         {
-            if (_selectedLobby != null && !string.IsNullOrEmpty(_selectedLobby.ServerCode))
+            if (_selectedGame != null && !string.IsNullOrEmpty(_selectedGame.ServerCode))
             {
-                _selectedLobby.Join();
+                _selectedGame.Join();
             }
             else
             {
@@ -276,10 +276,10 @@ namespace ServerBrowser.UI.ViewControllers
                 return;
             }
 
-            var selectedLobbyItem = (HostedGameCell)selectedRow;
-            _selectedLobby = selectedLobbyItem.Game;
+            var selectedGameCell = (HostedGameCell)selectedRow;
+            _selectedGame = selectedGameCell.Game;
 
-            ConnectButton.interactable = true;
+            ConnectButton.interactable = _selectedGame.canJoin;
         }
 
         [UIAction("pageUpButtonClick")]

@@ -121,7 +121,7 @@ namespace ServerBrowser.Core
         [JsonIgnoreAttribute]
         public SongPackMask songPacks => SongPackMask.all;
         [JsonIgnoreAttribute]
-        public bool canJoin => true;
+        public bool canJoin => !String.IsNullOrEmpty(ServerCode);
         [JsonIgnoreAttribute]
         public bool requiresPassword => true;
         [JsonIgnoreAttribute]
