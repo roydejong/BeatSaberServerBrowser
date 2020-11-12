@@ -86,6 +86,14 @@ namespace ServerBrowser.Core
             _lastSentAt = DateTime.Now;
 
             var responseOk = await PerformWebRequest("POST", "/announce", payload) != null;
+
+            if (!responseOk)
+            {
+                // Request failed, allow immediate retry
+                _lastPayloadSent = null;
+                _lastSentAt = null;
+            }
+
             return responseOk;
         }
 
