@@ -98,7 +98,7 @@ namespace ServerBrowser.UI
             {
                 _mainLoadingControl.ShowText("Failed to get server list", true);
             }
-            else if (!HostedGameBrowser.AnyResults)
+            else if (!HostedGameBrowser.AnyResultsOnPage)
             {
                 var isSearching = !String.IsNullOrEmpty(_searchQuery);
 
