@@ -5,6 +5,7 @@ using ServerBrowser.Utils;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace ServerBrowser.UI.Components
 {
@@ -32,9 +33,17 @@ namespace ServerBrowser.UI.Components
 
         public void UpdateUi()
         {
-            var modeDescription = Game.IsModded ? "Modded" : "Vanilla";
-
             this.text = Game.GameName;
+
+            if (Game.IsModded)
+            {
+                this.text += " (Modded)";
+            }
+            else 
+            {
+                this.text += " <color=#00ff00>(Vanilla)</color>";
+            }
+
             this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}]";
 
             if (Game.LobbyState == MultiplayerLobbyState.GameRunning && Game.LevelId != null)
@@ -45,39 +54,57 @@ namespace ServerBrowser.UI.Components
                 }
 
                 this.subtext += $" {Game.SongName}";
-
-                try
-                {
-                    SetCoverArt();
-                }
-                catch (Exception ex)
-                {
-                    Plugin.Log?.Error($"Could not set cover art for level {Game.LevelId}: {ex}");
-                }
             }
             else
             {
-                this.subtext += $" {modeDescription} lobby";
+                this.subtext += $" In lobby";
             }
 
             if (Game.Difficulty.HasValue && !String.IsNullOrEmpty(Game.LevelId))
             {
                 this.subtext += $" ({Game.Difficulty})";
             }
+
+            try
+            {
+                SetCoverArt();
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log?.Error($"Could not set cover art for level {Game.LevelId}: {ex}");
+            }
         }
 
         private async Task<bool> SetCoverArt()
         {
+            if (String.IsNullOrEmpty(Game.LevelId) || Game.LobbyState != MultiplayerLobbyState.GameRunning) 
+            {
+                // No level info / we are in a lobby
+                UpdateIcon(Sprites.PortalUser);
+                return true;
+            }
+
             var coverArtSprite = await CoverArtGrabber.GetCoverArtSprite(Game, _cancellationTokenSource.Token);
 
             if (coverArtSprite != null)
             {
-                this.icon = coverArtSprite;
-                _onContentChange(this);
+                // Official level, or installed custom level found
+                UpdateIcon(coverArtSprite);
                 return true;
             }
 
+            // Failed to get level info, show beatsaver icon as placeholder
+            UpdateIcon(Sprites.BeatSaverIcon);
             return false;
+        }
+
+        private void UpdateIcon(Sprite nextIcon)
+        {
+            if (this.icon == null || this.icon.name != nextIcon.name)
+            {
+                this.icon = nextIcon;
+                _onContentChange(this);
+            }
         }
     }
 }
