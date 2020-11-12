@@ -2,11 +2,9 @@
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using HMUI;
-using IPA.Utilities;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.UI.Components;
-using ServerBrowser.Utils;
 using SongCore.Utilities;
 using System;
 using System.Threading;
@@ -103,15 +101,23 @@ namespace ServerBrowser.UI.ViewControllers
                 StatusText.text = "Failed to get server list";
                 StatusText.color = Color.red;
             }
-            else if (!HostedGameBrowser.AnyResults)
+            else if (!HostedGameBrowser.AnyResultsOnPage)
             {
-                if (IsSearching)
+                if (HostedGameBrowser.TotalResultCount == 0)
                 {
-                    StatusText.text = "No servers found matching your search";
+                    if (IsSearching)
+                    {
+                        StatusText.text = "No servers found matching your search";
+                    }
+                    else
+                    {
+                        StatusText.text = "Sorry, no servers found";
+                    }
                 }
                 else
                 {
-                    StatusText.text = "Sorry, no servers found";
+                    StatusText.text = "This page is empty";
+                    RefreshButtonClick(); // this is awkward so force a refresh
                 }
 
                 StatusText.color = Color.red;
@@ -148,7 +154,7 @@ namespace ServerBrowser.UI.ViewControllers
 
             RefreshButton.interactable = true;
 
-            SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResults);
+            SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
             SearchButton.SetButtonText(IsSearching ? "<color=#ff0000>Search</color>" : "Search");
 
             PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;

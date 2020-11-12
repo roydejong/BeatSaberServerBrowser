@@ -58,7 +58,7 @@ namespace ServerBrowser.Core
             }
         }
 
-        public static bool AnyResults
+        public static bool AnyResultsOnPage
         {
             get
             {
