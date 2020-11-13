@@ -52,7 +52,7 @@ Please note MultiplayerExtensions is still in development and things may break o
 
 ## FAQs / Troubleshooting
 
-## Is standalone Quest supported?
+### Is standalone Quest supported?
 The mod itself is only available for PC at this time (Steam and Oculus).
 
 Standalone Quest is not currently supported, but you may be able to find games to join in the online browser: [https://bssb.app](https://bssb.app).
