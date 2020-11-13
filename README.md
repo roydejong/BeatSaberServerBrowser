@@ -15,6 +15,7 @@ Use this mod to find and join servers without ever having to leave the game.
 - **Host panel**: Use the lobby panel to add your server to the browser and set a public name.
 - **Custom games**: Supports modded / custom song lobbies if you have [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions) (*Early access*).
 - **Cross-play**: We'll help you join games on both official and unofficial servers (like [BeatTogether](https://discord.com/invite/gezGrFG4tz)) by switching your master server automatically. (To host a cross-play game, you'll need to install a cross-play mod.)
+- **Join/leave notifications**: An optional feature that helps you see when players join or leave your lobby, even when you're playing a level.
 
 ![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97793891-9cb3d980-1bf2-11eb-8785-ed99c11f6db6.png)
 
