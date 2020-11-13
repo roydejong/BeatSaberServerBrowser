@@ -8,7 +8,7 @@
 ## Overview
 Use this mod to find and join servers without ever having to leave the game.
 
-👉 The host must have this mod installed and turned to add their server to the browser.
+👉 The host must have this mod installed and enabled to add their server to the browser.
 
 ### Features
 - **Ingame browser**: Browse and join servers directly from the multiplayer menu.
