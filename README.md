@@ -1,4 +1,4 @@
-# Server Browser Mod for Beat Saber
+# Beat Saber Server Browser
 ✨ **A Beat Saber modification that adds a server browser to multiplayer!**
 
 |**⏬ Download**|**[Latest release](https://github.com/roydejong/BeatSaberServerBrowser/releases/latest)**|
