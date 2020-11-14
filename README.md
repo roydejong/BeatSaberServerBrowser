@@ -17,7 +17,7 @@ Use this mod to find and join servers without ever having to leave the game.
 - **Cross-play**: We'll help you join games on both official and unofficial servers (like [BeatTogether](https://discord.com/invite/gezGrFG4tz)) by switching your master server automatically. (To host a cross-play game, you'll need to install a cross-play mod.)
 - **Join/leave notifications**: An optional feature that helps you see when players join or leave your lobby, even when you're playing a level.
 
-![Server Browser Mod](https://user-images.githubusercontent.com/6772638/97793891-9cb3d980-1bf2-11eb-8785-ed99c11f6db6.png)
+![Server Browser Mod](https://user-images.githubusercontent.com/6772638/99152221-b64c2b00-26a0-11eb-8311-b061ab1a12ef.png)
 
 ### Joining games
 After installing the mod, you can find the Server Browser in the Multiplayer menu.
@@ -31,7 +31,7 @@ To show your game in the server browser, you must have the mod installed and ena
 
 You can then make your game visible by flipping the switch under Gameplay Setup. This will let anyone join from the browser:
 
-![Host UI](https://user-images.githubusercontent.com/6772638/97793912-f7e5cc00-1bf2-11eb-9302-0d9292a64288.png)
+![Host UI](https://user-images.githubusercontent.com/6772638/99152182-77b67080-26a0-11eb-9bff-d9ccbdd9f883.png)
 
 ## Installation
 Download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.
