@@ -17,7 +17,8 @@ namespace ServerBrowser.UI
         {
             Blue = 0,
             Red = 1,
-            Yellow = 2
+            Yellow = 2,
+            Cerise = 3
         }
 
         private enum NotificationStep
@@ -73,7 +74,21 @@ namespace ServerBrowser.UI
 
         public void ShowMessage(string title, string message, NotificationStyle style = NotificationStyle.Blue, Sprite sprite = null, float time = 5.0f)
         {
-            Plugin.Log?.Info($"ShowMessage: {title}, {message}");
+            if (_title == title && _message == message)
+            {
+                // We are already showing this same notification, let's not annoy the user by re-animating (just extend the time if possible/needed)
+                if (_currentStep == NotificationStep.Normal)
+                {
+                    _updateTimerTally = 0;
+                    return;
+                }
+                else if (_currentStep == NotificationStep.Appearing)
+                {
+                    return;
+                }
+            }
+
+            Plugin.Log?.Info($"Show floating notification: {title}, {message}");
 
             DismissMessage();
 
@@ -230,6 +245,9 @@ namespace ServerBrowser.UI
                     break;
                 case NotificationStyle.Yellow:
                     _bgImage.color = new Color(254f / 255f, 202f / 255f, 87f / 255f);
+                    break;
+                case NotificationStyle.Cerise:
+                    _bgImage.color = new Color(207f / 255f, 3f / 255f, 137f / 255f);
                     break;
             }
 

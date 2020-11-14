@@ -10,6 +10,7 @@ namespace ServerBrowser.Core
         public int Offset { get; set; }
         public int Limit { get; set; }
         public List<HostedGameData> Lobbies { get; set; }
+        public string Message { get; set; } = null;
 
         public static ServerBrowseResult FromJson(string json)
         {
