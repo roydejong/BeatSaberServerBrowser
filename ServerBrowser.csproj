@@ -155,7 +155,7 @@
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\ServerBrowseResult.cs" />
     <Compile Include="Core\GameStateManager.cs" />
-    <Compile Include="Core\MasterServerAPI.cs" />
+    <Compile Include="Core\BSSBMasterAPI.cs" />
     <Compile Include="Core\UpdateTimer.cs" />
     <Compile Include="Game\MpConnect.cs" />
     <Compile Include="Game\MpModeSelection.cs" />

@@ -26,7 +26,7 @@ namespace ServerBrowser.Core
         public static async Task LoadPage(int offset, string searchQuery)
         {
             // Send API request
-            var result = await MasterServerAPI.Browse(offset, searchQuery);
+            var result = await BSSBMasterAPI.Browse(offset, searchQuery);
 
             // Update state
             _offset = offset;

@@ -186,7 +186,7 @@ namespace ServerBrowser.Core
         {
             _sentUnAnnounce = false;
 
-            if (await MasterServerAPI.Announce(announce))
+            if (await BSSBMasterAPI.Announce(announce))
             {
                 _didAnnounce = true;
                 _lastCompleteAnnounce = announce;
@@ -217,7 +217,7 @@ namespace ServerBrowser.Core
             {
                 _sentUnAnnounce = true;
 
-                if (await MasterServerAPI.UnAnnounce(_lastCompleteAnnounce))
+                if (await BSSBMasterAPI.UnAnnounce(_lastCompleteAnnounce))
                 {
                     Plugin.Log?.Info($"Host announcement was deleted OK!");
 

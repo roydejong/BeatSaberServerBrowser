@@ -8,7 +8,7 @@ using System.Web;
 
 namespace ServerBrowser.Core
 {
-    public static class MasterServerAPI
+    public static class BSSBMasterAPI
     {
         #region Shared/HTTP
         private const string BASE_URL = "https://bssb.app/api/v1";
@@ -109,34 +109,49 @@ namespace ServerBrowser.Core
 
         public static async Task<ServerBrowseResult> Browse(int offset, string searchQuery)
         {
-            // Prepare query string
             var queryString = HttpUtility.ParseQueryString("");
 
             if (Plugin.PlatformId != Plugin.PLATFORM_UNKNOWN)
+            {
                 queryString.Add("platform", Plugin.PlatformId);
+            }
 
             if (offset > 0)
+            {
                 queryString.Add("offset", offset.ToString());
+            }
 
             if (Plugin.Config.UseNativeBrowserPreview)
+            {
                 queryString.Add("limit", "max");
+            }
 
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
+            {
                 queryString.Add("vanilla", "1");
+            }
 
             if (!String.IsNullOrEmpty(searchQuery))
+            {
                 queryString.Add("query", searchQuery);
+            }
+
+            var response = await PerformWebRequest("GET", $"/browse?{queryString}");
+
+            if (response == null)
+            {
+                Plugin.Log?.Warn($"Browse failed, did not get a valid response");
+                return null;
+            }
 
             try
             {
-                var response = await PerformWebRequest("GET", $"/browse?{queryString}");
                 var contentStr = await response.Content.ReadAsStringAsync();
-
                 return ServerBrowseResult.FromJson(contentStr);
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Warn($"Error in browse request: {ex}");
+                Plugin.Log?.Warn($"Error parsing browser response: {ex}");
                 return null;
             }
         }
