@@ -31,7 +31,7 @@ To show your game in the server browser, you must have the mod installed and ena
 
 You can then make your game visible by flipping the switch under Gameplay Setup. This will let anyone join from the browser:
 
-![Host UI](https://user-images.githubusercontent.com/6772638/99152182-77b67080-26a0-11eb-9bff-d9ccbdd9f883.png)
+![Host UI](https://user-images.githubusercontent.com/6772638/99152293-37a3bd80-26a1-11eb-8454-a6e8a34cff94.png)
 
 ## Installation
 Download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.

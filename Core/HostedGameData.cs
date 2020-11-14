@@ -31,14 +31,13 @@ namespace ServerBrowser.Core
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
-            var stateDescr = MpLobbyStatePatch.IsInGame ? "In game" : "In lobby";
 
             if (IsOnCustomMaster)
             {
                 moddedDescr += ", Cross-play";
             }
 
-            return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {stateDescr}, {moddedDescr})";
+            return $"{GameName} ({PlayerCount}/{PlayerLimit}, {moddedDescr})";
         }
 
         public string DescribeType()
