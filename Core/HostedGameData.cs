@@ -25,10 +25,18 @@ namespace ServerBrowser.Core
         public int? MasterServerPort { get; set; } = null;
         public string CoverUrl { get; set; } = null;
 
+        [JsonIgnoreAttribute]
+        public bool IsOnCustomMaster => !String.IsNullOrEmpty(MasterServerHost) && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);
+
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
             var stateDescr = MpLobbyStatePatch.IsInGame ? "In game" : "In lobby";
+
+            if (IsOnCustomMaster)
+            {
+                moddedDescr += ", Cross-play";
+            }
 
             return $"{GameName} ({PlayerCount}/{PlayerLimit} players, {stateDescr}, {moddedDescr})";
         }

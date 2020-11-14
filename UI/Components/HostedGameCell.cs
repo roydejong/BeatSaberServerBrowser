@@ -46,11 +46,16 @@ namespace ServerBrowser.UI.Components
 
             if (Game.IsModded)
             {
-                this.text += " (Modded)";
+                this.text += " <color=#8f48db>(Modded)</color>";
             }
             else 
             {
                 this.text += " <color=#00ff00>(Vanilla)</color>";
+            }
+
+            if (Game.IsOnCustomMaster)
+            {
+                this.text += $" <color=#59b0f4><size=3>({Game.MasterServerHost})</size></color>";
             }
 
             this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}]";
