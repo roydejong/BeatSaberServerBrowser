@@ -143,7 +143,7 @@ namespace ServerBrowser.UI.ViewControllers
 
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
             {
-                StatusText.text += "\r\nMultiplayerExtensions not detected, hiding custom games";
+                StatusText.text += "\r\nMultiplayerExtensions not detected, hiding modded games";
                 StatusText.color = Color.yellow;
             }
 
