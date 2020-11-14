@@ -51,6 +51,15 @@ namespace ServerBrowser.Game
         public static MasterServerEndPoint OverrideEndPoint { get; private set; } = null;
         public static MasterServerEndPoint LastUsedMasterServer { get; private set; } = null;
 
+        public static bool ShouldDisableCertificateValidation
+        {
+            get
+            {
+                // We should disable certificate validation (X509CertificateUtilityPatch) if we are overriding to unofficial masters
+                return OverrideEndPoint != null && !OverrideEndPoint.hostName.EndsWith(OFFICIAL_MASTER_SUFFIX);
+            }
+        }
+
         internal static void ReportCurrentMasterServerValue(MasterServerEndPoint currentEndPoint)
         {
             var isFirstReport = (LastUsedMasterServer == null);
