@@ -29,7 +29,7 @@ namespace ServerBrowser.Core
         public static async Task LoadPage(int offset, string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
         {
             // Send API request
-            var result = await BSSBMasterAPI.Browse(offset, searchQuery);
+            var result = await BSSBMasterAPI.Browse(offset, searchQuery, filterFull, filterInProgress, filterModded);
 
             // Update state
             _offset = offset;
@@ -40,28 +40,11 @@ namespace ServerBrowser.Core
 
             if (_lastServerResult != null)
             {
-                // Call .ToList() to iterate through a temporary list, allowing us to remove elements from the original
-                foreach (var lobby in _lastServerResult.Lobbies.ToList())
+                foreach (var lobby in _lastServerResult.Lobbies)
                 {
-                    if (filterFull && lobby.PlayerCount >= lobby.PlayerLimit)
-                    {
-                        _lastServerResult.Lobbies.Remove(lobby);
-                        continue;
-                    }
-                    if (filterInProgress && lobby.LobbyState == MultiplayerLobbyState.GameRunning)
-                    {
-                        _lastServerResult.Lobbies.Remove(lobby);
-                        continue;
-                    }
-                    if (filterModded && lobby.IsModded)
-                    {
-                        _lastServerResult.Lobbies.Remove(lobby);
-                        continue;
-                    }
                     _lobbyObjects[lobby.Id.Value] = lobby;
                     nextLobbiesOnPage.Add(lobby);
                 }
-                _lastServerResult.Count = _lastServerResult.Lobbies.Count;
 
                 // Server message
                 if (!String.IsNullOrEmpty(_lastServerResult.Message))

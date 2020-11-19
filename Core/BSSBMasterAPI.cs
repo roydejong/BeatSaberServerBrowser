@@ -107,7 +107,7 @@ namespace ServerBrowser.Core
             return responseOk;
         }
 
-        public static async Task<ServerBrowseResult> Browse(int offset, string searchQuery)
+        public static async Task<ServerBrowseResult> Browse(int offset, string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
         {
             var queryString = HttpUtility.ParseQueryString("");
 
@@ -134,6 +134,21 @@ namespace ServerBrowser.Core
             if (!String.IsNullOrEmpty(searchQuery))
             {
                 queryString.Add("query", searchQuery);
+            }
+
+            if (filterFull)
+            {
+                queryString.Add("filterFull", "1");
+            }
+
+            if (filterInProgress)
+            {
+                queryString.Add("filterInProgress", "1");
+            }
+
+            if (filterModded)
+            {
+                queryString.Add("filterModded", "1");
             }
 
             var response = await PerformWebRequest("GET", $"/browse?{queryString}");
