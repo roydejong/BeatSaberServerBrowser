@@ -27,7 +27,7 @@ namespace ServerBrowser.UI.ViewControllers
             HostedGameBrowser.OnUpdate += LobbyBrowser_OnUpdate;
 
             SetInitialUiState();
-            HostedGameBrowser.FullRefresh(SearchValue);
+            HostedGameBrowser.FullRefresh(SearchValue, FilterFull, FilterInProgress, FilterModded);
         }
 
         public override void __Deactivate(bool removedFromHierarchy, bool deactivateGameObject, bool screenSystemDisabling)
@@ -145,6 +145,7 @@ namespace ServerBrowser.UI.ViewControllers
             {
                 StatusText.text += "\r\nMultiplayerExtensions not detected, hiding modded games";
                 StatusText.color = Color.yellow;
+                FilterModdedButton.interactable = false;
             }
 
             GameList.tableView.ReloadData();
@@ -163,7 +164,7 @@ namespace ServerBrowser.UI.ViewControllers
 
         public bool IsSearching
         {
-            get => !String.IsNullOrEmpty(SearchValue);
+            get => !String.IsNullOrEmpty(SearchValue) || FilterFull || FilterInProgress || FilterModded;
         }
         #endregion
 
@@ -203,10 +204,16 @@ namespace ServerBrowser.UI.ViewControllers
 
         [UIComponent("loadingModal")]
         public ModalView LoadingModal;
+
+        [UIComponent("filterModded")]
+        public Button FilterModdedButton;
         #endregion
 
         #region UI Events
         private string _searchValue = "";
+        private bool _filterFull = false;
+        private bool _filterInProgress = false;
+        private bool _filterModded = false;
 
         [UIValue("searchValue")]
         public string SearchValue
@@ -216,6 +223,90 @@ namespace ServerBrowser.UI.ViewControllers
             {
                 _searchValue = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        public bool FilterFull
+        {
+            get => _filterFull;
+            set
+            {
+                _filterFull = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(FilterFullColor));
+            }
+        }
+
+        [UIValue("filterFullColor")]
+        public string FilterFullColor
+        {
+            get
+            {
+                switch (FilterFull)
+                {
+                    case true:
+                        return "#32CD32";
+                    case false:
+                        return "#FF0000";
+                    default:
+                        return "#FF0000";
+                }
+            }
+        }
+
+        public bool FilterInProgress
+        {
+            get => _filterInProgress;
+            set
+            {
+                _filterInProgress = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(FilterInProgressColor));
+            }
+        }
+
+        [UIValue("filterInProgressColor")]
+        public string FilterInProgressColor
+        {
+            get
+            {
+                switch (FilterInProgress)
+                {
+                    case true:
+                        return "#32CD32";
+                    case false:
+                        return "#FF0000";
+                    default:
+                        return "#FF0000";
+                }
+            }
+        }
+
+        public bool FilterModded
+        {
+            get => _filterModded;
+            set
+            {
+                _filterModded = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(FilterModdedColor));
+            }
+        }
+
+        [UIValue("filterModdedColor")]
+        public string FilterModdedColor
+        {
+            get
+            {
+                switch (FilterModded)
+                {
+                    case true:
+                        return "#32CD32";
+                    case false:
+                        return "#FF0000";
+                    default:
+                        return "#FF0000";
+                }
             }
         }
 
@@ -236,7 +327,7 @@ namespace ServerBrowser.UI.ViewControllers
         private void RefreshButtonClick()
         {
             SetInitialUiState();
-            HostedGameBrowser.FullRefresh(SearchValue);
+            HostedGameBrowser.FullRefresh(SearchValue, FilterFull, FilterInProgress, FilterModded);
         }
 
         [UIAction("searchButtonClick")]
@@ -244,6 +335,24 @@ namespace ServerBrowser.UI.ViewControllers
         {
             ClearSelection();
             parserParams.EmitEvent("openSearchKeyboard");
+        }
+
+        [UIAction("filterfullClick")]
+        private void FilterFullClick()
+        {
+            FilterFull = !FilterFull;
+        }
+
+        [UIAction("filterInProgressClick")]
+        private void FilterInProgressClick()
+        {
+            FilterInProgress = !FilterInProgress;
+        }
+
+        [UIAction("filterModdedClick")]
+        private void FilterModdedClick()
+        {
+            FilterModded = !FilterModded;
         }
 
         [UIAction("createButtonClick")]

@@ -4,6 +4,7 @@ using ServerBrowser.UI;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ServerBrowser.Core
 {
@@ -16,19 +17,19 @@ namespace ServerBrowser.Core
         private static List<HostedGameData> _lobbiesOnPage;
         private static int _offset;
 
-        public static async Task FullRefresh(string searchQuery)
+        public static async Task FullRefresh(string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
         {
             _lastServerResult = null;
             _lobbyObjects = new Dictionary<int, HostedGameData>(10);
             _lobbiesOnPage = new List<HostedGameData>(10);
 
-            await LoadPage(0, searchQuery);
+            await LoadPage(0, searchQuery, filterFull, filterInProgress, filterModded);
         }
 
-        public static async Task LoadPage(int offset, string searchQuery)
+        public static async Task LoadPage(int offset, string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
         {
             // Send API request
-            var result = await BSSBMasterAPI.Browse(offset, searchQuery);
+            var result = await BSSBMasterAPI.Browse(offset, searchQuery, filterFull, filterInProgress, filterModded);
 
             // Update state
             _offset = offset;
