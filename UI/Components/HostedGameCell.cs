@@ -44,39 +44,30 @@ namespace ServerBrowser.UI.Components
                 return;
             }
 
-            if (Game.IsModded)
-            {
-                this.text += " <color=#8f48db>(Modded)</color>";
-            }
-            else 
-            {
-                this.text += " <color=#00ff00>(Vanilla)</color>";
-            }
-
             if (Game.IsOnCustomMaster)
             {
                 this.text += $" <color=#59b0f4><size=3>({Game.MasterServerHost})</size></color>";
             }
 
-            this.subtext = $"[{Game.PlayerCount} / {Game.PlayerLimit}]";
+            this.subtext = $"";
 
             if (Game.LobbyState == MultiplayerLobbyState.GameRunning && Game.LevelId != null)
             {
                 if (!String.IsNullOrEmpty(Game.SongAuthor))
                 {
-                    this.subtext += $" {Game.SongAuthor} -";
+                    this.subtext += $"{Game.SongAuthor} - ";
                 }
 
-                this.subtext += $" {Game.SongName}";
+                this.subtext += $"{Game.SongName}";
             }
             else
             {
-                this.subtext += $" In lobby";
+                this.subtext += $"In lobby";
             }
 
             if (Game.Difficulty.HasValue && !String.IsNullOrEmpty(Game.LevelId))
             {
-                this.subtext += $" ({Game.Difficulty})";
+                this.subtext += $" ({Game.DescribeDifficulty(false)})";
             }
 
             try

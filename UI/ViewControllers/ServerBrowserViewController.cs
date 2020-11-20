@@ -148,10 +148,7 @@ namespace ServerBrowser.UI.ViewControllers
                 FilterModdedButton.interactable = false;
             }
 
-            GameList.tableView.ReloadData();
-            GameList.tableView.selectionType = TableViewSelectionType.Single;
-
-            ClearSelection();
+            AfterCellsCreated();
 
             RefreshButton.interactable = true;
 
@@ -411,25 +408,40 @@ namespace ServerBrowser.UI.ViewControllers
             }
         }
 
-        private void CellUpdateCallback(HostedGameCell cell)
+        private void CellUpdateCallback(HostedGameCell cellInfo)
         {
-            foreach (var visibleCell in GameList.tableView.visibleCells)
+            GameList.tableView.RefreshCellsContent();
+
+            foreach (var cell in GameList.tableView.visibleCells)
             {
-                // This is some BSML witchcraft. BSML made our cell a clone of the game's LevelListTableCell, where
-                //   the title component is _songNameText, which we use for finding the right cell to update.
+                var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
 
-                var frankenCell = visibleCell as LevelListTableCell;
-                var titleTextComponent = frankenCell.GetField<TextMeshProUGUI>("_songNameText");
-
-                if (titleTextComponent != null)
+                if (extensions != null)
                 {
-                    if (titleTextComponent.text == cell.text)
-                    {
-                        GameList.tableView.RefreshCellsContent();
-                        return;
-                    }
+                    extensions.RefreshContent();
                 }
             }
+        }
+        #endregion
+
+        #region UI Custom Behaviors
+        private void AfterCellsCreated()
+        {
+            GameList.tableView.selectionType = TableViewSelectionType.Single;
+
+            GameList.tableView.ReloadData();
+
+            foreach (var cell in GameList.tableView.visibleCells)
+            {
+                var hasExtendedBehavior = (cell.gameObject.GetComponent<HostedGameCellExtensions>() != null);
+
+                if (!hasExtendedBehavior)
+                {
+                    gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, (HostedGameCell)GameList.data[cell.idx]);
+                }
+            }
+
+            ClearSelection();
         }
         #endregion
     }
