@@ -1,9 +1,6 @@
 ﻿using BeatSaberMarkupLanguage;
-using HMUI;
-using IPA.Utilities;
 using ServerBrowser.Game;
 using ServerBrowser.UI.ViewControllers;
-using ServerBrowser.Utils;
 
 namespace ServerBrowser.UI
 {
@@ -18,30 +15,12 @@ namespace ServerBrowser.UI
 
         public static void LaunchServerBrowser()
         {
-            ViewController viewToMount;
-
-            if (Plugin.Config.UseNativeBrowserPreview)
+            if (_serverBrowserViewController == null)
             {
-                // Native browser preview (in development)
-                NativeServerBrowser.SetUp();
-
-                viewToMount = NativeServerBrowser.ViewController;
-            }
-            else
-            {
-                // Original custom BSML based browser
-                if (_serverBrowserViewController == null)
-                {
-                    _serverBrowserViewController = BeatSaberUI.CreateViewController<ServerBrowserViewController>();
-                }
-
-                viewToMount = _serverBrowserViewController;
+                _serverBrowserViewController = BeatSaberUI.CreateViewController<ServerBrowserViewController>();
             }
 
-            if (viewToMount != null)
-            {
-                MpModeSelection.PresentViewController(viewToMount);
-            }
+            MpModeSelection.PresentViewController(_serverBrowserViewController);
         }
     }
 }
