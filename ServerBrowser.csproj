@@ -153,6 +153,7 @@
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\HostedGameData.cs" />
     <Compile Include="Core\HostedGameBrowser.cs" />
+    <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\ServerBrowseResult.cs" />
     <Compile Include="Core\GameStateManager.cs" />
