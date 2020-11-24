@@ -1,8 +1,5 @@
-﻿using BeatSaberMarkupLanguage.Components.Settings;
-using BeatSaberMarkupLanguage.Tags;
-using HarmonyLib;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using HarmonyLib;
+using ServerBrowser.UI.Components;
 
 namespace ServerBrowser.Harmony
 {
@@ -11,27 +8,9 @@ namespace ServerBrowser.Harmony
     {
         public static void Postfix(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling, CreateServerViewController __instance)
         {
-            var wrapper = __instance.transform.Find("Wrapper");
-            var formView = wrapper.transform.Find("CreateServerFormView");
-
             if (firstActivation)
             {
-                (formView as RectTransform).offsetMax = new Vector2(90.0f, 0.0f);
-                wrapper.GetComponent<VerticalLayoutGroup>().enabled = true;
-                formView.GetComponent<VerticalLayoutGroup>().enabled = true;
-
-                var toggleTag = new ToggleSettingTag();
-                var toggleTagObj = toggleTag.CreateObject(formView);
-                (toggleTagObj.transform as RectTransform).sizeDelta = new Vector2(90.0f, 7.0f);
-
-                var toggleSetting = toggleTagObj.GetComponent<ToggleSetting>();
-                toggleSetting.text.SetText("Add to Server Browser");
-                toggleSetting.toggle.isOn = Plugin.Config.LobbyAnnounceToggle;
-
-                toggleSetting.toggle.onValueChanged.AddListener(delegate (bool value)
-                {
-                    Plugin.Config.LobbyAnnounceToggle = value;
-                });
+                __instance.gameObject.AddComponent<CreateServerExtensions>();
             }
         }
     }

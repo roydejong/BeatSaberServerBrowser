@@ -143,21 +143,10 @@ namespace ServerBrowser.Core
                 return;
             }
 
-            string finalGameName = $"{sessionManager.localPlayer.userName}'s game";
-
-            if (!String.IsNullOrEmpty(_customGameName))
-            {
-                finalGameName = _customGameName;
-            }
-            else if (!String.IsNullOrEmpty(Plugin.Config.CustomGameName))
-            {
-                finalGameName = Plugin.Config.CustomGameName;
-            }
-
             var lobbyAnnounce = new HostedGameData()
             {
                 ServerCode = _lobbyCode,
-                GameName = finalGameName,
+                GameName = MpSession.GetHostGameName(),
                 OwnerId = sessionManager.localPlayer.userId,
                 OwnerName = sessionManager.localPlayer.userName,
                 PlayerCount = MpSession.GetPlayerCount(),

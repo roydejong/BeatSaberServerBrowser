@@ -1,10 +1,8 @@
 ﻿using BS_Utils.Utilities;
 using HarmonyLib;
 using HMUI;
-using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace ServerBrowser.Harmony
 {

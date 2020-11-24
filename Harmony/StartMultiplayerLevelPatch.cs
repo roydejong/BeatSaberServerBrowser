@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
-using ServerBrowser.Assets;
 using ServerBrowser.Core;
-using ServerBrowser.UI;
 
 namespace ServerBrowser.Harmony
 {
@@ -9,7 +7,7 @@ namespace ServerBrowser.Harmony
     /// This patch lets us determine which song is being played, on start of the mp level.
     /// </summary>
     [HarmonyPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel", MethodType.Normal)]
-    class StartMultiplayerLevelPatch
+    public static class StartMultiplayerLevelPatch
     {
         public static void Postfix(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
             BeatmapCharacteristicSO beatmapCharacteristic, GameplayModifiers gameplayModifiers)
