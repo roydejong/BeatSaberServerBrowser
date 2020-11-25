@@ -212,5 +212,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Sprites\Pencil.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,6 +3,7 @@ using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.Tags;
 using BeatSaberMarkupLanguage.Tags.Settings;
 using HMUI;
+using ServerBrowser.Assets;
 using ServerBrowser.Game;
 using System;
 using TMPro;
@@ -15,6 +16,8 @@ namespace ServerBrowser.UI.Components
     {
         private Transform _wrapper;
         private Transform _formView;
+
+        private ToggleSetting _addToBrowserSetting;
         private StringSetting _serverNameSetting;
 
         public void Awake()
@@ -22,7 +25,7 @@ namespace ServerBrowser.UI.Components
             _wrapper = transform.Find("Wrapper");
             _formView = _wrapper.transform.Find("CreateServerFormView");
 
-            CreateToggle("Add to Server Browser", AddToBrowserValue, OnAddToBrowserChange);
+            _addToBrowserSetting = CreateToggle("Add to Server Browser", AddToBrowserValue, OnAddToBrowserChange);
             _serverNameSetting = CreateTextInput("Server Name", ServerNameValue, OnServerNameChange);
         }
 
@@ -97,6 +100,8 @@ namespace ServerBrowser.UI.Components
             buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
             buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
 
+            buttonRightSide.Find("EditIcon").GetComponent<ImageView>().sprite = Sprites.Pencil;
+
             return stringSetting;
         }
 
@@ -118,6 +123,9 @@ namespace ServerBrowser.UI.Components
         {
             Plugin.Log?.Info($"CreateServerViewExtensions: OnAddToBrowserChange -> {newValue}");
             Plugin.Config.LobbyAnnounceToggle = newValue;
+
+            // Ensure the control is in sync
+            _addToBrowserSetting.toggle.isOn = newValue;
 
             // Show server browser specific settings only if toggled on
             _serverNameSetting.gameObject.SetActive(newValue);
