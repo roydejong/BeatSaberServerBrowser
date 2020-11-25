@@ -77,6 +77,26 @@ namespace ServerBrowser.UI.Components
                 onChangeCallback(newValue);
             });
 
+            // Make it look nice :-)
+            var valuePicker = stringSetting.transform.Find("ValuePicker");
+
+            var buttonLeftSide = valuePicker.Find("DecButton") as RectTransform;
+            var buttonRightSide = valuePicker.Find("IncButton") as RectTransform;
+
+            float leftSideWidth = 0.05f;
+
+            buttonLeftSide.anchorMin = new Vector2(0.0f, 0.0f);
+            buttonLeftSide.anchorMax = new Vector2(leftSideWidth, 1.0f);
+            buttonLeftSide.offsetMin = new Vector2(0.0f, 0.0f);
+            buttonLeftSide.offsetMax = new Vector2(0.0f, 0.0f);
+            buttonLeftSide.sizeDelta = new Vector2(0.0f, 0.0f);
+
+            buttonRightSide.anchorMin = new Vector2(leftSideWidth, 0.0f);
+            buttonRightSide.anchorMax = new Vector2(1.0f, 1.0f);
+            buttonRightSide.offsetMin = new Vector2(0.0f, 0.0f);
+            buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
+            buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
+
             return stringSetting;
         }
 
@@ -114,9 +134,9 @@ namespace ServerBrowser.UI.Components
 
             Plugin.Log.Info($"After GetHostGameName() return v3, newValue = {newValue}");
 
-            _serverNameSetting.modalKeyboard.clearOnOpen = false;
-            _serverNameSetting.modalKeyboard.keyboard.KeyboardText.text = newValue;
-            _serverNameSetting.text.text = newValue;
+            _serverNameSetting.modalKeyboard.keyboard.KeyboardText.SetText(newValue);
+            _serverNameSetting.modalKeyboard.SetText(newValue);
+            _serverNameSetting.text.SetText(newValue);
         }
         #endregion
 
