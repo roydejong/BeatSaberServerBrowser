@@ -100,7 +100,9 @@ namespace ServerBrowser.UI.Components
             buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
             buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
 
-            buttonRightSide.Find("EditIcon").GetComponent<ImageView>().sprite = Sprites.Pencil;
+            var editIcon = buttonRightSide.Find("EditIcon").GetComponent<ImageView>();
+            editIcon.sprite = Sprites.Pencil;
+            editIcon.transform.localScale = new Vector3(-1.0f, -1.0f, 1.0f);
 
             return stringSetting;
         }
