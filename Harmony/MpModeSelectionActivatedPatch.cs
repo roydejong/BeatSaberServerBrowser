@@ -11,6 +11,12 @@ namespace ServerBrowser.Harmony
     {
         public static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
+            if (firstActivation)
+            {
+                // Core initialization event (deferred until online menu is opened)
+                Plugin.Instance.OnOnlineMenuFirstActivated();
+            }
+
             // Enable the "game browser" button (it was left in the game but unused currently)
             var btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");
 

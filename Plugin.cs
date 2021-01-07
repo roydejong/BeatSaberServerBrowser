@@ -1,5 +1,4 @@
-﻿using BS_Utils.Utilities;
-using IPA;
+﻿using IPA;
 using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
@@ -51,8 +50,7 @@ namespace ServerBrowser
             Log = logger;
             Config = config.Generated<PluginConfig>();
 
-            // Modifiers tab (in-lobby) - register needs to happen really early for now
-            // (https://github.com/monkeymanboy/BeatSaberMarkupLanguage/issues/67)
+            // Modifiers tab (in-lobby) - registering early so we appear first
             LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
@@ -77,9 +75,6 @@ namespace ServerBrowser
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
-            // BS Events
-            BSEvents.lateMenuSceneLoadedFresh += OnLateMenuSceneLoadedFresh;
-
             // Start update timer
             UpdateTimer.Start();
 
@@ -98,7 +93,6 @@ namespace ServerBrowser
             UpdateTimer.Stop();
 
             // Clean up events
-            BSEvents.lateMenuSceneLoadedFresh -= OnLateMenuSceneLoadedFresh;
             MpSession.TearDown();
 
             // Try to cancel any host announcements we may have had
@@ -107,7 +101,7 @@ namespace ServerBrowser
         #endregion
 
         #region Core events
-        private void OnLateMenuSceneLoadedFresh(ScenesTransitionSetupDataSO obj)
+        internal void OnOnlineMenuFirstActivated()
         {
             // Bind multiplayer session events
             MpSession.SetUp();
@@ -133,8 +127,6 @@ namespace ServerBrowser
             PlatformId = PLATFORM_UNKNOWN;
 
             // Attempt to detect platform
-            // --> NOTE: Currently this can hang for a long time (possibly until a level is finished), depending on which mods the user is using
-            // --> This should be fixed in BS_Utils v1.6.2+
             var userInfo = await BS_Utils.Gameplay.GetUserInfo.GetUserAsync().ConfigureAwait(false);
 
             if (userInfo.platform == UserInfo.Platform.Oculus)
