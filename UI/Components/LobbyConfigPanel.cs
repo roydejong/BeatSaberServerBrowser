@@ -232,7 +232,7 @@ namespace ServerBrowser.UI.Components
 
             if (!_tabIsAdded)
             {
-                GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance);
+                GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance, MenuType.Online);
                 Plugin.Log?.Debug("Added gameplay modifier tab (LobbyConfigPanel)");
                 _tabIsAdded = true;
             }
