@@ -6,6 +6,7 @@ using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Game;
 using System;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,9 @@ namespace ServerBrowser.UI.Components
         private ToggleSetting _addToBrowserSetting;
         private StringSetting _serverNameSetting;
 
+        private bool _eventsEnabled = false;
+        private bool _firstEnable = true;
+
         public void Awake()
         {
             _wrapper = transform.Find("Wrapper");
@@ -27,12 +31,42 @@ namespace ServerBrowser.UI.Components
 
             _addToBrowserSetting = CreateToggle("Add to Server Browser", AddToBrowserValue, OnAddToBrowserChange);
             _serverNameSetting = CreateTextInput("Server Name", ServerNameValue, OnServerNameChange);
+
+            _firstEnable = true;
         }
 
-        public void OnEnable()
+        public async void OnEnable()
+        {
+            // We're working around an issue with the BSML toggle here, it fires an incorrect change event around enable-time
+            // (Also, the ~150ms delay adds a nice animation when programatically changing the user's preference so this is kinda cool)
+
+            if (_firstEnable)
+            {
+                // Do this on first-enable to prevent the form view glitching
+                ReApplyVerticalLayout(false);
+                _firstEnable = false;
+            }
+
+            _eventsEnabled = false;
+
+            await Task.Delay(150);
+
+            if (this.enabled)
+            {
+                _eventsEnabled = true;
+                SyncValues();
+            }
+        }
+
+        private void SyncValues()
         {
             OnAddToBrowserChange(AddToBrowserValue);
             OnServerNameChange(ServerNameValue);
+        }
+
+        public void OnDisable()
+        {
+            _eventsEnabled = false;
         }
 
         #region UI Helpers
@@ -50,9 +84,14 @@ namespace ServerBrowser.UI.Components
             toggleSetting.toggle.isOn = value;
 
             // Event
+            toggleSetting.toggle.onValueChanged.RemoveAllListeners();
             toggleSetting.toggle.onValueChanged.AddListener(delegate (bool newValue)
             {
-                onChangeCallback(newValue);
+                if (_eventsEnabled)
+                {
+                    toggleSetting.toggle.isOn = newValue;
+                    onChangeCallback(newValue);
+                }
             });
 
             return toggleSetting;
@@ -73,6 +112,7 @@ namespace ServerBrowser.UI.Components
             stringSetting.modalKeyboard.keyboard.KeyboardText.text = value;
             stringSetting.text.text = value;
             stringSetting.text.richText = false;
+            stringSetting.text.alignment = TextAlignmentOptions.Center;
 
             // Event
             stringSetting.modalKeyboard.keyboard.EnterPressed += (delegate (string newValue)
@@ -85,6 +125,7 @@ namespace ServerBrowser.UI.Components
 
             var buttonLeftSide = valuePicker.Find("DecButton") as RectTransform;
             var buttonRightSide = valuePicker.Find("IncButton") as RectTransform;
+            var valueText = valuePicker.Find("ValueText") as RectTransform;
 
             float leftSideWidth = 0.05f;
 
@@ -99,6 +140,12 @@ namespace ServerBrowser.UI.Components
             buttonRightSide.offsetMin = new Vector2(0.0f, 0.0f);
             buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
             buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
+
+            valueText.anchorMin = new Vector2(0.0f, 0.0f);
+            valueText.anchorMax = new Vector2(1.0f, 1.0f);
+            valueText.offsetMin = new Vector2(0.0f, -0.33f);
+            valueText.offsetMax = new Vector2(0.0f, 0.0f);
+            valueText.sizeDelta = new Vector2(0.0f, 0.0f);
 
             var editIcon = buttonRightSide.Find("EditIcon").GetComponent<ImageView>();
             editIcon.sprite = Sprites.Pencil;
@@ -142,7 +189,7 @@ namespace ServerBrowser.UI.Components
             newValue = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty
             Plugin.Config.CustomGameName = newValue;
 
-            Plugin.Log.Info($"After GetHostGameName() return v3, newValue = {newValue}");
+            Plugin.Log.Info($"After GetHostGameName() return v888, newValue = {newValue}");
 
             _serverNameSetting.modalKeyboard.keyboard.KeyboardText.SetText(newValue);
             _serverNameSetting.modalKeyboard.SetText(newValue);
