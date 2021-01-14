@@ -161,10 +161,10 @@ namespace ServerBrowser.UI
             ////////////////////////////////////////////////////////////////////////////////////////
 
             // Clone the "main screen" for the lobby, normally used to show currently selected song in the distance
-            var screenController = Resources.FindObjectsOfTypeAll<CenterStageScreenController>().First();
-            var mainScreen = screenController.transform.parent;
+            var baseCenterStageScreenController = Resources.FindObjectsOfTypeAll<CenterStageScreenController>().First();
+            var baseMainScreen = baseCenterStageScreenController.transform.parent;
 
-            _clonedMainScreen = UnityEngine.Object.Instantiate(mainScreen);
+            _clonedMainScreen = UnityEngine.Object.Instantiate(baseMainScreen);
             _clonedMainScreen.name = "SBFNMainScreen";
             _clonedMainScreen.SetParent(gameObject.transform, false);
 
@@ -182,18 +182,32 @@ namespace ServerBrowser.UI
                     default:
                         tr.gameObject.SetActive(true);
                         break;
+                    // Next level countdown base
                     case "NextLevelBasePosition":
                     case "NextLevelCountdownPosition":
                     case "Title":
                     case "PlaceholderText":
                     case "ModifierSelection":
                     case "Countdown":
+                    // MpEx UI extensions
+                    case "BSMLVerticalLayoutGroup": 
+                    case "BSMLText": 
+                    case "BSMLLoadingIndicator":
                         Destroy(tr.gameObject);
                         break;
                 }
             }
 
             _clonedMainScreen.gameObject.SetActive(true);
+
+            // Workaround for MpEx injected "CenterScreenLoadingPanel" - since we don't have a reference, remove any and all components we don't want from CenterStageScreenController
+            foreach (var comp in _clonedMainScreen.Find("CenterStageScreenController").gameObject.GetComponents<Component>())
+            {
+                if (!(comp is Transform) && !(comp is Canvas) && !(comp is CanvasGroup) && !(comp is VRGraphicRaycaster)) 
+                {
+                    Destroy(comp);
+                }
+            }
 
             // Destroy any graphic raycasters, our notifs aren't clickable and they cause issues
             foreach (var vgr in _clonedMainScreen.GetComponentsInChildren<VRGraphicRaycaster>())
