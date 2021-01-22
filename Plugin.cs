@@ -132,9 +132,6 @@ namespace ServerBrowser
         {
             PlatformId = PLATFORM_UNKNOWN;
 
-            // Attempt to detect platform
-            // --> NOTE: Currently this can hang for a long time (possibly until a level is finished), depending on which mods the user is using
-            // --> This should be fixed in BS_Utils v1.6.2+
             var userInfo = await BS_Utils.Gameplay.GetUserInfo.GetUserAsync().ConfigureAwait(false);
 
             if (userInfo.platform == UserInfo.Platform.Oculus)
@@ -147,6 +144,10 @@ namespace ServerBrowser
             }
 
             Plugin.Log?.Debug($"Got platform user info: {userInfo.platform} / UID {userInfo.platformUserId}");
+
+            // Update user-agent now the platform identifier can be added
+            HttpClient.DefaultRequestHeaders.Remove("User-Agent");
+            HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
         }
         #endregion
     }
