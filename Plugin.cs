@@ -51,8 +51,7 @@ namespace ServerBrowser
             Log = logger;
             Config = config.Generated<PluginConfig>();
 
-            // Modifiers tab (in-lobby) - register needs to happen really early for now
-            // (https://github.com/monkeymanboy/BeatSaberMarkupLanguage/issues/67)
+            // Modifiers tab (in-lobby)
             LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
