@@ -44,16 +44,6 @@ namespace ServerBrowser.Utils
                 return sprite;
             }
 
-            // Level not found locally; ask Beat Saver for cover art
-            var downloadedCover = await BeatSaverHelper.FetchCoverArtBytesForLevel(levelId, token);
-
-            if (downloadedCover != null)
-            {
-                var sprite = Sprites.LoadSpriteRaw(downloadedCover);
-                sprite.name = levelId;
-                return sprite;
-            }
-
             // Failed to get level info, can't set cover art, too bad, very sad
             return null;
         }

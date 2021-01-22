@@ -181,7 +181,6 @@
     <Compile Include="UI\FloatingNotification.cs" />
     <Compile Include="UI\ViewControllers\ServerBrowserViewController.cs" />
     <Compile Include="UI\Components\LobbyConfigPanel.cs" />
-    <Compile Include="Utils\BeatSaverHelper.cs" />
     <Compile Include="Utils\CoverArtGrabber.cs" />
   </ItemGroup>
   <ItemGroup>
