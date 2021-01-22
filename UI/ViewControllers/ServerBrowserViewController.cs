@@ -418,7 +418,7 @@ namespace ServerBrowser.UI.ViewControllers
 
                 if (extensions != null)
                 {
-                    extensions.RefreshContent();
+                    extensions.RefreshContent((HostedGameCellData)GameList.data[cell.idx]);
                 }
             }
         }
@@ -429,15 +429,20 @@ namespace ServerBrowser.UI.ViewControllers
         {
             GameList.tableView.selectionType = TableViewSelectionType.Single;
 
-            GameList.tableView.ReloadData();
+            GameList.tableView.ReloadData(); // should cause visibleCells to be updated
 
             foreach (var cell in GameList.tableView.visibleCells)
             {
-                var hasExtendedBehavior = (cell.gameObject.GetComponent<HostedGameCellExtensions>() != null);
+                var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
+                var data = (HostedGameCellData)GameList.data[cell.idx];
 
-                if (!hasExtendedBehavior)
+                if (extensions == null)
                 {
-                    gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, (HostedGameCellData)GameList.data[cell.idx]);
+                    cell.gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, data);
+                }
+                else
+                {
+                    extensions.RefreshContent(data);
                 }
             }
 

@@ -101,8 +101,11 @@ namespace ServerBrowser.UI.Components
             }
         }
 
-        public void RefreshContent()
+        public void RefreshContent(HostedGameCellData cellInfo = null)
         {
+            if (cellInfo != null)
+                _cellInfo = cellInfo;
+
             FavoritesIcon.gameObject.SetActive(false);
             SongTime.gameObject.SetActive(true);
             SongBpm.gameObject.SetActive(true);
