@@ -137,7 +137,7 @@ namespace ServerBrowser.UI.ViewControllers
 
                 foreach (var lobby in HostedGameBrowser.LobbiesOnPage)
                 {
-                    GameList.data.Add(new HostedGameCell(_imageLoadCancellation, CellUpdateCallback, lobby));
+                    GameList.data.Add(new HostedGameCellData(_imageLoadCancellation, CellUpdateCallback, lobby));
                 }
             }
 
@@ -148,10 +148,7 @@ namespace ServerBrowser.UI.ViewControllers
                 FilterModdedButton.interactable = false;
             }
 
-            GameList.tableView.ReloadData();
-            GameList.tableView.selectionType = TableViewSelectionType.Single;
-
-            ClearSelection();
+            AfterCellsCreated();
 
             RefreshButton.interactable = true;
 
@@ -385,8 +382,8 @@ namespace ServerBrowser.UI.ViewControllers
                 return;
             }
 
-            var selectedGameCell = (HostedGameCell)selectedRow;
-            _selectedGame = selectedGameCell.Game;
+            var cellData = (HostedGameCellData)selectedRow;
+            _selectedGame = cellData.Game;
 
             ConnectButton.interactable = _selectedGame.canJoin;
         }
@@ -411,25 +408,45 @@ namespace ServerBrowser.UI.ViewControllers
             }
         }
 
-        private void CellUpdateCallback(HostedGameCell cell)
+        private void CellUpdateCallback(HostedGameCellData cellInfo)
         {
-            foreach (var visibleCell in GameList.tableView.visibleCells)
+            GameList.tableView.RefreshCellsContent();
+
+            foreach (var cell in GameList.tableView.visibleCells)
             {
-                // This is some BSML witchcraft. BSML made our cell a clone of the game's LevelListTableCell, where
-                //   the title component is _songNameText, which we use for finding the right cell to update.
+                var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
 
-                var frankenCell = visibleCell as LevelListTableCell;
-                var titleTextComponent = frankenCell.GetField<TextMeshProUGUI>("_songNameText");
-
-                if (titleTextComponent != null)
+                if (extensions != null)
                 {
-                    if (titleTextComponent.text == cell.text)
-                    {
-                        GameList.tableView.RefreshCellsContent();
-                        return;
-                    }
+                    extensions.RefreshContent((HostedGameCellData)GameList.data[cell.idx]);
                 }
             }
+        }
+        #endregion
+
+        #region UI Custom Behaviors
+        private void AfterCellsCreated()
+        {
+            GameList.tableView.selectionType = TableViewSelectionType.Single;
+
+            GameList.tableView.ReloadData(); // should cause visibleCells to be updated
+
+            foreach (var cell in GameList.tableView.visibleCells)
+            {
+                var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
+                var data = (HostedGameCellData)GameList.data[cell.idx];
+
+                if (extensions == null)
+                {
+                    cell.gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, data);
+                }
+                else
+                {
+                    extensions.RefreshContent(data);
+                }
+            }
+
+            ClearSelection();
         }
         #endregion
     }

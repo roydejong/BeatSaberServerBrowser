@@ -74,23 +74,54 @@ namespace ServerBrowser.Core
             return $"{masterServerDescr}, {moddedDescr}";
         }
 
-        public string DescribeDifficulty()
+        public string DescribeDifficulty(bool withColorTag = false)
         {
-            if (String.IsNullOrEmpty(this.LevelId))
+            if (String.IsNullOrEmpty(this.LevelId) || Difficulty == null)
             {
                 // Only empty if we've never played a level, in which case we shouldn't display a difficulty
                 return "-";
             }
 
+            string text;
+
             switch (Difficulty)
             {
-                case null:
-                    return "-";
                 default:
-                    return Difficulty.ToString();
+                    text = Difficulty.ToString();
+                    break;
                 case BeatmapDifficulty.ExpertPlus:
-                    return "Expert+";
+                    text = "Expert+";
+                    break;
             }
+
+            if (withColorTag)
+            {
+                string colorHex;
+
+                switch (Difficulty)
+                {
+                    default:
+                    case BeatmapDifficulty.Easy:
+                        colorHex = "#3cb371";
+                        break;
+                    case BeatmapDifficulty.Normal:
+                        colorHex = "#59b0f4";
+                        break;
+                    case BeatmapDifficulty.Hard:
+                        colorHex = "#ff6347";
+                        break;
+                    case BeatmapDifficulty.Expert:
+                        colorHex = "#bf2a42";
+                        break;
+                    case BeatmapDifficulty.ExpertPlus:
+                        colorHex = "#8f48db";
+                        break;
+                }
+
+                text = $"<color={colorHex}>{text}</color>";
+            }
+
+            return text;
         }
 
         public string ToJson()

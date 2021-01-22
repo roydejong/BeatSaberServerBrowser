@@ -121,11 +121,6 @@ namespace ServerBrowser.Core
                 queryString.Add("offset", offset.ToString());
             }
 
-            if (Plugin.Config.UseNativeBrowserPreview)
-            {
-                queryString.Add("limit", "max");
-            }
-
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
             {
                 queryString.Add("vanilla", "1");
