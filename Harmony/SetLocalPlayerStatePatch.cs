@@ -17,10 +17,6 @@ namespace ServerBrowser.Harmony
                 Plugin.Log?.Debug($"Local player state change (MultiplayerExtensions): {state}");
                 GameStateManager.HandleUpdate();
             }
-            else
-            {
-                Plugin.Log?.Debug($"Local player state change: {state}");
-            }
         }
     }
 }

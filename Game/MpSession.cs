@@ -2,6 +2,7 @@
 using ServerBrowser.Core;
 using ServerBrowser.Harmony;
 using ServerBrowser.UI;
+using System;
 using System.Linq;
 using UnityEngine;
 using static MultiplayerLobbyConnectionController;
@@ -151,6 +152,23 @@ namespace ServerBrowser.Game
                     // maxPlayerCount isn't getting set for clients, only hosts, assume 5
                     return 5;
             }
+        }
+
+        public static string GetHostGameName()
+        {
+            string finalGameName = "";
+
+            if (MpLocalPlayer.UserInfo != null)
+            {
+                finalGameName = $"{MpLocalPlayer.UserInfo.userName}'s game";
+            }
+
+            if (!String.IsNullOrEmpty(Plugin.Config.CustomGameName))
+            {
+                finalGameName = Plugin.Config.CustomGameName;
+            }
+
+            return !String.IsNullOrEmpty(finalGameName) ? finalGameName : "A game";
         }
         #endregion
     }

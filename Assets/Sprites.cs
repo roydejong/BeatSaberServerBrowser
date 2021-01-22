@@ -11,8 +11,11 @@ namespace ServerBrowser.Assets
     internal static class Sprites
     {
         public static Sprite BeatSaverIcon;
+
         public static Sprite Portal;
         public static Sprite PortalUser;
+
+        public static Sprite Pencil;
 
         public static void Initialize()
         {
@@ -24,6 +27,11 @@ namespace ServerBrowser.Assets
             
             Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
             PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
+
+            /// Octicons icon set by Github
+            /// Copyright (c) 2020 GitHub Inc.
+
+            Pencil = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Pencil.png");
         }
 
         public static Texture2D LoadTextureRaw(byte[] file)
