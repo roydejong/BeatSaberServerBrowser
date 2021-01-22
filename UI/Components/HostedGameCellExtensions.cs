@@ -1,6 +1,4 @@
 ﻿using HMUI;
-using ServerBrowser.Assets;
-using System;
 using UnityEngine;
 
 namespace ServerBrowser.UI.Components
@@ -118,9 +116,12 @@ namespace ServerBrowser.UI.Components
             SongTime.fontSize = 4;
 
             // Vanilla / modded indicator
-            SongBpm.text = game.IsModded ? "Modded" : "Vanilla";
+            SongBpm.text = game.DescribeType();
             SongBpm.color = (game.IsModded ? Color.cyan : Color.green);
-            (SongBpm.transform as RectTransform).anchorMax = new Vector2(1.03f, 0.5f);
+
+            var songBpmTransform = SongBpm.transform as RectTransform;
+            songBpmTransform.anchorMax = new Vector2(1.03f, 0.5f);
+            songBpmTransform.offsetMin = new Vector2(-32.00f, -4.60f);
         }
         #endregion
     }
