@@ -137,7 +137,7 @@ namespace ServerBrowser.UI.ViewControllers
 
                 foreach (var lobby in HostedGameBrowser.LobbiesOnPage)
                 {
-                    GameList.data.Add(new HostedGameCell(_imageLoadCancellation, CellUpdateCallback, lobby));
+                    GameList.data.Add(new HostedGameCellData(_imageLoadCancellation, CellUpdateCallback, lobby));
                 }
             }
 
@@ -382,8 +382,8 @@ namespace ServerBrowser.UI.ViewControllers
                 return;
             }
 
-            var selectedGameCell = (HostedGameCell)selectedRow;
-            _selectedGame = selectedGameCell.Game;
+            var cellData = (HostedGameCellData)selectedRow;
+            _selectedGame = cellData.Game;
 
             ConnectButton.interactable = _selectedGame.canJoin;
         }
@@ -408,7 +408,7 @@ namespace ServerBrowser.UI.ViewControllers
             }
         }
 
-        private void CellUpdateCallback(HostedGameCell cellInfo)
+        private void CellUpdateCallback(HostedGameCellData cellInfo)
         {
             GameList.tableView.RefreshCellsContent();
 
@@ -437,7 +437,7 @@ namespace ServerBrowser.UI.ViewControllers
 
                 if (!hasExtendedBehavior)
                 {
-                    gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, (HostedGameCell)GameList.data[cell.idx]);
+                    gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, (HostedGameCellData)GameList.data[cell.idx]);
                 }
             }
 

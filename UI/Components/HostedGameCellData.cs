@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace ServerBrowser.UI.Components
 {
-    public class HostedGameCell : CustomListTableData.CustomCellInfo
+    public class HostedGameCellData : CustomListTableData.CustomCellInfo
     {
         public HostedGameData Game
         {
@@ -18,9 +18,9 @@ namespace ServerBrowser.UI.Components
         }
 
         private static CancellationTokenSource _cancellationTokenSource;
-        private static Action<HostedGameCell> _onContentChange;
+        private static Action<HostedGameCellData> _onContentChange;
 
-        public HostedGameCell(CancellationTokenSource cancellationTokenSource, Action<HostedGameCell> onContentChange, HostedGameData game)
+        public HostedGameCellData(CancellationTokenSource cancellationTokenSource, Action<HostedGameCellData> onContentChange, HostedGameData game)
             : base("A game", "Getting details...", Sprites.BeatSaverIcon)
         {
             _cancellationTokenSource = cancellationTokenSource;

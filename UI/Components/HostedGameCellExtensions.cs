@@ -10,7 +10,7 @@ namespace ServerBrowser.UI.Components
         private bool _enabled = false;
 
         private SelectableCell _cell;
-        private HostedGameCell _cellInfo;
+        private HostedGameCellData _cellInfo;
 
         private ImageView _background;
 
@@ -20,7 +20,7 @@ namespace ServerBrowser.UI.Components
         private ImageView BpmIcon;
 
         #region Setup
-        internal void Configure(SelectableCell cell, HostedGameCell cellInfo)
+        internal void Configure(SelectableCell cell, HostedGameCellData cellInfo)
         {
             this._cell = cell;
             this._cellInfo = cellInfo;
