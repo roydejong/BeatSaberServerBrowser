@@ -111,6 +111,7 @@ namespace ServerBrowser
         {
             // Bind multiplayer session events
             MpSession.SetUp();
+            MpLocalPlayer.SetUp();
             MpModeSelection.SetUp();
 
             // UI setup
@@ -126,7 +127,7 @@ namespace ServerBrowser
         public const string PLATFORM_STEAM = "steam";
         public const string PLATFORM_OCULUS = "oculus";
 
-        public static string PlatformId { get; private set; } = PLATFORM_UNKNOWN;
+        public static string PlatformId { get; internal set; } = PLATFORM_UNKNOWN;
 
         private async Task DetectPlatform()
         {

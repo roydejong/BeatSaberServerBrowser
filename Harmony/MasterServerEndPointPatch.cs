@@ -5,7 +5,7 @@ using System;
 namespace ServerBrowser.Harmony
 {
     [HarmonyPatch(typeof(NetworkConfigSO))]
-    public class MasterServerEndPointPatch
+    public static class MasterServerEndPointPatch
     {
         [HarmonyPatch(MethodType.Getter)]
         [HarmonyPatch("masterServerEndPoint")]
