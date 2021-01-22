@@ -58,20 +58,14 @@ namespace ServerBrowser
         [OnStart]
         public async void OnApplicationStart()
         {
-            Log?.Debug("OnApplicationStart");
-
             // Harmony
             Harmony = new HarmonyLib.Harmony(HarmonyId);
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            Log?.Debug($"Harmony patching complete.");
 
             // Assets
             Sprites.Initialize();
-            Log?.Debug($"Sprite conversion complete.");
 
             // HTTP client
-            Log?.Info(UserAgent);
-
             HttpClient = new HttpClient();
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
@@ -143,11 +137,13 @@ namespace ServerBrowser
                 PlatformId = PLATFORM_STEAM;
             }
 
-            Plugin.Log?.Debug($"Got platform user info: {userInfo.platform} / UID {userInfo.platformUserId}");
+            Log?.Debug($"Got platform user info: {userInfo.platform} / UID {userInfo.platformUserId}");
 
             // Update user-agent now the platform identifier can be added
             HttpClient.DefaultRequestHeaders.Remove("User-Agent");
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
+
+            Log?.Info($"Running {UserAgent}");
         }
         #endregion
     }

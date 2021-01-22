@@ -83,8 +83,6 @@ namespace ServerBrowser.UI.Components
 
             if (_cell.selected)
             {
-                Plugin.Log.Info($"Selected cell test: {this._cellInfo.Game.GameName}");
-
                 _background.color0 = new Color(1.0f, 1.0f, 1.0f, 1.0f);
                 _background.color1 = new Color(1.0f, 1.0f, 1.0f, 0.5f);
                 _background.enabled = true;

@@ -170,7 +170,6 @@ namespace ServerBrowser.UI.Components
         #region UI Events
         private void OnAddToBrowserChange(bool newValue)
         {
-            Plugin.Log?.Info($"CreateServerViewExtensions: OnAddToBrowserChange -> {newValue}");
             Plugin.Config.LobbyAnnounceToggle = newValue;
 
             // Ensure the control is in sync
@@ -183,13 +182,10 @@ namespace ServerBrowser.UI.Components
 
         private void OnServerNameChange(string newValue)
         {
-            Plugin.Log?.Info($"CreateServerViewExtensions: OnServerNameChange -> {newValue}");
             Plugin.Config.CustomGameName = newValue;
 
             newValue = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty
             Plugin.Config.CustomGameName = newValue;
-
-            Plugin.Log.Info($"After GetHostGameName() return v888, newValue = {newValue}");
 
             _serverNameSetting.modalKeyboard.keyboard.KeyboardText.SetText(newValue);
             _serverNameSetting.modalKeyboard.SetText(newValue);
