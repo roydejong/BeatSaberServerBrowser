@@ -12,6 +12,8 @@ namespace ServerBrowser.UI.Components
 
         private ImageView _background;
 
+        private CurvedTextMeshPro SongName;
+        private CurvedTextMeshPro SongAuthor;
         private ImageView FavoritesIcon;
         private CurvedTextMeshPro SongTime;
         private CurvedTextMeshPro SongBpm;
@@ -42,10 +44,21 @@ namespace ServerBrowser.UI.Components
 
                 RefreshBackground();
 
+                SongName = _cell.transform.Find("SongName").GetComponent<CurvedTextMeshPro>();
+                SongAuthor = _cell.transform.Find("SongAuthor").GetComponent<CurvedTextMeshPro>();
                 FavoritesIcon = _cell.transform.Find("FavoritesIcon").GetComponent<ImageView>();
                 SongTime = _cell.transform.Find("SongTime").GetComponent<CurvedTextMeshPro>();
                 SongBpm = _cell.transform.Find("SongBpm").GetComponent<CurvedTextMeshPro>();
                 BpmIcon = _cell.transform.Find("BpmIcon").GetComponent<ImageView>();
+
+                // Re-align BPM text and allow more horizontal space - we use this for extended lobby type
+                var songBpmTransform = SongBpm.transform as RectTransform;
+                songBpmTransform.anchorMax = new Vector2(1.03f, 0.5f);
+                songBpmTransform.offsetMin = new Vector2(-32.00f, -4.60f);
+
+                // Limit text size for server name and song name
+                (SongName.transform as RectTransform).anchorMax = new Vector2(0.8f, 0.5f);
+                (SongAuthor.transform as RectTransform).anchorMax = new Vector2(0.8f, 0.5f);
 
                 RefreshContent();
             }
@@ -116,13 +129,9 @@ namespace ServerBrowser.UI.Components
             SongTime.color = (game.PlayerCount >= game.PlayerLimit ? Color.gray : Color.white);
             SongTime.fontSize = 4;
 
-            // Vanilla / modded indicator
+            // Lobby type (server + modded/vanilla indicator)
             SongBpm.text = game.DescribeType();
             SongBpm.color = (game.IsModded ? Color.cyan : Color.green);
-
-            var songBpmTransform = SongBpm.transform as RectTransform;
-            songBpmTransform.anchorMax = new Vector2(1.03f, 0.5f);
-            songBpmTransform.offsetMin = new Vector2(-32.00f, -4.60f);
         }
         #endregion
     }
