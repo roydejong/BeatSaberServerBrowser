@@ -163,6 +163,7 @@
     <Compile Include="Game\MpConnect.cs" />
     <Compile Include="Game\MpModeSelection.cs" />
     <Compile Include="Game\MpSession.cs" />
+    <Compile Include="Harmony\MpConnectionErrorDialogPatch.cs" />
     <Compile Include="Harmony\MpLobbyStatePatch.cs" />
     <Compile Include="Harmony\SetLobbyCodePatch.cs" />
     <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="UI\FloatingNotification.cs" />
     <Compile Include="UI\ViewControllers\ServerBrowserViewController.cs" />
     <Compile Include="UI\Components\LobbyConfigPanel.cs" />
+    <Compile Include="Utils\ConnectionErrorText.cs" />
     <Compile Include="Utils\CoverArtGrabber.cs" />
   </ItemGroup>
   <ItemGroup>

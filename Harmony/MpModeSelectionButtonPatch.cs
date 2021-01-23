@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using ServerBrowser.Game;
 using ServerBrowser.UI;
+using static MultiplayerModeSelectionViewController;
 
 namespace ServerBrowser.Harmony
 {
@@ -12,11 +13,16 @@ namespace ServerBrowser.Harmony
             // Make sure any overrides are cleared when we're going to connect or host
             MpConnect.ClearMasterServerOverride();
 
-            // When the "GameBrowser" button is clicked, bypass the game's own incomplete code & open our view instead
-            if (menuButton == MultiplayerModeSelectionViewController.MenuButton.GameBrowser)
+            if (menuButton == MenuButton.GameBrowser)
             {
+                // When the "GameBrowser" button is clicked, bypass the game's own incomplete code & open our view instead
                 PluginUi.LaunchServerBrowser();
                 return false;
+            }
+            else
+            {
+                // Going to a non-serverbrowser part of the online menu
+                MpModeSelection.WeInitiatedConnection = false;
             }
 
             return true;
