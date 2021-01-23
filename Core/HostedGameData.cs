@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ServerBrowser.Game;
-using ServerBrowser.Harmony;
 using System;
+using System.Collections.Generic;
 
 namespace ServerBrowser.Core
 {
@@ -24,6 +24,7 @@ namespace ServerBrowser.Core
         public string MasterServerHost { get; set; } = null;
         public int? MasterServerPort { get; set; } = null;
         public string CoverUrl { get; set; } = null;
+        public List<HostedGamePlayer> Players { get; set; } = null;
 
         [JsonIgnoreAttribute]
         public bool IsOnCustomMaster => !String.IsNullOrEmpty(MasterServerHost) && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);

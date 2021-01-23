@@ -1,8 +1,8 @@
 ﻿using ServerBrowser.Game;
 using ServerBrowser.Harmony;
 using ServerBrowser.UI.Components;
-using ServerBrowser.Utils;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ServerBrowser.Core
@@ -83,7 +83,6 @@ namespace ServerBrowser.Core
 
         public static void HandleUpdate()
         {
-#pragma warning disable CS4014
             var sessionManager = MpSession.SessionManager;
 
             if (sessionManager == null
@@ -143,15 +142,31 @@ namespace ServerBrowser.Core
                 return;
             }
 
+            var lobbyAnnounce = GenerateAnnounce();
+
+            StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
+            HasErrored = false;
+
+            LobbyConfigPanel.UpdatePanelInstance();
+
+            DoAnnounce(lobbyAnnounce);
+        }
+
+        private static HostedGameData GenerateAnnounce()
+        {
+            var sessionManager = MpSession.SessionManager;
+            var localPlayer = sessionManager.localPlayer;
+            var connectedPlayers = sessionManager.connectedPlayers;
+
             var lobbyAnnounce = new HostedGameData()
             {
                 ServerCode = _lobbyCode,
                 GameName = MpSession.GetHostGameName(),
-                OwnerId = sessionManager.localPlayer.userId,
-                OwnerName = sessionManager.localPlayer.userName,
+                OwnerId = localPlayer.userId,
+                OwnerName = localPlayer.userName,
                 PlayerCount = MpSession.GetPlayerCount(),
                 PlayerLimit = MpSession.GetPlayerLimit(),
-                IsModded = sessionManager.localPlayer.HasState("modded") && sessionManager.localPlayer.HasState("customsongs"),
+                IsModded = localPlayer.HasState("modded") || localPlayer.HasState("customsongs"),
                 LobbyState = MpLobbyStatePatch.LobbyState,
                 LevelId = _level?.levelID,
                 SongName = _level?.songName,
@@ -162,13 +177,28 @@ namespace ServerBrowser.Core
                 MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT
             };
 
-            StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
-            HasErrored = false;
+            lobbyAnnounce.Players = new List<HostedGamePlayer>();
+            lobbyAnnounce.Players.Add(new HostedGamePlayer()
+            {
+                SortIndex = localPlayer.sortIndex,
+                UserId = localPlayer.userId,
+                UserName = localPlayer.userName,
+                IsHost = localPlayer.isConnectionOwner,
+                Latency = localPlayer.currentLatency
+            });
+            foreach (var connectedPlayer in connectedPlayers)
+            {
+                lobbyAnnounce.Players.Add(new HostedGamePlayer()
+                {
+                    SortIndex = connectedPlayer.sortIndex,
+                    UserId = connectedPlayer.userId,
+                    UserName = connectedPlayer.userName,
+                    IsHost = connectedPlayer.isConnectionOwner,
+                    Latency = connectedPlayer.currentLatency
+                });
+            }
 
-            LobbyConfigPanel.UpdatePanelInstance();
-
-            DoAnnounce(lobbyAnnounce);
-#pragma warning restore CS4014
+            return lobbyAnnounce;
         }
 
         private static async Task DoAnnounce(HostedGameData announce)
@@ -197,7 +227,7 @@ namespace ServerBrowser.Core
 
         /// <summary>
         /// Ensures that any host announcements made by us are removed:
-        ///  - If a previous announcement was made, a DELETE request is sent to the master server, removing it.
+        ///  - If a previous announcement was made, a request is sent to the master server, removing it.
         ///  - If no previous announcement was made, or it was already deleted, this is a no-op.
         /// </summary>
         public static async Task UnAnnounce()
