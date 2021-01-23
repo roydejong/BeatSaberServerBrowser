@@ -82,7 +82,7 @@ namespace ServerBrowser.Game
 
                 if (isFirstReport)
                 {
-                    Plugin.Log?.Info($"Using an official master server: {_officialEndPoint}");
+                    Plugin.Log?.Info($"Default master server appears to be official: {_officialEndPoint}");
                 }
 
                 return;
@@ -94,7 +94,7 @@ namespace ServerBrowser.Game
 
             if (isFirstReport)
             {
-                Plugin.Log?.Warn($"Using a modded master server: {_moddedEndPoint}");
+                Plugin.Log?.Warn($"Default master server appears to be modded: {_moddedEndPoint}");
             }
         }
 
@@ -107,7 +107,7 @@ namespace ServerBrowser.Game
         {
             if (OverrideEndPoint == null || !OverrideEndPoint.Equals(overrideEndPoint))
             {
-                Plugin.Log?.Info($"Setting master server override: {overrideEndPoint}");
+                Plugin.Log?.Info($"Setting master server override now: {overrideEndPoint}");
                 OverrideEndPoint = overrideEndPoint;
             }
         }
@@ -116,7 +116,7 @@ namespace ServerBrowser.Game
         {
             if (OverrideEndPoint != null)
             {
-                Plugin.Log?.Info($"Clearing master server override");
+                Plugin.Log?.Info($"Stopped overriding master server");
                 OverrideEndPoint = null;
             }
         }
