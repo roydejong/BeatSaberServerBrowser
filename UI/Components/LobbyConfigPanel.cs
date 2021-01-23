@@ -72,14 +72,15 @@ namespace ServerBrowser.UI.Components
         [UIAction("nameKeyboardSubmit")]
         private async void NameKeyboardSubmit(string text)
         {
-            Plugin.Log?.Info($"Set custom game name to: \"{text}\"");
-
-            NameValue = text;
-
             // Make main content visible again
             MainContentRoot.gameObject.SetActive(true);
 
-            // Trigger update
+            // Name update on UI and in settings
+            NameValue = text;
+            text = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty
+            NameValue = text;
+
+            // Name update on announce
             GameStateManager.HandleCustomGameName(text);
         }
 
