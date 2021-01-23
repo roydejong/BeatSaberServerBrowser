@@ -1,5 +1,4 @@
 ﻿using BeatSaberMarkupLanguage.Components.Settings;
-using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.Tags;
 using BeatSaberMarkupLanguage.Tags.Settings;
 using HMUI;
@@ -115,8 +114,9 @@ namespace ServerBrowser.UI.Components
             stringSetting.text.alignment = TextAlignmentOptions.Center;
 
             // Event
-            stringSetting.modalKeyboard.keyboard.EnterPressed += (delegate (string newValue)
+            stringSetting.modalKeyboard.keyboard.EnterPressed += (async delegate (string newValue)
             {
+                await Task.Delay(1); // we need to run after BSML's own EnterPressed, and this, well, it works
                 onChangeCallback(newValue);
             });
 
@@ -180,16 +180,12 @@ namespace ServerBrowser.UI.Components
             ReApplyVerticalLayout(newValue);
         }
 
-        private void OnServerNameChange(string newValue)
+        private async void OnServerNameChange(string newValue)
         {
             Plugin.Config.CustomGameName = newValue;
-
             newValue = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty
             Plugin.Config.CustomGameName = newValue;
-
-            _serverNameSetting.modalKeyboard.keyboard.KeyboardText.SetText(newValue);
-            _serverNameSetting.modalKeyboard.SetText(newValue);
-            _serverNameSetting.text.SetText(newValue);
+            _serverNameSetting.EnterPressed(newValue); // this will update both keyboard text & button face text
         }
         #endregion
 
