@@ -1,5 +1,6 @@
 ﻿using HMUI;
 using IPA.Utilities;
+using ServerBrowser.Core;
 using System.Linq;
 using UnityEngine;
 using static HMUI.ViewController;
@@ -40,14 +41,19 @@ namespace ServerBrowser.Game
             _flowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
-        public static void ConnectToServerCode(string serverCode)
+        public static void ConnectToHostedGame(HostedGameData game)
         {
+            if (game == null || string.IsNullOrEmpty(game.ServerCode))
+            {
+                return;
+            }
+
             var mpConnectionController = ReflectionUtil.GetField<MultiplayerLobbyConnectionController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_multiplayerLobbyConnectionController");
             var mpJoiningLobbyViewController = ReflectionUtil.GetField<JoiningLobbyViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_joiningLobbyViewController");
 
-            mpConnectionController.ConnectToParty(serverCode);
+            mpConnectionController.ConnectToParty(game.ServerCode);
 
-            mpJoiningLobbyViewController.Init($"ohhh its happening ({serverCode})");
+            mpJoiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
 
             _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController", new object[] {
                 mpJoiningLobbyViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical

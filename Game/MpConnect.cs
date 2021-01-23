@@ -40,7 +40,7 @@ namespace ServerBrowser.Game
             }
 
             // Trigger the actual join via server code
-            MpModeSelection.ConnectToServerCode(game.ServerCode);
+            MpModeSelection.ConnectToHostedGame(game);
         }
 
         #region Master Server Management
