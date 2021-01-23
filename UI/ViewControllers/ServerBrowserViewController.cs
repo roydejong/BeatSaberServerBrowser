@@ -96,6 +96,16 @@ namespace ServerBrowser.UI.ViewControllers
             GameList.data.Clear();
             CancelImageLoading();
 
+            if (!String.IsNullOrEmpty(HostedGameBrowser.ServerMessage))
+            {
+                ServerMessageText.text = HostedGameBrowser.ServerMessage;
+                ServerMessageText.enabled = true;
+            }
+            else
+            {
+                ServerMessageText.enabled = false;
+            }
+
             if (!HostedGameBrowser.ConnectionOk)
             {
                 StatusText.text = "Failed to get server list";
@@ -174,6 +184,9 @@ namespace ServerBrowser.UI.ViewControllers
 
         [UIComponent("searchKeyboard")]
         public ModalKeyboard SearchKeyboard;
+
+        [UIComponent("serverMessageText")]
+        public TextMeshProUGUI ServerMessageText;
 
         [UIComponent("statusText")]
         public TextMeshProUGUI StatusText;

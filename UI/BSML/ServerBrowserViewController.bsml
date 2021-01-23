@@ -1,9 +1,10 @@
 ﻿<bg>
 
+  <text id="serverMessageText" text="" align="Center" font-size="3.5" anchor-min-y="2"></text>
+
   <modal-keyboard id="searchKeyboard" move-to-center="true" value="searchValue" show-event="openSearchKeyboard"
                   hide-event="closeSearchKeyboard" clear-on-open="false" on-enter="searchKeyboardSubmit"
                   clickerino-offerino-closerino="false">
-    <!-- <checkbox id="filterButton" pref-height="8" pref-width="30" text="Hide full lobbies"></checkbox> -->
 	  <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0" anchor-max-x="1.1" anchor-max-y="1.315">
 		  <button id="filterFull" pad="0" pref-height="6.15" pref-width="30" on-click="filterfullClick" text="Hide full lobbies" face-color="~filterFullColor"></button>
 		  <button id="filterInProgress" pad="0" pref-height="6.15" pref-width="40" on-click="filterInProgressClick" text="Hide games in progress" face-color="~filterInProgressColor"></button>

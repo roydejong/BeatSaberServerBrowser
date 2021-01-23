@@ -45,13 +45,6 @@ namespace ServerBrowser.Core
                     _lobbyObjects[lobby.Id.Value] = lobby;
                     nextLobbiesOnPage.Add(lobby);
                 }
-
-                // Server message
-                if (!String.IsNullOrEmpty(_lastServerResult.Message))
-                {
-                    FloatingNotification.Instance.ShowMessage("Server Browser Message", _lastServerResult.Message,
-                        FloatingNotification.NotificationStyle.Cerise, Sprites.Portal);
-                }
             }
 
             _lobbiesOnPage = nextLobbiesOnPage;
@@ -113,6 +106,14 @@ namespace ServerBrowser.Core
             get
             {
                 return new List<HostedGameData>(_lobbiesOnPage);
+            }
+        }
+
+        public static string ServerMessage
+        {
+            get
+            {
+                return _lastServerResult?.Message;
             }
         }
     }
