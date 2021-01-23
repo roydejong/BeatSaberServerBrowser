@@ -103,34 +103,6 @@ namespace ServerBrowser.UI
 
             gameObject.SetActive(true);
         }
-
-        public async Task ShowMessageWithImageDownload(string title, string message, string imageUrl, NotificationStyle style = NotificationStyle.Blue, Sprite spriteFallback = null, float time = 5.0f)
-        {
-            _runningCoroutine = true;
-            gameObject.SetActive(true);
-
-            StartCoroutine(ShowMessageWithImageCoroutine(title, message, imageUrl, style, spriteFallback, time));
-        }
-
-        private IEnumerator ShowMessageWithImageCoroutine(string title, string message, string imageUrl, NotificationStyle style, Sprite sprite, float time)
-        {
-            var request = UnityWebRequestTexture.GetTexture(imageUrl);
-
-            yield return request.SendWebRequest();
-
-            if (request.isNetworkError || request.isHttpError)
-            {
-                Plugin.Log?.Warn($"⚠ Notification image load failed: {imageUrl}");
-            }
-            else
-            {
-                var texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                sprite = Sprites.LoadSpriteFromTexture(texture);
-            }
-
-            ShowMessage(title, message, style, sprite, time);
-            _runningCoroutine = false;
-        }
         #endregion
 
         #region Unity / Rendering
