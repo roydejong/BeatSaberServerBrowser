@@ -22,11 +22,11 @@ namespace ServerBrowser.Harmony
 
             if (firstActivation)
             {
-                // Reposition and enlarge the button a bit
+                // Move up and enlarge the button a bit
                 var transform = btnGameBrowser.gameObject.transform;
                 transform.position = new Vector3(
                     transform.position.x,
-                    transform.position.y + 0.25f,
+                    transform.position.y + 0.4f, // carefully positioned so it is visually seperated from maintenance notice
                     transform.position.z
                 );
                 transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
