@@ -42,8 +42,8 @@ namespace ServerBrowser.UI.Components
 
             if (_firstEnable)
             {
-                // Do this on first-enable to prevent the form view glitching
-                ReApplyVerticalLayout(false);
+                // Do this on first-enable to prevent the form view glitching (elements shifting and such)
+                SyncValues();
                 _firstEnable = false;
             }
 
