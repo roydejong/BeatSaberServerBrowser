@@ -53,6 +53,12 @@ namespace ServerBrowser.UI.ViewControllers
             StatusText.text = "Loading...";
             StatusText.color = Color.gray;
 
+            // sometimes the non-primary buttons become disabled if the server browser
+            //  isn't opened until after level selection, so let's ensure they're active
+            RefreshButton.gameObject.SetActive(true);
+            SearchButton.gameObject.SetActive(true);
+            CreateButton.gameObject.SetActive(true);
+
             RefreshButton.interactable = false;
             SearchButton.interactable = false;
             ConnectButton.interactable = false;
