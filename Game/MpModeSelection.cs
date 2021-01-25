@@ -91,8 +91,7 @@ namespace ServerBrowser.Game
 
         public static void PresentConnectionFailedError(string errorTitle = "Connection failed", string errorMessage = null, bool canRetry = true)
         {
-            _mpLobbyConnectionController.LeaveLobby();
-            _joiningLobbyViewController.HideLoading();
+            CancelLobbyJoin();
 
             if (LastConnectToHostedGame == null)
                 canRetry = false; // we don't have game info to retry with
@@ -103,7 +102,7 @@ namespace ServerBrowser.Game
                 {
                     default:
                     case 0: // Back to browser
-                        ReplaceTopViewController(PluginUi.ServerBrowserViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
+                        MakeServerBrowserTopView();
                         break;
                     case 1: // Retry connection
                         ConnectToHostedGame(LastConnectToHostedGame);
@@ -112,6 +111,17 @@ namespace ServerBrowser.Game
             });
 
             ReplaceTopViewController(_simpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
+        }
+
+        public static void CancelLobbyJoin()
+        {
+            _mpLobbyConnectionController.LeaveLobby();
+            _joiningLobbyViewController.HideLoading();
+        }
+
+        public static void MakeServerBrowserTopView()
+        {
+            ReplaceTopViewController(PluginUi.ServerBrowserViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
         }
     }
 }

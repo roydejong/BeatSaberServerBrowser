@@ -10,14 +10,24 @@ namespace ServerBrowser.Harmony
         public static bool Prefix(MultiplayerModeSelectionFlowCoordinator __instance, ConnectionFailedReason reason)
         {
             Plugin.Log.Warn($"Multiplayer connection failed, reason: {reason}");
-            if (MpModeSelection.WeInitiatedConnection && reason != ConnectionFailedReason.ConnectionCanceled)
+
+            if (MpModeSelection.WeInitiatedConnection)
             {
-                // We only take over error handling UI if we initiated the connection, and it's not a self-cancel
-                MpModeSelection.PresentConnectionFailedError
-                (
-                    errorMessage: ConnectionErrorText.Generate(reason),
-                    canRetry: reason != ConnectionFailedReason.InvalidPassword && reason != ConnectionFailedReason.VersionMismatch
-                );
+                // We only take over error handling UI if we initiated the connection
+                if (reason == ConnectionFailedReason.ConnectionCanceled)
+                {
+                    // ...and if it's just a self-cancel, return to the browser immediately.
+                    MpModeSelection.CancelLobbyJoin();
+                    MpModeSelection.MakeServerBrowserTopView();
+                }
+                else
+                {
+                    MpModeSelection.PresentConnectionFailedError
+                    (
+                        errorMessage: ConnectionErrorText.Generate(reason),
+                        canRetry: reason != ConnectionFailedReason.InvalidPassword && reason != ConnectionFailedReason.VersionMismatch
+                    );
+                }
                 return false;
             }
             return true;
