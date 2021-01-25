@@ -26,11 +26,13 @@ namespace ServerBrowser.Utils
                     break;
                 case ConnectionFailedReason.NetworkNotConnected:
                 case ConnectionFailedReason.MasterServerUnreachable:
-                case ConnectionFailedReason.MasterServerNotAuthenticated:
                     msg.AppendLine("Could not connect to master server, check your connection and try again.");
                     break;
                 case ConnectionFailedReason.VersionMismatch:
                     msg.AppendLine("Make sure you and the host are using the same game version.");
+                    break;
+                case ConnectionFailedReason.MasterServerNotAuthenticated:
+                    msg.AppendLine("Could not authenticate master server, you may need to restart the game.");
                     break;
             }
 
