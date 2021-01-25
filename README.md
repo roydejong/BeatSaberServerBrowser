@@ -40,9 +40,9 @@ From the lobby, you can also change your server browser settings from the panel 
 While your game is added to the browser, anyone will be able to join and your server code will be made public on the site (https://bssb.app).
 
 ## Installation
-The latest version of the mod (v0.3) is not yet available on Mod Assistant, but will be soon.
+The latest version of the mod (v0.4) is not yet available on Mod Assistant, but will be soon.
 
-You can download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.
+**You can download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.**
 
 *If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 
