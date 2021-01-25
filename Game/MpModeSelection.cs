@@ -89,36 +89,29 @@ namespace ServerBrowser.Game
             ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
         }
 
-        public static void PresentConnectionError(ConnectionFailedReason reason)
+        public static void PresentConnectionFailedError(string errorTitle = "Connection failed", string errorMessage = null, bool canRetry = true)
         {
             _mpLobbyConnectionController.LeaveLobby();
             _joiningLobbyViewController.HideLoading();
 
-            if (reason != ConnectionFailedReason.ConnectionCanceled)
-            {
-                var canRetry = (LastConnectToHostedGame != null
-                    && reason != ConnectionFailedReason.InvalidPassword
-                    && reason != ConnectionFailedReason.VersionMismatch);
+            if (LastConnectToHostedGame == null)
+                canRetry = false; // we don't have game info to retry with
 
-                _simpleDialogPromptViewController.Init("Connection failed", ConnectionErrorText.Generate(reason), "Back to browser", canRetry ? "Retry connection" : null, delegate (int btnId)
-                {
-                    switch (btnId)
-                    {
-                        default:
-                        case 0: // Back to browser
-                            ReplaceTopViewController(PluginUi.ServerBrowserViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
-                            break;
-                        case 1: // Retry connection
-                            ConnectToHostedGame(LastConnectToHostedGame);
-                            break;
-                    }
-                });
-                ReplaceTopViewController(_simpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
-            }
-            else
+            _simpleDialogPromptViewController.Init(errorTitle, errorMessage, "Back to browser", canRetry ? "Retry connection" : null, delegate (int btnId)
             {
-                ReplaceTopViewController(PluginUi.ServerBrowserViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
-            }
+                switch (btnId)
+                {
+                    default:
+                    case 0: // Back to browser
+                        ReplaceTopViewController(PluginUi.ServerBrowserViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
+                        break;
+                    case 1: // Retry connection
+                        ConnectToHostedGame(LastConnectToHostedGame);
+                        break;
+                }
+            });
+
+            ReplaceTopViewController(_simpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
         }
     }
 }

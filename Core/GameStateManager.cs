@@ -1,6 +1,7 @@
 ﻿using ServerBrowser.Game;
 using ServerBrowser.Harmony;
 using ServerBrowser.UI.Components;
+using ServerBrowser.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace ServerBrowser.Core
         private static string _lobbyCode = null;
         private static string _customGameName = null;
         private static bool? _didSetLocalPlayerState = null;
+        private static SemVer.Version _mpExVersion = null;
 
         private static bool _didAnnounce = false;
         private static bool _sentUnAnnounce = false;
@@ -158,6 +160,16 @@ namespace ServerBrowser.Core
             var localPlayer = sessionManager.localPlayer;
             var connectedPlayers = sessionManager.connectedPlayers;
 
+            if (_mpExVersion == null)
+            {
+                _mpExVersion = MpExHelper.GetInstalledVersion();
+                
+                if (_mpExVersion != null)
+                {
+                    Plugin.Log?.Info($"Detected MultiplayerExtensions, version {_mpExVersion}");
+                }
+            }
+
             var lobbyAnnounce = new HostedGameData()
             {
                 ServerCode = _lobbyCode,
@@ -166,7 +178,7 @@ namespace ServerBrowser.Core
                 OwnerName = localPlayer.userName,
                 PlayerCount = MpSession.GetPlayerCount(),
                 PlayerLimit = MpSession.GetPlayerLimit(),
-                IsModded = localPlayer.HasState("modded") || localPlayer.HasState("customsongs"),
+                IsModded = localPlayer.HasState("modded") || localPlayer.HasState("customsongs") || _mpExVersion != null,
                 LobbyState = MpLobbyStatePatch.LobbyState,
                 LevelId = _level?.levelID,
                 SongName = _level?.songName,
@@ -174,7 +186,8 @@ namespace ServerBrowser.Core
                 Difficulty = _difficulty,
                 Platform = Plugin.PlatformId,
                 MasterServerHost = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null,
-                MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT
+                MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT,
+                MpExVersion = _mpExVersion
             };
 
             lobbyAnnounce.Players = new List<HostedGamePlayer>();

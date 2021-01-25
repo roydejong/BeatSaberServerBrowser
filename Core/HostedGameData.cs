@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ServerBrowser.Game;
+using ServerBrowser.Utils;
 using System;
 using System.Collections.Generic;
 
@@ -25,6 +26,8 @@ namespace ServerBrowser.Core
         public int? MasterServerPort { get; set; } = null;
         public string CoverUrl { get; set; } = null;
         public List<HostedGamePlayer> Players { get; set; } = null;
+        [JsonConverter(typeof(SemVerJsonConverter))]
+        public SemVer.Version MpExVersion { get; set; } = null;
 
         [JsonIgnoreAttribute]
         public bool IsOnCustomMaster => !String.IsNullOrEmpty(MasterServerHost) && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);
@@ -66,6 +69,11 @@ namespace ServerBrowser.Core
             if (IsModded)
             {
                 moddedDescr = "Modded";
+
+                if (MpExVersion != null)
+                {
+                    moddedDescr += $" {MpExVersion}";
+                }
             }
             else
             {

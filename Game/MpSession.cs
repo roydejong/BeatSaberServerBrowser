@@ -2,6 +2,7 @@
 using ServerBrowser.Core;
 using ServerBrowser.Harmony;
 using ServerBrowser.UI;
+using ServerBrowser.Utils;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -128,7 +129,7 @@ namespace ServerBrowser.Game
         #region Data helpers
         public static bool GetLocalPlayerHasMultiplayerExtensions()
         {
-            return SessionManager.LocalPlayerHasState("modded");
+            return SessionManager.LocalPlayerHasState("modded") || MpExHelper.GetIsInstalled();
         }
 
         public static int GetPlayerCount()

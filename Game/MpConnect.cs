@@ -1,4 +1,6 @@
 ﻿using ServerBrowser.Core;
+using ServerBrowser.Utils;
+using System.Text;
 
 namespace ServerBrowser.Game
 {
@@ -12,6 +14,37 @@ namespace ServerBrowser.Game
 
         public static void Join(HostedGameData game)
         {
+            // MpEx version check
+            if (game.MpExVersion != null)
+            {
+                var ourMpExVersion = MpExHelper.GetInstalledVersion();
+
+                if (ourMpExVersion == null || !ourMpExVersion.Equals(game.MpExVersion))
+                {
+                    var ourMpExVersionStr = (ourMpExVersion != null ? ourMpExVersion.ToString() : "Not installed");
+                    var theirMpExVersionStr = game.MpExVersion.ToString();
+
+                    Plugin.Log.Warn($"Blocking game join because of MultiplayerExtensions version mismatch " +
+                        $"(ours: {ourMpExVersionStr}, theirs: {theirMpExVersionStr})");
+
+                    var mpExError = new StringBuilder();
+                    mpExError.AppendLine($"MultiplayerExtensions version difference detected!");
+                    mpExError.AppendLine($"Please ensure you and the host are both using the latest version.");
+                    mpExError.AppendLine();
+                    mpExError.AppendLine($"Your version: {ourMpExVersionStr}");
+                    mpExError.AppendLine($"Their version: {theirMpExVersionStr}");
+
+                    MpModeSelection.PresentConnectionFailedError
+                    (
+                        errorTitle: "Incompatible game",
+                        errorMessage: mpExError.ToString(),
+                        canRetry: false
+                    );
+                    return;
+                }
+            }
+
+            // Master server switching
             if (game.MasterServerHost == null || game.MasterServerHost.EndsWith(OFFICIAL_MASTER_SUFFIX))
             {
                 // Game is hosted on the player platform's official master server

@@ -95,6 +95,11 @@
       <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="SemVer, Version=1.2.2.0, Culture=neutral, PublicKeyToken=a89bb7dc6f7a145c, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Libs\SemVer.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="SongCore, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\SongCore.dll</HintPath>
@@ -234,6 +239,8 @@
     <Compile Include="UI\Components\LobbyConfigPanel.cs" />
     <Compile Include="Utils\ConnectionErrorText.cs" />
     <Compile Include="Utils\CoverArtGrabber.cs" />
+    <Compile Include="Utils\MpExHelper.cs" />
+    <Compile Include="Utils\SemVerJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
