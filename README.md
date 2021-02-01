@@ -11,8 +11,8 @@ Use this mod to add your games to the server browser, and to browse and join mul
 ### Features
 - **Server browser**: Browse and join servers directly from the online menu.
 - **Host settings**: Add your server to the browser with a single switch to make it public, and set a custom name.
-- **Custom games**: Supports modded / custom song lobbies with [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions) (*Early access*).
-- **Cross-play**: Automatic switching between official and modded master servers, like [BeatTogether](https://discord.com/invite/gezGrFG4tz) (*Early access*).
+- **Custom games**: Supports modded / custom song lobbies with [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions).
+- **Cross-play**: Automatic switching between official and modded master servers, like [BeatTogether](https://discord.com/invite/gezGrFG4tz).
 - **Join/leave notifications**: An optional feature that lets you know when players join or leave, even in a level.
 
 <p align="center">
@@ -40,36 +40,36 @@ From the lobby, you can also change your server browser settings from the panel 
 While your game is added to the browser, anyone will be able to join and your server code will be made public on the site (https://bssb.app).
 
 ## Installation
-The latest version of the mod (v0.4) is not yet available on Mod Assistant, but will be soon.
+**The easiest way to install the ServerBrowser is through [ModAssistant](https://github.com/Assistant/ModAssistant)!**
 
-**You can download the latest build from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases) page, and extract it to your Beat Saber folder.**
+The latest version of the mod is always available from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases/latest) page. From there, download the ServerBrowser zip file and extract it to your Beat Saber folder.
 
 *If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 
 ### Requirements
-These libraries are required, install them [from BeatMods](https://beatmods.com/#/mods) or [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet:
+These libraries are required, install them [from BeatMods](https://beatmods.com/#/mods) or [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet. If you're using ModAssistant, these are installed automatically.
 
 - BSIPA v4.1.4+
 - BeatSaberMarkupLanguage: v1.4.5+
 - SongCore: v3.0.3+
 - BS Utils: v1.7.0+
 
-### Recommended
-I **highly** recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer, and adds some useful new features.
+### MultiplayerExtensions
+**I recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer and adds some useful new features.** You can get the latest version through GitHub, or install it through ModAssistant.
 
-Please note MultiplayerExtensions is still in active development and things may break or change at any time.
+Please note, you and the host must use the same version of MultiplayerExtensions. If a version difference is detected by the server browser, you will not be able to connect.
 
 ## FAQs / Troubleshooting
+
+### Does cross-play work?
+**That depends on the host!** To host a cross-play game, the host must use a cross-play mod like **[BeatTogether](https://discord.com/invite/gezGrFG4tz)**. In that case, anyone can see and join the game through the server browser regardless of platform.
+
+However, if a game is hosted on *official* Steam or Oculus servers, cross-play will not work. You will not see incompatible games on other platforms (for example, Steam users will not see games hosted on official Oculus servers).
 
 ### Is standalone Quest supported?
 The mod itself is only available for PC at this time (Steam and Oculus).
 
-Standalone Quest is not currently supported, but you may be able to find games to join in the online browser: [https://bssb.app](https://bssb.app).
-
-### Does cross-play work?
-Yes, but this depends on the host. To host a cross-play game, the host must use a cross-play mod like **[BeatTogether](https://discord.com/invite/gezGrFG4tz)**. In that case, anyone can see and join the game.
-
-However, if a game is hosted on *official* Steam or Oculus servers, cross-play will not work. You will not see incompatible games on other platforms (for example, Steam users will not see games hosted on official Oculus servers).
+Standalone Quest is not currently supported, but you may be able to find games to join in the online browser: [https://bssb.app](https://bssb.app). Note: you will only be able to connect to games hosted on **Unofficial** servers.
 
 ### Are Quick Play servers supported?
 No.
