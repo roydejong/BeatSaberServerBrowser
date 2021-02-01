@@ -67,9 +67,9 @@ Please note, you and the host must use the same version of MultiplayerExtensions
 However, if a game is hosted on *official* Steam or Oculus servers, cross-play will not work. You will not see incompatible games on other platforms (for example, Steam users will not see games hosted on official Oculus servers).
 
 ### Is standalone Quest supported?
-The mod itself is only available for PC at this time (Steam and Oculus).
+The mod itself is only available for PC at this time (Steam and Oculus). Standalone Quest is not currently supported. 
 
-Standalone Quest is not currently supported, but you may be able to find games to join in the online browser: [https://bssb.app](https://bssb.app). Note: you will only be able to connect to games hosted on **Unofficial** servers.
+However: if you have BeatTogether installed, you may be able to find games to join in the online browser: [https://bssb.app](https://bssb.app) (look for **btogether  **Unofficial** servers).
 
 ### Are Quick Play servers supported?
 No.
