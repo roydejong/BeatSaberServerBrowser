@@ -9,8 +9,7 @@
   "dependsOn": {
     "BSIPA": "^4.1.4",
     "BeatSaberMarkupLanguage": "^1.5.1",
-    "SongCore": "^3.2.0",
-    "BS Utils": "^1.8.0"
+    "SongCore": "^3.2.0"
   },
   "links": {
     "project-home": "https://bssb.app",

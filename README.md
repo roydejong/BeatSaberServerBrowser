@@ -52,7 +52,6 @@ These libraries are required, install them [from BeatMods](https://beatmods.com/
 - BSIPA v4.1.4+
 - BeatSaberMarkupLanguage: v1.5.1+
 - SongCore: v3.2.0+
-- BS Utils: v1.8.0+
 
 ### MultiplayerExtensions
 **I recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer and adds some useful new features.** You can get the latest version through GitHub, or install it through ModAssistant.

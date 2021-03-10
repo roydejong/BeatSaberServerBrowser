@@ -111,9 +111,9 @@ namespace ServerBrowser.Core
         {
             var queryString = HttpUtility.ParseQueryString("");
 
-            if (Plugin.PlatformId != Plugin.PLATFORM_UNKNOWN)
+            if (MpLocalPlayer.Platform.HasValue)
             {
-                queryString.Add("platform", Plugin.PlatformId);
+                queryString.Add("platform", MpLocalPlayer.PlatformId);
             }
 
             if (offset > 0)

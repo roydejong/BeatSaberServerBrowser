@@ -11,6 +11,9 @@ namespace ServerBrowser.Harmony
     {
         public static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
+            // Plugin startup hook
+            Plugin.Instance.OnOnlineMenuActivated();
+
             // Enable the "game browser" button (it was left in the game but unused currently)
             var btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");
 

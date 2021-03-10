@@ -184,7 +184,7 @@ namespace ServerBrowser.Core
                 SongName = _level?.songName,
                 SongAuthor = _level?.songAuthorName,
                 Difficulty = _difficulty,
-                Platform = Plugin.PlatformId,
+                Platform = MpLocalPlayer.PlatformId,
                 MasterServerHost = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null,
                 MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT,
                 MpExVersion = _mpExVersion
