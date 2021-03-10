@@ -60,6 +60,9 @@ namespace ServerBrowser.UI.Components
                 (SongName.transform as RectTransform).anchorMax = new Vector2(0.8f, 0.5f);
                 (SongAuthor.transform as RectTransform).anchorMax = new Vector2(0.8f, 0.5f);
 
+                // Allow bigger player count size (just in case we get those fat 100/100 lobbies)
+                (SongTime.transform as RectTransform).offsetMin = new Vector2(-13.0f, -2.3f);
+
                 RefreshContent();
             }
             
