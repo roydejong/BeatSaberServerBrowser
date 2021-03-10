@@ -35,15 +35,6 @@ namespace ServerBrowser.UI.Components
         {
             this.text = Game.GameName;
 
-            if (Game.OwnerId == "SERVER_MSG")
-            {
-                // Special case: the server can inject a fake game here as a message, e.g. to notify that an update is available
-                this.text = $"<color=#cf0389>{Game.GameName}</color>";
-                this.subtext = Game.SongName;
-                this.icon = Sprites.Portal;
-                return;
-            }
-
             if (Game.IsOnCustomMaster)
             {
                 this.text += $" <color=#59b0f4><size=3>({Game.MasterServerHost})</size></color>";
@@ -67,7 +58,7 @@ namespace ServerBrowser.UI.Components
 
             if (Game.Difficulty.HasValue && !String.IsNullOrEmpty(Game.LevelId))
             {
-                this.subtext += $" ({Game.DescribeDifficulty(false)})";
+                this.subtext += $" ({Game.DescribeDifficulty(true)})";
             }
 
             try

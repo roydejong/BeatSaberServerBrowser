@@ -19,6 +19,31 @@ namespace ServerBrowser.Game
             private set;
         }
 
+        public static UserInfo.Platform? Platform => UserInfo?.platform;
+        public static string PlatformUserId => UserInfo?.platformUserId;
+        public static string UserName => UserInfo?.userName;
+
+        public static string PlatformId
+        {
+            get
+            {
+                switch (Platform)
+                {
+                    case UserInfo.Platform.Oculus:
+                        return "oculus";
+                    case UserInfo.Platform.Steam:
+                        return "steam";
+                    case UserInfo.Platform.PS4:
+                        return "ps4";
+                    case UserInfo.Platform.Test:
+                        return "test";
+                    default:
+                    case null:
+                        return "unknown";
+                }
+            }
+        }
+
         public static async Task SetUp()
         {
             /** 
@@ -26,7 +51,7 @@ namespace ServerBrowser.Game
              *   we have only one instance that we can use continuously, it won't change.
              */
             LocalNetworkPlayerModel = Resources.FindObjectsOfTypeAll<LocalNetworkPlayerModel>().FirstOrDefault();
- 
+
             var platformUserModel = LocalNetworkPlayerModel.GetField<IPlatformUserModel, LocalNetworkPlayerModel>("_platformUserModel");
             UserInfo = await platformUserModel.GetUserInfo();
 
@@ -37,16 +62,6 @@ namespace ServerBrowser.Game
             }
 
             Plugin.Log?.Info($"Got local network player (platform: {UserInfo.platform}, platformUserId: {UserInfo.platformUserId}, userName: {UserInfo.userName})");
-
-            switch (UserInfo.platform)
-            {
-                case UserInfo.Platform.Oculus:
-                    Plugin.PlatformId = Plugin.PLATFORM_OCULUS;
-                    break;
-                case UserInfo.Platform.Steam:
-                    Plugin.PlatformId = Plugin.PLATFORM_STEAM;
-                    break;
-            }
         }
     }
 }

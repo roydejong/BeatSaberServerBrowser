@@ -17,19 +17,19 @@ namespace ServerBrowser.Core
         private static List<HostedGameData> _lobbiesOnPage;
         private static int _offset;
 
-        public static async Task FullRefresh(string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
+        public static async Task FullRefresh(HostedGameFilters filters)
         {
             _lastServerResult = null;
             _lobbyObjects = new Dictionary<int, HostedGameData>(10);
             _lobbiesOnPage = new List<HostedGameData>(10);
 
-            await LoadPage(0, searchQuery, filterFull, filterInProgress, filterModded);
+            await LoadPage(0, filters);
         }
 
-        public static async Task LoadPage(int offset, string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
+        public static async Task LoadPage(int offset, HostedGameFilters filters)
         {
             // Send API request
-            var result = await BSSBMasterAPI.Browse(offset, searchQuery, filterFull, filterInProgress, filterModded);
+            var result = await BSSBMasterAPI.Browse(offset, filters);
 
             // Update state
             _offset = offset;

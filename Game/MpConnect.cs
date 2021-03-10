@@ -7,8 +7,11 @@ namespace ServerBrowser.Game
     public static class MpConnect
     {
         public const string OFFICIAL_MASTER_SUFFIX = ".mp.beatsaber.com";
+
         public const string OFFICIAL_MASTER_OCULUS = "oculus.production.mp.beatsaber.com";
         public const string OFFICIAL_MASTER_STEAM = "steam.production.mp.beatsaber.com";
+        public const string OFFICIAL_MASTER_PS4 = "ps4.production.mp.beatsaber.com";
+        public const string OFFICIAL_MASTER_TEST = "staging.mp.beatsaber.com";
 
         public const int DEFAULT_MASTER_PORT = 2328;
 
@@ -50,14 +53,25 @@ namespace ServerBrowser.Game
                 // Game is hosted on the player platform's official master server
                 if (_usingModdedServer || _officialEndPoint == null)
                 {
-                    // If we normally use a modded server, we need to fall back to official servers manually
-                    if (Plugin.PlatformId == Plugin.PLATFORM_OCULUS)
+                    // If we normally use a modded server (e.g. because BeatTogether is installed), we need to now force-connect to our official server
+                    switch (MpLocalPlayer.Platform)
                     {
-                        SetMasterServerOverride(OFFICIAL_MASTER_OCULUS);
-                    }
-                    else
-                    {
-                        SetMasterServerOverride(OFFICIAL_MASTER_STEAM);
+                        case UserInfo.Platform.Oculus:
+                            SetMasterServerOverride(OFFICIAL_MASTER_OCULUS);
+                            break;
+                        case UserInfo.Platform.PS4:
+                            // lmao
+                            SetMasterServerOverride(OFFICIAL_MASTER_PS4);
+                            break;
+                        case UserInfo.Platform.Test:
+                            // hmmm
+                            SetMasterServerOverride(OFFICIAL_MASTER_TEST);
+                            break;
+                        default:
+                        case UserInfo.Platform.Steam:
+                        case null:
+                            SetMasterServerOverride(OFFICIAL_MASTER_STEAM);
+                            break;
                     }
                 }
                 else

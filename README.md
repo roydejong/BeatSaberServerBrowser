@@ -40,7 +40,7 @@ From the lobby, you can also change your server browser settings from the panel 
 While your game is added to the browser, anyone will be able to join and your server code will be made public on the site (https://bssb.app).
 
 ## Installation
-**The easiest way to install the ServerBrowser is through [ModAssistant](https://github.com/Assistant/ModAssistant)!**
+**The mod will be available on [ModAssistant](https://github.com/Assistant/ModAssistant) soon.**
 
 The latest version of the mod is always available from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases/latest) page. From there, download the ServerBrowser zip file and extract it to your Beat Saber folder.
 
@@ -50,9 +50,8 @@ The latest version of the mod is always available from the [Releases](https://gi
 These libraries are required, install them [from BeatMods](https://beatmods.com/#/mods) or [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet. If you're using ModAssistant, these are installed automatically.
 
 - BSIPA v4.1.4+
-- BeatSaberMarkupLanguage: v1.4.5+
-- SongCore: v3.0.3+
-- BS Utils: v1.7.0+
+- BeatSaberMarkupLanguage: v1.5.1+
+- SongCore: v3.2.0+
 
 ### MultiplayerExtensions
 **I recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer and adds some useful new features.** You can get the latest version through GitHub, or install it through ModAssistant.

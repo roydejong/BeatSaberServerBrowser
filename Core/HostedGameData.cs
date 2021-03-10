@@ -21,7 +21,7 @@ namespace ServerBrowser.Core
         public string SongName { get; set; } = null;
         public string SongAuthor { get; set; } = null;
         public BeatmapDifficulty? Difficulty { get; set; }
-        public string Platform { get; set; } = Plugin.PLATFORM_UNKNOWN;
+        public string Platform { get; set; } = "unknown";
         public string MasterServerHost { get; set; } = null;
         public int? MasterServerPort { get; set; } = null;
         public string CoverUrl { get; set; } = null;

@@ -5,7 +5,6 @@ using HMUI;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.UI.Components;
-using SongCore.Utilities;
 using System;
 using System.Threading;
 using TMPro;
@@ -18,8 +17,12 @@ namespace ServerBrowser.UI.ViewControllers
     {
         public override string ResourceName => "ServerBrowser.UI.BSML.ServerBrowserViewController.bsml";
 
+        private HostedGameFilters _filters = new HostedGameFilters();
+        private CancellationTokenSource _imageLoadCancellation = null;
+        private HostedGameData _selectedGame = null;
 
-        #region Lifecycle
+        #region Activation / Deactivation
+
         public override void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.__Activate(addedToHierarchy, screenSystemEnabling);
@@ -27,7 +30,8 @@ namespace ServerBrowser.UI.ViewControllers
             HostedGameBrowser.OnUpdate += LobbyBrowser_OnUpdate;
 
             SetInitialUiState();
-            HostedGameBrowser.FullRefresh(SearchValue, FilterFull, FilterInProgress, FilterModded);
+
+            _ = HostedGameBrowser.FullRefresh(_filters);
         }
 
         public override void __Deactivate(bool removedFromHierarchy, bool deactivateGameObject, bool screenSystemDisabling)
@@ -42,9 +46,7 @@ namespace ServerBrowser.UI.ViewControllers
         }
         #endregion
 
-        #region Data/UI updates
-        internal CancellationTokenSource _imageLoadCancellation;
-        private HostedGameData _selectedGame = null;
+        #region Core UI Code
 
         private void SetInitialUiState()
         {
@@ -72,12 +74,17 @@ namespace ServerBrowser.UI.ViewControllers
 
         private void CancelImageLoading(bool reset = true)
         {
-            if (_imageLoadCancellation != null)
+            try
             {
-                _imageLoadCancellation.Cancel();
-                _imageLoadCancellation.Dispose();
-                _imageLoadCancellation = null;
+                if (_imageLoadCancellation != null)
+                {
+                    _imageLoadCancellation.Cancel();
+                    _imageLoadCancellation.Dispose();
+                }
             }
+            catch (Exception) { }
+
+            _imageLoadCancellation = null;
 
             if (reset)
             {
@@ -90,11 +97,6 @@ namespace ServerBrowser.UI.ViewControllers
             GameList?.tableView?.ClearSelection();
             ConnectButton.interactable = false;
             _selectedGame = null;
-        }
-
-        private void ClearSearch()
-        {
-            SearchValue = "";
         }
 
         private void LobbyBrowser_OnUpdate()
@@ -169,19 +171,16 @@ namespace ServerBrowser.UI.ViewControllers
             RefreshButton.interactable = true;
 
             SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
-            SearchButton.SetButtonText(IsSearching ? "<color=#ff0000>Search</color>" : "Search");
+            SearchButton.SetButtonText(IsSearching ? "<color=#32CD32>Search</color>" : "Search");
 
             PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;
             PageDownButton.interactable = HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1;
         }
 
-        public bool IsSearching
-        {
-            get => !String.IsNullOrEmpty(SearchValue) || FilterFull || FilterInProgress || FilterModded;
-        }
+        public bool IsSearching => _filters.AnyActive;
         #endregion
 
-        #region UI Components
+        #region BSML UI Components
         [UIParams]
         public BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams;
 
@@ -225,29 +224,24 @@ namespace ServerBrowser.UI.ViewControllers
         public Button FilterModdedButton;
         #endregion
 
-        #region UI Events
-        private string _searchValue = "";
-        private bool _filterFull = false;
-        private bool _filterInProgress = false;
-        private bool _filterModded = false;
-
+        #region BSML UI Bindings
         [UIValue("searchValue")]
         public string SearchValue
         {
-            get => _searchValue;
+            get => _filters.TextSearch;
             set
             {
-                _searchValue = value;
+                _filters.TextSearch = value;
                 NotifyPropertyChanged();
             }
         }
 
         public bool FilterFull
         {
-            get => _filterFull;
+            get => _filters.HideFullGames;
             set
             {
-                _filterFull = value;
+                _filters.HideFullGames = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged(nameof(FilterFullColor));
             }
@@ -272,10 +266,10 @@ namespace ServerBrowser.UI.ViewControllers
 
         public bool FilterInProgress
         {
-            get => _filterInProgress;
+            get => _filters.HideInProgressGames;
             set
             {
-                _filterInProgress = value;
+                _filters.HideInProgressGames = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged(nameof(FilterInProgressColor));
             }
@@ -300,10 +294,10 @@ namespace ServerBrowser.UI.ViewControllers
 
         public bool FilterModded
         {
-            get => _filterModded;
+            get => _filters.HideModdedGames;
             set
             {
-                _filterModded = value;
+                _filters.HideModdedGames = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged(nameof(FilterModdedColor));
             }
@@ -325,11 +319,12 @@ namespace ServerBrowser.UI.ViewControllers
                 }
             }
         }
+        #endregion
 
+        #region BSML UI Actions
         [UIAction("searchKeyboardSubmit")]
         private async void SearchKeyboardSubmit(string text)
         {
-            Plugin.Log?.Debug($"Set server search query to: {text}");
             SearchValue = text;
 
             // Make main content visible again
@@ -343,7 +338,7 @@ namespace ServerBrowser.UI.ViewControllers
         private void RefreshButtonClick()
         {
             SetInitialUiState();
-            HostedGameBrowser.FullRefresh(SearchValue, FilterFull, FilterInProgress, FilterModded);
+            _ = HostedGameBrowser.FullRefresh(_filters);
         }
 
         [UIAction("searchButtonClick")]
@@ -413,7 +408,7 @@ namespace ServerBrowser.UI.ViewControllers
             if (HostedGameBrowser.PageIndex > 0)
             {
                 CancelImageLoading();
-                HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, SearchValue);
+                _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, _filters);
             }
         }
 
@@ -423,10 +418,12 @@ namespace ServerBrowser.UI.ViewControllers
             if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
             {
                 CancelImageLoading();
-                HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, SearchValue);
+                _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, _filters);
             }
         }
+        #endregion
 
+        #region Custom Cell Behaviors
         private void CellUpdateCallback(HostedGameCellData cellInfo)
         {
             GameList.tableView.RefreshCellsContent();
@@ -441,9 +438,7 @@ namespace ServerBrowser.UI.ViewControllers
                 }
             }
         }
-        #endregion
 
-        #region UI Custom Behaviors
         private void AfterCellsCreated()
         {
             GameList.tableView.selectionType = TableViewSelectionType.Single;

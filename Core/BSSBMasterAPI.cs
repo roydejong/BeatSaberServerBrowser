@@ -107,13 +107,13 @@ namespace ServerBrowser.Core
             return responseOk;
         }
 
-        public static async Task<ServerBrowseResult> Browse(int offset, string searchQuery, bool filterFull = false, bool filterInProgress = false, bool filterModded = false)
+        public static async Task<ServerBrowseResult> Browse(int offset, HostedGameFilters filters)
         {
             var queryString = HttpUtility.ParseQueryString("");
 
-            if (Plugin.PlatformId != Plugin.PLATFORM_UNKNOWN)
+            if (MpLocalPlayer.Platform.HasValue)
             {
-                queryString.Add("platform", Plugin.PlatformId);
+                queryString.Add("platform", MpLocalPlayer.PlatformId);
             }
 
             if (offset > 0)
@@ -126,22 +126,22 @@ namespace ServerBrowser.Core
                 queryString.Add("vanilla", "1");
             }
 
-            if (!String.IsNullOrEmpty(searchQuery))
+            if (!String.IsNullOrEmpty(filters.TextSearch))
             {
-                queryString.Add("query", searchQuery);
+                queryString.Add("query", filters.TextSearch);
             }
 
-            if (filterFull)
+            if (filters.HideFullGames)
             {
                 queryString.Add("filterFull", "1");
             }
 
-            if (filterInProgress)
+            if (filters.HideInProgressGames)
             {
                 queryString.Add("filterInProgress", "1");
             }
 
-            if (filterModded)
+            if (filters.HideModdedGames)
             {
                 queryString.Add("filterModded", "1");
             }
