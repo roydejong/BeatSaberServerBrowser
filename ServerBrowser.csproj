@@ -205,6 +205,7 @@
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\HostedGameData.cs" />
     <Compile Include="Core\HostedGameBrowser.cs" />
+    <Compile Include="Core\HostedGameFilters.cs" />
     <Compile Include="Core\HostedGamePlayer.cs" />
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
