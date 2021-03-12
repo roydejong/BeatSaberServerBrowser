@@ -1,10 +1,11 @@
 ﻿using HarmonyLib;
+using MasterServer;
 using ServerBrowser.Game;
 
 namespace ServerBrowser.Harmony
 {
-    [HarmonyPatch(typeof(X509CertificateUtility), "ValidateCertificateChain")]
-    public static class X509CertificateUtilityPatch
+    [HarmonyPatch(typeof(UserMessageHandler), "ValidateCertificateChain")]
+    public static class UserMessageHandlerCertificatePatch
     {
         public static bool Prefix()
         {
