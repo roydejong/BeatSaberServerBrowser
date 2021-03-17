@@ -40,18 +40,19 @@ From the lobby, you can also change your server browser settings from the panel 
 While your game is added to the browser, anyone will be able to join and your server code will be made public on the site (https://bssb.app).
 
 ## Installation
-**The mod will be available on [ModAssistant](https://github.com/Assistant/ModAssistant) soon.**
+👉 **The easiest way to install this mod is through [ModAssistant](https://github.com/Assistant/ModAssistant)! v0.5.1 is available there now.**
 
-The latest version of the mod is always available from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases/latest) page. From there, download the ServerBrowser zip file and extract it to your Beat Saber folder.
+### Manual installation
+You can manually download the latest version of the mod from the [Releases](https://github.com/roydejong/BeatSaberServerBrowser/releases/latest) page. From there, download the ServerBrowser zip file and extract it to your Beat Saber folder.
 
 *If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 
 ### Requirements
 These libraries are required, install them [from BeatMods](https://beatmods.com/#/mods) or [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet. If you're using ModAssistant, these are installed automatically.
 
-- BSIPA v4.1.4+
+- BSIPA v4.1.4+ *(Core mod)*
+- SongCore: v3.2.0+ *(Core mod)*
 - BeatSaberMarkupLanguage: v1.5.1+
-- SongCore: v3.2.0+
 
 ### MultiplayerExtensions
 **I recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer and adds some useful new features.** You can get the latest version through GitHub, or install it through ModAssistant.
@@ -68,9 +69,9 @@ However, if a game is hosted on *official* Steam or Oculus servers, cross-play w
 ### Is standalone Quest supported?
 The mod itself is only available for PC at this time (Steam and Oculus). Standalone Quest is not currently supported. 
 
-However: you may be able to find games to join in the online browser: **[https://bssb.app](https://bssb.app)**:
- - If your game is not modded, you can connect to games hosted on **Oculus (Official)** servers.
- - If you have BeatTogether installed, you can connect to games hosted on **Unofficial (btogether.xn--9o8hpe.ws)** servers.
+However: you may be able to find Quest-compatible games to join in the online browser: **[https://bssb.app](https://bssb.app)**:
+ - If your game is not modded, you can connect to games hosted on **Oculus (Official)** servers (no custom song support).
+ - If you have BeatTogether installed, you can connect to games hosted on **Unofficial** servers like BeatTogether.
 
 ### Are Quick Play servers supported?
 No.
