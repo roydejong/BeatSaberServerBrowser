@@ -1,11 +1,10 @@
 ﻿using HarmonyLib;
-using MasterServer;
 using ServerBrowser.Game;
 
 namespace ServerBrowser.Harmony
 {
-    [HarmonyPatch(typeof(UserMessageHandler), "ValidateCertificateChain")]
-    public static class UserMessageHandlerCertificatePatch
+    [HarmonyPatch(typeof(UserCertificateValidator), "ValidateCertificateChainInternal")]
+    public static class UserCertificateValidatorPatch
     {
         public static bool Prefix()
         {
@@ -14,6 +13,7 @@ namespace ServerBrowser.Harmony
 
             if (MpConnect.ShouldDisableCertificateValidation)
             {
+                Plugin.Log?.Info("Bypassing user certificate validation");
                 return false;
             }
 
