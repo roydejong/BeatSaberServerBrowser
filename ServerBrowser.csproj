@@ -20,6 +20,7 @@
     <!--<PathMap>$(AppOutputBase)=X:\$(AssemblyName)\</PathMap>-->
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -220,7 +221,7 @@
     <Compile Include="Harmony\MpModeSelectionActivatedPatch.cs" />
     <Compile Include="Harmony\SetLocalPlayerStatePatch.cs" />
     <Compile Include="Harmony\StartMultiplayerLevelPatch.cs" />
-    <Compile Include="Harmony\UserMessageHandlerCertificatePatch.cs" />
+    <Compile Include="Harmony\UserCertificateValidatorPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
