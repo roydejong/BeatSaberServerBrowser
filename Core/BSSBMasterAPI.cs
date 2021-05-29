@@ -50,7 +50,7 @@ namespace ServerBrowser.Core
                 Plugin.Log?.Debug($"✔ 200 OK: {method} {targetUrl}");
                 return response;
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
                 return null;
             }

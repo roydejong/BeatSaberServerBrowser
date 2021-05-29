@@ -50,7 +50,7 @@ namespace ServerBrowser.Core
             _lobbiesOnPage = nextLobbiesOnPage;
 
             // Fire update event for the UI
-            OnUpdate.Invoke();
+            OnUpdate?.Invoke();
         }
 
         public static bool ConnectionOk

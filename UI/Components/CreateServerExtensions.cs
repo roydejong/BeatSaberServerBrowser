@@ -180,7 +180,7 @@ namespace ServerBrowser.UI.Components
             ReApplyVerticalLayout(newValue);
         }
 
-        private async void OnServerNameChange(string newValue)
+        private void OnServerNameChange(string newValue)
         {
             Plugin.Config.CustomGameName = newValue;
             newValue = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty

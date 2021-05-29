@@ -63,7 +63,7 @@ namespace ServerBrowser.UI.Components
 
             try
             {
-                SetCoverArt();
+                _ = SetCoverArt();
             }
             catch (Exception ex)
             {

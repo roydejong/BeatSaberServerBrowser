@@ -55,7 +55,7 @@ namespace ServerBrowser.Utils
                 var coverResponse = await Plugin.HttpClient.GetAsync(coverUrl, token).ConfigureAwait(false);
                 return await coverResponse.Content.ReadAsByteArrayAsync();
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
                 return null;
             }

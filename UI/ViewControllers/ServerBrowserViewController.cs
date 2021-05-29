@@ -13,6 +13,7 @@ using UnityEngine.UI;
 
 namespace ServerBrowser.UI.ViewControllers
 {
+    #pragma warning disable CS0649
     public class ServerBrowserViewController : BeatSaberMarkupLanguage.ViewControllers.BSMLResourceViewController
     {
         public override string ResourceName => "ServerBrowser.UI.BSML.ServerBrowserViewController.bsml";
@@ -323,7 +324,7 @@ namespace ServerBrowser.UI.ViewControllers
 
         #region BSML UI Actions
         [UIAction("searchKeyboardSubmit")]
-        private async void SearchKeyboardSubmit(string text)
+        private void SearchKeyboardSubmit(string text)
         {
             SearchValue = text;
 
@@ -464,4 +465,5 @@ namespace ServerBrowser.UI.ViewControllers
         }
         #endregion
     }
+    #pragma warning restore CS0649
 }

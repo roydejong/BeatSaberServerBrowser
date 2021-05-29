@@ -13,6 +13,7 @@ using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Components
 {
+    #pragma warning disable CS0649
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {
         public const string ResourceName = "ServerBrowser.UI.BSML.LobbyConfigPanel.bsml";
@@ -55,7 +56,6 @@ namespace ServerBrowser.UI.Components
         [UIComponent("mainContentRoot")]
         public VerticalLayoutGroup MainContentRoot;
 
-        private string _nameValue = "";
         [UIValue("nameValue")]
         public string NameValue
         {
@@ -70,7 +70,7 @@ namespace ServerBrowser.UI.Components
         }
 
         [UIAction("nameKeyboardSubmit")]
-        private async void NameKeyboardSubmit(string text)
+        private void NameKeyboardSubmit(string text)
         {
             // Make main content visible again
             MainContentRoot.gameObject.SetActive(true);
@@ -237,4 +237,5 @@ namespace ServerBrowser.UI.Components
         }
         #endregion
     }
+    #pragma warning restore CS0649  
 }

@@ -55,7 +55,7 @@ namespace ServerBrowser
         }
 
         [OnStart]
-        public async void OnApplicationStart()
+        public void OnApplicationStart()
         {
             // Harmony
             Harmony = new HarmonyLib.Harmony(HarmonyId);

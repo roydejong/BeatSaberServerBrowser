@@ -97,7 +97,7 @@ namespace ServerBrowser.Core
                 StatusText = "You must be the host of a custom multiplayer game.";
                 HasErrored = true;
 
-                UnAnnounce();
+                _ = UnAnnounce();
 
                 LobbyConfigPanel.UpdatePanelInstance();
                 return;
@@ -118,7 +118,7 @@ namespace ServerBrowser.Core
                 StatusText = "Lobby announces are toggled off.";
                 HasErrored = true;
 
-                UnAnnounce();
+                _ = UnAnnounce();
 
                 if (!_didSetLocalPlayerState.HasValue || _didSetLocalPlayerState.Value == true)
                 {
@@ -138,7 +138,7 @@ namespace ServerBrowser.Core
                 StatusText = "Can't send announcement (invalid lobby state).";
                 HasErrored = true;
 
-                UnAnnounce();
+                _ = UnAnnounce();
 
                 LobbyConfigPanel.UpdatePanelInstance();
                 return;
@@ -151,7 +151,7 @@ namespace ServerBrowser.Core
 
             LobbyConfigPanel.UpdatePanelInstance();
 
-            DoAnnounce(lobbyAnnounce);
+            _ = DoAnnounce(lobbyAnnounce);
         }
 
         private static HostedGameData GenerateAnnounce()
