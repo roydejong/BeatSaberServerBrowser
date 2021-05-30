@@ -1,31 +1,61 @@
 ﻿using ServerBrowser.Harmony;
 using System;
 using System.Threading;
+using UnityEngine;
 
 namespace ServerBrowser.Core
 {
-    public static class UpdateTimer
+    public class UpdateTimer : MonoBehaviour
     {
-        private const int TICK_INTERVAL_SECS = 120;
+        private const float TickIntervalSecs = 120f;
 
-        private static Timer _timer;
-
-        public static void Start()
+        #region Public API
+        private static GameObject _gameObject;
+        
+        public static void CreateTimerObject()
         {
-            var timerIntervalMs = 1000 * TICK_INTERVAL_SECS;
-            _timer = new Timer(Tick, null, timerIntervalMs, timerIntervalMs);
+            if (_gameObject != null)
+                return;
+
+            _gameObject = new GameObject("ServerBrowserUpdateTimer");
+            _gameObject.AddComponent<UpdateTimer>();
+            
+            DontDestroyOnLoad(_gameObject); // keep object across all scenes
         }
 
-        public static void Stop()
+        public static void DestroyTimerObject()
         {
-            if (_timer != null)
-            {
-                _timer.Dispose();
-                _timer = null;
-            }
+            if (_gameObject == null)
+                return;
+            
+            Destroy(_gameObject);
+            _gameObject = null;
+        }
+        
+        public static void StartTimer()
+        {
+            if (_gameObject == null)
+                CreateTimerObject();
+            
+            _gameObject.SetActive(true);
         }
 
-        private static void Tick(object state)
+        public static void StopTimer()
+        {
+            if (_gameObject == null)
+                return;
+            
+            _gameObject.SetActive(false);
+        }
+        #endregion
+
+        #region UpdateTimer MonoBehavior
+        public void OnEnable()
+        {
+            InvokeRepeating(nameof(Tick), TickIntervalSecs, TickIntervalSecs);
+        }
+
+        private void Tick()
         {
             if (MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle)
             {
@@ -34,5 +64,6 @@ namespace ServerBrowser.Core
                 GameStateManager.HandleUpdate();
             }
         }
+        #endregion
     }
 }

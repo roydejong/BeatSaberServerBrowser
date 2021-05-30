@@ -68,9 +68,6 @@ namespace ServerBrowser
             HttpClient = new HttpClient();
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
-
-            // Start update timer
-            UpdateTimer.Start();
         }
 
         [OnExit]
@@ -78,8 +75,8 @@ namespace ServerBrowser
         {
             Log?.Debug("OnApplicationQuit");
 
-            // Cancel update timer
-            UpdateTimer.Stop();
+            // Destroy update timer
+            UpdateTimer.DestroyTimerObject();
 
             // Clean up events
             MpSession.TearDown();
@@ -94,15 +91,16 @@ namespace ServerBrowser
 
         internal async void OnOnlineMenuActivated()
         {
+            // Create/start update timer
+            UpdateTimer.StartTimer();
+            
+            // Most things only need to be setup once
             if (_gotFirstActivation)
-            {
                 return;
-            }
-
             _gotFirstActivation = true;
 
             Plugin.Log?.Info("Multiplayer / Online menu opened for the first time, setting up.");
-
+            
             // Bind multiplayer session events
             MpSession.SetUp();
             MpModeSelection.SetUp();
