@@ -129,7 +129,7 @@ namespace ServerBrowser.UI
             /// Please don't look at this code because cloning such a huge object is kinda gross
             /// 
             /// It was fun doing this in a really ugly way
-            /// Now eventually I'll try to get it to work without ugliness :)
+            /// Now eventually I'll try to get it to work without ugliness :) maybe
             ////////////////////////////////////////////////////////////////////////////////////////
 
             // Clone the "main screen" for the lobby, normally used to show currently selected song in the distance

@@ -6,6 +6,7 @@ using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.UI.Components;
 using System;
+using System.Linq;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace ServerBrowser.UI.ViewControllers
         private HostedGameFilters _filters = new HostedGameFilters();
         private CancellationTokenSource _imageLoadCancellation = null;
         private HostedGameData _selectedGame = null;
+        private LoadingControl _loadingControl = null;
 
         #region Activation / Deactivation
 
@@ -28,10 +30,21 @@ namespace ServerBrowser.UI.ViewControllers
         {
             base.__Activate(addedToHierarchy, screenSystemEnabling);
 
+            // Attach loading control
+            if (_loadingControl == null)
+            {
+                _loadingControl = ListLoadingControl.Create(GameList.gameObject.transform);
+                if (_loadingControl != null)
+                    _loadingControl.didPressRefreshButtonEvent += RefreshButtonClick;
+            }
+
+            // Begin listening for API browse responses
             HostedGameBrowser.OnUpdate += LobbyBrowser_OnUpdate;
 
+            // Reset the UI
             SetInitialUiState();
 
+            // Perform initial refresh
             _ = HostedGameBrowser.FullRefresh(_filters);
         }
 
@@ -53,8 +66,18 @@ namespace ServerBrowser.UI.ViewControllers
         {
             MpModeSelection.SetTitle("Server Browser");
 
+            ClearSelection();
+            CancelImageLoading();
+
             StatusText.text = "Loading...";
             StatusText.color = Color.gray;
+
+            if (_loadingControl != null)
+                _loadingControl.ShowLoading("Loading servers...");
+            
+            // make sure the table is fully cleared, if we don't do the cell gameobjects continue to add on every load
+            GameList.data.Clear();
+            GameList.tableView.DeleteCells(0, GameList.tableView.numberOfCells);
 
             // sometimes the non-primary buttons become disabled if the server browser
             //  isn't opened until after level selection, so let's ensure they're active
@@ -68,9 +91,6 @@ namespace ServerBrowser.UI.ViewControllers
 
             PageUpButton.interactable = false;
             PageDownButton.interactable = false;
-
-            ClearSelection();
-            CancelImageLoading();
         }
 
         private void CancelImageLoading(bool reset = true)
@@ -132,6 +152,9 @@ namespace ServerBrowser.UI.ViewControllers
                     {
                         StatusText.text = "Sorry, no servers found";
                     }
+                    
+                    if (_loadingControl != null)
+                        _loadingControl.ShowText("No servers found", true);
                 }
                 else
                 {
@@ -158,6 +181,9 @@ namespace ServerBrowser.UI.ViewControllers
                 {
                     GameList.data.Add(new HostedGameCellData(_imageLoadCancellation, CellUpdateCallback, lobby));
                 }
+                
+                if (_loadingControl != null)
+                    _loadingControl.Hide();
             }
 
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
@@ -408,7 +434,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             if (HostedGameBrowser.PageIndex > 0)
             {
-                CancelImageLoading();
+                SetInitialUiState();
                 _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, _filters);
             }
         }
@@ -418,7 +444,7 @@ namespace ServerBrowser.UI.ViewControllers
         {
             if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
             {
-                CancelImageLoading();
+                SetInitialUiState();
                 _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, _filters);
             }
         }

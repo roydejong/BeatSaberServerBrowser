@@ -228,6 +228,7 @@
     <Compile Include="UI\Components\CreateServerExtensions.cs" />
     <Compile Include="UI\Components\HostedGameCellData.cs" />
     <Compile Include="UI\Components\HostedGameCellExtensions.cs" />
+    <Compile Include="UI\Components\ListLoadingControl.cs" />
     <Compile Include="UI\PluginUi.cs" />
     <Compile Include="UI\FloatingNotification.cs" />
     <Compile Include="UI\ViewControllers\ServerBrowserViewController.cs" />
