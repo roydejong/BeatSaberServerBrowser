@@ -17,7 +17,7 @@ namespace ServerBrowser.Harmony
             GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
             bool isConnectionOwner, bool isDedicatedServer)
         {
-            GameStateManager.HandleConnectSuccess(code, secret, isDedicatedServer);
+            GameStateManager.HandleConnectSuccess(code, secret, isDedicatedServer, configuration);
         }
     }
 }

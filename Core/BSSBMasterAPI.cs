@@ -11,7 +11,7 @@ namespace ServerBrowser.Core
     public static class BSSBMasterAPI
     {
         #region Shared/HTTP
-        private const string BASE_URL = "http://bssb.wsl.local/api/v1";
+        private const string BASE_URL = "https://bssb.app/api/v1";
 
         private static async Task<HttpResponseMessage> PerformWebRequest(string method, string endpoint, string json = null)
         {

@@ -86,7 +86,8 @@ namespace ServerBrowser.Core
             }
         }
 
-        public static void HandleConnectSuccess(string code, string secret, bool isDedicatedServer)
+        public static void HandleConnectSuccess(string code, string secret, bool isDedicatedServer,
+            GameplayServerConfiguration configuration)
         {
             Plugin.Log?.Info($"HandleConnectSuccess (code={code}, secret={secret}" +
                              $", isDedicatedServer={isDedicatedServer})");
@@ -94,8 +95,15 @@ namespace ServerBrowser.Core
             if (!String.IsNullOrEmpty(code))
                 HandleLobbyCode(code);
 
+            _isDedicatedServer = isDedicatedServer;
             _hostSecret = secret;
+
+            if (_isDedicatedServer)
+            {
+                _difficulty = configuration.difficulties.FromMask();
+            }
             
+            HandleUpdate();
         }
 
         #endregion
@@ -179,18 +187,25 @@ namespace ServerBrowser.Core
             var localPlayer = sessionManager.localPlayer;
             var connectedPlayers = sessionManager.connectedPlayers;
             
-            if (_mpExVersion == null)
-            {
-                _mpExVersion = MpExHelper.GetInstalledVersion();
-                
-                if (_mpExVersion != null)
-                {
-                    Plugin.Log?.Info($"Detected MultiplayerExtensions, version {_mpExVersion}");
-                }
-            }
-            
             var serverType = HostedGameData.ServerTypePlayerHost;
             var connectionOwner = sessionManager.connectionOwner;
+
+            if (connectionOwner.isMe)
+            {
+                if (_mpExVersion == null)
+                {
+                    _mpExVersion = MpExHelper.GetInstalledVersion();
+
+                    if (_mpExVersion != null)
+                    {
+                        Plugin.Log?.Info($"Detected MultiplayerExtensions, version {_mpExVersion}");
+                    }
+                }
+            }
+            else
+            {
+                _mpExVersion = null;
+            }
 
             if (MpLobbyConnectionTypePatch.IsQuickplay)
             {
@@ -206,11 +221,11 @@ namespace ServerBrowser.Core
             {
                 ServerCode = _lobbyCode,
                 GameName = MpSession.GetHostGameName(),
-                OwnerId = localPlayer.userId,
-                OwnerName = localPlayer.userName,
+                OwnerId = connectionOwner.userId,
+                OwnerName = connectionOwner.userName,
                 PlayerCount = MpSession.GetPlayerCount(),
                 PlayerLimit = MpSession.GetPlayerLimit(),
-                IsModded = localPlayer.HasState("modded") || localPlayer.HasState("customsongs") || _mpExVersion != null,
+                IsModded = connectionOwner.HasState("modded") || connectionOwner.HasState("customsongs") || _mpExVersion != null,
                 LobbyState = MpLobbyStatePatch.LobbyState,
                 LevelId = _level?.levelID,
                 SongName = _level?.songName,
