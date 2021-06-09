@@ -58,6 +58,11 @@ namespace ServerBrowser.Core
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
 
+            if (IsQuickPlayServer)
+            {
+                moddedDescr += " Quick Play";
+            }
+            
             if (IsOnCustomMaster)
             {
                 moddedDescr += ", Cross-play";

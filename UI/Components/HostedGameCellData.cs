@@ -40,6 +40,11 @@ namespace ServerBrowser.UI.Components
                 this.text += $" <color=#59b0f4><size=3>({Game.MasterServerHost})</size></color>";
             }
 
+            if (Game.IsDedicatedServer)
+            {
+                this.text = $"<color=#f39c12>{this.text}</color>";
+            }
+
             this.subtext = $"";
 
             if (Game.LobbyState == MultiplayerLobbyState.GameRunning && Game.LevelId != null)
