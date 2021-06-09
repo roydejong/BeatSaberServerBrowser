@@ -11,6 +11,8 @@ namespace ServerBrowser.Core
     public static class GameStateManager
     {
         private static string _lobbyCode = null;
+        private static string _hostSecret = null;
+        private static bool _isDedicatedServer = false;
         private static string _customGameName = null;
         private static bool? _didSetLocalPlayerState = null;
         private static SemVer.Version _mpExVersion = null;
@@ -36,6 +38,7 @@ namespace ServerBrowser.Core
             }
         }
 
+        #region Data Events
         public static void HandleSongSelected(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
             BeatmapCharacteristicSO beatmapCharacteristic, GameplayModifiers gameplayModifiers)
         {
@@ -83,14 +86,29 @@ namespace ServerBrowser.Core
             }
         }
 
+        public static void HandleConnectSuccess(string code, string secret, bool isDedicatedServer)
+        {
+            Plugin.Log?.Info($"HandleConnectSuccess (code={code}, secret={secret}" +
+                             $", isDedicatedServer={isDedicatedServer})");
+
+            if (!String.IsNullOrEmpty(code))
+                HandleLobbyCode(code);
+
+            _hostSecret = secret;
+            
+        }
+
+        #endregion
+
+        #region Update Action
         public static void HandleUpdate()
         {
             var sessionManager = MpSession.SessionManager;
 
-            if (sessionManager == null
-                || !MpLobbyConnectionTypePatch.IsPartyMultiplayer
-                || !MpLobbyConnectionTypePatch.IsPartyHost
-                || !MpLobbyStatePatch.IsValidMpState)
+            var isPartyMp = MpLobbyConnectionTypePatch.IsPartyMultiplayer && MpLobbyConnectionTypePatch.IsPartyHost;
+            var isQuickplayMp = MpLobbyConnectionTypePatch.IsQuickplay;
+            
+            if (sessionManager == null || !MpLobbyStatePatch.IsValidMpState || (!isPartyMp && !isQuickplayMp))
             {
                 // We are not in a party lobby, or we are not the host
                 // Make sure any previous host announcements by us are cancelled and bail
@@ -130,10 +148,11 @@ namespace ServerBrowser.Core
                 return;
             }
 
-            if (String.IsNullOrEmpty(_lobbyCode) || !sessionManager.isConnectionOwner
-                || sessionManager.localPlayer == null || !sessionManager.isConnected
+            if ((String.IsNullOrEmpty(_lobbyCode) && String.IsNullOrEmpty(_hostSecret))
+                || sessionManager.localPlayer == null
+                || !sessionManager.isConnected
                 || sessionManager.maxPlayerCount == 1)
-            {
+            { 
                 // We do not (yet) have the Server Code, or we're at an in-between state where things aren't ready yet
                 StatusText = "Can't send announcement (invalid lobby state).";
                 HasErrored = true;
@@ -159,7 +178,7 @@ namespace ServerBrowser.Core
             var sessionManager = MpSession.SessionManager;
             var localPlayer = sessionManager.localPlayer;
             var connectedPlayers = sessionManager.connectedPlayers;
-
+            
             if (_mpExVersion == null)
             {
                 _mpExVersion = MpExHelper.GetInstalledVersion();
@@ -169,6 +188,19 @@ namespace ServerBrowser.Core
                     Plugin.Log?.Info($"Detected MultiplayerExtensions, version {_mpExVersion}");
                 }
             }
+            
+            var serverType = HostedGameData.ServerTypePlayerHost;
+            var connectionOwner = sessionManager.connectionOwner;
+
+            if (MpLobbyConnectionTypePatch.IsQuickplay)
+            {
+                if (connectionOwner?.userName.StartsWith("BeatDedi/") ?? false)
+                    serverType = HostedGameData.ServerTypeBeatDediQuickplay;
+                else
+                    serverType = HostedGameData.ServerTypeVanillaQuickplay;
+            }
+            
+            Plugin.Log?.Info($"Server type determined as: {serverType}");
 
             var lobbyAnnounce = new HostedGameData()
             {
@@ -187,7 +219,9 @@ namespace ServerBrowser.Core
                 Platform = MpLocalPlayer.PlatformId,
                 MasterServerHost = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null,
                 MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT,
-                MpExVersion = _mpExVersion
+                MpExVersion = _mpExVersion,
+                ServerType = serverType,
+                HostSecret = _hostSecret
             };
 
             lobbyAnnounce.Players = new List<HostedGamePlayer>();
@@ -213,7 +247,9 @@ namespace ServerBrowser.Core
 
             return lobbyAnnounce;
         }
+        #endregion
 
+        #region Announce/API
         private static async Task DoAnnounce(HostedGameData announce)
         {
             _sentUnAnnounce = false;
@@ -262,5 +298,6 @@ namespace ServerBrowser.Core
                 }
             }
         }
+        #endregion
     }
 }

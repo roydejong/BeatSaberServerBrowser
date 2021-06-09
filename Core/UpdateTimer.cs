@@ -57,9 +57,13 @@ namespace ServerBrowser.Core
 
         private void Tick()
         {
-            if (MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle)
+            if (!Plugin.Config.LobbyAnnounceToggle)
+                return;
+            
+            if (MpLobbyConnectionTypePatch.IsPartyHost || MpLobbyConnectionTypePatch.IsQuickplay)
             {
-                // We are the host and announcing a game, send periodic keep-alive updates to the server
+                // We are the host and announcing a game, or actively sharing a quickplay lobby
+                // Send periodic keep-alive updates to the server
                 Plugin.Log?.Debug("Host timer tick: sending periodic update to master server");
                 GameStateManager.HandleUpdate();
             }

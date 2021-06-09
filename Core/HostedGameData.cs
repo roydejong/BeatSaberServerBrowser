@@ -3,11 +3,20 @@ using ServerBrowser.Game;
 using ServerBrowser.Utils;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace ServerBrowser.Core
 {
     public class HostedGameData : INetworkPlayer
     {
+        #region Consts
+        public const string ServerTypePlayerHost = "player_host";
+        public const string ServerTypeBeatDediCustom = "beatdedi_custom";
+        public const string ServerTypeBeatDediQuickplay = "beatdedi_quickplay";
+        public const string ServerTypeVanillaQuickplay = "vanilla_quickplay";
+        #endregion
+        
+        #region Fields
         public int? Id { get; set; }
         public string ServerCode { get; set; }
         public string GameName { get; set; }
@@ -28,10 +37,23 @@ namespace ServerBrowser.Core
         public List<HostedGamePlayer> Players { get; set; } = null;
         [JsonConverter(typeof(SemVerJsonConverter))]
         public SemVer.Version MpExVersion { get; set; } = null;
+        public string ServerType { get; set; } = null;
+        public string HostSecret { get; set; } = null;
+        #endregion
 
+        #region Helpers
         [JsonIgnoreAttribute]
         public bool IsOnCustomMaster => !String.IsNullOrEmpty(MasterServerHost) && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);
 
+        [JsonIgnoreAttribute]
+        public bool IsDedicatedServer => ServerType == ServerTypeBeatDediCustom || ServerType == ServerTypeBeatDediQuickplay ||
+                                         ServerType == ServerTypeVanillaQuickplay;
+
+        [JsonIgnoreAttribute]
+        public bool IsQuickPlayServer => ServerType == ServerTypeBeatDediQuickplay || ServerType == ServerTypeVanillaQuickplay;
+        #endregion
+
+        #region Describe
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
@@ -132,11 +154,14 @@ namespace ServerBrowser.Core
 
             return text;
         }
+        #endregion
 
+        #region Serialize
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
         }
+        #endregion
 
         #region INetworkPlayer compatibility
         [JsonIgnoreAttribute]
@@ -168,7 +193,7 @@ namespace ServerBrowser.Core
         [JsonIgnoreAttribute]
         public SongPackMask songPacks => SongPackMask.all;
         [JsonIgnoreAttribute]
-        public bool canJoin => !String.IsNullOrEmpty(ServerCode);
+        public bool canJoin => !String.IsNullOrEmpty(ServerCode) || !String.IsNullOrEmpty(HostSecret);
         [JsonIgnoreAttribute]
         public bool requiresPassword => true;
         [JsonIgnoreAttribute]

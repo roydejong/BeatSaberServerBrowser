@@ -205,6 +205,8 @@
     <Compile Include="Core\HostedGamePlayer.cs" />
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
+    <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
+    <Compile Include="Harmony\JoinMatchmakingPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\ServerBrowseResult.cs" />
     <Compile Include="Core\GameStateManager.cs" />

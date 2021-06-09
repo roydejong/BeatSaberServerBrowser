@@ -35,5 +35,10 @@ namespace ServerBrowser.Harmony
             get => ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.PartyHost ||
                 ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.PartyClient;
         }
+
+        public static bool IsQuickplay
+        {
+            get => ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.QuickPlay;
+        }
     }
 }

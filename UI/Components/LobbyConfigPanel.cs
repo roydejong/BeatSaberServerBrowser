@@ -155,9 +155,10 @@ namespace ServerBrowser.UI.Components
 
             sessionManager = MpSession.SessionManager;
 
-            if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer)
+            if (sessionManager == null ||
+                (!MpLobbyConnectionTypePatch.IsPartyMultiplayer && !MpLobbyConnectionTypePatch.IsQuickplay))
             {
-                StatusText.text = "Only supported for custom multiplayer games.";
+                StatusText.text = "Only supported for custom and Quick Play games.";
                 StatusText.color = Color.yellow;
 
                 LobbyAnnounceToggle.interactable = false;
@@ -166,9 +167,9 @@ namespace ServerBrowser.UI.Components
                 return;
             }
 
-            if (!MpLobbyConnectionTypePatch.IsPartyHost)
+            if (MpLobbyConnectionTypePatch.IsPartyMultiplayer && !MpLobbyConnectionTypePatch.IsPartyHost)
             {
-                // We are not the host
+                // Party but we are not the host
                 LobbyAnnounceToggle.interactable = false;
 
                 var theHost = sessionManager.connectionOwner;
@@ -206,7 +207,14 @@ namespace ServerBrowser.UI.Components
                 }
                 else
                 {
-                    StatusText.text = "Turn me on to list your server in the browser ↑";
+                    if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    {
+                        StatusText.text = "Turn me on to list your server in the browser ↑";
+                    }
+                    else
+                    {
+                        StatusText.text = "Turn me on to publicly share this Quick Play game ↑";
+                    }
                     StatusText.color = Color.yellow;
                 }
 
@@ -218,7 +226,7 @@ namespace ServerBrowser.UI.Components
             StatusText.text = GameStateManager.StatusText;
             StatusText.color = GameStateManager.HasErrored ? Color.red : Color.green;
 
-            NameButton.interactable = true;
+            NameButton.interactable = MpLobbyConnectionTypePatch.IsPartyHost;
         }
         #endregion
 
