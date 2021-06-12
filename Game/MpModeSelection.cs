@@ -94,13 +94,18 @@ namespace ServerBrowser.Game
                 // Join Quick Play server by secret
                 Plugin.Log.Info($"Trying to join Quick Play game by secret ({game.HostSecret})...");
                 
-                MpModeSelection.InjectQuickPlaySecret = game.HostSecret;
+                MpModeSelection.InjectQuickPlaySecret = game.HostSecret; // NB: JoinMatchmakingPatch will inject secret
+
+                var difficultyMask = BeatmapDifficultyMask.All;
+                if (game.ServerType == HostedGameData.ServerTypeVanillaQuickplay && game.Difficulty.HasValue)
+                    // Vanilla quick play is locked to a specific difficulty in the lobby
+                    difficultyMask = game.Difficulty.Value.ToMask();
                 
-                _mpLobbyConnectionController.ConnectToMatchmaking(BeatmapDifficultyMask.All, SongPackMask.all); 
-                // NB: JoinMatchmakingPatch will inject our secret
-                
+                _mpLobbyConnectionController.ConnectToMatchmaking(difficultyMask, SongPackMask.all);
                 _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})"); 
-                ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+                
+                ReplaceTopViewController(_joiningLobbyViewController,
+                    animationDirection: ViewController.AnimationDirection.Vertical);
             }   
             else if (!string.IsNullOrEmpty(game.ServerCode))
             {
@@ -138,10 +143,12 @@ namespace ServerBrowser.Game
             ReplaceTopViewController(_simpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
         }
 
-        public static void CancelLobbyJoin()
+        public static void CancelLobbyJoin(bool hideLoading = true)
         {
             _mpLobbyConnectionController.LeaveLobby();
-            _joiningLobbyViewController.HideLoading();
+            
+            if (hideLoading)
+                _joiningLobbyViewController.HideLoading();
         }
 
         public static void MakeServerBrowserTopView()
