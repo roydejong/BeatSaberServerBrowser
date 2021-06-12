@@ -26,7 +26,7 @@ namespace ServerBrowser.Harmony
                                  $"Quick Play lobby (InjectQuickPlaySecret={MpModeSelection.InjectQuickPlaySecret}, " +
                                  $"ActualSecret={secret}, InjectServerCode={MpModeSelection.InjectServerCode}, " +
                                  $"ActualServerCode={code})");
-                MpModeSelection.CancelLobbyJoin();
+                MpModeSelection.CancelLobbyJoin(hideLoading: false);
                 return false;
             }
 
