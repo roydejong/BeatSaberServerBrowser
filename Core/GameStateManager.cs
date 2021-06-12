@@ -53,12 +53,6 @@ namespace ServerBrowser.Core
 
         public static void HandleLobbyCode(string lobbyCode)
         {
-            if (!MpLobbyConnectionTypePatch.IsPartyHost)
-            {
-                _lobbyCode = null;
-                return;
-            }
-
             if (_lobbyCode != lobbyCode)
             {
                 _lobbyCode = lobbyCode;
@@ -92,8 +86,7 @@ namespace ServerBrowser.Core
             Plugin.Log?.Info($"HandleConnectSuccess (code={code}, secret={secret}" +
                              $", isDedicatedServer={isDedicatedServer})");
 
-            if (!String.IsNullOrEmpty(code))
-                HandleLobbyCode(code);
+            HandleLobbyCode(code);
 
             _isDedicatedServer = isDedicatedServer;
             _hostSecret = secret;

@@ -15,6 +15,7 @@ namespace ServerBrowser.Game
         public static bool WeInitiatedConnection { get; set; } = false;
         public static HostedGameData LastConnectToHostedGame { get; private set; } = null;
         public static string InjectQuickPlaySecret { get; private set; } = null;
+        public static string InjectServerCode { get; private set; } = null;
 
         #region Init
         private static MultiplayerModeSelectionFlowCoordinator _flowCoordinator;
@@ -86,18 +87,9 @@ namespace ServerBrowser.Game
             MpModeSelection.WeInitiatedConnection = true;
             MpModeSelection.LastConnectToHostedGame = game;
             MpModeSelection.InjectQuickPlaySecret = null;
+            MpModeSelection.InjectServerCode = game.ServerCode;
 
-            if (!string.IsNullOrEmpty(game.ServerCode))
-            {
-                // Join party by code
-                Plugin.Log.Info($"Trying to join custom game by code ({game.ServerCode})...");
-                
-                _mpLobbyConnectionController.ConnectToParty(game.ServerCode);
-                
-                _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
-                ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
-            }
-            else if (game.IsQuickPlayServer && !string.IsNullOrEmpty(game.HostSecret))
+            if (game.IsQuickPlayServer && !string.IsNullOrEmpty(game.HostSecret))
             {
                 // Join Quick Play server by secret
                 Plugin.Log.Info($"Trying to join Quick Play game by secret ({game.HostSecret})...");
@@ -108,6 +100,16 @@ namespace ServerBrowser.Game
                 // NB: JoinMatchmakingPatch will inject our secret
                 
                 _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})"); 
+                ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+            }   
+            else if (!string.IsNullOrEmpty(game.ServerCode))
+            {
+                // Join party by code
+                Plugin.Log.Info($"Trying to join custom game by code ({game.ServerCode})...");
+                
+                _mpLobbyConnectionController.ConnectToParty(game.ServerCode);
+                
+                _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
                 ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
             }
         }

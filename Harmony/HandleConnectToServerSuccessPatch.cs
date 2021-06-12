@@ -2,6 +2,7 @@
 using HarmonyLib;
 using IPA.Utilities;
 using ServerBrowser.Core;
+using ServerBrowser.Game;
 
 namespace ServerBrowser.Harmony
 {
@@ -12,12 +13,26 @@ namespace ServerBrowser.Harmony
     [HarmonyPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
     public static class HandleConnectToServerSuccessPatch
     {
-        public static void Postfix(string userId, string userName, IPEndPoint remoteEndPoint, string secret,
+        public static bool Prefix(string userId, string userName, IPEndPoint remoteEndPoint, string secret,
             string code, DiscoveryPolicy discoveryPolicy, InvitePolicy invitePolicy, int maxPlayerCount,
             GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
             bool isConnectionOwner, bool isDedicatedServer)
         {
+            if (isDedicatedServer && MpModeSelection.WeInitiatedConnection &&
+                (MpModeSelection.InjectQuickPlaySecret != secret || MpModeSelection.InjectServerCode != code))
+            {
+                // Matchmaking put us in the wrong Quick Play lobby, which means our injected secret failed
+                Plugin.Log?.Warn($"HandleConnectToServerSuccess: Matchmaking did not put us in the expected " +
+                                 $"Quick Play lobby (InjectQuickPlaySecret={MpModeSelection.InjectQuickPlaySecret}, " +
+                                 $"ActualSecret={secret}, InjectServerCode={MpModeSelection.InjectServerCode}, " +
+                                 $"ActualServerCode={code})");
+                MpModeSelection.CancelLobbyJoin();
+                return false;
+            }
+
+            // Track the server connection and update game state as needed
             GameStateManager.HandleConnectSuccess(code, secret, isDedicatedServer, configuration);
+            return true;
         }
     }
 }
