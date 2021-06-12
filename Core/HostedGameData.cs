@@ -112,12 +112,6 @@ namespace ServerBrowser.Core
 
         public string DescribeDifficulty(bool withColorTag = false)
         {
-            if (String.IsNullOrEmpty(this.LevelId) || Difficulty == null)
-            {
-                // Only empty if we've never played a level, in which case we shouldn't display a difficulty
-                return "-";
-            }
-
             string text;
 
             switch (Difficulty)

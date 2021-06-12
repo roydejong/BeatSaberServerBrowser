@@ -61,7 +61,7 @@ namespace ServerBrowser.UI.Components
                 this.subtext += $"In lobby";
             }
 
-            if (Game.Difficulty.HasValue && !String.IsNullOrEmpty(Game.LevelId))
+            if (Game.Difficulty.HasValue && (!String.IsNullOrEmpty(Game.LevelId) || Game.IsQuickPlayServer))
             {
                 this.subtext += $" ({Game.DescribeDifficulty(true)})";
             }
