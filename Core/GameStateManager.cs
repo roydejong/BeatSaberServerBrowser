@@ -42,9 +42,6 @@ namespace ServerBrowser.Core
         public static void HandleSongSelected(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
             BeatmapCharacteristicSO beatmapCharacteristic, GameplayModifiers gameplayModifiers)
         {
-            if (!MpLobbyConnectionTypePatch.IsPartyHost)
-                return;
-
             _level = previewBeatmapLevel;
             _difficulty = beatmapDifficulty;
 
