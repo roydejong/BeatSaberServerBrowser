@@ -20,7 +20,7 @@
     <!--<PathMap>$(AppOutputBase)=X:\$(AssemblyName)\</PathMap>-->
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>7</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -199,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
+    <Compile Include="Core\AnnounceState.cs" />
     <Compile Include="Core\HostedGameData.cs" />
     <Compile Include="Core\HostedGameBrowser.cs" />
     <Compile Include="Core\HostedGameFilters.cs" />

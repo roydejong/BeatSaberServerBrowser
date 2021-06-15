@@ -4,6 +4,7 @@ using ServerBrowser.UI.Components;
 using ServerBrowser.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ServerBrowser.Core
@@ -18,7 +19,6 @@ namespace ServerBrowser.Core
         private static SemVer.Version _mpExVersion = null;
 
         private static bool _didAnnounce = false;
-        private static bool _sentUnAnnounce = false;
         private static HostedGameData _lastCompleteAnnounce = null;
 
         private static IPreviewBeatmapLevel _level = null;
@@ -259,51 +259,72 @@ namespace ServerBrowser.Core
         #endregion
 
         #region Announce/API
-        private static async Task DoAnnounce(HostedGameData announce)
+        private static Dictionary<string, AnnounceState> _announceStates = new();
+        
+        /// <summary>
+        /// Sends a host announcement.
+        /// </summary>
+        private static async Task<bool> DoAnnounce(HostedGameData announce)
         {
-            _sentUnAnnounce = false;
+            if (String.IsNullOrEmpty(announce.ServerCode))
+                return false;
+            
+            // Get or initialize state
+            AnnounceState announceState;
 
+            if (!_announceStates.ContainsKey(announce.ServerCode))
+            {
+                _announceStates.Add(announce.ServerCode, new()
+                {
+                    ServerCode = announce.ServerCode,
+                    OwnerId = announce.OwnerId,
+                    HostSecret = announce.HostSecret
+                });
+            }
+
+            announceState = _announceStates[announce.ServerCode];
+            
+            if (announceState.IsPending)
+                return false;
+            
+            announceState.IsPending = true;
+
+            // Try send announce
+            var resultOk = false;
+            
             if (await BSSBMasterAPI.Announce(announce))
             {
-                _didAnnounce = true;
-                _lastCompleteAnnounce = announce;
+                announceState.IsPending = false;
+                announceState.DidAnnounce = true;
+                announceState.LastSuccess = DateTime.Now;
 
                 StatusText = $"Players can now join from the browser!\r\n{announce.Describe()}";
                 HasErrored = false;
             }
             else
             {
-                _didAnnounce = false;
-                _lastCompleteAnnounce = null;
+                announceState.IsPending = false;
+                announceState.DidFail = true;
+                announceState.LastFailure = DateTime.Now;
 
                 StatusText = $"Could not announce to master server!";
                 HasErrored = true;
             }
 
             LobbyConfigPanel.UpdatePanelInstance();
+            return resultOk;
         }
 
         /// <summary>
-        /// Ensures that any host announcements made by us are removed:
-        ///  - If a previous announcement was made, a request is sent to the master server, removing it.
-        ///  - If no previous announcement was made, or it was already deleted, this is a no-op.
+        /// Ensures that any host announcements made by us previously are removed.
         /// </summary>
         public static async Task UnAnnounce()
         {
-            if (_lastCompleteAnnounce != null && !_sentUnAnnounce)
+            foreach (var state in _announceStates.Values.ToArray())
             {
-                _sentUnAnnounce = true;
-
-                if (await BSSBMasterAPI.UnAnnounce(_lastCompleteAnnounce))
+                if (await BSSBMasterAPI.UnAnnounce(state))
                 {
-                    Plugin.Log?.Info($"Host announcement was deleted OK!");
-
-                    _didAnnounce = false;
-                    _lastCompleteAnnounce = null;
-                }
-                else
-                {
-                    _sentUnAnnounce = false;
+                    _announceStates.Remove(state.ServerCode);
                 }
             }
         }

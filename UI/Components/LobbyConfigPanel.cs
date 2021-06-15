@@ -213,20 +213,12 @@ namespace ServerBrowser.UI.Components
             if (!LobbyAnnounceToggleValue)
             {
                 // Toggle is disabled, however
-                if (GameStateManager.DidLeakCurrentCode)
-                {
-                    StatusText.text = "Cancelled, now removed from browser\r\nNOTE: Your server code may have been seen already";
-                    StatusText.color = Color.red;
-                }
+                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    StatusText.text = "Turn me on to publicly share this Quick Play game ↑";
                 else
-                {
-                    if (MpLobbyConnectionTypePatch.IsQuickplay)
-                        StatusText.text = "Turn me on to publicly share this Quick Play game ↑";
-                    else
-                        StatusText.text = "Turn me on to list your server in the browser ↑";
-                    
-                    StatusText.color = Color.yellow;
-                }
+                    StatusText.text = "Turn me on to list your server in the browser ↑";
+                
+                StatusText.color = Color.yellow;
 
                 NameButton.interactable = false;
                 return;
