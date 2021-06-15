@@ -27,12 +27,20 @@ namespace ServerBrowser.UI.Components
         {
             get
             {
-                return Plugin.Config.LobbyAnnounceToggle;
+                if (MpLobbyConnectionTypePatch.IsPartyHost)
+                    return Plugin.Config.LobbyAnnounceToggle;
+                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    return Plugin.Config.ShareQuickPlayGames;
+                return false;
             }
 
             set
             {
-                Plugin.Config.LobbyAnnounceToggle = value;
+                if (MpLobbyConnectionTypePatch.IsPartyHost)
+                    Plugin.Config.LobbyAnnounceToggle = value;
+                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    Plugin.Config.ShareQuickPlayGames = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -196,6 +204,11 @@ namespace ServerBrowser.UI.Components
             // We are the host, enable controls
             LobbyAnnounceToggle.interactable = true;
             LobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
+            
+            if (MpLobbyConnectionTypePatch.IsQuickplay)
+                LobbyAnnounceToggle.Text = "Share this Quick Play game to the Server Browser";
+            else
+                LobbyAnnounceToggle.Text = "Add my game to the Server Browser";
 
             if (!LobbyAnnounceToggleValue)
             {
@@ -208,13 +221,10 @@ namespace ServerBrowser.UI.Components
                 else
                 {
                     if (MpLobbyConnectionTypePatch.IsQuickplay)
-                    {
-                        StatusText.text = "Turn me on to list your server in the browser ↑";
-                    }
-                    else
-                    {
                         StatusText.text = "Turn me on to publicly share this Quick Play game ↑";
-                    }
+                    else
+                        StatusText.text = "Turn me on to list your server in the browser ↑";
+                    
                     StatusText.color = Color.yellow;
                 }
 

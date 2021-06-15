@@ -122,7 +122,8 @@ namespace ServerBrowser.Core
                 return;
             }
 
-            if (Plugin.Config.LobbyAnnounceToggle)
+            if ((MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle) ||
+                (MpLobbyConnectionTypePatch.IsQuickplay && Plugin.Config.ShareQuickPlayGames))
             {
                 // Toggle is on, ensure state is synced
                 if (!_didSetLocalPlayerState.HasValue || _didSetLocalPlayerState.Value == false)

@@ -75,6 +75,7 @@ namespace ServerBrowser.Game
 
             // If we are initiating the server menu from our UI, assume the intent is to host a game
             Plugin.Config.LobbyAnnounceToggle = true;
+            Plugin.Config.ShareQuickPlayGames = true;
 
             _flowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
