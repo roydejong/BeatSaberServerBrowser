@@ -103,7 +103,7 @@ namespace ServerBrowser.Game
                     difficultyMask = game.Difficulty.Value.ToMask();
                 
                 _mpLobbyConnectionController.ConnectToMatchmaking(difficultyMask, SongPackMask.all);
-                _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})"); 
+                _joiningLobbyViewController.Init($"Trying to join {game.GameName}..."); 
                 
                 ReplaceTopViewController(_joiningLobbyViewController,
                     animationDirection: ViewController.AnimationDirection.Vertical);

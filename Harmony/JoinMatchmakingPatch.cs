@@ -13,11 +13,13 @@ namespace ServerBrowser.Harmony
     public static class JoinMatchmakingPatch
     {
         public static void Prefix(GameplayServerConfiguration configuration, DiscoveryPolicy discoveryPolicy,
-            ref string secret, string code)
+            ref string secret, ref string code)
         {
             if (MpModeSelection.WeInitiatedConnection && MpModeSelection.InjectQuickPlaySecret != null)
             {
                 secret = MpModeSelection.InjectQuickPlaySecret;
+                code = MpModeSelection.InjectServerCode;
+                
                 Plugin.Log?.Debug($"Injecting Quick Play secret: {secret}");
             }
         }
