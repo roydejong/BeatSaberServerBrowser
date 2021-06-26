@@ -127,9 +127,10 @@ namespace ServerBrowser.Game
         #endregion
 
         #region Data helpers
+
         public static bool GetLocalPlayerHasMultiplayerExtensions()
         {
-            return SessionManager.LocalPlayerHasState("modded") || MpExHelper.GetIsInstalled();
+            return SessionManager.LocalPlayerHasState("modded") || ModChecker.MultiplayerExtensions.InstalledAndEnabled;
         }
 
         public static int GetPlayerCount()

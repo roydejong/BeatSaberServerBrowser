@@ -185,7 +185,7 @@ namespace ServerBrowser.Core
             {
                 if (_mpExVersion == null)
                 {
-                    _mpExVersion = MpExHelper.GetInstalledVersion();
+                    _mpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion;
 
                     if (_mpExVersion != null)
                     {

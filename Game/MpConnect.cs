@@ -20,7 +20,7 @@ namespace ServerBrowser.Game
             // MpEx version check
             if (game.MpExVersion != null)
             {
-                var ourMpExVersion = MpExHelper.GetInstalledVersion();
+                var ourMpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion;
 
                 if (ourMpExVersion == null || !ourMpExVersion.Equals(game.MpExVersion))
                 {
