@@ -26,19 +26,19 @@ namespace ServerBrowser.Core
         public int PlayerLimit { get; set; }
         public bool IsModded { get; set; }
         public MultiplayerLobbyState LobbyState { get; set; } = MultiplayerLobbyState.None;
-        public string LevelId { get; set; } = null;
-        public string SongName { get; set; } = null;
-        public string SongAuthor { get; set; } = null;
+        public string? LevelId { get; set; } = null;
+        public string? SongName { get; set; } = null;
+        public string? SongAuthor { get; set; } = null;
         public BeatmapDifficulty? Difficulty { get; set; }
         public string Platform { get; set; } = "unknown";
-        public string MasterServerHost { get; set; } = null;
+        public string? MasterServerHost { get; set; } = null;
         public int? MasterServerPort { get; set; } = null;
-        public string CoverUrl { get; set; } = null;
-        public List<HostedGamePlayer> Players { get; set; } = null;
+        public string? CoverUrl { get; set; } = null;
+        public List<HostedGamePlayer>? Players { get; set; } = null;
         [JsonConverter(typeof(SemVerJsonConverter))]
-        public SemVer.Version MpExVersion { get; set; } = null;
-        public string ServerType { get; set; } = null;
-        public string HostSecret { get; set; } = null;
+        public SemVer.Version? MpExVersion { get; set; } = null;
+        public string? ServerType { get; set; } = null;
+        public string? HostSecret { get; set; } = null;
         #endregion
 
         #region Helpers

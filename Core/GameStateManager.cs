@@ -6,256 +6,284 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ServerBrowser.Game.Models;
+using static MultiplayerLobbyConnectionController;
 
 namespace ServerBrowser.Core
 {
     public static class GameStateManager
     {
-        private static string _lobbyCode = null;
-        private static string _hostSecret = null;
-        private static bool _isDedicatedServer = false;
-        private static string _customGameName = null;
-        private static bool? _didSetLocalPlayerState = null;
-        private static SemVer.Version _mpExVersion = null;
-
-        private static bool _didAnnounce = false;
-        private static HostedGameData _lastCompleteAnnounce = null;
-
-        private static IPreviewBeatmapLevel _level = null;
-        private static BeatmapDifficulty? _difficulty = null;
-
-        public static string StatusText { get; private set; } = "Unknown status";
+        /// <summary>
+        /// A summary of the current multiplayer game state.
+        /// </summary>
+        public static MultiplayerActivity Activity { get; private set; } = new();
+        
+        /// <summary>
+        /// UI status text for the game state manager, as shown in the lobby panel.
+        /// </summary>
+        public static string StatusText { get; private set; } = "Hello world";
+        
+        /// <summary>
+        /// Indicates whether the game state manager errored, meaning no successful announce was made.
+        /// </summary>
         public static bool HasErrored { get; private set; } = true;
 
-        public static bool DidLeakCurrentCode
+        #region Lifecycle
+        public static void SetUp()
         {
-            get
-            {
-                return _didAnnounce &&
-                    _lastCompleteAnnounce != null
-                    && !String.IsNullOrEmpty(_lobbyCode) 
-                    && _lastCompleteAnnounce.ServerCode == _lobbyCode;
-            }
+            MpEvents.MasterServerChanged += OnMasterServerChanged;
+            MpEvents.ConnectionTypeChanged += OnConnectionTypeChanged;
+            MpEvents.ServerCodeChanged += OnServerCodeChanged;
+            MpEvents.LobbyStateChanged += OnLobbyStateChanged;
+            MpEvents.BeforeConnectToServer += OnBeforeConnectToServer;
+            MpEvents.SessionConnected += OnSessionConnected;
+            MpEvents.SessionDisconnected += OnSessionDisconnected;
+            MpEvents.PlayerConnected += OnPlayerConnected;
+            MpEvents.PlayerDisconnected += OnPlayerDisconnected;
+            MpEvents.StartingMultiplayerLevel += OnStartingMultiplayerLevel;
         }
 
-        #region Data Events
-        public static void HandleSongSelected(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
-            BeatmapCharacteristicSO beatmapCharacteristic, GameplayModifiers gameplayModifiers)
+        public static void TearDown()
         {
-            _level = previewBeatmapLevel;
-            _difficulty = beatmapDifficulty;
+            MpEvents.MasterServerChanged -= OnMasterServerChanged;
+            MpEvents.ConnectionTypeChanged += OnConnectionTypeChanged;
+            MpEvents.ServerCodeChanged -= OnServerCodeChanged;
+            MpEvents.LobbyStateChanged -= OnLobbyStateChanged;
+            MpEvents.BeforeConnectToServer -= OnBeforeConnectToServer;
+            MpEvents.SessionConnected -= OnSessionConnected;
+            MpEvents.SessionDisconnected -= OnSessionDisconnected;
+            MpEvents.PlayerConnected -= OnPlayerConnected;
+            MpEvents.PlayerDisconnected -= OnPlayerDisconnected;
+            MpEvents.StartingMultiplayerLevel -= OnStartingMultiplayerLevel;
+        }
+        #endregion
+
+        #region Events
+        private static void OnMasterServerChanged(object sender, MasterServerEndPoint endPoint)
+        {
+            Activity.MasterServer = endPoint;
+            
+            HandleUpdate();
+        }
+        
+        private static void OnConnectionTypeChanged(object sender, LobbyConnectionType connectionType)
+        {
+            if (Activity.ConnectionType == connectionType)
+                return;
+            
+            Activity.ConnectionType = connectionType;
 
             HandleUpdate();
         }
 
-        public static void HandleLobbyCode(string lobbyCode)
+        private static void OnLobbyStateChanged(object sender, MultiplayerLobbyState lobbyState)
         {
-            if (_lobbyCode != lobbyCode)
-            {
-                _lobbyCode = lobbyCode;
-
-                if (!String.IsNullOrEmpty(_lobbyCode))
-                {
-                    // Lobby code changed and isn't empty; force an update now
-                    Plugin.Log?.Info($"Got lobby server code: \"{lobbyCode}\"");
-                    HandleUpdate();
-                }
-            }
-        }
-
-        public static void HandleCustomGameName(string name)
-        {
-            if (!MpLobbyConnectionTypePatch.IsPartyHost)
+            if (Activity.LobbyState == lobbyState)
                 return;
-
-            if (name != _customGameName)
-            {
-                Plugin.Log?.Info($"Got custom game name: \"{name}\"");
-
-                _customGameName = name;
-                HandleUpdate();
-            }
-        }
-
-        public static void HandleConnectSuccess(string code, string secret, bool isDedicatedServer,
-            GameplayServerConfiguration configuration)
-        {
-            Plugin.Log?.Info($"HandleConnectSuccess (code={code}, secret={secret}" +
-                             $", isDedicatedServer={isDedicatedServer})");
-
-            HandleLobbyCode(code);
-
-            _isDedicatedServer = isDedicatedServer;
-            _hostSecret = secret;
-
-            if (_isDedicatedServer)
-            {
-                _difficulty = configuration.difficulties.FromMask();
-            }
+            
+            Activity.LobbyState = lobbyState;
             
             HandleUpdate();
         }
 
+        private static void OnServerCodeChanged(object sender, string serverCode)
+        {
+            if (serverCode == Activity.ServerCode || String.IsNullOrEmpty(serverCode))
+                return;
+
+            Activity.ServerCode = serverCode;
+
+            HandleUpdate();
+        }
+
+        private static void OnSessionConnected(object sender, SessionConnectedEventArgs e)
+        {
+            Activity.MaxPlayerCount = e.MaxPlayers;
+            Activity.Players ??= new List<IConnectedPlayer>(e.MaxPlayers);
+            Activity.HostUserId = e.ConnectionOwner.userId;
+            
+            OnPlayerConnected(sender, e.LocalPlayer);
+            OnPlayerConnected(sender, e.ConnectionOwner);
+        }
+
+        private static void OnSessionDisconnected(object sender, DisconnectedReason e)
+        {
+            Activity.ConnectionType = LobbyConnectionType.None;
+            Activity.LobbyState = MultiplayerLobbyState.None;
+            Activity.ServerCode = null;
+            Activity.HostUserId = null;
+            Activity.HostSecret = null;
+            Activity.IsDedicatedServer = false;
+            Activity.ServerConfiguration = null;
+            Activity.MaxPlayerCount = 0;
+            Activity.Players?.Clear();
+            Activity.CurrentLevel = null;
+            Activity.CurrentDifficulty = null;
+            Activity.CurrentCharacteristic = null;
+            Activity.CurrentModifiers = null;
+                
+            HandleUpdate();
+        }
+
+        private static void OnPlayerConnected(object sender, IConnectedPlayer player)
+        {
+            if (Activity.Players == null || Activity.Players.Contains(player))
+                return;
+            
+            Activity.Players.Add(player);
+                
+            HandleUpdate();
+        }
+
+        private static void OnPlayerDisconnected(object sender, IConnectedPlayer player)
+        {
+            if (Activity.Players == null)
+                return;
+            
+            Activity.Players.Remove(player);
+                
+            HandleUpdate();
+        }
+        
+        private static void OnBeforeConnectToServer(object sender, ConnectToServerEventArgs e)
+        {
+            Activity.ServerCode = e.Code;
+            Activity.HostUserId = e.UserId;
+            Activity.HostSecret = e.Secret;
+            Activity.IsDedicatedServer = e.IsDedicatedServer;
+            Activity.ServerConfiguration = e.Configuration;
+            Activity.MaxPlayerCount = e.MaxPlayerCount;
+            Activity.Players = new(e.MaxPlayerCount);
+            
+            HandleUpdate();
+        }
+
+        private static void OnStartingMultiplayerLevel(object sender, StartingMultiplayerLevelEventArgs e)
+        {
+            Activity.CurrentLevel = e.BeatmapLevel;
+            Activity.CurrentDifficulty = e.Difficulty;
+            Activity.CurrentCharacteristic = e.Characteristic;
+            Activity.CurrentModifiers = e.Modifiers;
+
+            HandleUpdate();
+        }
         #endregion
 
         #region Update Action
-        public static void HandleUpdate()
+        public static void HandleUpdate(bool raiseEvent = true)
         {
-            var sessionManager = MpSession.SessionManager;
-
-            var isPartyMp = MpLobbyConnectionTypePatch.IsPartyMultiplayer && MpLobbyConnectionTypePatch.IsPartyHost;
-            var isQuickplayMp = MpLobbyConnectionTypePatch.IsQuickplay;
+            Activity.Name = MpSession.GetHostGameName();
             
-            if (sessionManager == null || !MpLobbyStatePatch.IsValidMpState || (!isPartyMp && !isQuickplayMp))
+            if (raiseEvent)
+                MpEvents.RaiseActivityUpdated(null, Activity);
+            
+            if (!CheckCanAnnounce())
             {
-                // We are not in a party lobby, or we are not the host
-                // Make sure any previous host announcements by us are cancelled and bail
-                StatusText = "You must be the host of a custom multiplayer game.";
-                HasErrored = true;
-
-                _ = UnAnnounce();
-
-                LobbyConfigPanel.UpdatePanelInstance();
+                // We are not able or allowed to announce right now
+                SetErrorState("Can't announce: you have to be the host, or be in a Quick Play game");
                 return;
             }
 
-            if ((MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle) ||
-                (MpLobbyConnectionTypePatch.IsQuickplay && Plugin.Config.ShareQuickPlayGames))
+            if (!CheckToggleSwitch())
             {
-                // Toggle is on, ensure state is synced
-                if (!_didSetLocalPlayerState.HasValue || _didSetLocalPlayerState.Value == false)
-                {
-                    _didSetLocalPlayerState = true;
-                    sessionManager.SetLocalPlayerState("lobbyannounce", true); // NB: this calls another update
-                }
-            }
-            else
-            {
-                // Toggle is off, ensure state is synced & do not proceed with announce
-                StatusText = "Lobby announces are toggled off.";
-                HasErrored = true;
-
-                _ = UnAnnounce();
-
-                if (!_didSetLocalPlayerState.HasValue || _didSetLocalPlayerState.Value == true)
-                {
-                    _didSetLocalPlayerState = false;
-                    sessionManager.SetLocalPlayerState("lobbyannounce", false); // NB: this calls another update
-                }
-
-                LobbyConfigPanel.UpdatePanelInstance();
+                // The toggle switch is off, announce disabled
+                SetErrorState("Flip the switch to announce this game");
                 return;
             }
+            
+            // No objections, try announce now
+            try
+            {
+                var lobbyAnnounce = GenerateAnnounce();
 
-            if ((String.IsNullOrEmpty(_lobbyCode) && String.IsNullOrEmpty(_hostSecret))
-                || sessionManager.localPlayer == null
-                || !sessionManager.isConnected
-                || sessionManager.maxPlayerCount == 1)
-            { 
-                // We do not (yet) have the Server Code, or we're at an in-between state where things aren't ready yet
-                StatusText = "Can't send announcement (invalid lobby state).";
-                HasErrored = true;
-
-                _ = UnAnnounce();
+                StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
+                HasErrored = false;
 
                 LobbyConfigPanel.UpdatePanelInstance();
-                return;
+
+                // Send actual
+                _ = DoAnnounce(lobbyAnnounce);
             }
-
-            var lobbyAnnounce = GenerateAnnounce();
-
-            StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
-            HasErrored = false;
-
+            catch (Exception e)
+            {
+                Plugin.Log.Error($"[GameStateManager] Error in announce: {e}");
+                SetErrorState("Error: could not send announce");
+            }
+        }
+        
+        /// <summary>
+        /// Sets error state, removes any previous announces, and updates the UI.
+        /// </summary>
+        private static void SetErrorState(string errorText, bool unAnnounce = true)
+        {
+            StatusText = errorText;
+            HasErrored = true;
+            
+            if (unAnnounce)
+                _ = UnAnnounce();
+            
             LobbyConfigPanel.UpdatePanelInstance();
-
-            _ = DoAnnounce(lobbyAnnounce);
         }
 
+        /// <summary>
+        /// Checks whether the local player can currently announce to the server browser.
+        /// </summary>
+        private static bool CheckCanAnnounce()
+        {
+            if (Activity.ConnectionType is LobbyConnectionType.None or LobbyConnectionType.PartyClient)
+                // Not connected / not in a Quick Play game / not a host
+                return false;
+            
+            if (Activity.ServerCode == null || Activity.ConnectionOwner == null)
+                // Need a server code and connection owner at minimum
+                return false;
+
+            // No objections
+            return true;
+        }
+
+        /// <summary>
+        /// Checks whether announces are enabled by the local player for the current lobby type.
+        /// </summary>
+        private static bool CheckToggleSwitch()
+        {
+            if (Activity.IsQuickPlay)
+                return Plugin.Config.ShareQuickPlayGames;
+            
+            return Plugin.Config.LobbyAnnounceToggle;
+        }
+        
+        /// <summary>
+        /// Generates the announce payload for the master server API.
+        /// </summary>
         private static HostedGameData GenerateAnnounce()
         {
-            var sessionManager = MpSession.SessionManager;
-            var localPlayer = sessionManager.localPlayer;
-            var connectedPlayers = sessionManager.connectedPlayers;
-            
-            var serverType = HostedGameData.ServerTypePlayerHost;
-            var connectionOwner = sessionManager.connectionOwner;
-
-            if (connectionOwner.isMe)
+            return new HostedGameData()
             {
-                if (_mpExVersion == null)
-                {
-                    _mpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion;
-
-                    if (_mpExVersion != null)
-                    {
-                        Plugin.Log?.Info($"Detected MultiplayerExtensions, version {_mpExVersion}");
-                    }
-                }
-            }
-            else
-            {
-                _mpExVersion = null;
-            }
-
-            if (MpLobbyConnectionTypePatch.IsQuickplay)
-            {
-                if (connectionOwner?.userName.StartsWith("BeatDedi/") ?? false)
-                    serverType = HostedGameData.ServerTypeBeatDediQuickplay;
-                else
-                    serverType = HostedGameData.ServerTypeVanillaQuickplay;
-            }
-            
-            Plugin.Log?.Info($"Server type determined as: {serverType}");
-
-            var lobbyAnnounce = new HostedGameData()
-            {
-                ServerCode = _lobbyCode,
+                ServerCode = Activity.ServerCode!,
                 GameName = MpSession.GetHostGameName(),
-                OwnerId = connectionOwner.userId,
-                OwnerName = connectionOwner.userName,
-                PlayerCount = MpSession.GetPlayerCount(),
-                PlayerLimit = MpSession.GetPlayerLimit(),
-                IsModded = connectionOwner.HasState("modded") || connectionOwner.HasState("customsongs") || _mpExVersion != null,
-                LobbyState = MpLobbyStatePatch.LobbyState,
-                LevelId = _level?.levelID,
-                SongName = _level?.songName,
-                SongAuthor = _level?.songAuthorName,
-                Difficulty = _difficulty,
+                OwnerId = Activity.ConnectionOwner!.userId,
+                OwnerName = Activity.ConnectionOwner!.userName,
+                PlayerCount = Activity.CurrentPlayerCount,
+                PlayerLimit = Activity.MaxPlayerCount,
+                IsModded = Activity.IsModded,
+                LobbyState = Activity.LobbyState,
+                LevelId = Activity.CurrentLevel?.levelID,
+                SongName = Activity.CurrentLevel?.songName,
+                SongAuthor = Activity.CurrentLevel?.songAuthorName,
+                Difficulty = Activity.CurrentDifficulty,
                 Platform = MpLocalPlayer.PlatformId,
-                MasterServerHost = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.hostName : null,
-                MasterServerPort = MpConnect.LastUsedMasterServer != null ? MpConnect.LastUsedMasterServer.port : MpConnect.DEFAULT_MASTER_PORT,
-                MpExVersion = _mpExVersion,
-                ServerType = serverType,
-                HostSecret = _hostSecret
+                MasterServerHost = Activity.MasterServer.hostName,
+                MasterServerPort = Activity.MasterServer.port,
+                MpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion,
+                ServerType = Activity.DetermineServerType(),
+                HostSecret = Activity.HostSecret,
+                Players = Activity.GetPlayersForAnnounce().ToList()
             };
-
-            lobbyAnnounce.Players = new List<HostedGamePlayer>();
-            lobbyAnnounce.Players.Add(new HostedGamePlayer()
-            {
-                SortIndex = localPlayer.sortIndex,
-                UserId = localPlayer.userId,
-                UserName = localPlayer.userName,
-                IsHost = localPlayer.isConnectionOwner,
-                Latency = localPlayer.currentLatency
-            });
-            foreach (var connectedPlayer in connectedPlayers)
-            {
-                lobbyAnnounce.Players.Add(new HostedGamePlayer()
-                {
-                    SortIndex = connectedPlayer.sortIndex,
-                    UserId = connectedPlayer.userId,
-                    UserName = connectedPlayer.userName,
-                    IsHost = connectedPlayer.isConnectionOwner,
-                    Latency = connectedPlayer.currentLatency
-                });
-            }
-
-            return lobbyAnnounce;
         }
         #endregion
 
-        #region Announce/API
+        #region Announce actions
         private static Dictionary<string, AnnounceState> _announceStates = new();
         
         /// <summary>
@@ -280,18 +308,12 @@ namespace ServerBrowser.Core
             }
 
             announceState = _announceStates[announce.ServerCode];
-            
-            if (announceState.IsPending)
-                return false;
-            
-            announceState.IsPending = true;
 
             // Try send announce
             var resultOk = false;
             
             if (await BSSBMasterAPI.Announce(announce))
             {
-                announceState.IsPending = false;
                 announceState.DidAnnounce = true;
                 announceState.LastSuccess = DateTime.Now;
 
@@ -300,7 +322,6 @@ namespace ServerBrowser.Core
             }
             else
             {
-                announceState.IsPending = false;
                 announceState.DidFail = true;
                 announceState.LastFailure = DateTime.Now;
 

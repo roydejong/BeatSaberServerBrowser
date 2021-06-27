@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using ServerBrowser.Core;
+using ServerBrowser.Game;
 
 namespace ServerBrowser.Harmony
 {
@@ -9,9 +10,9 @@ namespace ServerBrowser.Harmony
     [HarmonyPatch(typeof(MultiplayerSettingsPanelController), "SetLobbyCode", MethodType.Normal)]
     public static class SetLobbyCodePatch
     {
-        public static void Postfix(string code)
+        public static void Postfix(string code, MultiplayerSettingsPanelController __instance)
         {
-            GameStateManager.HandleLobbyCode(code);
+            MpEvents.RaiseServerCodeChanged(__instance, code);
         }
     }
 }

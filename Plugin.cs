@@ -7,7 +7,8 @@ using ServerBrowser.UI;
 using ServerBrowser.UI.Components;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
+using ServerBrowser.Game.Models;
+using ServerBrowser.Presence;
 using IPALogger = IPA.Logging.Logger;
 
 namespace ServerBrowser
@@ -23,6 +24,8 @@ namespace ServerBrowser
 
         internal static HarmonyLib.Harmony Harmony { get; private set; }
         internal static HttpClient HttpClient { get; private set; }
+        
+        internal static PresenceManager PresenceManager { get; private set; }
 
         public static string UserAgent
         {
@@ -58,6 +61,13 @@ namespace ServerBrowser
 
             // Assets
             Sprites.Initialize();
+            
+            // Bind events
+            GameStateManager.SetUp();
+            
+            // Rich Presence
+            PresenceManager = new PresenceManager();
+            PresenceManager.Start(GameStateManager.Activity);
 
             // HTTP client
             HttpClient = new HttpClient();
@@ -68,13 +78,16 @@ namespace ServerBrowser
         [OnExit]
         public async void OnApplicationQuit()
         {
-            Log?.Debug("OnApplicationQuit");
-
             // Destroy update timer
             UpdateTimer.DestroyTimerObject();
 
             // Clean up events
+            GameStateManager.TearDown();
             MpSession.TearDown();
+            
+            // Rich Presence
+            PresenceManager = new PresenceManager();
+            PresenceManager.Stop();
 
             // Try to cancel any host announcements we may have had
             await GameStateManager.UnAnnounce();
@@ -104,7 +117,7 @@ namespace ServerBrowser
             PluginUi.SetUp();
 
             // Initial state update
-            GameStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate(false);
 
             // Read local player info
             await MpLocalPlayer.SetUp();

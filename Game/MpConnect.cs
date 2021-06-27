@@ -95,7 +95,7 @@ namespace ServerBrowser.Game
         private static MasterServerEndPoint _moddedEndPoint;
         private static bool _usingModdedServer;
 
-        public static MasterServerEndPoint OverrideEndPoint { get; private set; } = null;
+        public static MasterServerEndPoint? OverrideEndPoint { get; private set; } = null;
         public static MasterServerEndPoint LastUsedMasterServer { get; private set; } = null;
 
         public static bool ShouldDisableCertificateValidation

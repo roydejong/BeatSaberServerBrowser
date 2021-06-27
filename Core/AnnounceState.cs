@@ -3,7 +3,7 @@ using System;
 namespace ServerBrowser.Core
 {
     /// <summary>
-    /// Tracks the state of announces.
+    /// Tracks the state of announces sent to the BSSB API.
     /// </summary>
     public class AnnounceState
     {
@@ -11,9 +11,9 @@ namespace ServerBrowser.Core
         public string OwnerId = null;
         public string HostSecret = null;
 
-        public bool IsPending = false;
         public bool DidAnnounce = false;
         public DateTime? LastSuccess = null;
+        
         public bool DidFail = false;
         public DateTime? LastFailure = null;
     }

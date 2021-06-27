@@ -20,6 +20,8 @@ namespace ServerBrowser.Harmony
                 // We are overriding the endpoint, to replace either the official or modded value
                 __result = MpConnect.OverrideEndPoint;
             }
+
+            MpEvents.RaiseMasterServerChanged(__instance, __result);
         }
     }
 }

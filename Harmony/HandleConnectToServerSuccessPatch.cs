@@ -3,6 +3,7 @@ using HarmonyLib;
 using IPA.Utilities;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
+using ServerBrowser.Game.Models;
 
 namespace ServerBrowser.Harmony
 {
@@ -16,7 +17,7 @@ namespace ServerBrowser.Harmony
         public static bool Prefix(string userId, string userName, IPEndPoint remoteEndPoint, string secret,
             string code, DiscoveryPolicy discoveryPolicy, InvitePolicy invitePolicy, int maxPlayerCount,
             GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
-            bool isConnectionOwner, bool isDedicatedServer)
+            bool isConnectionOwner, bool isDedicatedServer, MasterServerConnectionManager __instance)
         {
             if (isDedicatedServer && MpModeSelection.WeInitiatedConnection &&
                 (MpModeSelection.InjectQuickPlaySecret != secret || MpModeSelection.InjectServerCode != code))
@@ -30,8 +31,22 @@ namespace ServerBrowser.Harmony
                 return false;
             }
 
-            // Track the server connection and update game state as needed
-            GameStateManager.HandleConnectSuccess(code, secret, isDedicatedServer, configuration);
+            // Track the server connection and update game state as needed 
+            MpEvents.RaiseBeforeConnectToServer(__instance, new ConnectToServerEventArgs()
+            {
+                UserId = userId,
+                UserName = userName,
+                RemoteEndPoint = remoteEndPoint,
+                Secret = secret,
+                Code = code,
+                DiscoveryPolicy = discoveryPolicy,
+                InvitePolicy = invitePolicy,
+                MaxPlayerCount = maxPlayerCount,
+                Configuration = configuration,
+                IsDedicatedServer = isDedicatedServer,
+                IsConnectionOwner = isConnectionOwner
+            });
+            
             return true;
         }
     }

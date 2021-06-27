@@ -62,7 +62,7 @@ namespace ServerBrowser.Core
             {
                 // We are the host and announcing a game, or actively sharing a quick play lobby
                 Plugin.Log?.Debug("Host timer tick: sending periodic update to master server");
-                GameStateManager.HandleUpdate();
+                GameStateManager.HandleUpdate(false);
             }
         }
         #endregion

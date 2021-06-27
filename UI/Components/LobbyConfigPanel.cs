@@ -48,7 +48,7 @@ namespace ServerBrowser.UI.Components
         public void SetLobbyAnnounceToggle(bool value)
         {
             LobbyAnnounceToggleValue = value;
-            GameStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate(false);
         }
         #endregion
 
@@ -88,8 +88,8 @@ namespace ServerBrowser.UI.Components
             text = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty
             NameValue = text;
 
-            // Name update on announce
-            GameStateManager.HandleCustomGameName(text);
+            // Announce update
+            GameStateManager.HandleUpdate(true);
         }
 
 
