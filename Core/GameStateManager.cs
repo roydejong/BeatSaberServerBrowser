@@ -99,8 +99,12 @@ namespace ServerBrowser.Core
         private static void OnSessionConnected(object sender, SessionConnectedEventArgs e)
         {
             Activity.MaxPlayerCount = e.MaxPlayers;
-            Activity.Players ??= new List<IConnectedPlayer>(e.MaxPlayers);
             Activity.HostUserId = e.ConnectionOwner.userId;
+            
+            if (Activity.Players == null) 
+                Activity.Players = new List<IConnectedPlayer>(e.MaxPlayers);
+            else
+                Activity.Players.Clear();
             
             OnPlayerConnected(sender, e.LocalPlayer);
             OnPlayerConnected(sender, e.ConnectionOwner);
@@ -127,7 +131,7 @@ namespace ServerBrowser.Core
 
         private static void OnPlayerConnected(object sender, IConnectedPlayer player)
         {
-            if (Activity.Players == null || Activity.Players.Contains(player))
+            if (Activity.Players == null || Activity.Players.Any(p => p.userId == player.userId))
                 return;
             
             Activity.Players.Add(player);
@@ -256,31 +260,28 @@ namespace ServerBrowser.Core
         /// <summary>
         /// Generates the announce payload for the master server API.
         /// </summary>
-        private static HostedGameData GenerateAnnounce()
+        private static HostedGameData GenerateAnnounce() => new()
         {
-            return new HostedGameData()
-            {
-                ServerCode = Activity.ServerCode!,
-                GameName = MpSession.GetHostGameName(),
-                OwnerId = Activity.ConnectionOwner!.userId,
-                OwnerName = Activity.ConnectionOwner!.userName,
-                PlayerCount = Activity.CurrentPlayerCount,
-                PlayerLimit = Activity.MaxPlayerCount,
-                IsModded = Activity.IsModded,
-                LobbyState = Activity.LobbyState,
-                LevelId = Activity.CurrentLevel?.levelID,
-                SongName = Activity.CurrentLevel?.songName,
-                SongAuthor = Activity.CurrentLevel?.songAuthorName,
-                Difficulty = Activity.CurrentDifficulty,
-                Platform = MpLocalPlayer.PlatformId,
-                MasterServerHost = Activity.MasterServer.hostName,
-                MasterServerPort = Activity.MasterServer.port,
-                MpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion,
-                ServerType = Activity.DetermineServerType(),
-                HostSecret = Activity.HostSecret,
-                Players = Activity.GetPlayersForAnnounce().ToList()
-            };
-        }
+            ServerCode = Activity.ServerCode!,
+            GameName = MpSession.GetHostGameName(),
+            OwnerId = Activity.ConnectionOwner!.userId,
+            OwnerName = Activity.ConnectionOwner!.userName,
+            PlayerCount = Activity.CurrentPlayerCount,
+            PlayerLimit = Activity.MaxPlayerCount,
+            IsModded = Activity.IsModded,
+            LobbyState = Activity.LobbyState,
+            LevelId = Activity.CurrentLevel?.levelID,
+            SongName = Activity.CurrentLevel?.songName,
+            SongAuthor = Activity.CurrentLevel?.songAuthorName,
+            Difficulty = Activity.DetermineLobbyDifficulty(),
+            Platform = MpLocalPlayer.PlatformId,
+            MasterServerHost = Activity.MasterServer.hostName,
+            MasterServerPort = Activity.MasterServer.port,
+            MpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion,
+            ServerType = Activity.DetermineServerType(),
+            HostSecret = Activity.HostSecret,
+            Players = Activity.GetPlayersForAnnounce().ToList()
+        };
         #endregion
 
         #region Announce actions

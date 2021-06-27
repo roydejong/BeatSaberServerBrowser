@@ -89,6 +89,14 @@ namespace ServerBrowser.Game.Models
                 }
             }
         }
+
+        public BeatmapDifficulty? DetermineLobbyDifficulty()
+        {
+            var difficulty = CurrentDifficulty;
+            if (difficulty == null && ServerConfiguration.HasValue)
+                difficulty = ServerConfiguration.Value.difficulties.FromMask();
+            return difficulty;
+        }
         #endregion
     }
 }
