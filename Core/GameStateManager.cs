@@ -98,7 +98,9 @@ namespace ServerBrowser.Core
 
         private static void OnSessionConnected(object sender, SessionConnectedEventArgs e)
         {
-            Activity.MaxPlayerCount = e.MaxPlayers;
+            if (e.MaxPlayers > 0)
+                Activity.MaxPlayerCount = e.MaxPlayers;
+            
             Activity.HostUserId = e.ConnectionOwner.userId;
             
             if (Activity.Players == null) 

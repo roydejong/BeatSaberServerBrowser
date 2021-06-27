@@ -32,7 +32,7 @@ namespace ServerBrowser.Game.Models
         #endregion
 
         #region Getters
-        public int CurrentPlayerCount => Players?.Count ?? 1;
+        public int CurrentPlayerCount => Players?.Count(p => p.sortIndex >= 0 && !p.isKicked) ?? 1;
         
         public bool IsInMultiplayer => ConnectionType != LobbyConnectionType.None &&
                                        LobbyState != MultiplayerLobbyState.None &&
