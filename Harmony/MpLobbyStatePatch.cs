@@ -12,10 +12,17 @@ namespace ServerBrowser.Harmony
     [HarmonyPatch(typeof(LobbyGameStateController), "state", MethodType.Setter)]
     public static class MpLobbyStatePatch
     {
+        private static MultiplayerLobbyState _lastState = MultiplayerLobbyState.None;
+        
         public static void Postfix(LobbyGameStateController __instance)
         {
             var nextState = __instance.GetProperty<MultiplayerLobbyState, LobbyGameStateController>("state");
-            MpEvents.RaiseLobbyStateChanged(__instance, nextState);
+
+            if (nextState != _lastState)
+            {
+                _lastState = nextState;
+                MpEvents.RaiseLobbyStateChanged(__instance, nextState);
+            }
         }
     }
 }
