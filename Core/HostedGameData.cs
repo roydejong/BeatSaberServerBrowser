@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using ServerBrowser.Game;
-using ServerBrowser.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using Newtonsoft.Json;
+using ServerBrowser.Game;
+using ServerBrowser.Utils.Serialization;
 
 namespace ServerBrowser.Core
 {

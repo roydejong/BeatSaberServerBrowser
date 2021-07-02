@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
-namespace ServerBrowser.Utils
+namespace ServerBrowser.Utils.Serialization
 {
     public class SemVerJsonConverter : JsonConverter<SemVer.Version>
     {

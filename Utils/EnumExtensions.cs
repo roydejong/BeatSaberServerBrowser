@@ -3,18 +3,29 @@ using System.Text.RegularExpressions;
 
 namespace ServerBrowser.Utils
 {
-    public static class EnumExtensions
+    internal static class EnumExtensions
     {
-        public static string ToStringWithSpaces<T>(this T value) where T : Enum
+        internal static string ToStringWithSpaces<T>(this T value) where T : Enum
         {
             return Regex.Replace(value.ToString(), "(\\B[A-Z])", " $1");
         }
         
-        public static string ToStringWithSpaces<T>(this T? value) where T : struct, Enum
+        internal static string ToStringWithSpaces<T>(this T? value) where T : struct, Enum
         {
             if (!value.HasValue)
                 return "-";
             return value.Value.ToStringWithSpaces();
+        }
+
+        internal static string ToNiceName(this BeatmapDifficulty difficulty)
+        {
+            switch (difficulty)
+            {
+                case BeatmapDifficulty.ExpertPlus:
+                    return "Expert+";
+                default:
+                    return difficulty.ToStringWithSpaces();
+            }
         }
     }
 }

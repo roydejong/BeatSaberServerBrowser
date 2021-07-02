@@ -1,12 +1,11 @@
-﻿using ServerBrowser.Game;
-using ServerBrowser.Harmony;
-using ServerBrowser.UI.Components;
-using ServerBrowser.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ServerBrowser.Game;
 using ServerBrowser.Game.Models;
+using ServerBrowser.UI.Components;
+using ServerBrowser.Utils;
 using static MultiplayerLobbyConnectionController;
 
 namespace ServerBrowser.Core
@@ -98,6 +97,8 @@ namespace ServerBrowser.Core
 
         private static void OnSessionConnected(object sender, SessionConnectedEventArgs e)
         {
+            Activity.SessionStartedAt = DateTime.Now;
+
             if (e.MaxPlayers > 0)
                 Activity.MaxPlayerCount = e.MaxPlayers;
             
@@ -127,6 +128,7 @@ namespace ServerBrowser.Core
             Activity.CurrentDifficulty = null;
             Activity.CurrentCharacteristic = null;
             Activity.CurrentModifiers = null;
+            Activity.SessionStartedAt = null;
                 
             HandleUpdate();
         }

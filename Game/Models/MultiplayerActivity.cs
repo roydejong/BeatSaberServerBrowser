@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using ServerBrowser.Core;
+using ServerBrowser.Presence;
 using ServerBrowser.Utils;
+using static ServerBrowser.Presence.PresenceSecret;
 using static MultiplayerLobbyConnectionController;
 
 namespace ServerBrowser.Game.Models
@@ -29,6 +30,7 @@ namespace ServerBrowser.Game.Models
         public BeatmapDifficulty? CurrentDifficulty;
         public BeatmapCharacteristicSO? CurrentCharacteristic;
         public GameplayModifiers? CurrentModifiers;
+        public DateTime? SessionStartedAt;
         #endregion
 
         #region Getters
@@ -44,10 +46,10 @@ namespace ServerBrowser.Game.Models
 
         public bool IsQuickPlay => ConnectionType == LobbyConnectionType.QuickPlay;
 
-        public string CurrentDifficultyName => CurrentDifficulty.ToStringWithSpaces();
+        public string CurrentDifficultyName => CurrentDifficulty?.ToNiceName() ?? "Unknown";
 
         public string DifficultyMaskName => ServerConfiguration.HasValue
-            ? ServerConfiguration.Value.difficulties.ToStringWithSpaces()
+            ? ServerConfiguration.Value.difficulties.FromMask().ToNiceName()
             : "All";
 
         public IConnectedPlayer? ConnectionOwner => Players?.FirstOrDefault(p => p.isConnectionOwner);
@@ -96,6 +98,30 @@ namespace ServerBrowser.Game.Models
             if (difficulty == null && ServerConfiguration.HasValue)
                 difficulty = ServerConfiguration.Value.difficulties.FromMask();
             return difficulty;
+        }
+        #endregion
+
+        #region Presence helpers
+        public PresenceSecret[] GetPresenceSecrets()
+        {
+            var secrets = new PresenceSecret[3];
+            secrets[(byte)PresenceSecretType.Match] = GetPresenceSecret(PresenceSecretType.Match); 
+            secrets[(byte)PresenceSecretType.Join] = GetPresenceSecret(PresenceSecretType.Join); 
+            secrets[(byte)PresenceSecretType.Spectate] = GetPresenceSecret(PresenceSecretType.Spectate);
+            return secrets;
+        }
+
+        private PresenceSecret GetPresenceSecret(PresenceSecretType secretType)
+        {
+            return new()
+            {
+                SecretType = secretType,
+                MasterServerEndPoint = MasterServer,
+                ServerCode = ServerCode,
+                HostSecret = HostSecret,
+                ServerType = DetermineServerType(),
+                // TODO Can we track MpEx version for the connection owner?
+            };
         }
         #endregion
     }

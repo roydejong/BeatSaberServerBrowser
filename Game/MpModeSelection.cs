@@ -1,10 +1,9 @@
-﻿using HMUI;
+﻿using System;
+using System.Linq;
+using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
 using ServerBrowser.UI;
-using ServerBrowser.Utils;
-using System;
-using System.Linq;
 using UnityEngine;
 using static HMUI.ViewController;
 

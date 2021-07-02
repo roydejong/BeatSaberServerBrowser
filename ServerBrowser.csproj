@@ -238,6 +238,7 @@
     <Compile Include="Presence\DiscordCore\PresenceProvider.cs" />
     <Compile Include="Presence\IPresenceProvider.cs" />
     <Compile Include="Presence\PresenceManager.cs" />
+    <Compile Include="Presence\PresenceSecret.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Components\CreateServerExtensions.cs" />
     <Compile Include="UI\Components\HostedGameCellData.cs" />
@@ -251,7 +252,8 @@
     <Compile Include="Utils\ConnectionErrorText.cs" />
     <Compile Include="Utils\CoverArtGrabber.cs" />
     <Compile Include="Utils\ModChecker.cs" />
-    <Compile Include="Utils\SemVerJsonConverter.cs" />
+    <Compile Include="Utils\Serialization\MasterServerEndPointJsonConverter.cs" />
+    <Compile Include="Utils\Serialization\SemVerJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />

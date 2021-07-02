@@ -1,15 +1,14 @@
-using System;
 using Discord;
-using ServerBrowser.Utils;
 using DiscordCore;
-using JetBrains.Annotations;
-using ServerBrowser.Assets;
 using ServerBrowser.Game.Models;
+using ServerBrowser.Utils;
 
 namespace ServerBrowser.Presence.DiscordCore
 {
     public class PresenceProvider : IPresenceProvider
     {
+        private const long DiscordAppId = 860315531944001556;
+        
         private DiscordInstance _instance;
 
         public bool GetIsAvailable()
@@ -24,9 +23,9 @@ namespace ServerBrowser.Presence.DiscordCore
             _instance = DiscordManager.instance.CreateInstance(new DiscordSettings()
             {
                 handleInvites = true,
-                modIcon = Sprites.Portal,
                 modId = Plugin.HarmonyId,
-                modName = "Beat Saber Server Browser"
+                modName = "Beat Saber Server Browser",
+                appId = DiscordAppId
             });
 
             _instance.OnActivityInvite += OnDiscordActivityInvite;
@@ -51,33 +50,39 @@ namespace ServerBrowser.Presence.DiscordCore
         #region Events from Discord
         private void OnDiscordActivityInvite(ActivityActionType type, ref User user, ref Activity activity)
         {
-            Plugin.Log?.Warn("OnDiscordActivityInvite");
+            Plugin.Log?.Debug($"[PresenceProvider] OnDiscordActivityInvite");
         }
         
         private void OnDiscordActivityJoinRequest(ref User user)
         {
-            Plugin.Log?.Warn("OnDiscordActivityJoinRequest");
+            Plugin.Log?.Debug("[PresenceProvider] OnDiscordActivityJoinRequest");
         }
 
         private void OnDiscordActivitySpectate(string secret)
         {
-            Plugin.Log?.Warn("OnDiscordActivitySpectate");
+            Plugin.Log?.Debug("[PresenceProvider] OnDiscordActivitySpectate");
+            PresenceSecret.FromString(secret).Connect();
         }
 
         private void OnDiscordActivityJoin(string secret)
         {
-            Plugin.Log?.Warn("OnDiscordActivityJoin");
+            Plugin.Log?.Debug("[PresenceProvider] OnDiscordActivityJoin");
+            PresenceSecret.FromString(secret).Connect();
         }
         #endregion
 
         #region Update
         public void Update(MultiplayerActivity? activity)
         {
-            if (activity == null || !activity.IsInMultiplayer)
+            if (activity is not {IsInMultiplayer: true} || activity.ServerCode == null
+                                                        || activity.SessionStartedAt == null)
             {
+                // Not in a multiplayer activity, or not enough data to make secrets
                 _instance.ClearActivity();
                 return;
             }
+
+            var matchSecrets = activity.GetPresenceSecrets();
 
             // Base
             var discordActivity = new Activity()
@@ -93,13 +98,18 @@ namespace ServerBrowser.Presence.DiscordCore
                 },
                 Secrets = new ActivitySecrets()
                 {
-                    Match = activity.HostSecret,
-                    Join = activity.ServerCode,
-                    Spectate = activity.ServerCode
+                    Match = matchSecrets[(byte)PresenceSecret.PresenceSecretType.Match].ToString(),
+                    Join = matchSecrets[(byte)PresenceSecret.PresenceSecretType.Join].ToString(),
+                    Spectate = matchSecrets[(byte)PresenceSecret.PresenceSecretType.Spectate].ToString()
                 },
                 Timestamps = new ActivityTimestamps()
                 {
-                    Start = DateTime.Now.Ticks,
+                    Start = activity.SessionStartedAt.Value.ToUnixTime()
+                },
+                Assets = new ActivityAssets()
+                {
+                    LargeImage = "bslogo",
+                    SmallImage = "inlobby"
                 }
             };
 
@@ -107,25 +117,32 @@ namespace ServerBrowser.Presence.DiscordCore
             if (activity.IsQuickPlay)
             {
                 discordActivity.State = $"In Quick Play ({activity.DifficultyMaskName})";
+                discordActivity.Assets.LargeText = "Quick Play";
             }
             else if (activity.IsHost)
             {
-                discordActivity.State = "Hosting Multiplayer Game";
+                discordActivity.State = $"Hosting {activity.Name}";
+                discordActivity.Assets.LargeText = "Custom Game (Host)";
             }
             else
             {
-                discordActivity.State = "In Multiplayer Game";
+                discordActivity.State = $"In {activity.Name}";
+                discordActivity.Assets.LargeText = "Custom Game (Player)";
             }
 
             // Subtitle
             if (activity.IsInGameplay && activity.CurrentLevel != null)
             {
                 discordActivity.Details =
-                    $"Playing {activity.CurrentLevel.songName} ({activity.CurrentDifficultyName})";
+                    $"Playing \"{activity.CurrentLevel.songName}\" ({activity.CurrentDifficultyName})";
+                discordActivity.Assets.SmallImage = "lightsaber";
+                discordActivity.Assets.SmallText = "Playing level";
             }
             else
             {
-                discordActivity.Details = $"In lobby ({activity.CurrentPlayerCount}/{activity.MaxPlayerCount} players)";
+                discordActivity.Details = $"In lobby";
+                discordActivity.Assets.SmallImage = "inlobby";
+                discordActivity.Assets.SmallText = "In lobby";
             }
 
             // Apply
