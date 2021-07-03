@@ -1,7 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using HarmonyLib;
-using IPA.Utilities;
-using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.Game.Models;
 
@@ -19,8 +18,10 @@ namespace ServerBrowser.Harmony
             GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
             bool isConnectionOwner, bool isDedicatedServer, MasterServerConnectionManager __instance)
         {
-            if (isDedicatedServer && MpModeSelection.WeInitiatedConnection &&
-                (MpModeSelection.InjectQuickPlaySecret != secret || MpModeSelection.InjectServerCode != code))
+            if (isDedicatedServer && MpModeSelection.WeInitiatedConnection
+                                  && !String.IsNullOrEmpty(MpModeSelection.InjectQuickPlaySecret)
+                                  && (MpModeSelection.InjectQuickPlaySecret != secret
+                                      || MpModeSelection.InjectServerCode != code))
             {
                 // Matchmaking put us in the wrong Quick Play lobby, which means our injected secret failed
                 Plugin.Log?.Warn($"HandleConnectToServerSuccess: Matchmaking did not put us in the expected " +
