@@ -1,6 +1,4 @@
 ﻿using ServerBrowser.Harmony;
-using System;
-using System.Threading;
 using UnityEngine;
 
 namespace ServerBrowser.Core
@@ -62,7 +60,7 @@ namespace ServerBrowser.Core
             {
                 // We are the host and announcing a game, or actively sharing a quick play lobby
                 Plugin.Log?.Debug("Host timer tick: sending periodic update to master server");
-                GameStateManager.HandleUpdate(false);
+                GameStateManager.HandleUpdate();
             }
         }
         #endregion

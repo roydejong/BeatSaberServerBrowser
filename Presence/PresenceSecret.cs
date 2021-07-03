@@ -32,6 +32,10 @@ namespace ServerBrowser.Presence
 
         public void Connect()
         {
+            Plugin.Log?.Info("[Presence] Connecting to session via Rich Presence invite" +
+                             $" (MasterServerEndPoint={MasterServerEndPoint}, ServerCode={ServerCode}" +
+                             $", HostSecret={HostSecret}, ServerType={ServerType})");
+            
             // Set master server
             MpConnect.SetMasterServerOverride(MasterServerEndPoint);
             

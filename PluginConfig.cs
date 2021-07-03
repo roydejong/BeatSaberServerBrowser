@@ -24,5 +24,10 @@
         /// This can be toggled from the in-lobby modifiers panel.
         /// </summary>
         public bool JoinNotificationsEnabled { get; set; } = true;
+
+        /// <summary>
+        /// This setting controls whether the Discord Rich Presence feature is globally enabled or not.
+        /// </summary>
+        public bool DiscordRichPresenceEnabled { get; set; } = true;
     }
 }

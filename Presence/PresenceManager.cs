@@ -33,7 +33,7 @@ namespace ServerBrowser.Presence
             
             if (!provider.GetIsAvailable())
             {
-                Plugin.Log?.Warn($"[PresenceManager] Provider unavailable for current install: {providerId}");
+                Plugin.Log?.Warn($"[PresenceManager] Provider disabled or unavailable: {providerId}");
                 return;
             }
 

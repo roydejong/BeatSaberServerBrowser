@@ -102,16 +102,7 @@ namespace ServerBrowser.Game.Models
         #endregion
 
         #region Presence helpers
-        public PresenceSecret[] GetPresenceSecrets()
-        {
-            var secrets = new PresenceSecret[3];
-            secrets[(byte)PresenceSecretType.Match] = GetPresenceSecret(PresenceSecretType.Match); 
-            secrets[(byte)PresenceSecretType.Join] = GetPresenceSecret(PresenceSecretType.Join); 
-            secrets[(byte)PresenceSecretType.Spectate] = GetPresenceSecret(PresenceSecretType.Spectate);
-            return secrets;
-        }
-
-        private PresenceSecret GetPresenceSecret(PresenceSecretType secretType)
+        public PresenceSecret GetPresenceSecret(PresenceSecretType secretType)
         {
             return new()
             {
