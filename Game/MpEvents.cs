@@ -9,6 +9,28 @@ namespace ServerBrowser.Game
     /// </summary>
     internal static class MpEvents
     {
+        #region OnlineMenuOpened
+        /// <summary>
+        /// This event is raised when the online menu is opened.
+        /// This is the "main" event to subscribe to if you don't need granular updates.
+        /// </summary>
+        internal static event EventHandler<OnlineMenuOpenedEventArgs>? OnlineMenuOpened;
+
+        internal static void RaiseOnlineMenuOpened(object sender, OnlineMenuOpenedEventArgs e) =>
+            OnlineMenuOpened.RaiseEventSafe(sender, e);
+        #endregion
+
+        #region OnlineMenuClosed
+        /// <summary>
+        /// This event is raised when the online menu is opened.
+        /// This is the "main" event to subscribe to if you don't need granular updates.
+        /// </summary>
+        internal static event EventHandler<EventArgs>? OnlineMenuClosed;
+
+        internal static void RaiseOnlineMenuClosed(object sender) =>
+            OnlineMenuClosed.RaiseEventSafe(sender, EventArgs.Empty);
+        #endregion
+        
         #region ActivityUpdated
         /// <summary>
         /// This event is raised when the local multiplayer state changes.
@@ -128,7 +150,7 @@ namespace ServerBrowser.Game
             if (e == null)
                 return;
             
-            Plugin.Log?.Info($"[MpEvents] Invoking event: {e.Method.Name} ({args})");
+            Plugin.Log?.Info($"[MpEvents] {e.Method.Name} ({args})");
 
             foreach (var invocation in e.GetInvocationList())
             {

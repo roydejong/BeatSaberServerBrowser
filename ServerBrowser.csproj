@@ -210,6 +210,7 @@
     <Compile Include="Core\HostedGamePlayer.cs" />
     <Compile Include="Game\Models\ConnectToServerEventArgs.cs" />
     <Compile Include="Game\Models\MultiplayerActivity.cs" />
+    <Compile Include="Game\Models\OnlineMenuOpenedEventArgs.cs" />
     <Compile Include="Game\Models\SessionConnectedEventArgs.cs" />
     <Compile Include="Game\Models\StartingMultiplayerLevelEventArgs.cs" />
     <Compile Include="Game\MpEvents.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Game\MpSession.cs" />
     <Compile Include="Harmony\MpConnectionErrorDialogPatch.cs" />
     <Compile Include="Harmony\MpLobbyStatePatch.cs" />
+    <Compile Include="Harmony\MpModeSelectionDeactivatedPatch.cs" />
     <Compile Include="Harmony\SetLobbyCodePatch.cs" />
     <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
     <Compile Include="Harmony\MpModeSelectionButtonPatch.cs" />

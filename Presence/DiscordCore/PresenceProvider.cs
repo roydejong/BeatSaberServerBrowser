@@ -82,10 +82,13 @@ namespace ServerBrowser.Presence.DiscordCore
         public void Update(MultiplayerActivity? activity)
         {
             var discord = _discordInstance as DiscordInstance;
-            
-            if (activity is null)
+
+            if (activity is null || !activity.InOnlineMenu)
+            {
+                discord.ClearActivity();
                 return;
-            
+            }
+
             // Create base activity
             var discordActivity = new Activity()
             {

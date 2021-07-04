@@ -15,6 +15,7 @@ namespace ServerBrowser.Game.Models
     public sealed class MultiplayerActivity
     {
         #region Fields
+        public bool InOnlineMenu;
         public string Name;
         public MasterServerEndPoint MasterServer;
         public LobbyConnectionType ConnectionType;

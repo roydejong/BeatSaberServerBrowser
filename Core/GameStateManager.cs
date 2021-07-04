@@ -30,6 +30,8 @@ namespace ServerBrowser.Core
         #region Lifecycle
         public static void SetUp()
         {
+            MpEvents.OnlineMenuOpened += OnOnlineMenuOpened;
+            MpEvents.OnlineMenuClosed += OnOnlineMenuClosed;
             MpEvents.MasterServerChanged += OnMasterServerChanged;
             MpEvents.ConnectionTypeChanged += OnConnectionTypeChanged;
             MpEvents.ServerCodeChanged += OnServerCodeChanged;
@@ -44,6 +46,8 @@ namespace ServerBrowser.Core
 
         public static void TearDown()
         {
+            MpEvents.OnlineMenuOpened -= OnOnlineMenuOpened;
+            MpEvents.OnlineMenuClosed -= OnOnlineMenuClosed;
             MpEvents.MasterServerChanged -= OnMasterServerChanged;
             MpEvents.ConnectionTypeChanged += OnConnectionTypeChanged;
             MpEvents.ServerCodeChanged -= OnServerCodeChanged;
@@ -58,6 +62,19 @@ namespace ServerBrowser.Core
         #endregion
 
         #region Events
+        private static void OnOnlineMenuOpened(object sender, OnlineMenuOpenedEventArgs e)
+        {
+            Activity.InOnlineMenu = true;
+            
+            HandleUpdate();
+        }
+        private static void OnOnlineMenuClosed(object sender, EventArgs e)
+        {
+            Activity.InOnlineMenu = false;
+            
+            HandleUpdate();
+        }
+        
         private static void OnMasterServerChanged(object sender, MasterServerEndPoint endPoint)
         {
             Activity.MasterServer = endPoint;

@@ -1,5 +1,6 @@
 using System.Text;
 using Newtonsoft.Json;
+using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.Utils.Serialization;
 
@@ -32,6 +33,15 @@ namespace ServerBrowser.Presence
 
         public void Connect()
         {
+            // Check connection state
+            var mpActivity = GameStateManager.Activity;
+
+            if (!mpActivity.InOnlineMenu || mpActivity.IsInMultiplayer)
+            {
+                Plugin.Log?.Error("[Presence] Ignoring Rich Presence invite: must be in online menu!");
+                return;
+            }
+            
             Plugin.Log?.Info("[Presence] Connecting to session via Rich Presence invite" +
                              $" (MasterServerEndPoint={MasterServerEndPoint}, ServerCode={ServerCode}" +
                              $", HostSecret={HostSecret}, ServerType={ServerType})");
