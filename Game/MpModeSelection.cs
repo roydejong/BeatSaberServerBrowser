@@ -1,10 +1,9 @@
-﻿using HMUI;
+﻿using System;
+using System.Linq;
+using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
 using ServerBrowser.UI;
-using ServerBrowser.Utils;
-using System;
-using System.Linq;
 using UnityEngine;
 using static HMUI.ViewController;
 
@@ -14,11 +13,15 @@ namespace ServerBrowser.Game
     {
         public static bool WeInitiatedConnection { get; set; } = false;
         public static HostedGameData LastConnectToHostedGame { get; private set; } = null;
+        public static string InjectQuickPlaySecret { get; private set; } = null;
+        public static string InjectServerCode { get; private set; } = null;
 
         #region Init
         private static MultiplayerModeSelectionFlowCoordinator _flowCoordinator;
 
         private static MultiplayerLobbyConnectionController _mpLobbyConnectionController;
+        private static IUnifiedNetworkPlayerModel _unifiedNetworkPlayerModel;
+        
         private static JoiningLobbyViewController _joiningLobbyViewController;
         private static SimpleDialogPromptViewController _simpleDialogPromptViewController;
 
@@ -27,6 +30,8 @@ namespace ServerBrowser.Game
             _flowCoordinator = Resources.FindObjectsOfTypeAll<MultiplayerModeSelectionFlowCoordinator>().First();
 
             _mpLobbyConnectionController = ReflectionUtil.GetField<MultiplayerLobbyConnectionController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_multiplayerLobbyConnectionController");
+            _unifiedNetworkPlayerModel = ReflectionUtil.GetField<IUnifiedNetworkPlayerModel, MultiplayerLobbyConnectionController>(_mpLobbyConnectionController, "_unifiedNetworkPlayerModel");
+            
             _joiningLobbyViewController = ReflectionUtil.GetField<JoiningLobbyViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_joiningLobbyViewController");
             _simpleDialogPromptViewController = ReflectionUtil.GetField<SimpleDialogPromptViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_simpleDialogPromptViewController");
         }
@@ -69,24 +74,49 @@ namespace ServerBrowser.Game
 
             // If we are initiating the server menu from our UI, assume the intent is to host a game
             Plugin.Config.LobbyAnnounceToggle = true;
+            Plugin.Config.ShareQuickPlayGames = true;
 
             _flowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
         public static void ConnectToHostedGame(HostedGameData game)
         {
-            if (game == null || string.IsNullOrEmpty(game.ServerCode))
-            {
+            if (game == null)
                 return;
-            }
 
             MpModeSelection.WeInitiatedConnection = true;
             MpModeSelection.LastConnectToHostedGame = game;
+            MpModeSelection.InjectQuickPlaySecret = null;
+            MpModeSelection.InjectServerCode = game.ServerCode;
 
-            _mpLobbyConnectionController.ConnectToParty(game.ServerCode);
-            _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
+            if (game.IsQuickPlayServer && !string.IsNullOrEmpty(game.HostSecret))
+            {
+                // Join Quick Play server by secret
+                Plugin.Log.Info($"Trying to join Quick Play game by secret ({game.HostSecret})...");
+                
+                MpModeSelection.InjectQuickPlaySecret = game.HostSecret; // NB: JoinMatchmakingPatch will inject secret
 
-            ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+                var difficultyMask = BeatmapDifficultyMask.All;
+                if (game.ServerType == HostedGameData.ServerTypeVanillaQuickplay && game.Difficulty.HasValue)
+                    // Vanilla quick play is locked to a specific difficulty in the lobby
+                    difficultyMask = game.Difficulty.Value.ToMask();
+                
+                _mpLobbyConnectionController.ConnectToMatchmaking(difficultyMask, SongPackMask.all);
+                _joiningLobbyViewController.Init($"Trying to join {game.GameName}..."); 
+                
+                ReplaceTopViewController(_joiningLobbyViewController,
+                    animationDirection: ViewController.AnimationDirection.Vertical);
+            }   
+            else if (!string.IsNullOrEmpty(game.ServerCode))
+            {
+                // Join party by code
+                Plugin.Log.Info($"Trying to join custom game by code ({game.ServerCode})...");
+                
+                _mpLobbyConnectionController.ConnectToParty(game.ServerCode);
+                
+                _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
+                ReplaceTopViewController(_joiningLobbyViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+            }
         }
 
         public static void PresentConnectionFailedError(string errorTitle = "Connection failed", string errorMessage = null, bool canRetry = true)
@@ -113,10 +143,12 @@ namespace ServerBrowser.Game
             ReplaceTopViewController(_simpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
         }
 
-        public static void CancelLobbyJoin()
+        public static void CancelLobbyJoin(bool hideLoading = true)
         {
             _mpLobbyConnectionController.LeaveLobby();
-            _joiningLobbyViewController.HideLoading();
+            
+            if (hideLoading)
+                _joiningLobbyViewController.HideLoading();
         }
 
         public static void MakeServerBrowserTopView()

@@ -1,13 +1,15 @@
-﻿using IPA;
+﻿using System;
+using System.Net.Http;
+using System.Reflection;
+using IPA;
 using IPA.Config.Stores;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
+using ServerBrowser.Game.Models;
+using ServerBrowser.Presence;
 using ServerBrowser.UI;
 using ServerBrowser.UI.Components;
-using System.Net.Http;
-using System.Reflection;
-using System.Threading.Tasks;
 using IPALogger = IPA.Logging.Logger;
 
 namespace ServerBrowser
@@ -23,6 +25,8 @@ namespace ServerBrowser
 
         internal static HarmonyLib.Harmony Harmony { get; private set; }
         internal static HttpClient HttpClient { get; private set; }
+
+        internal static PresenceManager? PresenceManager { get; private set; }
 
         public static string UserAgent
         {
@@ -58,6 +62,12 @@ namespace ServerBrowser
 
             // Assets
             Sprites.Initialize();
+            
+            // Bind events
+            MpEvents.OnlineMenuOpened += OnOnlineMenuOpened;
+            MpEvents.OnlineMenuClosed += OnOnlineMenuClosed;
+            
+            GameStateManager.SetUp();
 
             // HTTP client
             HttpClient = new HttpClient();
@@ -68,13 +78,19 @@ namespace ServerBrowser
         [OnExit]
         public async void OnApplicationQuit()
         {
-            Log?.Debug("OnApplicationQuit");
-
             // Destroy update timer
             UpdateTimer.DestroyTimerObject();
 
             // Clean up events
+            MpEvents.OnlineMenuOpened -= OnOnlineMenuOpened;
+            MpEvents.OnlineMenuClosed -= OnOnlineMenuClosed;
+            
+            GameStateManager.TearDown();
             MpSession.TearDown();
+            
+            // Rich Presence
+            PresenceManager = new PresenceManager();
+            PresenceManager.Stop();
 
             // Try to cancel any host announcements we may have had
             await GameStateManager.UnAnnounce();
@@ -82,19 +98,23 @@ namespace ServerBrowser
         #endregion
 
         #region Core events
-        private bool _gotFirstActivation = false;
+        private bool _gotFirstActivation;
 
-        internal async void OnOnlineMenuActivated()
+        private async void OnOnlineMenuOpened(object sender, OnlineMenuOpenedEventArgs e)
         {
-            // Create/start update timer
+            // Create or resume update timer
             UpdateTimer.StartTimer();
+            
+            // Create or resume Rich Presence
+            PresenceManager ??= new PresenceManager();
+            PresenceManager.Start(GameStateManager.Activity);
             
             // Most things only need to be setup once
             if (_gotFirstActivation)
                 return;
             _gotFirstActivation = true;
 
-            Plugin.Log?.Info("Multiplayer / Online menu opened for the first time, setting up.");
+            Log?.Info("Multiplayer / Online menu opened for the first time, setting up.");
             
             // Bind multiplayer session events
             MpSession.SetUp();
@@ -104,7 +124,7 @@ namespace ServerBrowser
             PluginUi.SetUp();
 
             // Initial state update
-            GameStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate(false);
 
             // Read local player info
             await MpLocalPlayer.SetUp();
@@ -117,6 +137,13 @@ namespace ServerBrowser
 
                 Log?.Info($"Running {UserAgent}");
             }
+        }
+
+        private void OnOnlineMenuClosed(object sender, EventArgs e)
+        {
+            // Suspend online-specific features until the menu is reopened
+            UpdateTimer.StopTimer();
+            PresenceManager?.Stop();
         }
         #endregion
     }

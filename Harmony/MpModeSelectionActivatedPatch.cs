@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using HMUI;
 using IPA.Utilities;
+using ServerBrowser.Game;
+using ServerBrowser.Game.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,8 +13,11 @@ namespace ServerBrowser.Harmony
     {
         public static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
-            // Plugin startup hook
-            Plugin.Instance.OnOnlineMenuActivated();
+            // Raise internal event
+            MpEvents.RaiseOnlineMenuOpened(__instance, new OnlineMenuOpenedEventArgs()
+            {
+                FirstActivation = firstActivation
+            });
 
             // Enable the "game browser" button (it was left in the game but unused currently)
             var btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");

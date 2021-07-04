@@ -27,12 +27,20 @@ namespace ServerBrowser.UI.Components
         {
             get
             {
-                return Plugin.Config.LobbyAnnounceToggle;
+                if (MpLobbyConnectionTypePatch.IsPartyHost)
+                    return Plugin.Config.LobbyAnnounceToggle;
+                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    return Plugin.Config.ShareQuickPlayGames;
+                return false;
             }
 
             set
             {
-                Plugin.Config.LobbyAnnounceToggle = value;
+                if (MpLobbyConnectionTypePatch.IsPartyHost)
+                    Plugin.Config.LobbyAnnounceToggle = value;
+                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    Plugin.Config.ShareQuickPlayGames = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -40,7 +48,7 @@ namespace ServerBrowser.UI.Components
         public void SetLobbyAnnounceToggle(bool value)
         {
             LobbyAnnounceToggleValue = value;
-            GameStateManager.HandleUpdate();
+            GameStateManager.HandleUpdate(false);
         }
         #endregion
 
@@ -80,8 +88,8 @@ namespace ServerBrowser.UI.Components
             text = MpSession.GetHostGameName(); // this will read CustomGameName but fall back to a default name if left empty
             NameValue = text;
 
-            // Name update on announce
-            GameStateManager.HandleCustomGameName(text);
+            // Announce update
+            GameStateManager.HandleUpdate(true);
         }
 
 
@@ -155,9 +163,10 @@ namespace ServerBrowser.UI.Components
 
             sessionManager = MpSession.SessionManager;
 
-            if (sessionManager == null || !MpLobbyConnectionTypePatch.IsPartyMultiplayer)
+            if (sessionManager == null ||
+                (!MpLobbyConnectionTypePatch.IsPartyMultiplayer && !MpLobbyConnectionTypePatch.IsQuickplay))
             {
-                StatusText.text = "Only supported for custom multiplayer games.";
+                StatusText.text = "Only supported for custom and Quick Play games.";
                 StatusText.color = Color.yellow;
 
                 LobbyAnnounceToggle.interactable = false;
@@ -166,9 +175,9 @@ namespace ServerBrowser.UI.Components
                 return;
             }
 
-            if (!MpLobbyConnectionTypePatch.IsPartyHost)
+            if (MpLobbyConnectionTypePatch.IsPartyMultiplayer && !MpLobbyConnectionTypePatch.IsPartyHost)
             {
-                // We are not the host
+                // Party but we are not the host
                 LobbyAnnounceToggle.interactable = false;
 
                 var theHost = sessionManager.connectionOwner;
@@ -195,20 +204,21 @@ namespace ServerBrowser.UI.Components
             // We are the host, enable controls
             LobbyAnnounceToggle.interactable = true;
             LobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
+            
+            if (MpLobbyConnectionTypePatch.IsQuickplay)
+                LobbyAnnounceToggle.Text = "Share this Quick Play game to the Server Browser";
+            else
+                LobbyAnnounceToggle.Text = "Add my game to the Server Browser";
 
             if (!LobbyAnnounceToggleValue)
             {
                 // Toggle is disabled, however
-                if (GameStateManager.DidLeakCurrentCode)
-                {
-                    StatusText.text = "Cancelled, now removed from browser\r\nNOTE: Your server code may have been seen already";
-                    StatusText.color = Color.red;
-                }
+                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                    StatusText.text = "Turn me on to publicly share this Quick Play game ↑";
                 else
-                {
                     StatusText.text = "Turn me on to list your server in the browser ↑";
-                    StatusText.color = Color.yellow;
-                }
+                
+                StatusText.color = Color.yellow;
 
                 NameButton.interactable = false;
                 return;
@@ -218,7 +228,7 @@ namespace ServerBrowser.UI.Components
             StatusText.text = GameStateManager.StatusText;
             StatusText.color = GameStateManager.HasErrored ? Color.red : Color.green;
 
-            NameButton.interactable = true;
+            NameButton.interactable = MpLobbyConnectionTypePatch.IsPartyHost;
         }
         #endregion
 

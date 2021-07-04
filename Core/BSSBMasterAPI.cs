@@ -97,14 +97,17 @@ namespace ServerBrowser.Core
             return responseOk;
         }
 
-        public static async Task<bool> UnAnnounce(HostedGameData announce)
+        public static async Task<bool> UnAnnounce(AnnounceState announceState)
         {
-            Plugin.Log?.Info($"Cancelling host announcement: {announce.GameName}, {announce.ServerCode}");
+            Plugin.Log?.Info($"Cancelling host announcement (ServerCode={announceState.ServerCode}, " +
+                             $"OwnerId={announceState.OwnerId}, HostSecret={announceState.HostSecret})");
 
-            _lastPayloadSent = null;
+            var queryString = HttpUtility.ParseQueryString("");
+            queryString.Add("serverCode", announceState.ServerCode);
+            queryString.Add("ownerId", announceState.OwnerId);
+            queryString.Add("hostSecret", announceState.HostSecret);
 
-            var responseOk = await PerformWebRequest("POST", $"/unannounce?serverCode={announce.ServerCode}&ownerId={announce.OwnerId}") != null;
-            return responseOk;
+            return await PerformWebRequest("POST", $"/unannounce?{queryString}") != null;
         }
 
         public static async Task<ServerBrowseResult> Browse(int offset, HostedGameFilters filters)
@@ -112,39 +115,25 @@ namespace ServerBrowser.Core
             var queryString = HttpUtility.ParseQueryString("");
 
             if (MpLocalPlayer.Platform.HasValue)
-            {
                 queryString.Add("platform", MpLocalPlayer.PlatformId);
-            }
 
             if (offset > 0)
-            {
                 queryString.Add("offset", offset.ToString());
-            }
-
+            
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
-            {
                 queryString.Add("vanilla", "1");
-            }
-
+            
             if (!String.IsNullOrEmpty(filters.TextSearch))
-            {
                 queryString.Add("query", filters.TextSearch);
-            }
-
+            
             if (filters.HideFullGames)
-            {
                 queryString.Add("filterFull", "1");
-            }
-
+            
             if (filters.HideInProgressGames)
-            {
                 queryString.Add("filterInProgress", "1");
-            }
-
+            
             if (filters.HideModdedGames)
-            {
                 queryString.Add("filterModded", "1");
-            }
 
             var response = await PerformWebRequest("GET", $"/browse?{queryString}");
 

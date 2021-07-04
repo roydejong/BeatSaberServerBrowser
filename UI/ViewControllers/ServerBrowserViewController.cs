@@ -402,7 +402,7 @@ namespace ServerBrowser.UI.ViewControllers
         [UIAction("connectButtonClick")]
         private void ConnectButtonClick()
         {
-            if (_selectedGame != null && !string.IsNullOrEmpty(_selectedGame.ServerCode))
+            if (_selectedGame?.canJoin ?? false)
             {
                 _selectedGame.Join();
             }

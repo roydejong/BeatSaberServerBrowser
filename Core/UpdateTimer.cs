@@ -1,6 +1,4 @@
 ﻿using ServerBrowser.Harmony;
-using System;
-using System.Threading;
 using UnityEngine;
 
 namespace ServerBrowser.Core
@@ -57,9 +55,10 @@ namespace ServerBrowser.Core
 
         private void Tick()
         {
-            if (MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle)
+            if ((MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle) ||
+                (MpLobbyConnectionTypePatch.IsQuickplay && Plugin.Config.ShareQuickPlayGames))
             {
-                // We are the host and announcing a game, send periodic keep-alive updates to the server
+                // We are the host and announcing a game, or actively sharing a quick play lobby
                 Plugin.Log?.Debug("Host timer tick: sending periodic update to master server");
                 GameStateManager.HandleUpdate();
             }

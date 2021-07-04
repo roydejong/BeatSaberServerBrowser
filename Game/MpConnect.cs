@@ -20,7 +20,7 @@ namespace ServerBrowser.Game
             // MpEx version check
             if (game.MpExVersion != null)
             {
-                var ourMpExVersion = MpExHelper.GetInstalledVersion();
+                var ourMpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion;
 
                 if (ourMpExVersion == null || !ourMpExVersion.Equals(game.MpExVersion))
                 {
@@ -95,7 +95,7 @@ namespace ServerBrowser.Game
         private static MasterServerEndPoint _moddedEndPoint;
         private static bool _usingModdedServer;
 
-        public static MasterServerEndPoint OverrideEndPoint { get; private set; } = null;
+        public static MasterServerEndPoint? OverrideEndPoint { get; private set; } = null;
         public static MasterServerEndPoint LastUsedMasterServer { get; private set; } = null;
 
         public static bool ShouldDisableCertificateValidation

@@ -8,7 +8,7 @@ namespace ServerBrowser.Utils
         public static string Generate(ConnectionFailedReason reason)
         {
             var reasonInt = (int)reason;
-            var reasonStr = Regex.Replace(reason.ToString(), "(\\B[A-Z])", " $1"); // insert spaces in error token for readability
+            var reasonStr = reason.ToStringWithSpaces();
 
             var msg = new StringBuilder();
             msg.AppendLine($"Error CFR-{reasonInt} ({reasonStr})");
@@ -16,7 +16,7 @@ namespace ServerBrowser.Utils
             switch (reason)
             {
                 case ConnectionFailedReason.ServerUnreachable:
-                    msg.AppendLine("Could not connect to the host.");
+                    msg.AppendLine("Could not connect to the game host.");
                     break;
                 case ConnectionFailedReason.ServerDoesNotExist:
                     msg.AppendLine("It looks like this game has already ended.");

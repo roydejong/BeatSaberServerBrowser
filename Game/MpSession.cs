@@ -5,6 +5,7 @@ using ServerBrowser.UI;
 using ServerBrowser.Utils;
 using System;
 using System.Linq;
+using ServerBrowser.Game.Models;
 using UnityEngine;
 using static MultiplayerLobbyConnectionController;
 
@@ -65,6 +66,14 @@ namespace ServerBrowser.Game
 
             IsConnected = true;
             DisconnectedReason = DisconnectedReason.Unknown;
+            
+            // Raise internal event
+            MpEvents.RaiseSessionConnected(SessionManager, new SessionConnectedEventArgs()
+            {
+                ConnectionOwner = SessionManager.connectionOwner,
+                LocalPlayer = SessionManager.localPlayer,
+                MaxPlayers = SessionManager.maxPlayerCount
+            });
         }
 
         private static void OnSessionDisconnected(DisconnectedReason reason)
@@ -79,14 +88,14 @@ namespace ServerBrowser.Game
 
             // Clear any notifications
             FloatingNotification.Instance.DismissMessage();
+            
+            // Raise internal event
+            MpEvents.RaiseSessionDisconnected(SessionManager, reason);
         }
 
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
         {
             Plugin.Log?.Info($"A player joined the session: {player.userName}");
-
-            // State update, player count may have changed
-            GameStateManager.HandleUpdate();
 
             // Notification if enabled (and fully connected, because all players raise this on connect)
             var isFullyConnected = IsConnected && MpLobbyConnectionTypePatch.ConnectionType != LobbyConnectionType.None;
@@ -100,14 +109,14 @@ namespace ServerBrowser.Game
                     Sprites.PortalUser
                 );
             }
+            
+            // Raise internal event
+            MpEvents.RaisePlayerConnected(SessionManager, player);
         }
 
         private static void OnSessionPlayerDisconnected(IConnectedPlayer player)
         {
             Plugin.Log?.Info($"A player left the session: {player.userName}");
-
-            // State update, player count may have changed
-            GameStateManager.HandleUpdate();
 
             // Notification if enabled (and connected, because all players raise this on disconnect)
             var isFullyConnected = IsConnected && MpLobbyConnectionTypePatch.ConnectionType != LobbyConnectionType.None;
@@ -123,13 +132,16 @@ namespace ServerBrowser.Game
                     Sprites.Portal
                 );
             }
+            
+            // Raise internal event
+            MpEvents.RaisePlayerDisconnected(SessionManager, player);
         }
         #endregion
 
         #region Data helpers
         public static bool GetLocalPlayerHasMultiplayerExtensions()
         {
-            return SessionManager.LocalPlayerHasState("modded") || MpExHelper.GetIsInstalled();
+            return SessionManager.LocalPlayerHasState("modded") || ModChecker.MultiplayerExtensions.InstalledAndEnabled;
         }
 
         public static int GetPlayerCount()
@@ -157,6 +169,11 @@ namespace ServerBrowser.Game
 
         public static string GetHostGameName()
         {
+            if (MpLobbyConnectionTypePatch.ConnectionType == LobbyConnectionType.QuickPlay)
+            {
+                return "Quick Play Lobby";
+            }
+            
             string finalGameName = "";
 
             if (MpLocalPlayer.UserInfo != null)

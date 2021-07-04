@@ -1,13 +1,21 @@
-﻿using Newtonsoft.Json;
-using ServerBrowser.Game;
-using ServerBrowser.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using ServerBrowser.Game;
+using ServerBrowser.Utils.Serialization;
 
 namespace ServerBrowser.Core
 {
     public class HostedGameData : INetworkPlayer
     {
+        #region Consts
+        public const string ServerTypePlayerHost = "player_host";
+        public const string ServerTypeBeatDediCustom = "beatdedi_custom";
+        public const string ServerTypeBeatDediQuickplay = "beatdedi_quickplay";
+        public const string ServerTypeVanillaQuickplay = "vanilla_quickplay";
+        #endregion
+        
+        #region Fields
         public int? Id { get; set; }
         public string ServerCode { get; set; }
         public string GameName { get; set; }
@@ -17,25 +25,43 @@ namespace ServerBrowser.Core
         public int PlayerLimit { get; set; }
         public bool IsModded { get; set; }
         public MultiplayerLobbyState LobbyState { get; set; } = MultiplayerLobbyState.None;
-        public string LevelId { get; set; } = null;
-        public string SongName { get; set; } = null;
-        public string SongAuthor { get; set; } = null;
+        public string? LevelId { get; set; } = null;
+        public string? SongName { get; set; } = null;
+        public string? SongAuthor { get; set; } = null;
         public BeatmapDifficulty? Difficulty { get; set; }
         public string Platform { get; set; } = "unknown";
-        public string MasterServerHost { get; set; } = null;
+        public string? MasterServerHost { get; set; } = null;
         public int? MasterServerPort { get; set; } = null;
-        public string CoverUrl { get; set; } = null;
-        public List<HostedGamePlayer> Players { get; set; } = null;
+        public string? CoverUrl { get; set; } = null;
+        public List<HostedGamePlayer>? Players { get; set; } = null;
         [JsonConverter(typeof(SemVerJsonConverter))]
-        public SemVer.Version MpExVersion { get; set; } = null;
+        public SemVer.Version? MpExVersion { get; set; } = null;
+        public string? ServerType { get; set; } = null;
+        public string? HostSecret { get; set; } = null;
+        #endregion
 
+        #region Helpers
         [JsonIgnoreAttribute]
         public bool IsOnCustomMaster => !String.IsNullOrEmpty(MasterServerHost) && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);
 
+        [JsonIgnoreAttribute]
+        public bool IsDedicatedServer => ServerType == ServerTypeBeatDediCustom || ServerType == ServerTypeBeatDediQuickplay ||
+                                         ServerType == ServerTypeVanillaQuickplay;
+
+        [JsonIgnoreAttribute]
+        public bool IsQuickPlayServer => ServerType == ServerTypeBeatDediQuickplay || ServerType == ServerTypeVanillaQuickplay;
+        #endregion
+
+        #region Describe
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
 
+            if (IsQuickPlayServer)
+            {
+                moddedDescr += " Quick Play";
+            }
+            
             if (IsOnCustomMaster)
             {
                 moddedDescr += ", Cross-play";
@@ -85,12 +111,6 @@ namespace ServerBrowser.Core
 
         public string DescribeDifficulty(bool withColorTag = false)
         {
-            if (String.IsNullOrEmpty(this.LevelId) || Difficulty == null)
-            {
-                // Only empty if we've never played a level, in which case we shouldn't display a difficulty
-                return "-";
-            }
-
             string text;
 
             switch (Difficulty)
@@ -132,11 +152,14 @@ namespace ServerBrowser.Core
 
             return text;
         }
+        #endregion
 
+        #region Serialize
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
         }
+        #endregion
 
         #region INetworkPlayer compatibility
         [JsonIgnoreAttribute]
@@ -168,7 +191,7 @@ namespace ServerBrowser.Core
         [JsonIgnoreAttribute]
         public SongPackMask songPacks => SongPackMask.all;
         [JsonIgnoreAttribute]
-        public bool canJoin => !String.IsNullOrEmpty(ServerCode);
+        public bool canJoin => !String.IsNullOrEmpty(ServerCode) || !String.IsNullOrEmpty(HostSecret);
         [JsonIgnoreAttribute]
         public bool requiresPassword => true;
         [JsonIgnoreAttribute]
