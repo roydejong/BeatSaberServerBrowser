@@ -54,10 +54,32 @@ These libraries are required, install them [from BeatMods](https://beatmods.com/
 - SongCore: v3.4.0+ *(Core mod)*
 - BeatSaberMarkupLanguage: v1.5.3+
 
+Optional requirement:
+
+- DiscordCore: v1.0.5+ *(for Rich Presence support)*
+
 ### MultiplayerExtensions
 **I recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer and adds some useful new features.** You can get the latest version through GitHub, or install it through ModAssistant.
 
 Please note, you and the host must use the same version of MultiplayerExtensions. If a version difference is detected by the server browser, you will not be able to connect.
+
+## Rich Presence (BETA)
+The Server Browser mod supports Rich Presence for Discord. This feature lets you join and invite players directly through Discord!
+
+### How to use Discord presence
+- You must have the DiscordCore library installed (available on ModAssistant).
+- You must have Discord running on the same PC as Beat Saber.
+
+### How to send invites
+If you are hosting a game, or if you have joined a public game, you can invite users directly through Discord by clicking the ➕ button:
+
+![Discord invite](https://user-images.githubusercontent.com/6772638/124370610-e705c280-dc79-11eb-98a2-4225b4b783cd.png)
+
+Invites expire after 2 hours, or when the host ends the game.
+
+### How to use invites
+**⚠ To accept invites, you must be in the Online menu in Beat Saber.**
+
 
 ## FAQs / Troubleshooting
 
@@ -74,4 +96,9 @@ However: you may be able to find Quest-compatible games to join in the online br
  - If you have BeatTogether installed, you can connect to games hosted on **Unofficial** servers like BeatTogether.
 
 ### Are Quick Play servers supported?
-No.
+Not *yet*. Coming soon!
+
+### Do players need to be on the same game version?
+Yes. Different versions of Beat Saber are not compatible with each other for multiplayer.
+
+The Server Browser will only show games hosted on the exact same version of the game as yours.
