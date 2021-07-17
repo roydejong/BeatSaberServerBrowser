@@ -16,7 +16,6 @@ namespace ServerBrowser.Game
 
         #region Init
         private static MultiplayerModeSelectionFlowCoordinator _flowCoordinator;
-
         private static MultiplayerLobbyConnectionController _mpLobbyConnectionController;
         private static JoiningLobbyViewController _joiningLobbyViewController;
         private static SimpleDialogPromptViewController _simpleDialogPromptViewController;
@@ -24,7 +23,6 @@ namespace ServerBrowser.Game
         public static void SetUp()
         {
             _flowCoordinator = Resources.FindObjectsOfTypeAll<MultiplayerModeSelectionFlowCoordinator>().First();
-
             _mpLobbyConnectionController = ReflectionUtil.GetField<MultiplayerLobbyConnectionController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_multiplayerLobbyConnectionController");
             _joiningLobbyViewController = ReflectionUtil.GetField<JoiningLobbyViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_joiningLobbyViewController");
             _simpleDialogPromptViewController = ReflectionUtil.GetField<SimpleDialogPromptViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_simpleDialogPromptViewController");
@@ -85,11 +83,8 @@ namespace ServerBrowser.Game
                             $" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
                             $" ServerType={game.ServerType}, ServerBrowserId={game.Id})");
 
-            var destination = new MpLobbyDestination(game.ServerCode, game.HostSecret);
-            _mpLobbyConnectionController.CreateOrConnectToDestinationParty(destination);
-            
-            _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
-            ReplaceTopViewController(_joiningLobbyViewController, animationDirection: AnimationDirection.Vertical);
+            _flowCoordinator.Setup(new MpLobbyDestination(game.ServerCode, game.HostSecret));
+            _flowCoordinator.ProcessDeeplinkingToLobby();
         }
 
         public static void PresentConnectionFailedError(string errorTitle = "Connection failed", string errorMessage = null, bool canRetry = true)
