@@ -217,6 +217,7 @@
     <Compile Include="Game\MpLobbyDestination.cs" />
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
+    <Compile Include="Harmony\TempFixDeepLinkJoins.cs" />
     <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\ServerBrowseResult.cs" />
