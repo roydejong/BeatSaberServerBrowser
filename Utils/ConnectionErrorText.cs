@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 
 namespace ServerBrowser.Utils
 {
@@ -18,6 +17,7 @@ namespace ServerBrowser.Utils
                 case ConnectionFailedReason.ServerUnreachable:
                     msg.AppendLine("Could not connect to the game host.");
                     break;
+                case ConnectionFailedReason.ServerIsTerminating:
                 case ConnectionFailedReason.ServerDoesNotExist:
                     msg.AppendLine("It looks like this game has already ended.");
                     break;
@@ -32,6 +32,7 @@ namespace ServerBrowser.Utils
                     msg.AppendLine("Make sure you and the host are using the same game version.");
                     break;
                 case ConnectionFailedReason.MasterServerNotAuthenticated:
+                case ConnectionFailedReason.MasterServerCertificateValidationFailed:
                     msg.AppendLine("Could not authenticate master server, you may need to restart the game.");
                     break;
             }
