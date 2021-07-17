@@ -24,6 +24,7 @@ namespace ServerBrowser.Game.Models
         public string? HostUserId;
         public string? HostSecret;
         public bool IsDedicatedServer;
+        public BeatmapLevelSelectionMask? SelectionMask;
         public GameplayServerConfiguration? ServerConfiguration;
         public int MaxPlayerCount;
         public List<IConnectedPlayer>? Players;
@@ -32,6 +33,7 @@ namespace ServerBrowser.Game.Models
         public BeatmapCharacteristicSO? CurrentCharacteristic;
         public GameplayModifiers? CurrentModifiers;
         public DateTime? SessionStartedAt;
+        public string? ManagerId;
         #endregion
 
         #region Getters
@@ -49,8 +51,8 @@ namespace ServerBrowser.Game.Models
 
         public string CurrentDifficultyName => CurrentDifficulty?.ToNiceName() ?? "Unknown";
 
-        public string DifficultyMaskName => ServerConfiguration.HasValue
-            ? ServerConfiguration.Value.difficulties.FromMask().ToNiceName()
+        public string DifficultyMaskName => SelectionMask.HasValue
+            ? SelectionMask.Value.difficulties.FromMask().ToNiceName()
             : "All";
 
         public IConnectedPlayer? ConnectionOwner => Players?.FirstOrDefault(p => p.isConnectionOwner);
@@ -96,8 +98,8 @@ namespace ServerBrowser.Game.Models
         public BeatmapDifficulty? DetermineLobbyDifficulty()
         {
             var difficulty = CurrentDifficulty;
-            if (difficulty == null && ServerConfiguration.HasValue)
-                difficulty = ServerConfiguration.Value.difficulties.FromMask();
+            if (difficulty == null && SelectionMask.HasValue)
+                difficulty = SelectionMask.Value.difficulties.FromMask();
             return difficulty;
         }
         #endregion

@@ -6,7 +6,7 @@ using ServerBrowser.Utils.Serialization;
 
 namespace ServerBrowser.Core
 {
-    public class HostedGameData : INetworkPlayer
+    public class HostedGameData
     {
         #region Consts
         public const string ServerTypePlayerHost = "player_host";
@@ -50,6 +50,9 @@ namespace ServerBrowser.Core
 
         [JsonIgnoreAttribute]
         public bool IsQuickPlayServer => ServerType == ServerTypeBeatDediQuickplay || ServerType == ServerTypeVanillaQuickplay;
+        
+        [JsonIgnoreAttribute]
+        public bool CanJoin => !String.IsNullOrEmpty(ServerCode) || !String.IsNullOrEmpty(HostSecret);
         #endregion
 
         #region Describe
@@ -158,100 +161,6 @@ namespace ServerBrowser.Core
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
-        }
-        #endregion
-
-        #region INetworkPlayer compatibility
-        [JsonIgnoreAttribute]
-        public string userId => OwnerId;
-        [JsonIgnoreAttribute]
-        public string userName => GameName;
-        [JsonIgnoreAttribute]
-        public bool isMe => false;
-        [JsonIgnoreAttribute]
-        public int currentPartySize => PlayerCount;
-        [JsonIgnoreAttribute]
-        public int maxPartySize => PlayerLimit;
-        [JsonIgnoreAttribute]
-        public bool isMyPartyOwner => true;
-        [JsonIgnoreAttribute]
-        public bool isOpenParty => true;
-        [JsonIgnoreAttribute]
-        public bool isConnected => true;
-        [JsonIgnoreAttribute]
-        public bool isPlayer => false;
-        [JsonIgnoreAttribute]
-        public bool isDedicatedServer => false;
-        [JsonIgnoreAttribute]
-        public bool isSpectating => false;
-        [JsonIgnoreAttribute]
-        public BeatmapDifficultyMask difficulties => BeatmapDifficultyMask.All;
-        [JsonIgnoreAttribute]
-        public GameplayModifierMask modifiers => GameplayModifierMask.None;
-        [JsonIgnoreAttribute]
-        public SongPackMask songPacks => SongPackMask.all;
-        [JsonIgnoreAttribute]
-        public bool canJoin => !String.IsNullOrEmpty(ServerCode) || !String.IsNullOrEmpty(HostSecret);
-        [JsonIgnoreAttribute]
-        public bool requiresPassword => true;
-        [JsonIgnoreAttribute]
-        public bool isWaitingOnJoin => false;
-        [JsonIgnoreAttribute]
-        public bool canInvite => false;
-        [JsonIgnoreAttribute]
-        public bool isWaitingOnInvite => false;
-        [JsonIgnoreAttribute]
-        public bool canKick => false;
-        [JsonIgnoreAttribute]
-        public bool canLeave => false;
-        [JsonIgnoreAttribute]
-        public bool canBlock => false;
-        [JsonIgnoreAttribute]
-        public bool canUnblock => false;
-
-        public void Block()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Invite()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Join()
-        {
-            MpConnect.Join(this);
-        }
-
-        public void Join(string password)
-        {
-            Join();
-        }
-
-        public void Kick()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Leave()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SendInviteResponse(bool accept)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SendJoinResponse(bool accept)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Unblock()
-        {
-            throw new NotImplementedException();
         }
         #endregion
     }

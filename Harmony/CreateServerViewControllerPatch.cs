@@ -15,15 +15,16 @@ namespace ServerBrowser.Harmony
         }
     }
 
-    [HarmonyPatch(typeof(CreateServerViewController), "CreatePartyConfig", MethodType.Normal)]
-    public static class CreateServerViewControllerCreatePartyConfigPatch
+    [HarmonyPatch(typeof(CreateServerViewController), "ApplyAndGetData", MethodType.Normal)]
+    public static class CreateServerFormDataPatch
     {
-        public static void Postfix(CreateServerViewController __instance, ref UnifiedNetworkPlayerModel.CreatePartyConfig __result)
+        public static void Postfix(ref CreateServerFormData __result)
         {
             if (Plugin.Config.LobbyAnnounceToggle)
             {
-                __result.discoveryPolicy = DiscoveryPolicy.Public;
-                __result.invitePolicy = InvitePolicy.AnyoneCanInvite;
+                __result.netDiscoverable = true;
+                __result.allowInviteOthers = true;
+                __result.usePassword = false;
             }
         }
     }

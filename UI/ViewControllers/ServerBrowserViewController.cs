@@ -1,13 +1,12 @@
-﻿using BeatSaberMarkupLanguage;
+﻿using System;
+using System.Threading;
+using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using HMUI;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.UI.Components;
-using System;
-using System.Linq;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -402,9 +401,9 @@ namespace ServerBrowser.UI.ViewControllers
         [UIAction("connectButtonClick")]
         private void ConnectButtonClick()
         {
-            if (_selectedGame?.canJoin ?? false)
+            if (_selectedGame?.CanJoin ?? false)
             {
-                _selectedGame.Join();
+                MpConnect.Join(_selectedGame);
             }
             else
             {
@@ -426,7 +425,7 @@ namespace ServerBrowser.UI.ViewControllers
             var cellData = (HostedGameCellData)selectedRow;
             _selectedGame = cellData.Game;
 
-            ConnectButton.interactable = _selectedGame.canJoin;
+            ConnectButton.interactable = _selectedGame.CanJoin;
         }
 
         [UIAction("pageUpButtonClick")]

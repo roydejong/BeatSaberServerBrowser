@@ -177,8 +177,8 @@ namespace ServerBrowser.Core
             Activity.HostSecret = e.Secret;
             Activity.IsDedicatedServer = e.IsDedicatedServer;
             Activity.ServerConfiguration = e.Configuration;
-            Activity.MaxPlayerCount = e.MaxPlayerCount;
-            Activity.Players = new(e.MaxPlayerCount);
+            Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
+            Activity.Players = new(Activity.MaxPlayerCount);
             
             HandleUpdate();
         }

@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using ServerBrowser.Core;
 using ServerBrowser.Game;
 
 namespace ServerBrowser.Harmony
@@ -14,6 +13,7 @@ namespace ServerBrowser.Harmony
         
         public static void Postfix(string code, MultiplayerSettingsPanelController __instance)
         {
+            Plugin.Log.Error($"SetLobbyCode -> {code}");
             if (_lastCode != code)
             {
                 _lastCode = code;
