@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
@@ -79,12 +80,20 @@ namespace ServerBrowser.Game
             MpModeSelection.WeInitiatedConnection = true;
             MpModeSelection.LastConnectToHostedGame = game;
             
-            Plugin.Log.Info("→ Connecting to lobby destination now" +
+            Plugin.Log.Info("--> Connecting to lobby destination now" +
                             $" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
                             $" ServerType={game.ServerType}, ServerBrowserId={game.Id})");
 
-            _flowCoordinator.Setup(new MpLobbyDestination(game.ServerCode, game.HostSecret));
-            _flowCoordinator.ProcessDeeplinkingToLobby();
+            _flowCoordinator.SetField("_joiningLobbyCancellationTokenSource", new CancellationTokenSource());
+            
+            _mpLobbyConnectionController.CreateOrConnectToDestinationParty(
+                new MpLobbyDestination(game.ServerCode, game.HostSecret)
+            );
+            
+            _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
+            
+            ReplaceTopViewController(_joiningLobbyViewController, animationType: AnimationType.In,
+                animationDirection: AnimationDirection.Vertical);
         }
 
         public static void PresentConnectionFailedError(string errorTitle = "Connection failed", string errorMessage = null, bool canRetry = true)

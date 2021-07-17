@@ -13,7 +13,6 @@ namespace ServerBrowser.Harmony
         
         public static void Postfix(string code, MultiplayerSettingsPanelController __instance)
         {
-            Plugin.Log.Error($"SetLobbyCode -> {code}");
             if (_lastCode != code)
             {
                 _lastCode = code;

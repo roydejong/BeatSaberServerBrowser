@@ -5,9 +5,7 @@ using IPA.Utilities;
 namespace ServerBrowser.Harmony
 {
     /// <summary>
-    /// Temporary fix:
-    /// It ensures the _joiningLobbyCancellationTokenSource is initialized, which fixes base game deep links.
-    /// Since we use the deep link code to connect lobbies, this is essential until fixed by the base game.
+    /// Temporary fix: Ensures the _joiningLobbyCancellationTokenSource is initialized, which fixes base game deep links
     /// </summary>
     [HarmonyPatch(typeof(MultiplayerModeSelectionFlowCoordinator), "ProcessDeeplinkingToLobby", MethodType.Normal)]
     public static class FixDeepLinkJoins
