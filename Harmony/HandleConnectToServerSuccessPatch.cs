@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using HarmonyLib;
 using ServerBrowser.Game;
 using ServerBrowser.Game.Models;
@@ -17,6 +18,37 @@ namespace ServerBrowser.Harmony
             byte[] myRandom, byte[] remoteRandom, bool isConnectionOwner, bool isDedicatedServer, string managerId,
             MasterServerConnectionManager __instance)
         {
+            // If we initiated the connection, make sure the master server didn't put us in the wrong lobby
+            if (MpModeSelection.WeInitiatedConnection && MpModeSelection.LastConnectToHostedGame != null)
+            {
+                var targetGame = MpModeSelection.LastConnectToHostedGame;
+                var isValidJoin = true;
+
+                if (!String.IsNullOrEmpty(targetGame.ServerCode) && code != targetGame.ServerCode)
+                {
+                    // Server code mismatch
+                    Plugin.Log.Warn("HandleConnectToServerSuccess: Server Code mismatch" +
+                                    $" (Expected={targetGame.ServerCode}, Actual={code})");
+                    isValidJoin = false;
+                }
+                
+                if (!String.IsNullOrEmpty(targetGame.HostSecret) && !String.IsNullOrEmpty(secret)
+                                                                 && secret != targetGame.HostSecret)
+                {
+                    // Host secret mismatch
+                    Plugin.Log.Warn("HandleConnectToServerSuccess: Host Secret mismatch" +
+                                    $" (Expected={targetGame.HostSecret}, Actual={secret})");
+                    isValidJoin = false;
+                }
+
+                if (!isValidJoin)
+                {
+                    MpModeSelection.WeAbortedJoin = true;
+                    MpModeSelection.CancelLobbyJoin(hideLoading: false);
+                    return false;
+                }
+            }
+            
             // Track the server connection and update game state as needed 
             MpEvents.RaiseBeforeConnectToServer(__instance, new ConnectToServerEventArgs()
             {

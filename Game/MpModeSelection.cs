@@ -13,6 +13,7 @@ namespace ServerBrowser.Game
     public static class MpModeSelection
     {
         public static bool WeInitiatedConnection { get; set; } = false;
+        public static bool WeAbortedJoin { get; set; } = false;
         public static HostedGameData? LastConnectToHostedGame { get; private set; } = null;
 
         #region Init
@@ -78,6 +79,7 @@ namespace ServerBrowser.Game
                 return;
 
             MpModeSelection.WeInitiatedConnection = true;
+            MpModeSelection.WeAbortedJoin = false;
             MpModeSelection.LastConnectToHostedGame = game;
             
             Plugin.Log.Info("--> Connecting to lobby destination now" +

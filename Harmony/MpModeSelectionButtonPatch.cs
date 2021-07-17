@@ -23,6 +23,7 @@ namespace ServerBrowser.Harmony
             {
                 // Going to a non-serverbrowser part of the online menu
                 MpModeSelection.WeInitiatedConnection = false;
+                MpModeSelection.WeAbortedJoin = false;
             }
 
             return true;

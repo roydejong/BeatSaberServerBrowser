@@ -13,6 +13,14 @@ namespace ServerBrowser.Harmony
             
             if (MpModeSelection.WeInitiatedConnection)
             {
+                if (MpModeSelection.WeAbortedJoin)
+                {
+                    MpModeSelection.PresentConnectionFailedError(
+                        errorMessage: "The selected server instance is no longer available."
+                    );
+                    return false;
+                }
+                
                 if (reason == ConnectionFailedReason.ConnectionCanceled)
                 {
                     // ...and if it's just a self-cancel, return to the browser immediately.
