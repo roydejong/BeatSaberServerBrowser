@@ -60,14 +60,13 @@ namespace ServerBrowser.Game
             });
         }
 
-        public static void HandleMultiplayerLobbyControllerDidFinish(
-            MultiplayerModeSelectionViewController? viewController,
-            MultiplayerModeSelectionViewController.MenuButton menuButton)
+        public static void TriggerMenuButton(MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
             _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>(
-                "HandleMultiplayerLobbyControllerDidFinish", new
+                "HandleMultiplayerLobbyControllerDidFinish", new object[]
                 {
-                    viewController, menuButton
+                    // nb: first param is unused by game, it's safe to pass null
+                    null!, menuButton
                 });
         }
 
@@ -82,7 +81,7 @@ namespace ServerBrowser.Game
             Plugin.Config.LobbyAnnounceToggle = true;
             Plugin.Config.ShareQuickPlayGames = true;
 
-            HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
+            TriggerMenuButton(MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
         public static void ConnectToHostedGame(HostedGameData? game)
