@@ -63,12 +63,15 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="DiscordCore, Version=1.0.6.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\SteamLibrary\steamapps\common\Beat Saber\Plugins\DiscordCore.dll</HintPath>
+      <HintPath>$(BeatSaberDir)\Plugins\DiscordCore.dll</HintPath>
     </Reference>
     <Reference Include="GameplayCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Hive.Versioning, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(BeatSaberDir)\Libs\Hive.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="HMLib, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -217,7 +220,6 @@
     <Compile Include="Game\MpLobbyDestination.cs" />
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
-    <Compile Include="Harmony\TempFixDeepLinkJoins.cs" />
     <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\ServerBrowseResult.cs" />

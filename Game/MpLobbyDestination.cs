@@ -2,12 +2,16 @@ using IPA.Utilities;
 
 namespace ServerBrowser.Game
 {
-    public class MpLobbyDestination : SelectMultiplayerLobbyDestination
+    public class MpLobbyDestination 
     {
-        public MpLobbyDestination(string serverCode, string? hostSecret) : base(serverCode)
+        public static SelectMultiplayerLobbyDestination Create(string serverCode, string? hostSecret)
         {
+            var destination = new SelectMultiplayerLobbyDestination(serverCode);
+            
             if (hostSecret != null)
-                this.SetField<SelectMultiplayerLobbyDestination, string>("lobbySecret", hostSecret);
+                destination.SetField("lobbySecret", hostSecret);
+            
+            return destination;
         }
     }
 }

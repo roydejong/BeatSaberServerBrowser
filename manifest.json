@@ -5,11 +5,11 @@
   "author": "LookAtHippo",
   "version": "0.7.0",
   "description": "Adds a Server Browser to the Online menu, making it easy to share and join multiplayer games.",
-  "gameVersion": "1.16.1",
+  "gameVersion": "1.16.4",
   "dependsOn": {
-    "BSIPA": "^4.1.6",
-    "BeatSaberMarkupLanguage": "^1.5.3",
-    "SongCore": "^3.4.0"
+    "BSIPA": "^4.2.0",
+    "BeatSaberMarkupLanguage": "^1.5.4",
+    "SongCore": "^3.5.0"
   },
   "links": {
     "project-home": "https://bssb.app",

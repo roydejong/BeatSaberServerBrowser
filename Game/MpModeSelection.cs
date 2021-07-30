@@ -59,6 +59,18 @@ namespace ServerBrowser.Game
                 title, ViewController.AnimationType.In
             });
         }
+
+        public static void HandleMultiplayerLobbyControllerDidFinish(
+            MultiplayerModeSelectionViewController? viewController,
+            MultiplayerModeSelectionViewController.MenuButton menuButton)
+        {
+            _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>(
+                "HandleMultiplayerLobbyControllerDidFinish", new
+                {
+                    viewController, menuButton
+                });
+        }
+
         #endregion
 
         public static void OpenCreateServerMenu()
@@ -70,7 +82,7 @@ namespace ServerBrowser.Game
             Plugin.Config.LobbyAnnounceToggle = true;
             Plugin.Config.ShareQuickPlayGames = true;
 
-            _flowCoordinator.HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
+            HandleMultiplayerLobbyControllerDidFinish(null, MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
         public static void ConnectToHostedGame(HostedGameData? game)
@@ -89,7 +101,7 @@ namespace ServerBrowser.Game
             _flowCoordinator.SetField("_joiningLobbyCancellationTokenSource", new CancellationTokenSource());
             
             _mpLobbyConnectionController.CreateOrConnectToDestinationParty(
-                new MpLobbyDestination(game.ServerCode, game.HostSecret)
+                MpLobbyDestination.Create(game.ServerCode, game.HostSecret)
             );
             
             _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
