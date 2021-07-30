@@ -3,6 +3,7 @@ using DiscordCore;
 using ServerBrowser.Game.Models;
 using ServerBrowser.Utils;
 using static ServerBrowser.Presence.PresenceSecret;
+using Hive.Versioning;
 
 namespace ServerBrowser.Presence.DiscordCore
 {
@@ -14,9 +15,9 @@ namespace ServerBrowser.Presence.DiscordCore
 
         public bool GetIsAvailable()
         {
-            return Plugin.Config.DiscordRichPresenceEnabled
-                   && ModChecker.DiscordCore.InstalledAndEnabled
-                   && ModChecker.DiscordCore.InstalledVersion >= new SemVer.Version("1.0.5");
+            return Plugin.Config.DiscordRichPresenceEnabled &&
+                   ModCheck.DiscordCore.InstalledAndEnabled &&
+                   ModCheck.DiscordCore.InstalledVersion! >= new Version("1.0.7");
         }
 
         #region Start/Stop

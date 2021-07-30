@@ -298,7 +298,7 @@ namespace ServerBrowser.Core
             Platform = MpLocalPlayer.PlatformId,
             MasterServerHost = Activity.MasterServer.hostName,
             MasterServerPort = Activity.MasterServer.port,
-            MpExVersion = ModChecker.MultiplayerExtensions.InstalledVersion,
+            MpExVersion = ModCheck.MultiplayerExtensions.InstalledVersion,
             ServerType = Activity.DetermineServerType(),
             HostSecret = Activity.HostSecret,
             Players = Activity.GetPlayersForAnnounce().ToList()

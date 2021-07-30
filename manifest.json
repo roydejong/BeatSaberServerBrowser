@@ -11,6 +11,7 @@
     "BeatSaberMarkupLanguage": "^1.5.4",
     "SongCore": "^3.5.0"
   },
+  "loadAfter": ["DiscordCore"],
   "links": {
     "project-home": "https://bssb.app",
     "project-source": "https://github.com/roydejong/BeatSaberServerBrowser"
