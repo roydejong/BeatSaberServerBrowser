@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using ServerBrowser.Game;
 using ServerBrowser.Utils.Serialization;
-using Hive.Versioning;
+using Version = Hive.Versioning.Version;
 
 namespace ServerBrowser.Core
 {
@@ -35,7 +35,8 @@ namespace ServerBrowser.Core
         public int? MasterServerPort { get; set; } = null;
         public string? CoverUrl { get; set; } = null;
         public List<HostedGamePlayer>? Players { get; set; } = null;
-        public Hive.Versioning.Version? MpExVersion { get; set; } = null;
+        [JsonConverter(typeof(HiveVersionJsonConverter))]
+        public Version? MpExVersion { get; set; } = null;
         public string? ServerType { get; set; } = null;
         public string? HostSecret { get; set; } = null;
         #endregion
