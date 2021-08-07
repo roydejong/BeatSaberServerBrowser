@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using HMUI;
 using IPA.Utilities;
@@ -12,10 +13,6 @@ namespace ServerBrowser.Game
 {
     public static class MpModeSelection
     {
-        public static bool WeInitiatedConnection { get; set; } = false;
-        public static bool WeAbortedJoin { get; set; } = false;
-        public static HostedGameData? LastConnectToHostedGame { get; private set; } = null;
-
         #region Init
         private static MultiplayerModeSelectionFlowCoordinator _flowCoordinator;
         private static MultiplayerLobbyConnectionController _mpLobbyConnectionController;
@@ -89,15 +86,20 @@ namespace ServerBrowser.Game
             if (game == null)
                 return;
 
-            MpModeSelection.WeInitiatedConnection = true;
-            MpModeSelection.WeAbortedJoin = false;
-            MpModeSelection.LastConnectToHostedGame = game;
+            GlobalModState.Reset();
+            GlobalModState.WeInitiatedConnection = true;
+            GlobalModState.LastConnectToHostedGame = game;
             
             Plugin.Log.Info("--> Connecting to lobby destination now" +
                             $" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
                             $" ServerType={game.ServerType}, ServerBrowserId={game.Id})");
 
             _flowCoordinator.SetField("_joiningLobbyCancellationTokenSource", new CancellationTokenSource());
+
+            if (game.ServerCode == "55555")
+            {
+                GlobalModState.DirectConnectTarget = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2312);
+            }
             
             _mpLobbyConnectionController.CreateOrConnectToDestinationParty(
                 MpLobbyDestination.Create(game.ServerCode, game.HostSecret)
@@ -113,7 +115,7 @@ namespace ServerBrowser.Game
         {
             CancelLobbyJoin();
 
-            if (LastConnectToHostedGame == null)
+            if (GlobalModState.LastConnectToHostedGame == null)
                 canRetry = false; // we don't have game info to retry with
 
             _simpleDialogPromptViewController.Init(errorTitle, errorMessage, "Back to browser", canRetry ? "Retry connection" : null, delegate (int btnId)
@@ -125,7 +127,7 @@ namespace ServerBrowser.Game
                         MakeServerBrowserTopView();
                         break;
                     case 1: // Retry connection
-                        ConnectToHostedGame(LastConnectToHostedGame);
+                        ConnectToHostedGame(GlobalModState.LastConnectToHostedGame);
                         break;
                 }
             });

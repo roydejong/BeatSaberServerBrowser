@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.UI;
 using static MultiplayerModeSelectionViewController;
@@ -22,8 +23,7 @@ namespace ServerBrowser.Harmony
             else
             {
                 // Going to a non-serverbrowser part of the online menu
-                MpModeSelection.WeInitiatedConnection = false;
-                MpModeSelection.WeAbortedJoin = false;
+                GlobalModState.Reset();
             }
 
             return true;

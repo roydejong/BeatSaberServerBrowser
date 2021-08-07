@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.Utils;
 
@@ -11,9 +12,11 @@ namespace ServerBrowser.Harmony
         {
             Plugin.Log.Warn($"Multiplayer connection failed, reason: {reason}");
             
-            if (MpModeSelection.WeInitiatedConnection)
+            if (GlobalModState.WeInitiatedConnection)
             {
-                if (MpModeSelection.WeAbortedJoin)
+                GlobalModState.ShouldDisableEncryption = false; // always re-enable encryption for master server
+                
+                if (GlobalModState.WeAbortedJoin)
                 {
                     MpModeSelection.PresentConnectionFailedError(
                         errorMessage: "The selected server instance is no longer available."

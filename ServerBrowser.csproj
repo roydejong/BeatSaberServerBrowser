@@ -202,6 +202,7 @@
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\AnnounceState.cs" />
+    <Compile Include="Core\GlobalModState.cs" />
     <Compile Include="Core\HostedGameData.cs" />
     <Compile Include="Core\HostedGameBrowser.cs" />
     <Compile Include="Core\HostedGameFilters.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Harmony\MpConnectionErrorDialogPatch.cs" />
     <Compile Include="Harmony\MpLobbyStatePatch.cs" />
     <Compile Include="Harmony\MpModeSelectionDeactivatedPatch.cs" />
+    <Compile Include="Harmony\PacketEncryptionLayerPatch.cs" />
     <Compile Include="Harmony\SetLobbyCodePatch.cs" />
     <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
     <Compile Include="Harmony\MpModeSelectionButtonPatch.cs" />

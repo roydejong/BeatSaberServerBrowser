@@ -50,6 +50,9 @@ namespace ServerBrowser.Core
                                          ServerType == ServerTypeVanillaQuickplay;
 
         [JsonIgnoreAttribute]
+        public bool IsBeatDedi => ServerType == ServerTypeBeatDediCustom || ServerType == ServerTypeBeatDediQuickplay;
+
+        [JsonIgnoreAttribute]
         public bool IsQuickPlayServer => ServerType == ServerTypeBeatDediQuickplay || ServerType == ServerTypeVanillaQuickplay;
         
         [JsonIgnoreAttribute]

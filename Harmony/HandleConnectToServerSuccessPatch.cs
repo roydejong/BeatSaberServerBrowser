@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using HarmonyLib;
+using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.Game.Models;
 
@@ -13,42 +14,66 @@ namespace ServerBrowser.Harmony
     [HarmonyPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
     public static class HandleConnectToServerSuccessPatch
     {
-        public static bool Prefix(string userId, string userName, IPEndPoint remoteEndPoint, string secret, string code,
-            BeatmapLevelSelectionMask selectionMask, GameplayServerConfiguration configuration, byte[] preMasterSecret,
+        public static bool Prefix(ref string userId, ref string userName, ref IPEndPoint remoteEndPoint,
+            ref string secret, ref string code, ref BeatmapLevelSelectionMask selectionMask,
+            ref GameplayServerConfiguration configuration, byte[] preMasterSecret,
             byte[] myRandom, byte[] remoteRandom, bool isConnectionOwner, bool isDedicatedServer, string managerId,
             MasterServerConnectionManager __instance)
         {
-            // If we initiated the connection, make sure the master server didn't put us in the wrong lobby
-            if (MpModeSelection.WeInitiatedConnection && MpModeSelection.LastConnectToHostedGame != null)
+            if (GlobalModState.WeInitiatedConnection && GlobalModState.LastConnectToHostedGame != null)
             {
-                var targetGame = MpModeSelection.LastConnectToHostedGame;
-                var isValidJoin = true;
+                // Server Browser initiated this connection attempt
+                if (GlobalModState.DirectConnectTarget != null)
+                {
+                    // Direct connection attempt, ignore the master server target
+                    Plugin.Log.Warn("HandleConnectToServerSuccess: Forcing direct connection override" +
+                                    $" (DirectConnectTarget={GlobalModState.DirectConnectTarget})");
 
-                if (!String.IsNullOrEmpty(targetGame.ServerCode) && code != targetGame.ServerCode)
-                {
-                    // Server code mismatch
-                    Plugin.Log.Warn("HandleConnectToServerSuccess: Server Code mismatch" +
-                                    $" (Expected={targetGame.ServerCode}, Actual={code})");
-                    isValidJoin = false;
+                    userId = GlobalModState.LastConnectToHostedGame.OwnerId;
+                    userName = GlobalModState.LastConnectToHostedGame.OwnerName;
+                    remoteEndPoint = GlobalModState.DirectConnectTarget;
+                    secret = GlobalModState.LastConnectToHostedGame.HostSecret;
+                    code = GlobalModState.LastConnectToHostedGame.ServerCode;
+                    selectionMask = new BeatmapLevelSelectionMask(BeatmapDifficultyMask.All, 
+                        GameplayModifierMask.All, SongPackMask.all);
+                    configuration = new GameplayServerConfiguration(GlobalModState.LastConnectToHostedGame.PlayerLimit,
+                        DiscoveryPolicy.Public, InvitePolicy.AnyoneCanInvite, GameplayServerMode.Managed,
+                        SongSelectionMode.OwnerPicks, GameplayServerControlSettings.All);
+                    
+                    GlobalModState.ShouldDisableEncryption = true; // about to talk to game server, disable encryption
                 }
-                
-                if (!String.IsNullOrEmpty(targetGame.HostSecret) && !String.IsNullOrEmpty(secret)
-                                                                 && secret != targetGame.HostSecret)
+                else
                 {
-                    // Host secret mismatch
-                    Plugin.Log.Warn("HandleConnectToServerSuccess: Host Secret mismatch" +
-                                    $" (Expected={targetGame.HostSecret}, Actual={secret})");
-                    isValidJoin = false;
-                }
+                    // Normal connection attempt, verify the master server target
+                    var targetGame = GlobalModState.LastConnectToHostedGame;
+                    var isValidJoin = true;
 
-                if (!isValidJoin)
-                {
-                    MpModeSelection.WeAbortedJoin = true;
-                    MpModeSelection.CancelLobbyJoin(hideLoading: false);
-                    return false;
+                    if (!String.IsNullOrEmpty(targetGame.ServerCode) && code != targetGame.ServerCode)
+                    {
+                        // Server code mismatch
+                        Plugin.Log.Warn("HandleConnectToServerSuccess: Server Code mismatch" +
+                                        $" (Expected={targetGame.ServerCode}, Actual={code})");
+                        isValidJoin = false;
+                    }
+
+                    if (!String.IsNullOrEmpty(targetGame.HostSecret) && !String.IsNullOrEmpty(secret)
+                                                                     && secret != targetGame.HostSecret)
+                    {
+                        // Host secret mismatch
+                        Plugin.Log.Warn("HandleConnectToServerSuccess: Host Secret mismatch" +
+                                        $" (Expected={targetGame.HostSecret}, Actual={secret})");
+                        isValidJoin = false;
+                    }
+
+                    if (!isValidJoin)
+                    {
+                        GlobalModState.WeAbortedJoin = true;
+                        MpModeSelection.CancelLobbyJoin(hideLoading: false);
+                        return false;
+                    }
                 }
             }
-            
+
             // Track the server connection and update game state as needed 
             MpEvents.RaiseBeforeConnectToServer(__instance, new ConnectToServerEventArgs()
             {
@@ -63,7 +88,7 @@ namespace ServerBrowser.Harmony
                 IsConnectionOwner = isConnectionOwner,
                 ManagerId = managerId
             });
-            
+
             return true;
         }
     }
