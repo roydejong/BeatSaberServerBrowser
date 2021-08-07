@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using HarmonyLib;
 using ServerBrowser.Core;
@@ -17,8 +18,21 @@ namespace ServerBrowser.Harmony
                     __instance.filterUnencryptedTraffic = false;
                 
                 Plugin.Log.Warn("ProcessOutBoundPacketInternal: Hit disable patch");
-
+                
                 encrypted = false;
+                
+                if (offset == 0)
+                {
+                    Array.Copy(data, offset, data, offset + 1, length);
+                }
+                else
+                {
+                    offset--;
+                }
+                
+                length++;
+                data[offset] = 0;
+                
                 __result = true;
                 return false;
             }
