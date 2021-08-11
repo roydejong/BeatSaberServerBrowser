@@ -138,6 +138,9 @@ namespace ServerBrowser.UI.ViewControllers
             {
                 StatusText.text = "Failed to get server list";
                 StatusText.color = Color.red;
+                
+                if (_loadingControl != null)
+                    _loadingControl.ShowText("Failed to load servers", true);
             }
             else if (!HostedGameBrowser.AnyResultsOnPage)
             {
@@ -187,9 +190,13 @@ namespace ServerBrowser.UI.ViewControllers
 
             if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
             {
-                StatusText.text += "\r\nMultiplayerExtensions not detected, hiding modded games";
-                StatusText.color = Color.yellow;
                 FilterModdedButton.interactable = false;
+
+                if (HostedGameBrowser.ConnectionOk)
+                {
+                    StatusText.text += "\r\nMultiplayerExtensions not detected, hiding modded games";
+                    StatusText.color = Color.yellow;
+                }
             }
 
             AfterCellsCreated();
