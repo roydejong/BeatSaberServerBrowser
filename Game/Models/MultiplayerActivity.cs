@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using ServerBrowser.Core;
 using ServerBrowser.Presence;
 using ServerBrowser.Utils;
@@ -23,6 +24,7 @@ namespace ServerBrowser.Game.Models
         public string? ServerCode;
         public string? HostUserId;
         public string? HostSecret;
+        public IPEndPoint? Endpoint;
         public bool IsDedicatedServer;
         public BeatmapLevelSelectionMask? SelectionMask;
         public GameplayServerConfiguration? ServerConfiguration;

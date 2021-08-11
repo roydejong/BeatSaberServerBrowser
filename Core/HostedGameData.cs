@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using Newtonsoft.Json;
 using ServerBrowser.Game;
 using ServerBrowser.Utils.Serialization;
@@ -39,6 +40,8 @@ namespace ServerBrowser.Core
         public Version? MpExVersion { get; set; } = null;
         public string? ServerType { get; set; } = null;
         public string? HostSecret { get; set; } = null;
+        [JsonConverter(typeof(IPEndPointJsonConverter))]
+        public IPEndPoint? Endpoint { get; set; } = null;
         #endregion
 
         #region Helpers
@@ -51,6 +54,9 @@ namespace ServerBrowser.Core
 
         [JsonIgnoreAttribute]
         public bool IsBeatDedi => ServerType == ServerTypeBeatDediCustom || ServerType == ServerTypeBeatDediQuickplay;
+
+        [JsonIgnoreAttribute]
+        public bool SupportsDirectConnect => IsBeatDedi;
 
         [JsonIgnoreAttribute]
         public bool IsQuickPlayServer => ServerType == ServerTypeBeatDediQuickplay || ServerType == ServerTypeVanillaQuickplay;

@@ -175,6 +175,7 @@ namespace ServerBrowser.Core
             Activity.ServerCode = e.Code;
             Activity.HostUserId = e.UserId;
             Activity.HostSecret = e.Secret;
+            Activity.Endpoint = e.RemoteEndPoint;
             Activity.IsDedicatedServer = e.IsDedicatedServer;
             Activity.ServerConfiguration = e.Configuration;
             Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
@@ -301,6 +302,7 @@ namespace ServerBrowser.Core
             MpExVersion = ModCheck.MultiplayerExtensions.InstalledVersion,
             ServerType = Activity.DetermineServerType(),
             HostSecret = Activity.HostSecret,
+            Endpoint = Activity.Endpoint,
             Players = Activity.GetPlayersForAnnounce().ToList()
         };
         #endregion
@@ -314,7 +316,7 @@ namespace ServerBrowser.Core
         private static async Task<bool> DoAnnounce(HostedGameData announce)
         {
             if (String.IsNullOrEmpty(announce.ServerCode))
-                return false;
+                return false;  
             
             // Get or initialize state
             AnnounceState announceState;

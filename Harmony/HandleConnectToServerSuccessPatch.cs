@@ -20,6 +20,10 @@ namespace ServerBrowser.Harmony
             byte[] myRandom, byte[] remoteRandom, bool isConnectionOwner, bool isDedicatedServer, string managerId,
             MasterServerConnectionManager __instance)
         {
+            Plugin.Log.Info($"HandleConnectToServerSuccess (userId={userId}, userName={userName}," +
+                            $" remoteEndPoint={remoteEndPoint}, secret={secret}, code={code}," +
+                            $" isDedicatedServer={isDedicatedServer}, managerId={managerId})");
+            
             if (GlobalModState.WeInitiatedConnection && GlobalModState.LastConnectToHostedGame != null)
             {
                 // Server Browser initiated this connection attempt
@@ -64,7 +68,7 @@ namespace ServerBrowser.Harmony
                                         $" (Expected={targetGame.HostSecret}, Actual={secret})");
                         isValidJoin = false;
                     }
-
+                    
                     if (!isValidJoin)
                     {
                         GlobalModState.WeAbortedJoin = true;

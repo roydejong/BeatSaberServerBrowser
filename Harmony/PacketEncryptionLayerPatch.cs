@@ -17,8 +17,6 @@ namespace ServerBrowser.Harmony
                 if (__instance.filterUnencryptedTraffic)
                     __instance.filterUnencryptedTraffic = false;
                 
-                Plugin.Log.Warn("ProcessOutBoundPacketInternal: Hit disable patch");
-                
                 encrypted = false;
                 
                 if (offset == 0)

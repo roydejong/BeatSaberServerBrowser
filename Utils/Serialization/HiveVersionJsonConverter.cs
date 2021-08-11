@@ -17,7 +17,10 @@ namespace ServerBrowser.Utils.Serialization
         public override Version? ReadJson(JsonReader reader, Type objectType, Version? existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             if (reader.Value == null)
+            {
+                reader.Skip();
                 return null;
+            }
 
             var s = (string) reader.Value;
 

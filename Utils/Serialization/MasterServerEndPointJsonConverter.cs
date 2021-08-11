@@ -20,6 +20,7 @@ namespace ServerBrowser.Utils.Serialization
         {
             if (reader.Value is null)
             {
+                reader.Skip();
                 return null;
             }
 

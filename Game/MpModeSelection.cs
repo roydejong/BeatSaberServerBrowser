@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using HMUI;
 using IPA.Utilities;
@@ -92,15 +91,19 @@ namespace ServerBrowser.Game
             
             Plugin.Log.Info("--> Connecting to lobby destination now" +
                             $" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
-                            $" ServerType={game.ServerType}, ServerBrowserId={game.Id})");
+                            $" ServerType={game.ServerType}, ServerBrowserId={game.Id}," +
+                            $" Endpoint={game.Endpoint})");
 
             _flowCoordinator.SetField("_joiningLobbyCancellationTokenSource", new CancellationTokenSource());
 
-            if (game.ServerCode == "55555")
+            if (game.SupportsDirectConnect && game.Endpoint != null)
             {
-                GlobalModState.DirectConnectTarget = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2312);
+                Plugin.Log.Info($"Attempting direct connection to endpoint: {game.Endpoint}");
+                GlobalModState.DirectConnectTarget = game.Endpoint;
             }
             
+            // NB: We call this even when direct connecting, as direct connections simply intercept the master response
+            // TODO Make direct connects better by avoiding the master server altogether :)
             _mpLobbyConnectionController.CreateOrConnectToDestinationParty(
                 MpLobbyDestination.Create(game.ServerCode, game.HostSecret)
             );

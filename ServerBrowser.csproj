@@ -255,6 +255,7 @@
     <Compile Include="Utils\CoverArtGrabber.cs" />
     <Compile Include="Utils\ModCheck.cs" />
     <Compile Include="Utils\Serialization\HiveVersionJsonConverter.cs" />
+    <Compile Include="Utils\Serialization\IPEndPointJsonConverter.cs" />
     <Compile Include="Utils\Serialization\MasterServerEndPointJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>
