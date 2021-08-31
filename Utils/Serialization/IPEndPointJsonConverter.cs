@@ -22,15 +22,12 @@ namespace ServerBrowser.Utils.Serialization
             if (reader.Value is null)
             {
                 reader.Skip();
-                Plugin.Log.Error("reader.Value is null");
                 return null;
             }
 
             var valueStr = reader.Value.ToString();
             var valueParts = valueStr.Split(':');
             
-            Plugin.Log.Error($"reader.Value = {valueStr}");
-
             if (valueParts.Length == 2
                 && IPAddress.TryParse(valueParts[0], out var ipAddress)
                 && int.TryParse(valueParts[1], out var port))
