@@ -43,6 +43,8 @@ namespace ServerBrowser.Harmony
                     configuration = new GameplayServerConfiguration(GlobalModState.LastConnectToHostedGame.PlayerLimit,
                         DiscoveryPolicy.Public, InvitePolicy.AnyoneCanInvite, GameplayServerMode.Managed,
                         SongSelectionMode.OwnerPicks, GameplayServerControlSettings.All);
+                    managerId = GlobalModState.LastConnectToHostedGame.ManagerId ??
+                                GlobalModState.LastConnectToHostedGame.OwnerId;
                     
                     GlobalModState.ShouldDisableEncryption = true; // about to talk to game server, disable encryption
                 }
