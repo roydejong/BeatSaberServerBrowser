@@ -179,6 +179,8 @@ namespace ServerBrowser.Core
             Activity.IsDedicatedServer = e.IsDedicatedServer;
             Activity.ServerConfiguration = e.Configuration;
             Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
+            Activity.ManagerId = e.ManagerId;
+            
             Activity.Players = new(Activity.MaxPlayerCount);
             
             HandleUpdate();
@@ -303,6 +305,8 @@ namespace ServerBrowser.Core
             ServerType = Activity.DetermineServerType(),
             HostSecret = Activity.HostSecret,
             Endpoint = Activity.Endpoint,
+            ManagerId = Activity.ManagerId,
+            
             Players = Activity.GetPlayersForAnnounce().ToList()
         };
         #endregion

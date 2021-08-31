@@ -42,6 +42,7 @@ namespace ServerBrowser.Core
         public string? HostSecret { get; set; } = null;
         [JsonConverter(typeof(IPEndPointJsonConverter))]
         public IPEndPoint? Endpoint { get; set; } = null;
+        public string? ManagerId { get; set; } = null;
         #endregion
 
         #region Helpers
