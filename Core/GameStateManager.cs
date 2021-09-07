@@ -99,7 +99,8 @@ namespace ServerBrowser.Core
             
             Activity.LobbyState = lobbyState;
             
-            HandleUpdate();
+            if (Activity.LobbyState != MultiplayerLobbyState.None)
+                HandleUpdate();
         }
 
         private static void OnServerCodeChanged(object sender, string serverCode)
