@@ -177,6 +177,7 @@ namespace ServerBrowser.Core
             Activity.HostSecret = e.Secret;
             Activity.Endpoint = e.RemoteEndPoint;
             Activity.IsDedicatedServer = e.IsDedicatedServer;
+            Activity.SelectionMask = e.SelectionMask;
             Activity.ServerConfiguration = e.Configuration;
             Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
             Activity.ManagerId = e.ManagerId;

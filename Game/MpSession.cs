@@ -1,11 +1,10 @@
-﻿using ServerBrowser.Assets;
-using ServerBrowser.Core;
+﻿using System;
+using System.Linq;
+using ServerBrowser.Assets;
+using ServerBrowser.Game.Models;
 using ServerBrowser.Harmony;
 using ServerBrowser.UI;
 using ServerBrowser.Utils;
-using System;
-using System.Linq;
-using ServerBrowser.Game.Models;
 using UnityEngine;
 using static MultiplayerLobbyConnectionController;
 
@@ -151,20 +150,6 @@ namespace ServerBrowser.Game
             
             // NB: +1 because the local player doesn't count as a "connected player"
             return SessionManager.connectedPlayerCount + 1;
-        }
-
-        public static int GetPlayerLimit()
-        {
-            switch (MpLobbyConnectionTypePatch.ConnectionType)
-            {
-                case LobbyConnectionType.PartyHost:
-                    // Custom lobby with its own player limit
-                    return SessionManager.maxPlayerCount;
-
-                default:
-                    // maxPlayerCount isn't getting set for clients, only hosts, assume 5
-                    return 5;
-            }
         }
 
         public static string GetHostGameName()
