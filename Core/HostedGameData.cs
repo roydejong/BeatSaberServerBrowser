@@ -11,10 +11,13 @@ namespace ServerBrowser.Core
     public class HostedGameData
     {
         #region Consts
-        public const string ServerTypePlayerHost = "player_host";
+        public const string ServerTypeBeatTogetherDedicated = "beattogether_dedicated";
+        public const string ServerTypeBeatTogetherQuickplay = "beattogether_quickplay";
         public const string ServerTypeBeatDediCustom = "beatdedi_custom";
         public const string ServerTypeBeatDediQuickplay = "beatdedi_quickplay";
+        public const string ServerTypeVanillaDedicated = "vanilla_dedicated";
         public const string ServerTypeVanillaQuickplay = "vanilla_quickplay";
+        public const string ServerTypePlayerHost = "player_host";
         #endregion
         
         #region Fields

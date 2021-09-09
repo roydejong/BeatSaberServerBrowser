@@ -59,6 +59,7 @@ namespace ServerBrowser.Game.Models
 
         public IConnectedPlayer? ConnectionOwner => Players?.FirstOrDefault(p => p.isConnectionOwner);
         
+        public bool IsBeatTogether => IsDedicatedServer && MasterServer.hostName.Contains("beattogether.systems");
         public bool IsBeatDedi => ConnectionOwner?.userName.StartsWith("BeatDedi/") ?? false;
 
         public bool IsModded => ConnectionOwner.HasState("modded") || ConnectionOwner.HasState("customsongs");
@@ -67,16 +68,29 @@ namespace ServerBrowser.Game.Models
         #region Announce helpers
         public string DetermineServerType()
         {
-            if (IsQuickPlay)
-                if (IsBeatDedi)
+            // Special: BeatTogether
+            if (IsBeatTogether)
+                if (IsQuickPlay)
+                    return HostedGameData.ServerTypeBeatTogetherQuickplay;
+                else
+                    return HostedGameData.ServerTypeBeatTogetherDedicated;
+            
+            // Special: BeatDedi
+            if (IsBeatDedi)
+                if (IsQuickPlay)
                     return HostedGameData.ServerTypeBeatDediQuickplay;
                 else
-                    return HostedGameData.ServerTypeVanillaQuickplay;
-            else
-                if (IsBeatDedi)
                     return HostedGameData.ServerTypeBeatDediCustom;
+            
+            // Official: Dedicated Server
+            if (IsDedicatedServer)
+                if (IsQuickPlay)
+                    return HostedGameData.ServerTypeVanillaQuickplay;
                 else
-                    return HostedGameData.ServerTypePlayerHost;
+                    return HostedGameData.ServerTypeVanillaDedicated;
+
+            // Fallback: old P2P host? This should never happen
+            return HostedGameData.ServerTypePlayerHost;
         }
 
         public IEnumerable<HostedGamePlayer> GetPlayersForAnnounce()
