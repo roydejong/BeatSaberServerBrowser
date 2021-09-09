@@ -213,7 +213,6 @@
     <Compile Include="Game\Models\SessionConnectedEventArgs.cs" />
     <Compile Include="Game\Models\StartingMultiplayerLevelEventArgs.cs" />
     <Compile Include="Game\MpEvents.cs" />
-    <Compile Include="Game\MpLobbyDestination.cs" />
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
     <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />

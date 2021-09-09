@@ -105,7 +105,7 @@ namespace ServerBrowser.Game
             // NB: We call this even when direct connecting, as direct connections simply intercept the master response
             // TODO Make direct connects better by avoiding the master server altogether :)
             _mpLobbyConnectionController.CreateOrConnectToDestinationParty(
-                MpLobbyDestination.Create(game.ServerCode, game.HostSecret)
+                new SelectMultiplayerLobbyDestination(game.HostSecret, game.ServerCode)
             );
             
             _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
