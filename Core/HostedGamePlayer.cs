@@ -6,7 +6,7 @@
         public string UserId;
         public string UserName;
         public bool IsHost;
-        public float Latency;
         public bool IsAnnouncer;
+        public float Latency;
     }
 }

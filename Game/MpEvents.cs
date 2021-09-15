@@ -143,6 +143,16 @@ namespace ServerBrowser.Game
         internal static void RaiseSessionDisconnected(object sender, DisconnectedReason reason) =>
             SessionDisconnected.RaiseEventSafe(sender, reason);
         #endregion
+
+        #region PartyOwnerChanged
+        /// <summary>
+        /// This event is raised when the party owner changes.
+        /// </summary>
+        internal static event EventHandler<string>? PartyOwnerChanged;
+
+        internal static void RaisePartyOwnerChanged(object sender, string userId) =>
+            PartyOwnerChanged.RaiseEventSafe(sender, userId);
+        #endregion
         
         #region Helper code
         private static void RaiseEventSafe<TArgs>(this EventHandler<TArgs>? e, object sender, TArgs args)

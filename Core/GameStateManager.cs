@@ -42,6 +42,7 @@ namespace ServerBrowser.Core
             MpEvents.PlayerConnected += OnPlayerConnected;
             MpEvents.PlayerDisconnected += OnPlayerDisconnected;
             MpEvents.StartingMultiplayerLevel += OnStartingMultiplayerLevel;
+            MpEvents.PartyOwnerChanged += OnPartyOwnerChanged;
         }
 
         public static void TearDown()
@@ -58,6 +59,7 @@ namespace ServerBrowser.Core
             MpEvents.PlayerConnected -= OnPlayerConnected;
             MpEvents.PlayerDisconnected -= OnPlayerDisconnected;
             MpEvents.StartingMultiplayerLevel -= OnStartingMultiplayerLevel;
+            MpEvents.PartyOwnerChanged -= OnPartyOwnerChanged;
         }
         #endregion
 
@@ -194,6 +196,16 @@ namespace ServerBrowser.Core
             Activity.CurrentDifficulty = e.Difficulty;
             Activity.CurrentCharacteristic = e.Characteristic;
             Activity.CurrentModifiers = e.Modifiers;
+
+            HandleUpdate();
+        }
+        
+        private static void OnPartyOwnerChanged(object sender, string userId)
+        {
+            if (Activity.ManagerId == userId)
+                return;
+            
+            Activity.ManagerId = userId;
 
             HandleUpdate();
         }

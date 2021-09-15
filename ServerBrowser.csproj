@@ -232,6 +232,7 @@
     <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
     <Compile Include="Harmony\MpModeSelectionButtonPatch.cs" />
     <Compile Include="Harmony\MpModeSelectionActivatedPatch.cs" />
+    <Compile Include="Harmony\SetPlayerIsPartyOwnerPatch.cs" />
     <Compile Include="Harmony\StartMultiplayerLevelPatch.cs" />
     <Compile Include="Harmony\UserCertificateValidatorPatch.cs" />
     <Compile Include="Plugin.cs" />
