@@ -12,7 +12,10 @@ namespace ServerBrowser.Harmony
         public static void Postfix(string userId, bool isPartyOwner, bool notifyChange,
             LobbyPlayersDataModel __instance)
         {
-            MpEvents.RaisePartyOwnerChanged(__instance, userId);
+            if (isPartyOwner)
+            {
+                MpEvents.RaisePartyOwnerChanged(__instance, userId);
+            }
         }
     }
 }
