@@ -150,7 +150,8 @@ namespace ServerBrowser.Game
             if (e == null)
                 return;
             
-            Plugin.Log?.Info($"[MpEvents] {e.Method.Name} ({args})");
+            if (e.Method.Name != "OnMultiplayerActivityUpdated")
+                Plugin.Log?.Info($"[MpEvents] {e.Method.Name} ({args})");
 
             foreach (var invocation in e.GetInvocationList())
             {
