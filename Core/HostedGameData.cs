@@ -81,7 +81,7 @@ namespace ServerBrowser.Core
             
             if (IsOnCustomMaster)
             {
-                moddedDescr += ", Cross-play";
+                moddedDescr += ", Unofficial";
             }
 
             return $"{GameName} ({PlayerCount}/{PlayerLimit}, {moddedDescr})";
@@ -106,7 +106,7 @@ namespace ServerBrowser.Core
             }
             else
             {
-                masterServerDescr = "Cross-play";
+                masterServerDescr = "Unofficial";
             }
 
             if (IsModded)
