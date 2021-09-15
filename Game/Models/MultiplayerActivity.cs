@@ -105,7 +105,8 @@ namespace ServerBrowser.Game.Models
                         UserId = player.userId,
                         UserName = player.userName,
                         IsHost = player.isConnectionOwner,
-                        Latency = player.currentLatency
+                        IsAnnouncer = player.isMe,
+                        Latency = player.currentLatency,
                     };
                 }
             }
