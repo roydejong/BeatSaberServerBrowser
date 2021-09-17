@@ -207,6 +207,8 @@
     <Compile Include="Core\HostedGameBrowser.cs" />
     <Compile Include="Core\HostedGameFilters.cs" />
     <Compile Include="Core\HostedGamePlayer.cs" />
+    <Compile Include="Core\Responses\AnnounceResult.cs" />
+    <Compile Include="Core\Responses\BrowseResult.cs" />
     <Compile Include="Game\Models\ConnectToServerEventArgs.cs" />
     <Compile Include="Game\Models\MultiplayerActivity.cs" />
     <Compile Include="Game\Models\OnlineMenuOpenedEventArgs.cs" />
@@ -217,7 +219,6 @@
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
     <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
-    <Compile Include="Core\ServerBrowseResult.cs" />
     <Compile Include="Core\GameStateManager.cs" />
     <Compile Include="Core\BSSBMasterAPI.cs" />
     <Compile Include="Core\UpdateTimer.cs" />
@@ -240,7 +241,6 @@
     <Compile Include="Presence\DiscordCore\PresenceProvider.cs" />
     <Compile Include="Presence\IPresenceProvider.cs" />
     <Compile Include="Presence\PresenceManager.cs" />
-    <Compile Include="Presence\PresenceSecret.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Components\CreateServerExtensions.cs" />
     <Compile Include="UI\Components\HostedGameCellData.cs" />
@@ -255,6 +255,7 @@
     <Compile Include="Utils\CoverArtGrabber.cs" />
     <Compile Include="Utils\ModCheck.cs" />
     <Compile Include="Utils\Serialization\HiveVersionJsonConverter.cs" />
+    <Compile Include="Utils\Serialization\JsonObject.cs" />
     <Compile Include="Utils\Serialization\IPEndPointJsonConverter.cs" />
     <Compile Include="Utils\Serialization\MasterServerEndPointJsonConverter.cs" />
   </ItemGroup>

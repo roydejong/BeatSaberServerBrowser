@@ -1,10 +1,7 @@
-﻿using ServerBrowser.Assets;
-using ServerBrowser.Core;
-using ServerBrowser.UI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
+using ServerBrowser.Core.Responses;
 
 namespace ServerBrowser.Core
 {
@@ -12,7 +9,7 @@ namespace ServerBrowser.Core
     {
         public static event Action OnUpdate;
 
-        private static ServerBrowseResult _lastServerResult;
+        private static BrowseResult _lastServerResult;
         private static Dictionary<int, HostedGameData> _lobbyObjects;
         private static List<HostedGameData> _lobbiesOnPage;
         private static int _offset;

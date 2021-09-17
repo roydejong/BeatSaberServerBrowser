@@ -1,6 +1,6 @@
-﻿using ServerBrowser.Core;
+﻿using System.Text;
+using ServerBrowser.Core;
 using ServerBrowser.Utils;
-using System.Text;
 
 namespace ServerBrowser.Game
 {
@@ -87,7 +87,7 @@ namespace ServerBrowser.Game
             }
 
             // Trigger the actual join via server code
-            MpModeSelection.ConnectToHostedGame(game);
+            _ = MpModeSelection.ConnectToHostedGame(game);
         }
 
         #region Master Server Management

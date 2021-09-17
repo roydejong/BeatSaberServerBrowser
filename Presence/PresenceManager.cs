@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ServerBrowser.Core;
 using ServerBrowser.Game;
 using ServerBrowser.Game.Models;
+using ServerBrowser.UI;
 
 namespace ServerBrowser.Presence
 {
@@ -124,6 +128,52 @@ namespace ServerBrowser.Presence
         private void OnMultiplayerActivityUpdated(object sender, MultiplayerActivity activity)
         {
             Update(activity);
+        }
+        #endregion
+        
+        #region Launcher
+        private CancellationTokenSource? _joinCancellationTokenSource;
+        
+        public async Task JoinFromSecret(string secret)
+        {
+            // Check connection state
+            var mpActivity = GameStateManager.Activity;
+
+            if (!mpActivity.InOnlineMenu || mpActivity.IsInMultiplayer)
+            {
+                Plugin.Log?.Error($"[PresenceManager] Ignoring invite (secret={secret}) - not in online menu!");
+                FloatingNotification.Instance.ShowMessage(
+                    title: "Invite error",
+                    message: "To accept multiplayer invites, you must be in the Online menu.",
+                    FloatingNotification.NotificationStyle.Cerise
+                );
+                return;
+            }
+            
+            // Cancel any previous joins
+            _joinCancellationTokenSource?.Cancel();
+            _joinCancellationTokenSource?.Dispose();
+            _joinCancellationTokenSource = new CancellationTokenSource();
+            
+            // UI notice
+            FloatingNotification.Instance.ShowMessage(
+                title: "Accepting invitation",
+                message: "Please wait, trying to join lobby from invitation...",
+                FloatingNotification.NotificationStyle.Cerise
+            );
+            
+            // Presence secret is actually the key of the game on BSSB - query game data
+            Plugin.Log?.Info($"[PresenceManager] Trying to join game from Rich Presence (secret={secret})");
+            
+            var gameData = await BSSBMasterAPI.BrowseDetail(secret, _joinCancellationTokenSource.Token);
+
+            if (gameData is null || !gameData.CanJoin)
+            {
+                Plugin.Log?.Error($"[PresenceManager] Join failed; could not fetch game data (secret={secret})");
+                return;
+            }
+
+            HMMainThreadDispatcher.instance.Enqueue(() => MpConnect.Join(gameData));
         }
         #endregion
     }

@@ -128,7 +128,21 @@ namespace ServerBrowser.Core
                 Activity.Players = new List<IConnectedPlayer>(e.MaxPlayers);
             else
                 Activity.Players.Clear();
-            
+
+            if (GlobalModState.WeInitiatedConnection && GlobalModState.LastConnectToHostedGame is not null)
+            {
+                // We have joined the game from the server browser as a client, override certain details
+                Activity.BssbGame = GlobalModState.LastConnectToHostedGame;
+                Activity.Name = Activity.BssbGame.GameName;
+                Activity.MaxPlayerCount = Activity.BssbGame.PlayerLimit;
+            }
+            else
+            {
+                // Joined outside of server browser
+                Activity.BssbGame = null;
+                Activity.Name = MpSession.GetHostGameName();
+            }
+
             OnPlayerConnected(sender, e.LocalPlayer);
             OnPlayerConnected(sender, e.ConnectionOwner);
         }
@@ -214,8 +228,6 @@ namespace ServerBrowser.Core
         #region Update Action
         public static void HandleUpdate(bool raiseEvent = true)
         {
-            Activity.Name = MpSession.GetHostGameName();
-            
             if (raiseEvent)
                 MpEvents.RaiseActivityUpdated(null, Activity);
             
@@ -352,27 +364,33 @@ namespace ServerBrowser.Core
             announceState = _announceStates[announce.ServerCode];
 
             // Try send announce
-            var resultOk = false;
+            var announceResult = await BSSBMasterAPI.Announce(announce);
             
-            if (await BSSBMasterAPI.Announce(announce))
+            if (announceResult.Success)
             {
                 announceState.DidAnnounce = true;
                 announceState.LastSuccess = DateTime.Now;
 
                 StatusText = $"Players can now join from the browser!\r\n{announce.Describe()}";
                 HasErrored = false;
+
+                announce.Key = announceResult.Key;
+                Activity.BssbGame = announce;
+                
+                MpEvents.RaiseActivityUpdated(Activity, Activity);
             }
             else
             {
                 announceState.DidFail = true;
                 announceState.LastFailure = DateTime.Now;
 
-                StatusText = $"Could not announce to master server!";
+                StatusText = $"Failed to announce to Server Browser!";
                 HasErrored = true;
             }
 
             LobbyConfigPanel.UpdatePanelInstance();
-            return resultOk;
+            
+            return announceResult.Success;
         }
 
         /// <summary>

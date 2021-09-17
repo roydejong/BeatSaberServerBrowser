@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
@@ -80,36 +81,59 @@ namespace ServerBrowser.Game
             TriggerMenuButton(MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
-        public static void ConnectToHostedGame(HostedGameData? game)
+        public static async Task ConnectToHostedGame(HostedGameData? game)
         {
             if (game == null)
                 return;
+            
+            // Cancel any previous connection attempts, ensure cancellation token is initialized
+            var gameJoinCancellationTokenSource = _flowCoordinator.GetField<CancellationTokenSource,
+                MultiplayerModeSelectionFlowCoordinator>("_joiningLobbyCancellationTokenSource");
 
+            gameJoinCancellationTokenSource?.Cancel();
+            gameJoinCancellationTokenSource?.Dispose();
+
+            gameJoinCancellationTokenSource = new CancellationTokenSource();
+            _flowCoordinator.SetField("_joiningLobbyCancellationTokenSource", gameJoinCancellationTokenSource);
+            
+            // Set global mod state for Harmony patches
+            Plugin.Log.Info("--> Connecting to lobby destination now" +
+                            $" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
+                            $" ServerType={game.ServerType}, ServerBrowserKey={game.Key}," +
+                            $" Endpoint={game.Endpoint})");
+            
             GlobalModState.Reset();
             GlobalModState.WeInitiatedConnection = true;
             GlobalModState.LastConnectToHostedGame = game;
-            
-            Plugin.Log.Info("--> Connecting to lobby destination now" +
-                            $" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
-                            $" ServerType={game.ServerType}, ServerBrowserId={game.Id}," +
-                            $" Endpoint={game.Endpoint})");
-
-            _flowCoordinator.SetField("_joiningLobbyCancellationTokenSource", new CancellationTokenSource());
 
             if (game.SupportsDirectConnect && game.Endpoint != null)
             {
                 Plugin.Log.Info($"Attempting direct connection to endpoint: {game.Endpoint}");
                 GlobalModState.DirectConnectTarget = game.Endpoint;
             }
+
+            if (!PluginUi.ServerBrowserViewController.isInViewControllerHierarchy)
+            {
+                // Ensure Server Browser view is up - this avoids UI crashes for async joins from rich presence...
+                PluginUi.LaunchServerBrowser();
+
+                try
+                {
+                    await Task.Delay(1000, gameJoinCancellationTokenSource.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    return;
+                }
+            }
+
+            // Trigger game connection and UI
+            var lobbyDestination = new SelectMultiplayerLobbyDestination(game.HostSecret, game.ServerCode);
             
-            // NB: We call this even when direct connecting, as direct connections simply intercept the master response
-            // TODO Make direct connects better by avoiding the master server altogether :)
-            _mpLobbyConnectionController.CreateOrConnectToDestinationParty(
-                new SelectMultiplayerLobbyDestination(game.HostSecret, game.ServerCode)
-            );
-            
+            _mpLobbyConnectionController.CreateOrConnectToDestinationParty(lobbyDestination);
+
             _joiningLobbyViewController.Init($"{game.GameName} ({game.ServerCode})");
-            
+
             ReplaceTopViewController(_joiningLobbyViewController, animationType: AnimationType.In,
                 animationDirection: AnimationDirection.Vertical);
         }
@@ -130,7 +154,7 @@ namespace ServerBrowser.Game
                         MakeServerBrowserTopView();
                         break;
                     case 1: // Retry connection
-                        ConnectToHostedGame(GlobalModState.LastConnectToHostedGame);
+                        _ = ConnectToHostedGame(GlobalModState.LastConnectToHostedGame);
                         break;
                 }
             });

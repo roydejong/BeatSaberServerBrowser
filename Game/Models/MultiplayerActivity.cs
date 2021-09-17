@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using ServerBrowser.Core;
-using ServerBrowser.Presence;
 using ServerBrowser.Utils;
-using static ServerBrowser.Presence.PresenceSecret;
 using static MultiplayerLobbyConnectionController;
 
 namespace ServerBrowser.Game.Models
@@ -36,6 +34,7 @@ namespace ServerBrowser.Game.Models
         public GameplayModifiers? CurrentModifiers;
         public DateTime? SessionStartedAt;
         public string? ManagerId;
+        public HostedGameData? BssbGame;
         #endregion
 
         #region Getters
@@ -118,21 +117,6 @@ namespace ServerBrowser.Game.Models
             if (difficulty == null && SelectionMask.HasValue)
                 difficulty = SelectionMask.Value.difficulties.FromMask();
             return difficulty;
-        }
-        #endregion
-
-        #region Presence helpers
-        public PresenceSecret GetPresenceSecret(PresenceSecretType secretType)
-        {
-            return new()
-            {
-                SecretType = secretType,
-                MasterServerEndPoint = MasterServer,
-                ServerCode = ServerCode,
-                HostSecret = HostSecret,
-                ServerType = DetermineServerType(),
-                // TODO Can we track MpEx version for the connection owner?
-            };
         }
         #endregion
     }

@@ -1,9 +1,8 @@
 using Discord;
 using DiscordCore;
+using Hive.Versioning;
 using ServerBrowser.Game.Models;
 using ServerBrowser.Utils;
-using static ServerBrowser.Presence.PresenceSecret;
-using Hive.Versioning;
 
 namespace ServerBrowser.Presence.DiscordCore
 {
@@ -69,13 +68,13 @@ namespace ServerBrowser.Presence.DiscordCore
         private void OnDiscordActivitySpectate(string secret)
         {
             Plugin.Log?.Info($"[PresenceProvider] OnDiscordActivitySpectate (secret: {secret})");
-            PresenceSecret.FromString(secret).Connect();
+            Plugin.PresenceManager?.JoinFromSecret(secret);
         }
 
         private void OnDiscordActivityJoin(string secret)
         {
             Plugin.Log?.Info($"[PresenceProvider] OnDiscordActivityJoin (secret: {secret})");
-            PresenceSecret.FromString(secret).Connect();
+            Plugin.PresenceManager?.JoinFromSecret(secret);
         }
         #endregion
 
@@ -129,21 +128,26 @@ namespace ServerBrowser.Presence.DiscordCore
                 };
                 
                 // Add activity secret
-                if (activity.CurrentPlayerCount >= activity.MaxPlayerCount)
+                var activitySecret = activity.BssbGame?.Key;
+                
+                if (activitySecret is not null)
                 {
-                    // Lobby full, add spectate secret
-                    discordActivity.Secrets = new ActivitySecrets()
+                    if (activity.CurrentPlayerCount >= activity.MaxPlayerCount)
                     {
-                        Spectate = activity.GetPresenceSecret(PresenceSecretType.Spectate).ToString()
-                    };
-                }
-                else
-                {
-                    // Lobby has space, add join secret
-                    discordActivity.Secrets = new ActivitySecrets()
+                        // Lobby full, add spectate secret
+                        discordActivity.Secrets = new ActivitySecrets()
+                        {
+                            Spectate = activitySecret
+                        };
+                    }
+                    else
                     {
-                        Join = activity.GetPresenceSecret(PresenceSecretType.Match).ToString()
-                    };
+                        // Lobby has space, add join secret
+                        discordActivity.Secrets = new ActivitySecrets()
+                        {
+                            Match = activitySecret,
+                        };
+                    }
                 }
 
                 // State text & primary asset
@@ -154,12 +158,12 @@ namespace ServerBrowser.Presence.DiscordCore
                 }
                 else if (activity.IsHost)
                 {
-                    discordActivity.State = $"Hosting {activity.Name}";
+                    discordActivity.State = activity.Name;
                     discordActivity.Assets.LargeText = "Custom Game (Host)";
                 }
                 else
                 {
-                    discordActivity.State = $"In {activity.Name}";
+                    discordActivity.State = activity.Name;
                     discordActivity.Assets.LargeText = "Custom Game (Player)";
                 }
                 

@@ -1,45 +1,57 @@
-﻿using ServerBrowser.Game;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using ServerBrowser.Core.Responses;
+using ServerBrowser.Game;
 
 namespace ServerBrowser.Core
 {
     public static class BSSBMasterAPI
     {
         #region Shared/HTTP
-        private const string BASE_URL = "https://bssb.app/api/v1";
+        private const string BaseURL = "https://bssb.app/api/v1";
 
-        private static async Task<HttpResponseMessage> PerformWebRequest(string method, string endpoint, string json = null)
+        private static async Task<HttpResponseMessage?> PerformWebRequest(string method, string endpoint,
+            string? json = null, CancellationToken? cancellationToken = null)
         {
-            var targetUrl = BASE_URL + endpoint;
-            Plugin.Log?.Debug($"{method} {targetUrl} {json}");
+            var targetUrl = BaseURL + endpoint;
+            
+            Plugin.Log?.Debug($"[BSSBMasterAPI] {method} {targetUrl} {json}");
 
             try
             {
                 HttpResponseMessage response;
 
-                switch (method)
+                if (method == "GET")
                 {
-                    case "GET":
-                        response = await Plugin.HttpClient.GetAsync(targetUrl).ConfigureAwait(false);
-                        break;
-                    case "POST":
-                        if (String.IsNullOrEmpty(json))
-                        {
+                    response = await Plugin.HttpClient.GetAsync(targetUrl).ConfigureAwait(false);
+                }
+                else if (method == "POST")
+                {
+                    if (String.IsNullOrEmpty(json))
+                    {
+                        if (cancellationToken is null)
                             response = await Plugin.HttpClient.PostAsync(targetUrl, null).ConfigureAwait(false);
-                        }
                         else
-                        {
-                            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                            response = await Plugin.HttpClient.PostAsync(targetUrl, null, cancellationToken.Value).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
+                        
+                        if (cancellationToken is null)
                             response = await Plugin.HttpClient.PostAsync(targetUrl, content).ConfigureAwait(false);
-                        }
-                        break;
-                    default:
-                        throw new ArgumentException($"Invalid request method for the Master Server API: {method}");
+                        else
+                            response = await Plugin.HttpClient.PostAsync(targetUrl, content, cancellationToken.Value).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException($"Invalid request method for the Master Server API: {method}");
                 }
 
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -47,54 +59,46 @@ namespace ServerBrowser.Core
                     throw new Exception($"Expected HTTP 200 OK, got HTTP {response.StatusCode}");
                 }
 
-                Plugin.Log?.Debug($"✔ 200 OK: {method} {targetUrl}");
+                Plugin.Log?.Debug($"[BSSBMasterAPI] ✔ 200 OK: {method} {targetUrl}");
                 return response;
             }
             catch (TaskCanceledException)
             {
+                Plugin.Log?.Warn($"[BSSBMasterAPI] Request task canceled: {method} {targetUrl}");
                 return null;
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Error($"⚠ Request error: {method} {targetUrl} → {ex}");
+                Plugin.Log?.Error($"[BSSBMasterAPI] Request error: {method} {targetUrl} → {ex}");
                 return null;
             }
         }
         #endregion
 
-        private static string _lastPayloadSent = null;
-        private static DateTime? _lastSentAt = null;
-        private const int ANNOUNCE_INTERVAL_MINS = 1;
-
-        public static async Task<bool> Announce(HostedGameData announce)
+        public static async Task<AnnounceResult> Announce(HostedGameData announce)
         {
             var payload = announce.ToJson();
+            
+            Plugin.Log?.Info($"Sending host announcement (OwnerId={announce.OwnerId}, " +
+                             $"HostSecret={announce.HostSecret}, ServerCode={announce.ServerCode}, " +
+                             $"Endpoint={announce.Endpoint}, ServerType={announce.ServerType})...");
 
-            var isDupeRequest = (_lastPayloadSent != null && _lastPayloadSent == payload);
-            var enoughTimeHasPassed = (_lastSentAt == null
-                || (DateTime.Now - _lastSentAt.Value).TotalMinutes >= ANNOUNCE_INTERVAL_MINS);
+            var response = await PerformWebRequest("POST", "/announce", payload);
 
-            if (isDupeRequest && !enoughTimeHasPassed) {
-                // An identical payload was already sent out!
-                // Do not send a dupe unless enough time has passed
-                return true;
-            }
-
-            Plugin.Log?.Info($"Sending host announcement [{announce.Describe()}] for code {announce.ServerCode}");
-
-            _lastPayloadSent = payload;
-            _lastSentAt = DateTime.Now;
-
-            var responseOk = await PerformWebRequest("POST", "/announce", payload) != null;
-
-            if (!responseOk)
+            if (response is not null)
             {
-                // Request failed, allow immediate retry
-                _lastPayloadSent = null;
-                _lastSentAt = null;
+                try
+                {
+                    var contentStr = await response.Content.ReadAsStringAsync();
+                    return AnnounceResult.FromJson(contentStr);
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Log?.Warn($"Error parsing Announce response: {ex}");
+                }
             }
-
-            return responseOk;
+            
+            return new AnnounceResult() { Success = false };
         }
 
         public static async Task<bool> UnAnnounce(AnnounceState announceState)
@@ -110,7 +114,7 @@ namespace ServerBrowser.Core
             return await PerformWebRequest("POST", $"/unannounce?{queryString}") != null;
         }
 
-        public static async Task<ServerBrowseResult> Browse(int offset, HostedGameFilters filters)
+        public static async Task<BrowseResult?> Browse(int offset, HostedGameFilters filters)
         {
             var queryString = HttpUtility.ParseQueryString("");
 
@@ -137,6 +141,26 @@ namespace ServerBrowser.Core
 
             var response = await PerformWebRequest("GET", $"/browse?{queryString}");
 
+            if (response is not null)
+            {
+                try
+                {
+                    var contentStr = await response.Content.ReadAsStringAsync();
+                    return BrowseResult.FromJson(contentStr);
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Log?.Warn($"Error parsing Browse response: {ex}");
+                }
+            }
+            
+            return null;
+        }
+        
+        public static async Task<HostedGameData?> BrowseDetail(string key, CancellationToken? cancellationToken = null)
+        {
+            var response = await PerformWebRequest("GET", $"/browse/{key}", null, cancellationToken);
+
             if (response == null)
             {
                 Plugin.Log?.Warn($"Browse failed, did not get a valid response");
@@ -146,7 +170,7 @@ namespace ServerBrowser.Core
             try
             {
                 var contentStr = await response.Content.ReadAsStringAsync();
-                return ServerBrowseResult.FromJson(contentStr);
+                return HostedGameData.FromJson(contentStr);
             }
             catch (Exception ex)
             {

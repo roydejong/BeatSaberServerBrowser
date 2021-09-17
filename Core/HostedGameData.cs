@@ -46,6 +46,7 @@ namespace ServerBrowser.Core
         [JsonConverter(typeof(IPEndPointJsonConverter))]
         public IPEndPoint? Endpoint { get; set; } = null;
         public string? ManagerId { get; set; } = null;
+        public string? Key { get; set; } = null;
         #endregion
 
         #region Helpers
@@ -172,6 +173,11 @@ namespace ServerBrowser.Core
         #endregion
 
         #region Serialize
+        public static HostedGameData FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<HostedGameData>(json);
+        }
+        
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
