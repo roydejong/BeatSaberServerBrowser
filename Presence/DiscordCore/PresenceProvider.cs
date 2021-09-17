@@ -145,7 +145,7 @@ namespace ServerBrowser.Presence.DiscordCore
                         // Lobby has space, add join secret
                         discordActivity.Secrets = new ActivitySecrets()
                         {
-                            Match = activitySecret,
+                            Join = activitySecret,
                         };
                     }
                 }
