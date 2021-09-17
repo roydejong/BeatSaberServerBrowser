@@ -48,15 +48,15 @@ You can manually download the latest version of the mod from the [Releases](http
 *If the mod was successfully installed, you will see `ServerBrowser.dll` in your `Plugins` directory.*
 
 ### Requirements
-These libraries are required, install them [from BeatMods](https://beatmods.com/#/mods) or [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet. If you're using ModAssistant, these are installed automatically.
+These mods are required, install them [with ModAssistant](https://github.com/Assistant/ModAssistant) if you don't have them yet:
 
-- BSIPA v4.1.6+ *(Core mod)*
-- SongCore: v3.4.0+ *(Core mod)*
-- BeatSaberMarkupLanguage: v1.5.3+
+- BSIPA *(Core mod)*
+- SongCore *(Core mod)*
+- BeatSaberMarkupLanguage
 
 Optional requirement:
 
-- DiscordCore: v1.0.5+ *(for Rich Presence support)*
+- DiscordCore *(if you want Rich Presence / Discord invites)*
 
 ### MultiplayerExtensions
 **I recommend installing [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions), which lets you play custom levels in multiplayer and adds some useful new features.** You can get the latest version through GitHub, or install it through ModAssistant.
@@ -67,38 +67,51 @@ Please note, you and the host must use the same version of MultiplayerExtensions
 The Server Browser mod supports Rich Presence for Discord. This feature lets you join and invite players directly through Discord!
 
 ### How to use Discord presence
-- You must have the DiscordCore library installed (available on ModAssistant).
+- You must have the DiscordCore mod installed (available on ModAssistant).
 - You must have Discord running on the same PC as Beat Saber.
 
 ### How to send invites
-If you are hosting a game, or if you have joined a public game, you can invite users directly through Discord by clicking the ➕ button:
+If you are hosting a game, or if you have joined a public game, you can invite users directly through Discord by clicking the ![Discord plus](https://user-images.githubusercontent.com/6772638/133779235-c06ffc3a-4e20-42f0-ba06-1411653f6d22.png) button:
 
-![Discord invite](https://user-images.githubusercontent.com/6772638/124370610-e705c280-dc79-11eb-98a2-4225b4b783cd.png)
+![Discord invite send](https://user-images.githubusercontent.com/6772638/133778816-ed0bcdc1-095f-44af-9cee-2165081496ca.png)
 
-Invites expire after 2 hours, or when the host ends the game.
+Users can also "Ask to Join" you from your Discord status.
+
+🕑 It can take a minute or so before you can send the invite, after jonining the lobby.
+
+⏰ Invites expire after 2 hours, or whenever the host ends the game.
+
+⚠ Invites can only be sent if the game was announced to the server browser.
 
 ### How to use invites
-**⚠ To accept invites, you must be in the Online menu in Beat Saber.**
+**To accept invites, you must be in the Online menu in Beat Saber.**
 
+When you're in the Online menu, simply click Join:
+
+![Discord invite receive](https://user-images.githubusercontent.com/6772638/133782395-77078928-a5e2-4ffa-8b72-afff863b4352.png)
+
+It can take a few moments for the join to be processed, hang tight :)
 
 ## FAQs / Troubleshooting
 
 ### Does cross-play work?
-**That depends on the host!** To host a cross-play game, the host must use a cross-play mod like **[BeatTogether](https://discord.com/invite/gezGrFG4tz)**. In that case, anyone can see and join the game through the server browser regardless of platform.
+🎉 Yes! Beat Saber has enabled cross-play for all platforms on official servers.
 
-However, if a game is hosted on *official* Steam or Oculus servers, cross-play will not work. You will not see incompatible games on other platforms (for example, Steam users will not see games hosted on official Oculus servers).
+In addition, unofficial servers like BeatTogether always allow cross play.
+
+The Server Browser will now show all games regardless of the host's platform.
 
 ### Is standalone Quest supported?
-The mod itself is only available for PC at this time (Steam and Oculus). Standalone Quest is not currently supported. 
+*Coming soon(tm).*
 
-However: you may be able to find Quest-compatible games to join in the online browser: **[https://bssb.app](https://bssb.app)**:
- - If your game is not modded, you can connect to games hosted on **Oculus (Official)** servers (no custom song support).
- - If you have BeatTogether installed, you can connect to games hosted on **Unofficial** servers like BeatTogether.
+The mod is only available for PC at this time (Steam and Oculus).
 
 ### Are Quick Play servers supported?
-Not *yet*. Coming soon!
+Yes! You can now share and join Quick Play servers through the Server Browser. 
+
+The games are only visible if someone in the lobby is announcing it to the Server Browser - Quick Play lobby data is crowd sourced!
 
 ### Do players need to be on the same game version?
-Yes. Different versions of Beat Saber are not compatible with each other for multiplayer.
+Yes. Different versions of Beat Saber are *not* compatible with each other for multiplayer.
 
 The Server Browser will only show games hosted on the exact same version of the game as yours.
