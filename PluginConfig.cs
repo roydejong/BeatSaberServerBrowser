@@ -29,5 +29,10 @@
         /// This setting controls whether the Discord Rich Presence feature is globally enabled or not.
         /// </summary>
         public bool DiscordRichPresenceEnabled { get; set; } = true;
+
+        /// <summary>
+        /// This setting controls whether the Steam Rich Presence feature is globally enabled or not.
+        /// </summary>
+        public bool SteamRichPresenceEnabled { get; set; } = true;
     }
 }
