@@ -33,18 +33,29 @@ namespace ServerBrowser.Harmony
                     Plugin.Log.Warn("HandleConnectToServerSuccess: Forcing direct connection override" +
                                     $" (DirectConnectTarget={GlobalModState.DirectConnectTarget})");
 
-                    userId = GlobalModState.LastConnectToHostedGame.OwnerId;
-                    userName = GlobalModState.LastConnectToHostedGame.OwnerName;
+                    var targetGame = GlobalModState.LastConnectToHostedGame;
+                    
+                    userId = targetGame.OwnerId;
+                    userName = targetGame.OwnerName;
                     remoteEndPoint = GlobalModState.DirectConnectTarget;
-                    secret = GlobalModState.LastConnectToHostedGame.HostSecret;
-                    code = GlobalModState.LastConnectToHostedGame.ServerCode;
+                    secret = targetGame.HostSecret ?? "";
+                    code = targetGame.ServerCode;
                     selectionMask = new BeatmapLevelSelectionMask(BeatmapDifficultyMask.All, 
                         GameplayModifierMask.All, SongPackMask.all);
-                    configuration = new GameplayServerConfiguration(GlobalModState.LastConnectToHostedGame.PlayerLimit,
-                        DiscoveryPolicy.Public, InvitePolicy.AnyoneCanInvite, GameplayServerMode.Managed,
-                        SongSelectionMode.OwnerPicks, GameplayServerControlSettings.All);
-                    managerId = GlobalModState.LastConnectToHostedGame.ManagerId ??
-                                GlobalModState.LastConnectToHostedGame.OwnerId;
+                    managerId = targetGame.ManagerId ?? targetGame.OwnerId;
+
+                    if (targetGame.IsQuickPlayServer)
+                    {
+                        configuration = new GameplayServerConfiguration(targetGame.PlayerLimit,
+                            DiscoveryPolicy.Public, InvitePolicy.AnyoneCanInvite, GameplayServerMode.Countdown,
+                            SongSelectionMode.Vote, GameplayServerControlSettings.All);
+                    }
+                    else
+                    {
+                        configuration = new GameplayServerConfiguration(targetGame.PlayerLimit,
+                            DiscoveryPolicy.Public, InvitePolicy.AnyoneCanInvite, GameplayServerMode.Managed,
+                            SongSelectionMode.OwnerPicks, GameplayServerControlSettings.All);
+                    }
                     
                     GlobalModState.ShouldDisableEncryption = true; // about to talk to game server, disable encryption
                 }
