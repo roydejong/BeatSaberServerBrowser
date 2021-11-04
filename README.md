@@ -10,10 +10,11 @@ Use this mod to add your games to the server browser, and to browse and join mul
 
 ### Features
 - **Server browser**: Browse and join servers directly from the online menu.
-- **Host settings**: Add your server to the browser with a single switch to make it public, and set a custom name.
+- **Host settings**: Share your lobbies to the server browser with a custom name, and control the settings directly from the lobby.
 - **Custom games**: Supports modded / custom song lobbies with [MultiplayerExtensions](https://github.com/Zingabopp/MultiplayerExtensions).
-- **Cross-play**: Automatic switching between official and modded master servers, like [BeatTogether](https://discord.com/invite/gezGrFG4tz).
+- **Master server switching**: Automatic switching between official and modded master servers, like [BeatTogether](https://discord.com/invite/gezGrFG4tz).
 - **Join/leave notifications**: An optional feature that lets you know when players join or leave, even in a level.
+- **Rich presence**: Adds rich presence support for Discord and Steam invites.
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/6772638/105616590-80ca6900-5dd8-11eb-9f76-9785b05cb524.png" alt="Beat Saber Server Browser">
@@ -64,33 +65,36 @@ Optional requirement:
 Please note, you and the host must use the same version of MultiplayerExtensions. If a version difference is detected by the server browser, you will not be able to connect.
 
 ## Rich Presence (BETA)
-The Server Browser mod supports Rich Presence for Discord. This feature lets you join and invite players directly through Discord!
+The server browser mod adds rich presence support for Steam and Discord. This lets you join and invite players directly through these platforms!
 
-### How to use Discord presence
-- You must have the DiscordCore mod installed (available on ModAssistant).
-- You must have Discord running on the same PC as Beat Saber.
+### Requirements
+- **The multiplayer game must be publicly shared on the server browser.**
+- **To accept invites, you must already be in the Online menu in Beat Saber.**
 
-### How to send invites
-If you are hosting a game, or if you have joined a public game, you can invite users directly through Discord by clicking the ![Discord plus](https://user-images.githubusercontent.com/6772638/133779235-c06ffc3a-4e20-42f0-ba06-1411653f6d22.png) button:
+- Discord Rich Presence requires the DiscordCore mod to be installed, and Discord must be running.
+- Steam Rich Presence is automatically enabled if you have the Steam version of the game.
+
+### Inviting and joining players
+Once you're in a public server browser lobby, other players can join you, and you can send invites.
+
+#### On Discord
+You can send an invite to any channel or DM via the plus botton:
 
 ![Discord invite send](https://user-images.githubusercontent.com/6772638/133778816-ed0bcdc1-095f-44af-9cee-2165081496ca.png)
 
-Users can also "Ask to Join" you from your Discord status.
+Other players can also "Ask to Join" you from your Discord status.
 
-🕑 It can take a minute or so before you can send the invite, after jonining the lobby.
+- 🕑 Discord invites are slow! Please be patient. It can take minute before you can send or accept an invite. 
+- ⏰ Invites expire after 2 hours, or whenever the host ends the game.
 
-⏰ Invites expire after 2 hours, or whenever the host ends the game.
+#### On Steam
+Right click a friend to send an invite, or to join their game.
 
-⚠ Invites can only be sent if the game was announced to the server browser.
+![Steam invites](https://user-images.githubusercontent.com/6772638/140385776-6ddced18-4360-4a1c-86cf-8d3269fb7f1a.png)
 
-### How to use invites
-**To accept invites, you must be in the Online menu in Beat Saber.**
+You can also click "View game info" to see a friend's extended multiplayer status if they are in a lobby:
 
-When you're in the Online menu, simply click Join:
-
-![Discord invite receive](https://user-images.githubusercontent.com/6772638/133782395-77078928-a5e2-4ffa-8b72-afff863b4352.png)
-
-It can take a few moments for the join to be processed, hang tight :)
+![Steam game info](https://user-images.githubusercontent.com/6772638/140385211-e321ea00-1181-4128-9913-c0ef95ebec8e.png)
 
 ## FAQs / Troubleshooting
 

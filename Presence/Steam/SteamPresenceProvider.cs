@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using ServerBrowser.Game.Models;
 using Steamworks;
 using UnityEngine;
+using static MultiplayerLobbyConnectionController;
 using Object = UnityEngine.Object;
 
 namespace ServerBrowser.Presence.Steam
@@ -78,29 +80,56 @@ namespace ServerBrowser.Presence.Steam
         #region Update
         public void Update(MultiplayerActivity? activity)
         {
-            if (activity is null)
+            if (activity?.BssbGame is null || activity.ConnectionType == LobbyConnectionType.None)
             {
                 ClearActivity();
                 return;
             }
-
-            // TODO Proper status text
-            // TODO Will HostUserId work as a key for BeatTogether etc? Also, uhh: should it just be text?
             
-            SteamFriends.SetRichPresence("connect", activity.BssbGame?.Key ?? "");
-            SteamFriends.SetRichPresence("steam_player_group", activity.HostUserId ?? "");
+            // These rich presence keys will group players together in the friend list & allows joins/invites
+            SteamFriends.SetRichPresence("connect", activity.BssbGame.Key);
+            SteamFriends.SetRichPresence("steam_player_group", activity.BssbGame.Key);
             SteamFriends.SetRichPresence("steam_player_group_size", activity.CurrentPlayerCount.ToString());
             
-            SteamFriends.SetRichPresence("status", "Test status");
-            
-            Plugin.Log?.Info("[SteamPresenceProvider] SteamAPI did set activity");
+            /***
+             * Note: we have limited control over the rich presence status text.
+             * Beat Saber's steam localization does not allow variables, so we can't display anything special.
+             * 
+             * Our "status" text will show up in the "view game info" dialog in the Steam friends list though.
+             */
+
+            var statusParts = new List<string>();
+            statusParts.Add("Server Browser:");
+
+            if (activity.IsInGameplay)
+            {
+                statusParts.Add("Playing level");
+
+                if (activity.CurrentLevel is not null)
+                {
+                    statusParts.Add("-");
+                    statusParts.Add($"{activity.CurrentLevel.songAuthorName} - {activity.CurrentLevel.songName}");
+                    statusParts.Add($"[{activity.CurrentDifficultyName}]");
+                }
+            }
+            else
+            {
+                statusParts.Add("In lobby");
+            }
+
+            statusParts.Add($"({activity.Name}, {activity.CurrentPlayerCount}/{activity.MaxPlayerCount} players)");
+
+            var statusText = String.Join(" ", statusParts);
+            SteamFriends.SetRichPresence("status", statusText);
+            Plugin.Log?.Info($"[SteamPresenceProvider] SteamAPI did set activity (status={statusText})");
         }
 
         private void ClearActivity()
         {
-            SteamFriends.SetRichPresence("connect", "");
-            SteamFriends.SetRichPresence("steam_player_group", "");
-            SteamFriends.SetRichPresence("steam_player_group_size", "");
+            SteamFriends.SetRichPresence("connect", null);
+            SteamFriends.SetRichPresence("steam_player_group", null);
+            SteamFriends.SetRichPresence("steam_player_group_size", null);
+            SteamFriends.SetRichPresence("status", null);
             
             Plugin.Log?.Info("[SteamPresenceProvider] SteamAPI did clear activity");
         }
