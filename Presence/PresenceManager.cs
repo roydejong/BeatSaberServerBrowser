@@ -25,7 +25,8 @@ namespace ServerBrowser.Presence
             _providers = new();
             _startedProviders = new();
             
-            RegisterProvider(new DiscordCore.PresenceProvider());
+            RegisterProvider(new DiscordCore.DiscordPresenceProvider());
+            RegisterProvider(new Steam.SteamPresenceProvider());
         }
 
         public void RegisterProvider(IPresenceProvider provider)

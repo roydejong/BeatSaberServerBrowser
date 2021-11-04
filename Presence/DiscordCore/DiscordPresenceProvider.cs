@@ -6,7 +6,7 @@ using ServerBrowser.Utils;
 
 namespace ServerBrowser.Presence.DiscordCore
 {
-    public class PresenceProvider : IPresenceProvider
+    public class DiscordPresenceProvider : IPresenceProvider
     {
         private const long DiscordAppId = 860315531944001556;
         
@@ -57,23 +57,23 @@ namespace ServerBrowser.Presence.DiscordCore
         #region Events from Discord
         private void OnDiscordActivityInvite(ActivityActionType type, ref User user, ref Activity activity)
         {
-            Plugin.Log?.Info($"[PresenceProvider] OnDiscordActivityInvite (user: {user.Username})");
+            Plugin.Log?.Info($"[DiscordPresenceProvider] OnDiscordActivityInvite (user: {user.Username})");
         }
         
         private void OnDiscordActivityJoinRequest(ref User user)
         {
-            Plugin.Log?.Info($"[PresenceProvider] OnDiscordActivityJoinRequest (user: {user.Username})");
+            Plugin.Log?.Info($"[DiscordPresenceProvider] OnDiscordActivityJoinRequest (user: {user.Username})");
         }
 
         private void OnDiscordActivitySpectate(string secret)
         {
-            Plugin.Log?.Info($"[PresenceProvider] OnDiscordActivitySpectate (secret: {secret})");
+            Plugin.Log?.Info($"[DiscordPresenceProvider] OnDiscordActivitySpectate (secret: {secret})");
             Plugin.PresenceManager?.JoinFromSecret(secret);
         }
 
         private void OnDiscordActivityJoin(string secret)
         {
-            Plugin.Log?.Info($"[PresenceProvider] OnDiscordActivityJoin (secret: {secret})");
+            Plugin.Log?.Info($"[DiscordPresenceProvider] OnDiscordActivityJoin (secret: {secret})");
             Plugin.PresenceManager?.JoinFromSecret(secret);
         }
         #endregion
@@ -184,7 +184,7 @@ namespace ServerBrowser.Presence.DiscordCore
             }
             
             // Apply
-            Plugin.Log.Info($"[PresenceProvider] Setting Discord activity " +
+            Plugin.Log.Info($"[DiscordPresenceProvider] Setting Discord activity " +
                             $"(State={discordActivity.State}, Details={discordActivity.Details})");
             
             discord.UpdateActivity(discordActivity);
