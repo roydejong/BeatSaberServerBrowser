@@ -3,9 +3,9 @@
   "id": "ServerBrowser",
   "name": "ServerBrowser",
   "author": "LookAtHippo",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Adds a Server Browser to the Online menu, making it easy to share and join multiplayer games.",
-  "gameVersion": "1.17.1",
+  "gameVersion": "1.18.3",
   "dependsOn": {
     "BSIPA": "^4.2.0",
     "BeatSaberMarkupLanguage": "^1.5.5",
