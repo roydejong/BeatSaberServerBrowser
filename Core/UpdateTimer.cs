@@ -1,5 +1,4 @@
-﻿using ServerBrowser.Harmony;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ServerBrowser.Core
 {
@@ -8,14 +7,14 @@ namespace ServerBrowser.Core
         private const float TickIntervalSecs = 120f;
 
         #region Public API
-        private static GameObject _gameObject;
+        private static GameObject? _gameObject;
         
-        public static void CreateTimerObject()
+        private static void CreateTimerObject()
         {
-            if (_gameObject != null)
+            if (_gameObject is not null)
                 return;
 
-            _gameObject = new GameObject("ServerBrowserUpdateTimer");
+            _gameObject = new GameObject("ServerBrowser_UpdateTimer");
             _gameObject.AddComponent<UpdateTimer>();
             
             DontDestroyOnLoad(_gameObject); // keep object across all scenes
@@ -32,10 +31,10 @@ namespace ServerBrowser.Core
         
         public static void StartTimer()
         {
-            if (_gameObject == null)
+            if (_gameObject is null)
                 CreateTimerObject();
             
-            _gameObject.SetActive(true);
+            _gameObject!.SetActive(true);
         }
 
         public static void StopTimer()
@@ -53,13 +52,16 @@ namespace ServerBrowser.Core
             InvokeRepeating(nameof(Tick), TickIntervalSecs, TickIntervalSecs);
         }
 
+        public void OnDisable()
+        {
+            CancelInvoke(nameof(Tick));
+        }
+
         private void Tick()
         {
-            if ((MpLobbyConnectionTypePatch.IsPartyHost && Plugin.Config.LobbyAnnounceToggle) ||
-                (MpLobbyConnectionTypePatch.IsQuickplay && Plugin.Config.ShareQuickPlayGames))
+            if ((GameStateManager.Activity.IsHost && Plugin.Config.LobbyAnnounceToggle) ||
+                (GameStateManager.Activity.IsQuickPlay && Plugin.Config.ShareQuickPlayGames))
             {
-                // We are the host and announcing a game, or actively sharing a quick play lobby
-                Plugin.Log?.Debug("Host timer tick: sending periodic update to master server");
                 GameStateManager.HandleUpdate();
             }
         }

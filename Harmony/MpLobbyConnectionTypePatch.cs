@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using IPA.Utilities;
-using ServerBrowser.Core;
 using ServerBrowser.Game;
 
 namespace ServerBrowser.Harmony
@@ -22,26 +21,10 @@ namespace ServerBrowser.Harmony
             {
                 ConnectionType = nextConnectionType;
                 
-                Plugin.Log?.Debug($"Lobby connection type change: {ConnectionType} (IsPartyMultiplayer: {IsPartyMultiplayer}, IsPartyHost: {IsPartyHost})");
+                Plugin.Log?.Debug($"Lobby connection type change: {ConnectionType}");
                 
                 MpEvents.RaiseConnectionTypeChanged(__instance, nextConnectionType);
             }
-        }
-
-        public static bool IsPartyHost
-        {
-            get => ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.PartyHost;
-        }
-
-        public static bool IsPartyMultiplayer
-        {
-            get => ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.PartyHost ||
-                ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.PartyClient;
-        }
-
-        public static bool IsQuickplay
-        {
-            get => ConnectionType == MultiplayerLobbyConnectionController.LobbyConnectionType.QuickPlay;
         }
     }
 }

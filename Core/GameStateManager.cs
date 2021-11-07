@@ -27,6 +27,8 @@ namespace ServerBrowser.Core
         /// </summary>
         public static bool HasErrored { get; private set; } = true;
 
+        private static bool _wasAnnounced = false;
+
         #region Lifecycle
         public static void SetUp()
         {
@@ -43,6 +45,8 @@ namespace ServerBrowser.Core
             MpEvents.PlayerDisconnected += OnPlayerDisconnected;
             MpEvents.StartingMultiplayerLevel += OnStartingMultiplayerLevel;
             MpEvents.PartyOwnerChanged += OnPartyOwnerChanged;
+
+            _wasAnnounced = true;
         }
 
         public static void TearDown()
@@ -60,6 +64,8 @@ namespace ServerBrowser.Core
             MpEvents.PlayerDisconnected -= OnPlayerDisconnected;
             MpEvents.StartingMultiplayerLevel -= OnStartingMultiplayerLevel;
             MpEvents.PartyOwnerChanged -= OnPartyOwnerChanged;
+
+            _wasAnnounced = false;
         }
         #endregion
 
@@ -90,6 +96,8 @@ namespace ServerBrowser.Core
                 return;
             
             Activity.ConnectionType = connectionType;
+            
+            _wasAnnounced = Activity.IsAnnounced;
 
             HandleUpdate();
         }
@@ -145,6 +153,8 @@ namespace ServerBrowser.Core
 
             OnPlayerConnected(sender, e.LocalPlayer);
             OnPlayerConnected(sender, e.ConnectionOwner);
+
+            _wasAnnounced = Activity.IsAnnounced;
         }
 
         private static void OnSessionDisconnected(object sender, DisconnectedReason e)
@@ -163,6 +173,8 @@ namespace ServerBrowser.Core
             Activity.CurrentCharacteristic = null;
             Activity.CurrentModifiers = null;
             Activity.SessionStartedAt = null;
+
+            _wasAnnounced = false;
                 
             HandleUpdate();
         }
@@ -220,6 +232,21 @@ namespace ServerBrowser.Core
                 return;
             
             Activity.ManagerId = userId;
+
+            if (Activity.LocalPlayer?.userId == userId && Activity.ConnectionType == LobbyConnectionType.PartyClient)
+            {
+                // We are transitioning from client to host
+                Plugin.Log?.Info($"Local player has been promoted to party leader (_wasAnnounced={_wasAnnounced})");
+                Activity.ConnectionType = LobbyConnectionType.PartyHost;
+
+                if (_wasAnnounced)
+                {
+                    // The game was already announced by previous manager, do auto takeover
+                    Plugin.Config.LobbyAnnounceToggle = true;
+                }
+            }
+
+            _wasAnnounced = Activity.IsAnnounced;
 
             HandleUpdate();
         }
@@ -288,7 +315,7 @@ namespace ServerBrowser.Core
                 // Not connected / not in a Quick Play game / not a host
                 return false;
             
-            if (Activity.ServerCode == null || Activity.ConnectionOwner == null)
+            if (Activity.ServerCode == null || Activity.HostPlayer == null)
                 // Need a server code and connection owner at minimum
                 return false;
 
@@ -314,8 +341,8 @@ namespace ServerBrowser.Core
         {
             ServerCode = Activity.ServerCode!,
             GameName = MpSession.GetHostGameName(),
-            OwnerId = Activity.ConnectionOwner!.userId,
-            OwnerName = Activity.ConnectionOwner!.userName,
+            OwnerId = Activity.HostPlayer!.userId,
+            OwnerName = Activity.HostPlayer!.userName,
             PlayerCount = Activity.CurrentPlayerCount,
             PlayerLimit = Activity.MaxPlayerCount,
             IsModded = Activity.IsModded,

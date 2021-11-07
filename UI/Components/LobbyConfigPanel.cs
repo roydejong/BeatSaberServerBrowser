@@ -6,7 +6,7 @@ using BeatSaberMarkupLanguage.Parser;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Game;
-using ServerBrowser.Harmony;
+using ServerBrowser.Game.Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +17,11 @@ namespace ServerBrowser.UI.Components
     internal class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>
     {
         public const string ResourceName = "ServerBrowser.UI.BSML.LobbyConfigPanel.bsml";
-
+        
+        public static readonly Color ColorWarning = new Color(254f / 255f, 202f / 255f, 87f / 255f);
+        public static readonly Color ColorError = new Color(238f / 255f, 82f / 255f, 83f / 255f);
+        public static readonly Color ColorSuccess = new Color(46f / 255f, 204f / 255f, 113f / 255f);
+        
         #region LobbyAnnounceToggle
         [UIComponent("lobbyAnnounceToggle")]
         public ToggleSetting LobbyAnnounceToggle;
@@ -27,19 +31,19 @@ namespace ServerBrowser.UI.Components
         {
             get
             {
-                if (MpLobbyConnectionTypePatch.IsPartyHost)
-                    return Plugin.Config.LobbyAnnounceToggle;
-                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                if (_activity?.IsQuickPlay ?? false)
                     return Plugin.Config.ShareQuickPlayGames;
-                return false;
+                
+                return Plugin.Config.LobbyAnnounceToggle;
             }
 
             set
             {
-                if (MpLobbyConnectionTypePatch.IsPartyHost)
-                    Plugin.Config.LobbyAnnounceToggle = value;
-                if (MpLobbyConnectionTypePatch.IsQuickplay)
+                if (_activity?.IsQuickPlay ?? false)
                     Plugin.Config.ShareQuickPlayGames = value;
+                
+                Plugin.Config.LobbyAnnounceToggle = value;
+                
                 NotifyPropertyChanged();
             }
         }
@@ -102,7 +106,7 @@ namespace ServerBrowser.UI.Components
             ParserParams.EmitEvent("openNameKeyboard");
         }
         #endregion
-
+        
         #region JoinNotificationsEnabled
         [UIComponent("joinNotificationsEnabled")]
         public ToggleSetting JoinNotificationsEnabled;
@@ -141,7 +145,29 @@ namespace ServerBrowser.UI.Components
             }
         }
         #endregion
+        
+        #region Unity/Mod events
+        private MultiplayerActivity? _activity = null;
+        
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            
+            MpEvents.ActivityUpdated += OnActivityUpdated;
+        }
 
+        public void OnDisable()
+        {
+            MpEvents.ActivityUpdated -= OnActivityUpdated;
+        }
+
+        private void OnActivityUpdated(object sender, MultiplayerActivity activity)
+        {
+            _activity = activity;
+            UpdatePanel();
+        }
+        #endregion
+        
         #region UI Update
         private MultiplayerSessionManager sessionManager = null;
 
@@ -155,80 +181,78 @@ namespace ServerBrowser.UI.Components
 
         public void UpdatePanel()
         {
-            if (StatusText == null || LobbyAnnounceToggle == null || NameButton == null)
+            if (StatusText is null || LobbyAnnounceToggle is null || NameButton is null)
+                // BSML did not yet assign components
+                return;
+
+            if (_activity is null || !_activity.IsInMultiplayer)
             {
-                // Components not loaded yet
+                // No activity data yet or not connected
+                SetPanelDisabledState();
                 return;
             }
 
-            sessionManager = MpSession.SessionManager;
+            var weHaveControl = _activity.WeArePartyLeader;
+            var weCanAnnounce = weHaveControl || _activity.IsQuickPlay;
+            var lobbyIsAnnounced = _activity.IsAnnounced;
+            
+            LobbyAnnounceToggle.interactable = weCanAnnounce;
+            LobbyAnnounceToggle.Text = _activity.IsQuickPlay
+                ? "Share this Quick Play game to the Server Browser"
+                : "Add my game to the Server Browser";
+            
+            NameButton.interactable = weHaveControl && LobbyAnnounceToggleValue;
 
-            if (sessionManager == null ||
-                (!MpLobbyConnectionTypePatch.IsPartyMultiplayer && !MpLobbyConnectionTypePatch.IsQuickplay))
+            if (weCanAnnounce)
             {
-                StatusText.text = "Only supported for custom and Quick Play games.";
-                StatusText.color = Color.yellow;
-
-                LobbyAnnounceToggle.interactable = false;
-                LobbyAnnounceToggle.Value = false;
-                NameButton.interactable = false;
-                return;
+                // We are the party leader, or can announce a quick play lobby
+                LobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
+                
+                if (LobbyAnnounceToggleValue)
+                {
+                    MpSession.SessionManager.SetLocalPlayerState("lobbyannounce", true);
+                
+                    StatusText.text = GameStateManager.StatusText;
+                    StatusText.color = GameStateManager.HasErrored ? ColorError : ColorSuccess;   
+                }
+                else
+                {
+                    MpSession.SessionManager.SetLocalPlayerState("lobbyannounce", false);
+                
+                    StatusText.text = _activity.IsQuickPlay 
+                        ? "Turn me on to publicly share this Quick Play game ↑" 
+                        : "Turn me on to list your server in the browser ↑";
+                    StatusText.color = ColorWarning;
+                }
             }
-
-            if (MpLobbyConnectionTypePatch.IsPartyMultiplayer && !MpLobbyConnectionTypePatch.IsPartyHost)
+            else
             {
-                // Party but we are not the host
-                LobbyAnnounceToggle.interactable = false;
-
-                var theHost = sessionManager.connectionOwner;
-
-                if (theHost != null && theHost.HasState("lobbyannounce"))
+                // We are a client without control
+                if (lobbyIsAnnounced)
                 {
                     LobbyAnnounceToggle.Value = true;
 
                     StatusText.text = "The host has announced this lobby.";
-                    StatusText.color = Color.green;
+                    StatusText.color = ColorSuccess;
                 }
                 else
                 {
                     LobbyAnnounceToggle.Value = false;
 
                     StatusText.text = "The host has not announced this lobby.";
-                    StatusText.color = Color.red;
+                    StatusText.color = ColorWarning;
                 }
-
-                NameButton.interactable = false;
-                return;
             }
+        }
 
-            // We are the host, enable controls
-            LobbyAnnounceToggle.interactable = true;
-            LobbyAnnounceToggle.Value = LobbyAnnounceToggleValue;
-            
-            if (MpLobbyConnectionTypePatch.IsQuickplay)
-                LobbyAnnounceToggle.Text = "Share this Quick Play game to the Server Browser";
-            else
-                LobbyAnnounceToggle.Text = "Add my game to the Server Browser";
+        private void SetPanelDisabledState()
+        {
+            StatusText.text = "!Not initialized!";
+            StatusText.color = ColorError;
 
-            if (!LobbyAnnounceToggleValue)
-            {
-                // Toggle is disabled, however
-                if (MpLobbyConnectionTypePatch.IsQuickplay)
-                    StatusText.text = "Turn me on to publicly share this Quick Play game ↑";
-                else
-                    StatusText.text = "Turn me on to list your server in the browser ↑";
-                
-                StatusText.color = Color.yellow;
-
-                NameButton.interactable = false;
-                return;
-            }
-
-            // Fallthrough: enabled & all good to go
-            StatusText.text = GameStateManager.StatusText;
-            StatusText.color = GameStateManager.HasErrored ? Color.red : Color.green;
-
-            NameButton.interactable = MpLobbyConnectionTypePatch.IsPartyHost;
+            LobbyAnnounceToggle.interactable = false;
+            LobbyAnnounceToggle.Value = false;
+            NameButton.interactable = false;
         }
         #endregion
 

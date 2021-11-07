@@ -68,11 +68,15 @@ Please note, you and the host must use the same version of MultiplayerExtensions
 The server browser mod adds rich presence support for Steam and Discord. This lets you join and invite players directly through these platforms!
 
 ### Requirements
-- **The multiplayer game must be publicly shared on the server browser.**
-- **To accept invites, you must already be in the Online menu in Beat Saber.**
-
+Platform specific:
 - Discord Rich Presence requires the DiscordCore mod to be installed, and Discord must be running.
 - Steam Rich Presence is automatically enabled if you have the Steam version of the game.
+
+In general:
+- 👉 The multiplayer game must be publicly shared on the server browser.
+- 👉 To accept invites, you must already be in the Online menu in Beat Saber.
+- Both players must have the server browser mod.
+- Both players should be on the same game version and MultiplayerExtensions version. 
 
 ### Inviting and joining players
 Once you're in a public server browser lobby, other players can join you, and you can send invites.

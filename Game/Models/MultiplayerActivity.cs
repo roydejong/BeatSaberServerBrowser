@@ -55,13 +55,46 @@ namespace ServerBrowser.Game.Models
         public string DifficultyMaskName => SelectionMask.HasValue
             ? SelectionMask.Value.difficulties.FromMask().ToNiceName()
             : "All";
-
-        public IConnectedPlayer? ConnectionOwner => Players?.FirstOrDefault(p => p.isConnectionOwner);
         
         public bool IsBeatTogether => IsDedicatedServer && MasterServer.hostName.Contains("beattogether.systems");
-        public bool IsBeatDedi => ConnectionOwner?.userName.StartsWith("BeatDedi/") ?? false;
+        public bool IsBeatDedi => HostPlayer?.userName.StartsWith("BeatDedi/") ?? false;
 
-        public bool IsModded => ConnectionOwner.HasState("modded") || ConnectionOwner.HasState("customsongs");
+        public bool IsModded
+        {
+            get
+            {
+                if (HostPlayer is not null)
+                    if (HostPlayer.HasState("modded") || HostPlayer.HasState("customsongs"))
+                        return true;
+                if (PartyLeaderPlayer is not null)
+                    if (PartyLeaderPlayer.HasState("modded") || PartyLeaderPlayer.HasState("customsongs"))
+                        return true;
+                return false;
+            }
+        }
+
+        public bool IsAnnounced
+        {
+            get
+            {
+                if (HostPlayer is not null)
+                    if (HostPlayer.HasState("lobbyannounce"))
+                        return true;
+                if (PartyLeaderPlayer is not null)
+                    if (PartyLeaderPlayer.HasState("lobbyannounce"))
+                        return true;
+                return false;
+            }
+        }
+
+        public IConnectedPlayer? HostPlayer => Players?.FirstOrDefault(p => p.isConnectionOwner);
+
+        public IConnectedPlayer? PartyLeaderPlayer => ManagerId is not null && Players is not null
+            ? Players.FirstOrDefault(p => p.userId == ManagerId) : null;
+        
+        public IConnectedPlayer? LocalPlayer => Players?.FirstOrDefault(p => p.isMe);
+
+        public bool WeArePartyLeader => IsHost || (LocalPlayer is not null && LocalPlayer.userId == ManagerId);
         #endregion
 
         #region Announce helpers
@@ -105,7 +138,7 @@ namespace ServerBrowser.Game.Models
                         UserName = player.userName,
                         IsHost = player.isConnectionOwner,
                         IsAnnouncer = player.isMe,
-                        Latency = player.currentLatency,
+                        Latency = player.currentLatency
                     };
                 }
             }
