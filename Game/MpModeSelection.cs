@@ -120,6 +120,13 @@ namespace ServerBrowser.Game
                 try
                 {
                     await Task.Delay(1000, gameJoinCancellationTokenSource.Token);
+
+                    if (!PluginUi.ServerBrowserViewController.isActivated)
+                    {
+                        // Fix for #41 (Backing out of rich presence join can cause UI softlock)
+                        Plugin.Log.Warn("Aborted rich presence join - user closed server browser?");
+                        return;
+                    }
                 }
                 catch (TaskCanceledException)
                 {
