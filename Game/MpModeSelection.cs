@@ -81,7 +81,7 @@ namespace ServerBrowser.Game
             TriggerMenuButton(MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
-        public static async Task ConnectToHostedGame(HostedGameData? game)
+        public static async Task ConnectToHostedGame(HostedGameData? game, bool fixViewHierarchy = true)
         {
             if (game == null)
                 return;
@@ -112,7 +112,7 @@ namespace ServerBrowser.Game
                 GlobalModState.DirectConnectTarget = game.Endpoint;
             }
 
-            if (!PluginUi.ServerBrowserViewController.isInViewControllerHierarchy)
+            if (fixViewHierarchy && !PluginUi.ServerBrowserViewController.isInViewControllerHierarchy)
             {
                 // Ensure Server Browser view is up - this avoids UI crashes for async joins from rich presence...
                 PluginUi.LaunchServerBrowser();
@@ -138,28 +138,31 @@ namespace ServerBrowser.Game
                 animationDirection: AnimationDirection.Vertical);
         }
 
-        public static void PresentConnectionFailedError(string errorTitle = "Connection failed", string errorMessage = null, bool canRetry = true)
+        public static void PresentConnectionFailedError(string errorTitle = "Connection failed",
+            string errorMessage = null, bool canRetry = true)
         {
             CancelLobbyJoin();
 
             if (GlobalModState.LastConnectToHostedGame == null)
                 canRetry = false; // we don't have game info to retry with
 
-            _simpleDialogPromptViewController.Init(errorTitle, errorMessage, "Back to browser", canRetry ? "Retry connection" : null, delegate (int btnId)
-            {
-                switch (btnId)
+            _simpleDialogPromptViewController.Init(errorTitle, errorMessage, "Back to browser",
+                canRetry ? "Retry connection" : null, delegate(int btnId)
                 {
-                    default:
-                    case 0: // Back to browser
-                        MakeServerBrowserTopView();
-                        break;
-                    case 1: // Retry connection
-                        _ = ConnectToHostedGame(GlobalModState.LastConnectToHostedGame);
-                        break;
-                }
-            });
+                    switch (btnId)
+                    {
+                        default:
+                        case 0: // Back to browser
+                            MakeServerBrowserTopView();
+                            break;
+                        case 1: // Retry connection
+                            _ = ConnectToHostedGame(GlobalModState.LastConnectToHostedGame, false);
+                            break;
+                    }
+                });
 
-            ReplaceTopViewController(_simpleDialogPromptViewController, null, ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
+            ReplaceTopViewController(_simpleDialogPromptViewController, null,
+                ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
         }
 
         public static void CancelLobbyJoin(bool hideLoading = true)
