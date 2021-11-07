@@ -46,7 +46,7 @@ namespace ServerBrowser.Core
             MpEvents.StartingMultiplayerLevel += OnStartingMultiplayerLevel;
             MpEvents.PartyOwnerChanged += OnPartyOwnerChanged;
 
-            _wasAnnounced = true;
+            _wasAnnounced = false;
         }
 
         public static void TearDown()
@@ -96,8 +96,6 @@ namespace ServerBrowser.Core
                 return;
             
             Activity.ConnectionType = connectionType;
-            
-            _wasAnnounced = Activity.IsAnnounced;
 
             HandleUpdate();
         }
@@ -153,8 +151,6 @@ namespace ServerBrowser.Core
 
             OnPlayerConnected(sender, e.LocalPlayer);
             OnPlayerConnected(sender, e.ConnectionOwner);
-
-            _wasAnnounced = Activity.IsAnnounced;
         }
 
         private static void OnSessionDisconnected(object sender, DisconnectedReason e)
@@ -173,7 +169,7 @@ namespace ServerBrowser.Core
             Activity.CurrentCharacteristic = null;
             Activity.CurrentModifiers = null;
             Activity.SessionStartedAt = null;
-
+            
             _wasAnnounced = false;
                 
             HandleUpdate();
@@ -185,6 +181,8 @@ namespace ServerBrowser.Core
                 return;
             
             Activity.Players.Add(player);
+            
+            _wasAnnounced = Activity.IsAnnounced;
                 
             HandleUpdate();
         }
@@ -226,12 +224,14 @@ namespace ServerBrowser.Core
             HandleUpdate();
         }
         
-        private static void OnPartyOwnerChanged(object sender, string userId)
+        private static async void OnPartyOwnerChanged(object sender, string userId)
         {
             if (Activity.ManagerId == userId)
                 return;
             
             Activity.ManagerId = userId;
+
+            var didTakeOver = false;
 
             if (Activity.LocalPlayer?.userId == userId && Activity.ConnectionType == LobbyConnectionType.PartyClient)
             {
@@ -243,12 +243,21 @@ namespace ServerBrowser.Core
                 {
                     // The game was already announced by previous manager, do auto takeover
                     Plugin.Config.LobbyAnnounceToggle = true;
+                    didTakeOver = true;
                 }
             }
-
+            
             _wasAnnounced = Activity.IsAnnounced;
 
             HandleUpdate();
+
+            if (didTakeOver)
+            {
+                // If we did a take over, re-send announcement after ~1 sec to work around a possible race condition
+                //  with the previous host sending an un-announce msg at the same time.
+                await Task.Delay(1500);
+                HandleUpdate();
+            }
         }
         #endregion
 
