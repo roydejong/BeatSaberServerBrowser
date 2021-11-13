@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using ServerBrowser.Core;
 using ServerBrowser.Game.Models;
 using Steamworks;
 using UnityEngine;
@@ -48,7 +49,7 @@ namespace ServerBrowser.Presence.Steam
             _gameRichPresenceJoinRequestedCallback = Callback<GameRichPresenceJoinRequested_t>.Create(
                 OnGameRichPresenceJoinRequested
             );
-            
+
             Plugin.Log?.Info("[SteamPresenceProvider] SteamAPI initialized - ran through");
         }
 
@@ -71,9 +72,14 @@ namespace ServerBrowser.Presence.Steam
         #region Events from Steam
         private void OnGameRichPresenceJoinRequested(GameRichPresenceJoinRequested_t pCallback)
         {
-            var secret = pCallback.m_rgchConnect;
-            Plugin.Log?.Info($"[SteamPresenceProvider] OnGameRichPresenceJoinRequested (secret={secret})");
-            Plugin.PresenceManager?.JoinFromSecret(secret);
+            var connectArg = pCallback.m_rgchConnect;
+            var parsedKey = LaunchArg.TryParseBssbKey(connectArg);
+            
+            Plugin.Log?.Info($"[SteamPresenceProvider] OnGameRichPresenceJoinRequested" +
+                             $" (secret={connectArg}, parsed={parsedKey})");
+            
+            if (parsedKey is not null)
+                Plugin.PresenceManager?.JoinFromSecret(parsedKey);
         }
         #endregion
 
@@ -87,7 +93,7 @@ namespace ServerBrowser.Presence.Steam
             }
             
             // These rich presence keys will group players together in the friend list & allows joins/invites
-            SteamFriends.SetRichPresence("connect", activity.BssbGame.Key);
+            SteamFriends.SetRichPresence("connect",  LaunchArg.Format(activity.BssbGame.Key));
             SteamFriends.SetRichPresence("steam_player_group", activity.BssbGame.Key);
             SteamFriends.SetRichPresence("steam_player_group_size", activity.CurrentPlayerCount.ToString());
             

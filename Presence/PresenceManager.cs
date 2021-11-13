@@ -135,14 +135,14 @@ namespace ServerBrowser.Presence
         #region Launcher
         private CancellationTokenSource? _joinCancellationTokenSource;
         
-        public async Task JoinFromSecret(string secret)
+        public async Task JoinFromSecret(string bssbKey)
         {
             // Check connection state
             var mpActivity = GameStateManager.Activity;
 
             if (!mpActivity.InOnlineMenu || mpActivity.IsInMultiplayer)
             {
-                Plugin.Log?.Error($"[PresenceManager] Ignoring invite (secret={secret}) - not in online menu!");
+                Plugin.Log?.Error($"[PresenceManager] Ignoring invite (bssbKey={bssbKey}) - not in online menu!");
                 FloatingNotification.Instance.ShowMessage(
                     title: "Invite error",
                     message: "To accept multiplayer invites, you must be in the Online menu.",
@@ -164,13 +164,13 @@ namespace ServerBrowser.Presence
             );
             
             // Presence secret is actually the key of the game on BSSB - query game data
-            Plugin.Log?.Info($"[PresenceManager] Trying to join game from Rich Presence (secret={secret})");
+            Plugin.Log?.Info($"[PresenceManager] Trying to join game from Rich Presence (bssbKey={bssbKey})");
             
-            var gameData = await BSSBMasterAPI.BrowseDetail(secret, _joinCancellationTokenSource.Token);
+            var gameData = await BSSBMasterAPI.BrowseDetail(bssbKey, _joinCancellationTokenSource.Token);
 
             if (gameData is null || !gameData.CanJoin)
             {
-                Plugin.Log?.Error($"[PresenceManager] Join failed; could not fetch game data (secret={secret})");
+                Plugin.Log?.Error($"[PresenceManager] Join failed; could not fetch game data (bssbKey={bssbKey})");
                 return;
             }
 

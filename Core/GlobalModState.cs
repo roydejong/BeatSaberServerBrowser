@@ -39,15 +39,25 @@ namespace ServerBrowser.Core
         internal static bool ShouldDisableEncryption = false;
 
         /// <summary>
+        /// Used with the "-bssb" launch argument to automatically join a game on game launch.
+        /// Must be set to a BSSB game key (hashid) to enable.
+        /// Will be automatically set to null after an auto join has been attempted.
+        /// </summary>
+        internal static string? AutoJoinBssbKey = null;
+
+        /// <summary>
         /// Resets the mod state, disabling any special networking patches and behaviors.
         /// </summary>
-        internal static void Reset()
+        internal static void Reset(bool resetAutoJoin = false)
         {
             WeInitiatedConnection = false;
             WeAbortedJoin = false;
             LastConnectToHostedGame = null;
             DirectConnectTarget = null;
             ShouldDisableEncryption = false;
+
+            if (resetAutoJoin)
+                AutoJoinBssbKey = null;
         }
     }
 }

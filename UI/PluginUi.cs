@@ -28,6 +28,7 @@ namespace ServerBrowser.UI
 
         public static void LaunchServerBrowser()
         {
+            Plugin.Log.Error("LaunchServerBrowser()");
             MpModeSelection.PresentViewController(ServerBrowserViewController, animationDirection: AnimationDirection.Horizontal);
         }
     }

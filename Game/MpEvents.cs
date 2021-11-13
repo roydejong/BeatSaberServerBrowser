@@ -12,7 +12,6 @@ namespace ServerBrowser.Game
         #region OnlineMenuOpened
         /// <summary>
         /// This event is raised when the online menu is opened.
-        /// This is the "main" event to subscribe to if you don't need granular updates.
         /// </summary>
         internal static event EventHandler<OnlineMenuOpenedEventArgs>? OnlineMenuOpened;
 
@@ -22,8 +21,7 @@ namespace ServerBrowser.Game
 
         #region OnlineMenuClosed
         /// <summary>
-        /// This event is raised when the online menu is opened.
-        /// This is the "main" event to subscribe to if you don't need granular updates.
+        /// This event is raised when the online menu is closed (when the mode selection menu is dismissed).
         /// </summary>
         internal static event EventHandler<EventArgs>? OnlineMenuClosed;
 

@@ -210,6 +210,7 @@
     <Compile Include="Core\HostedGameBrowser.cs" />
     <Compile Include="Core\HostedGameFilters.cs" />
     <Compile Include="Core\HostedGamePlayer.cs" />
+    <Compile Include="Core\LaunchArg.cs" />
     <Compile Include="Core\Responses\AnnounceResult.cs" />
     <Compile Include="Core\Responses\BrowseResult.cs" />
     <Compile Include="Game\Models\ConnectToServerEventArgs.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
     <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
+    <Compile Include="Harmony\MainFlowCoordinatorPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
     <Compile Include="Core\GameStateManager.cs" />
     <Compile Include="Core\BSSBMasterAPI.cs" />

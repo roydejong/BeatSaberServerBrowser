@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 using IPA;
 using IPA.Config.Stores;
 using ServerBrowser.Assets;
@@ -73,6 +74,12 @@ namespace ServerBrowser
             HttpClient = new HttpClient();
             HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
             HttpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
+            
+            // Launch arg for join (for Steam Rich presence etc)
+            GlobalModState.AutoJoinBssbKey = LaunchArg.TryGetBssbKeyFromEnv();
+            
+            if (GlobalModState.AutoJoinBssbKey is not null)
+                Log?.Info($"Game started with BSSB key launch arg: {GlobalModState.AutoJoinBssbKey}");
         }
 
         [OnExit]
@@ -110,32 +117,45 @@ namespace ServerBrowser
             PresenceManager.Start(GameStateManager.Activity);
             
             // Most things only need to be setup once
-            if (_gotFirstActivation)
-                return;
-            _gotFirstActivation = true;
-
-            Log?.Info("Multiplayer / Online menu opened for the first time, setting up.");
-            
-            // Bind multiplayer session events
-            MpSession.SetUp();
-            MpModeSelection.SetUp();
-
-            // UI setup
-            PluginUi.SetUp();
-
-            // Initial state update
-            GameStateManager.HandleUpdate(false);
-
-            // Read local player info
-            await MpLocalPlayer.SetUp();
-
-            if (MpLocalPlayer.UserInfo != null)
+            if (!_gotFirstActivation)
             {
-                // Update user-agent now the platform identifier can be added
-                HttpClient.DefaultRequestHeaders.Remove("User-Agent");
-                HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
+                _gotFirstActivation = true;
 
-                Log?.Info($"Running {UserAgent}");
+                Log?.Info("Multiplayer / Online menu opened for the first time, setting up.");
+
+                // Bind multiplayer session events
+                MpSession.SetUp();
+                MpModeSelection.SetUp();
+
+                // UI setup
+                PluginUi.SetUp();
+
+                // Initial state update
+                GameStateManager.HandleUpdate(false);
+
+                // Read local player info
+                await MpLocalPlayer.SetUp();
+
+                if (MpLocalPlayer.UserInfo != null)
+                {
+                    // Update user-agent now the platform identifier can be added
+                    HttpClient.DefaultRequestHeaders.Remove("User-Agent");
+                    HttpClient.DefaultRequestHeaders.Add("User-Agent", Plugin.UserAgent);
+
+                    Log?.Info($"Running {UserAgent}");
+                }
+            }
+            
+            // Process auto join launch arg
+            if (GlobalModState.AutoJoinBssbKey is not null)
+            {
+                await Task.Delay(250);
+                
+                HMMainThreadDispatcher.instance.Enqueue(() =>
+                {
+                    PresenceManager?.JoinFromSecret(GlobalModState.AutoJoinBssbKey);
+                    GlobalModState.AutoJoinBssbKey = null;    
+                });
             }
         }
 
