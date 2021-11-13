@@ -26,7 +26,7 @@ namespace ServerBrowser.Presence.Steam
                 "Plugins", "x86_64", "steam_api64.dll"));
             var testResult = File.Exists(testPath);
             
-            Plugin.Log.Info($"[SteamPresenceProvider] TryDetectSteamDll (path={testPath}, result={testResult})");
+            Plugin.Log.Debug($"[SteamPresenceProvider] TryDetectSteamDll (path={testPath}, result={testResult})");
 
             return testResult;
         }
@@ -40,7 +40,7 @@ namespace ServerBrowser.Presence.Steam
                 return;
             }
             
-            Plugin.Log?.Info("[SteamPresenceProvider] SteamAPI initialized");
+            Plugin.Log?.Debug("[SteamPresenceProvider] SteamAPI initialized");
 
             _tickObject = new GameObject("ServerBrowser_SteamPresenceProvider");
             _tickObject.AddComponent<SteamPresenceEventBehavior>();
@@ -49,8 +49,6 @@ namespace ServerBrowser.Presence.Steam
             _gameRichPresenceJoinRequestedCallback = Callback<GameRichPresenceJoinRequested_t>.Create(
                 OnGameRichPresenceJoinRequested
             );
-
-            Plugin.Log?.Info("[SteamPresenceProvider] SteamAPI initialized - ran through");
         }
 
         public void Stop()
@@ -127,7 +125,7 @@ namespace ServerBrowser.Presence.Steam
 
             var statusText = String.Join(" ", statusParts);
             SteamFriends.SetRichPresence("status", statusText);
-            Plugin.Log?.Info($"[SteamPresenceProvider] SteamAPI did set activity (status={statusText})");
+            Plugin.Log?.Debug($"[SteamPresenceProvider] SteamAPI did set activity (status={statusText})");
         }
 
         private void ClearActivity()
@@ -137,7 +135,7 @@ namespace ServerBrowser.Presence.Steam
             SteamFriends.SetRichPresence("steam_player_group_size", null);
             SteamFriends.SetRichPresence("status", null);
             
-            Plugin.Log?.Info("[SteamPresenceProvider] SteamAPI did clear activity");
+            Plugin.Log?.Debug("[SteamPresenceProvider] SteamAPI did clear activity");
         }
         #endregion
     }

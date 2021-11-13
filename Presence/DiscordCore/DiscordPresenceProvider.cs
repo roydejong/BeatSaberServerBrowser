@@ -57,12 +57,12 @@ namespace ServerBrowser.Presence.DiscordCore
         #region Events from Discord
         private void OnDiscordActivityInvite(ActivityActionType type, ref User user, ref Activity activity)
         {
-            Plugin.Log?.Info($"[DiscordPresenceProvider] OnDiscordActivityInvite (user: {user.Username})");
+            Plugin.Log?.Debug($"[DiscordPresenceProvider] OnDiscordActivityInvite (user: {user.Username})");
         }
         
         private void OnDiscordActivityJoinRequest(ref User user)
         {
-            Plugin.Log?.Info($"[DiscordPresenceProvider] OnDiscordActivityJoinRequest (user: {user.Username})");
+            Plugin.Log?.Debug($"[DiscordPresenceProvider] OnDiscordActivityJoinRequest (user: {user.Username})");
         }
 
         private void OnDiscordActivitySpectate(string secret)
