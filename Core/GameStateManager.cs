@@ -339,8 +339,8 @@ namespace ServerBrowser.Core
         {
             if (Activity.IsQuickPlay)
                 return Plugin.Config.ShareQuickPlayGames;
-            
-            return Plugin.Config.LobbyAnnounceToggle;
+            else
+                return Plugin.Config.LobbyAnnounceToggle;
         }
         
         /// <summary>

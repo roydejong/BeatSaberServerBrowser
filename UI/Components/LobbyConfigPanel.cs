@@ -33,16 +33,16 @@ namespace ServerBrowser.UI.Components
             {
                 if (_activity?.IsQuickPlay ?? false)
                     return Plugin.Config.ShareQuickPlayGames;
-                
-                return Plugin.Config.LobbyAnnounceToggle;
+                else
+                    return Plugin.Config.LobbyAnnounceToggle;
             }
 
             set
             {
                 if (_activity?.IsQuickPlay ?? false)
                     Plugin.Config.ShareQuickPlayGames = value;
-                
-                Plugin.Config.LobbyAnnounceToggle = value;
+                else
+                    Plugin.Config.LobbyAnnounceToggle = value;
                 
                 NotifyPropertyChanged();
             }
@@ -51,6 +51,10 @@ namespace ServerBrowser.UI.Components
         [UIAction("lobbyAnnounceToggle")]
         public void SetLobbyAnnounceToggle(bool value)
         {
+            if (_activity is null || !_activity.IsInMultiplayer)
+                // BSML randomly calls this after disconnecting it seems? Ignore
+                return;
+            
             LobbyAnnounceToggleValue = value;
             GameStateManager.HandleUpdate(false);
         }
