@@ -1,9 +1,20 @@
 # Beat Saber Server Browser (PC)
 ⚔ **A mod for Beat Saber that adds a Server Browser to Online, making it easy to share and join multiplayer games.**
 
-|**⏬ Download**|**[Latest release](https://github.com/roydejong/BeatSaberServerBrowser/releases/latest)**|
-|---|---|
-|**🌎 Online**|**[https://bssb.app](https://bssb.app)**|
+<table>
+    <tr>
+        <td><strong>⏬ PC Download</strong></td>
+        <td><strong><a href="https://github.com/roydejong/BeatSaberServerBrowser/releases/latest" target="_self">Latest release</a></strong></td>
+    </tr>
+    <tr>
+        <td><strong>🆕 Quest mod</strong></td>
+        <td><strong><a href="https://github.com/EnderdracheLP/BeatSaberServerBrowserQuest/releases/latest" target="_self">BeatSaberServerBrowserQuest</a></strong></td>
+    </tr>
+    <tr>
+        <td><strong>🌎 Online</strong></td>
+        <td>https://bssb.app</td>
+    </tr>
+</table>
 
 ## Overview
 Use this mod to add your games to the server browser, and to browse and join multiplayer matches from within the game. Only games hosted with this mod can be seen in the browser.
@@ -110,9 +121,11 @@ In addition, unofficial servers like BeatTogether always allow cross play.
 The Server Browser will now show all games regardless of the host's platform.
 
 ### Is standalone Quest supported?
-*Coming soon(tm).*
+EnderdracheLP has released a Lite[^questlite] version of the mod for Quest, check it out here:
 
-The mod is only available for PC at this time (Steam and Oculus).
+[https://github.com/EnderdracheLP/BeatSaberServerBrowserQuest](https://github.com/EnderdracheLP/BeatSaberServerBrowserQuest)
+
+[^questlite]: The lite version of BeatSaberServerBrowserQuest only lets you join games that were announced via the PC mod.
 
 ### Are Quick Play servers supported?
 Yes! You can now share and join Quick Play servers through the Server Browser. 
@@ -120,6 +133,8 @@ Yes! You can now share and join Quick Play servers through the Server Browser.
 The games are only visible if someone in the lobby is announcing it to the Server Browser - Quick Play lobby data is crowd sourced!
 
 ### Do players need to be on the same game version?
-Yes. Different versions of Beat Saber are *not* compatible with each other for multiplayer.
+Generally speaking: Yes. Different versions of Beat Saber are usually not compatible with each other for multiplayer.
 
-The Server Browser will only show games hosted on the exact same version of the game as yours.
+The Server Browser will only show games hosted on the exact same version of the game as yours, or game versions that are known to be compatible[^compatvers].
+
+[^compatvers]: The server browser currently treats 1.17 and 1.18 game versions as compatible, to make it easier for quest and PC users to play together.
