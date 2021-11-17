@@ -1,11 +1,12 @@
-﻿using BeatSaberMarkupLanguage.Components.Settings;
+﻿using System;
+using System.Threading.Tasks;
+using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Tags;
 using BeatSaberMarkupLanguage.Tags.Settings;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Game;
-using System;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +20,7 @@ namespace ServerBrowser.UI.Components
 
         private ToggleSetting _addToBrowserSetting;
         private StringSetting _serverNameSetting;
+        private FormattableText _masterServerText;
 
         private bool _eventsEnabled = false;
         private bool _firstEnable = true;
@@ -30,6 +32,7 @@ namespace ServerBrowser.UI.Components
 
             _addToBrowserSetting = CreateToggle("Add to Server Browser", AddToBrowserValue, OnAddToBrowserChange);
             _serverNameSetting = CreateTextInput("Server Name", ServerNameValue, OnServerNameChange);
+            _masterServerText = CreateExtraText("Test 123");
 
             _firstEnable = true;
         }
@@ -61,6 +64,18 @@ namespace ServerBrowser.UI.Components
         {
             OnAddToBrowserChange(AddToBrowserValue);
             OnServerNameChange(ServerNameValue);
+
+            if (MasterServerHost is not null)
+            {
+                _masterServerText.text = MasterServerHost;
+                _masterServerText.gameObject.SetActive(true);
+            }
+            else
+            {
+                _masterServerText.gameObject.SetActive(false);
+            }
+            
+            ReApplyVerticalLayout();
         }
 
         public void OnDisable()
@@ -154,13 +169,31 @@ namespace ServerBrowser.UI.Components
             return stringSetting;
         }
 
-        private void ReApplyVerticalLayout(bool extraHeight)
+        private FormattableText CreateExtraText(string initialText)
+        {
+            var textTagObject = (new TextTag()).CreateObject(_formView);
+            
+            var fmText = textTagObject.GetComponent<FormattableText>();
+            fmText.text = initialText;
+            
+            return fmText;
+        }
+
+        private void ReApplyVerticalLayout()
         {
             _wrapper.GetComponent<VerticalLayoutGroup>().enabled = false;
             _formView.GetComponent<VerticalLayoutGroup>().enabled = false;
 
+            const float baseHeight = 15.0f;
+            const float extraHeightNameSetting = 20.0f;
+            const float extraHeightMasterServerText = 20.0f;
+
+            float sizeY = baseHeight
+                          + (_serverNameSetting.gameObject.activeSelf ? extraHeightNameSetting : 0)
+                          + (_masterServerText.gameObject.activeSelf ? extraHeightMasterServerText : 0);
+
             (_formView as RectTransform).offsetMax = new Vector2(90.0f, 0.0f);
-            (_formView as RectTransform).sizeDelta = new Vector2(90.0f, extraHeight ? 20.0f : 15.0f);
+            (_formView as RectTransform).sizeDelta = new Vector2(90.0f, sizeY);
 
             _formView.GetComponent<VerticalLayoutGroup>().enabled = true;
             _wrapper.GetComponent<VerticalLayoutGroup>().enabled = true;
@@ -177,7 +210,9 @@ namespace ServerBrowser.UI.Components
 
             // Show server browser specific settings only if toggled on
             _serverNameSetting.gameObject.SetActive(newValue);
-            ReApplyVerticalLayout(newValue);
+            _masterServerText.gameObject.SetActive(newValue);
+            
+            ReApplyVerticalLayout();
         }
 
         private void OnServerNameChange(string newValue)
@@ -190,15 +225,9 @@ namespace ServerBrowser.UI.Components
         #endregion
 
         #region UI Data
-        public bool AddToBrowserValue
-        {
-            get => Plugin.Config.LobbyAnnounceToggle;
-        }
-
-        public string ServerNameValue
-        {
-            get => MpSession.GetHostGameName();
-        }
+        public bool AddToBrowserValue => Plugin.Config.LobbyAnnounceToggle;
+        public string ServerNameValue => MpSession.GetHostGameName();
+        public string? MasterServerHost => MpConnect.LastUsedMasterServer?.hostName;
         #endregion
     }
 }
