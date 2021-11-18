@@ -32,7 +32,7 @@ namespace ServerBrowser.UI.Components
 
             _addToBrowserSetting = CreateToggle("Add to Server Browser", AddToBrowserValue, OnAddToBrowserChange);
             _serverNameSetting = CreateTextInput("Server Name", ServerNameValue, OnServerNameChange);
-            _masterServerText = CreateExtraText("Test 123");
+            _masterServerText = CreateExtraText("");
 
             _firstEnable = true;
         }
@@ -67,7 +67,16 @@ namespace ServerBrowser.UI.Components
 
             if (MasterServerHost is not null)
             {
-                _masterServerText.text = MasterServerHost;
+                var targetText = "";
+                
+                if (MasterServerHost.EndsWith(".beatsaber.com"))
+                    targetText = $"<color=#fbc531>Creating lobby on Official Servers (custom songs NOT supported)";  
+                else if (MasterServerHost.EndsWith(".beattogether.systems"))
+                    targetText = $"<color=#4cd137>Creating lobby on BeatTogether (supports custom songs)";   
+                else
+                    targetText = $"<color=#00a8ff>Creating lobby on custom master server: {MasterServerHost}";
+
+                _masterServerText.text = targetText;
                 _masterServerText.gameObject.SetActive(true);
             }
             else
@@ -175,6 +184,13 @@ namespace ServerBrowser.UI.Components
             
             var fmText = textTagObject.GetComponent<FormattableText>();
             fmText.text = initialText;
+            fmText.rectTransform.offsetMin = new Vector2(0.0f, -30.0f);
+            fmText.rectTransform.offsetMax = new Vector2(90.0f, -30.0f);
+            fmText.rectTransform.sizeDelta = new Vector2(90.0f, 15.0f);
+            fmText.alignment = TextAlignmentOptions.Center;
+            fmText.fontSize = 4f;
+            fmText.extraPadding = true;
+            fmText.RefreshText();
             
             return fmText;
         }
@@ -185,8 +201,8 @@ namespace ServerBrowser.UI.Components
             _formView.GetComponent<VerticalLayoutGroup>().enabled = false;
 
             const float baseHeight = 15.0f;
-            const float extraHeightNameSetting = 20.0f;
-            const float extraHeightMasterServerText = 20.0f;
+            const float extraHeightNameSetting = 5.0f;
+            const float extraHeightMasterServerText = 8.0f;
 
             float sizeY = baseHeight
                           + (_serverNameSetting.gameObject.activeSelf ? extraHeightNameSetting : 0)
@@ -210,7 +226,6 @@ namespace ServerBrowser.UI.Components
 
             // Show server browser specific settings only if toggled on
             _serverNameSetting.gameObject.SetActive(newValue);
-            _masterServerText.gameObject.SetActive(newValue);
             
             ReApplyVerticalLayout();
         }
