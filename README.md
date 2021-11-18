@@ -113,10 +113,17 @@ You can also click "View game info" to see a friend's extended multiplayer statu
 
 ## FAQs / Troubleshooting
 
+### How do I play custom songs?
+You need to have MultiplayerExtensions installed to play custom songs.
+
+If you are the host, you must also have BeatTogether installed, and have BeatTogether selected as your server.
+
+Custom songs do NOT work on Official Servers.
+
 ### Does cross-play work?
 🎉 Yes! Beat Saber has enabled cross-play for all platforms on official servers.
 
-In addition, unofficial servers like BeatTogether always allow cross play.
+Unofficial servers like BeatTogether always allow cross play.
 
 The Server Browser will now show all games regardless of the host's platform.
 
