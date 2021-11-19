@@ -3,7 +3,7 @@
   "id": "ServerBrowser",
   "name": "ServerBrowser",
   "author": "LookAtHippo",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Adds a Server Browser to the Online menu, making it easy to share and join multiplayer games.",
   "gameVersion": "1.18.3",
   "dependsOn": {
