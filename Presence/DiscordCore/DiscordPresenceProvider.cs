@@ -184,7 +184,7 @@ namespace ServerBrowser.Presence.DiscordCore
             }
             
             // Apply
-            Plugin.Log.Info($"[DiscordPresenceProvider] Setting Discord activity " +
+            Plugin.Log.Debug($"[DiscordPresenceProvider] Setting Discord activity " +
                             $"(State={discordActivity.State}, Details={discordActivity.Details})");
             
             discord.UpdateActivity(discordActivity);
