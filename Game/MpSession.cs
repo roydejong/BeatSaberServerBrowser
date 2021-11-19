@@ -154,11 +154,6 @@ namespace ServerBrowser.Game
 
         public static string GetHostGameName()
         {
-            if (MpLobbyConnectionTypePatch.ConnectionType == LobbyConnectionType.QuickPlay)
-            {
-                return "Quick Play Lobby";
-            }
-            
             string finalGameName = "";
 
             if (MpLocalPlayer.UserInfo != null)

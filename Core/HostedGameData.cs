@@ -50,8 +50,10 @@ namespace ServerBrowser.Core
         #endregion
 
         #region Helpers
+
         [JsonIgnoreAttribute]
-        public bool IsOnCustomMaster => !String.IsNullOrEmpty(MasterServerHost) && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);
+        public bool IsOnCustomMaster => MasterServerHost is not null
+                                        && !MasterServerHost.EndsWith(MpConnect.OFFICIAL_MASTER_SUFFIX);
 
         [JsonIgnoreAttribute]
         public bool IsDedicatedServer => ServerType == ServerTypeBeatDediCustom || ServerType == ServerTypeBeatDediQuickplay ||
@@ -74,18 +76,14 @@ namespace ServerBrowser.Core
         public string Describe()
         {
             var moddedDescr = IsModded ? "Modded" : "Vanilla";
-
-            if (IsQuickPlayServer)
-            {
-                moddedDescr += " Quick Play";
-            }
             
             if (IsOnCustomMaster)
-            {
                 moddedDescr += ", Unofficial";
-            }
-
-            return $"{GameName} ({PlayerCount}/{PlayerLimit}, {moddedDescr})";
+            
+            if (IsQuickPlayServer)
+                return $"Quick Play Lobby ({PlayerCount}/{PlayerLimit}, {moddedDescr})";
+            else
+                return $"{GameName} ({PlayerCount}/{PlayerLimit}, {moddedDescr})";
         }
 
         public string DescribeType()
