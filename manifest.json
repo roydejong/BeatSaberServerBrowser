@@ -12,6 +12,7 @@
     "SongCore": "^3.7.0"
   },
   "loadAfter": ["DiscordCore"],
+  "icon": "ServerBrowser.Assets.icon.png",
   "links": {
     "project-home": "https://bssb.app",
     "project-source": "https://github.com/roydejong/BeatSaberServerBrowser"
