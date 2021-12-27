@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Game;
@@ -18,6 +19,14 @@ namespace ServerBrowser.Harmony
             {
                 FirstActivation = firstActivation
             });
+
+            // Touch master server endpoint to trigger MasterServerEndPointPatch (fixes #49)
+            try
+            {
+                __instance.GetField<INetworkConfig, MultiplayerModeSelectionViewController>("_networkConfig")
+                    .masterServerEndPoint.ToString();
+            }
+            catch (MissingFieldException) { }
 
             // Enable the "game browser" button (it was left in the game but unused currently)
             var btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");
