@@ -162,7 +162,7 @@ namespace ServerBrowser.Core
             Activity.HostSecret = null;
             Activity.IsDedicatedServer = false;
             Activity.ServerConfiguration = null;
-            Activity.MaxPlayerCount = 0;
+            Activity.MaxPlayerCount = 5;
             Activity.Players?.Clear();
             Activity.CurrentLevel = null;
             Activity.CurrentDifficulty = null;
@@ -206,7 +206,10 @@ namespace ServerBrowser.Core
             Activity.IsDedicatedServer = e.IsDedicatedServer;
             Activity.SelectionMask = e.SelectionMask;
             Activity.ServerConfiguration = e.Configuration;
-            Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
+            
+            if (e.Configuration.maxPlayerCount > 0)
+                Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
+            
             Activity.ManagerId = e.ManagerId;
             
             Activity.Players = new(Activity.MaxPlayerCount);

@@ -12,6 +12,8 @@ namespace ServerBrowser.Harmony
     [HarmonyPatch(typeof(MultiplayerModeSelectionViewController), "DidActivate", MethodType.Normal)]
     public static class MpModeSelectionActivatedPatch
     {
+        private static Button? _btnGameBrowser;
+        
         public static void Postfix(MultiplayerModeSelectionViewController __instance, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             // Raise internal event
@@ -29,27 +31,34 @@ namespace ServerBrowser.Harmony
             catch (MissingFieldException) { }
 
             // Enable the "game browser" button (it was left in the game but unused currently)
-            var btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");
+            _btnGameBrowser = ReflectionUtil.GetField<Button, MultiplayerModeSelectionViewController>(__instance, "_gameBrowserButton");
+            _btnGameBrowser.enabled = true;
+            _btnGameBrowser.gameObject.SetActive(true);
 
-            btnGameBrowser.enabled = true;
-            btnGameBrowser.gameObject.SetActive(true);
-
-            foreach (var comp in btnGameBrowser.GetComponents<Component>())
+            foreach (var comp in _btnGameBrowser.GetComponents<Component>())
                 comp.gameObject.SetActive(true);
 
             if (firstActivation)
             {
                 // Move up and enlarge the button a bit
-                var transform = btnGameBrowser.gameObject.transform;
+                var transform = _btnGameBrowser.gameObject.transform;
                 transform.position = new Vector3(
                     transform.position.x,
                     transform.position.y + 0.4f, // carefully positioned so it is visually seperated from maintenance notice
                     transform.position.z
                 );
                 transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
-                btnGameBrowser.GetComponentInChildren<CurvedTextMeshPro>()
+                _btnGameBrowser.GetComponentInChildren<CurvedTextMeshPro>()
                     .SetText("Server Browser");
             }
+        }
+
+        public static void DisableButton()
+        {
+            if (_btnGameBrowser is null)
+                return;
+            
+            _btnGameBrowser.gameObject.SetActive(false);
         }
     }
 }

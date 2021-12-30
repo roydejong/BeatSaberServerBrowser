@@ -33,7 +33,7 @@ namespace ServerBrowser.UI
         #region Creation / Instance
         private const string GameObjectName = "ServerBrowserFloatingNotification";
 
-        public static FloatingNotification Instance
+        public static FloatingNotification? Instance
         {
             get;
             private set;
@@ -41,13 +41,23 @@ namespace ServerBrowser.UI
 
         public static FloatingNotification SetUp()
         {
-            if (Instance == null)
+            if (Instance is null)
             {
                 Instance = new GameObject(GameObjectName).AddComponent<FloatingNotification>();
                 Instance.DismissMessage();
             }
 
             return Instance;
+        }
+
+        public static void TearDown()
+        {
+            if (Instance is null)
+                return;
+            
+            Instance.DismissMessage();
+            Destroy(Instance);
+            Instance = null;
         }
         #endregion
 

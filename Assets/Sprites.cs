@@ -17,20 +17,22 @@ namespace ServerBrowser.Assets
 
         public static Sprite Pencil;
 
+        public static bool IsInitialized { get; private set; } 
+
         public static void Initialize()
         {
+            IsInitialized = true;
+
             BeatSaverIcon = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
 
             /// Technology - Straight Line icon set by designforeat
             /// https://www.iconfinder.com/iconsets/technology-straight-line
             /// License: CC BY 3.0
-            
             Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
             PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
 
             /// Octicons icon set by Github
             /// Copyright (c) 2020 GitHub Inc.
-
             Pencil = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Pencil.png");
         }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.Core;
+using ServerBrowser.Harmony;
 using ServerBrowser.UI;
 using UnityEngine;
 using static HMUI.ViewController;
@@ -25,6 +26,11 @@ namespace ServerBrowser.Game
             _mpLobbyConnectionController = ReflectionUtil.GetField<MultiplayerLobbyConnectionController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_multiplayerLobbyConnectionController");
             _joiningLobbyViewController = ReflectionUtil.GetField<JoiningLobbyViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_joiningLobbyViewController");
             _simpleDialogPromptViewController = ReflectionUtil.GetField<SimpleDialogPromptViewController, MultiplayerModeSelectionFlowCoordinator>(_flowCoordinator, "_simpleDialogPromptViewController");
+        }
+
+        public static void TearDown()
+        {
+            MpModeSelectionActivatedPatch.DisableButton();
         }
         #endregion
 

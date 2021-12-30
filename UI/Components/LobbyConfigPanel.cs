@@ -264,14 +264,25 @@ namespace ServerBrowser.UI.Components
         private const string TAB_NAME = "Server Browser";
 
         private static bool _tabIsAdded = false;
+        
         public static void RegisterGameplayModifierTab()
         {
+            if (_tabIsAdded)
+                return;
+            
+            GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance, MenuType.Online);
+            Plugin.Log?.Debug("Added gameplay modifier tab (LobbyConfigPanel)");
+            _tabIsAdded = true;
+        }
+        
+        public static void RemoveGameplayModifierTab()
+        {
             if (!_tabIsAdded)
-            {
-                GameplaySetup.instance.AddTab(TAB_NAME, ResourceName, LobbyConfigPanel.instance, MenuType.Online);
-                Plugin.Log?.Debug("Added gameplay modifier tab (LobbyConfigPanel)");
-                _tabIsAdded = true;
-            }
+                return;
+            
+            GameplaySetup.instance.RemoveTab(TAB_NAME);
+            Plugin.Log?.Debug("Removed gameplay modifier tab (LobbyConfigPanel)");
+            _tabIsAdded = false;
         }
         #endregion
     }

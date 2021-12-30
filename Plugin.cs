@@ -15,7 +15,7 @@ using IPALogger = IPA.Logging.Logger;
 
 namespace ServerBrowser
 {
-    [Plugin(RuntimeOptions.SingleStartInit)]
+    [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
         public const string HarmonyId = "mod.serverbrowser";
@@ -23,8 +23,8 @@ namespace ServerBrowser
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
         internal static PluginConfig Config { get; private set; }
-
         internal static HarmonyLib.Harmony Harmony { get; private set; }
+        
         internal static HttpClient HttpClient { get; private set; }
 
         internal static PresenceManager? PresenceManager { get; private set; }
@@ -49,25 +49,29 @@ namespace ServerBrowser
             Instance = this;
             Log = logger;
             Config = config.Generated<PluginConfig>();
-
-            // Modifiers tab (in-lobby)
-            LobbyConfigPanel.RegisterGameplayModifierTab();
+            Harmony = new HarmonyLib.Harmony(HarmonyId);
         }
 
-        [OnStart]
-        public void OnApplicationStart()
+        [OnEnable]
+        public void OnEnable()
         {
+            _gotFirstActivation = false;
+            
             // Harmony
-            Harmony = new HarmonyLib.Harmony(HarmonyId);
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            
+            // Modifiers tab (in-lobby)
+            LobbyConfigPanel.RegisterGameplayModifierTab();
 
             // Assets
-            Sprites.Initialize();
+            if (!Sprites.IsInitialized)
+                Sprites.Initialize();
             
             // Bind events
             MpEvents.OnlineMenuOpened += OnOnlineMenuOpened;
             MpEvents.OnlineMenuClosed += OnOnlineMenuClosed;
             
+            // Core components
             GameStateManager.SetUp();
 
             // HTTP client
@@ -82,9 +86,17 @@ namespace ServerBrowser
                 Log?.Info($"Game started with BSSB key launch arg: {GlobalModState.AutoJoinBssbKey}");
         }
 
-        [OnExit]
-        public async void OnApplicationQuit()
+        [OnDisable]
+        public async void OnDisable()
         {
+            _gotFirstActivation = false;
+            
+            // Unpatch Harmony
+            Harmony.UnpatchSelf();
+            
+            // Modifiers tab (in-lobby)
+            LobbyConfigPanel.RemoveGameplayModifierTab();
+            
             // Destroy update timer
             UpdateTimer.DestroyTimerObject();
 
@@ -92,12 +104,17 @@ namespace ServerBrowser
             MpEvents.OnlineMenuOpened -= OnOnlineMenuOpened;
             MpEvents.OnlineMenuClosed -= OnOnlineMenuClosed;
             
+            // Core components 
             GameStateManager.TearDown();
+            
+            // Late init components
             MpSession.TearDown();
+            MpModeSelection.TearDown();
+            PluginUi.TearDown();
             
             // Rich Presence
-            PresenceManager = new PresenceManager();
-            PresenceManager.Stop();
+            PresenceManager?.Stop();
+            PresenceManager = null;
 
             // Try to cancel any host announcements we may have had
             await GameStateManager.UnAnnounce();
