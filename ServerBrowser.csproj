@@ -299,5 +299,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Assets\icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="description.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
