@@ -222,6 +222,7 @@
     <Compile Include="Game\MpEvents.cs" />
     <Compile Include="Game\MpLocalPlayer.cs" />
     <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
+    <Compile Include="Harmony\GameRestartDetectionPatch.cs" />
     <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
     <Compile Include="Harmony\MainFlowCoordinatorPatch.cs" />
     <Compile Include="Harmony\MasterServerEndPointPatch.cs" />

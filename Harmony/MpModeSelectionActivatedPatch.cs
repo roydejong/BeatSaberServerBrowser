@@ -55,7 +55,7 @@ namespace ServerBrowser.Harmony
 
         public static void DisableButton()
         {
-            if (_btnGameBrowser is null)
+            if (_btnGameBrowser == null)
                 return;
             
             _btnGameBrowser.gameObject.SetActive(false);

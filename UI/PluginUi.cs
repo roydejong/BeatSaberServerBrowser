@@ -41,7 +41,7 @@ namespace ServerBrowser.UI
 
         public static void LaunchServerBrowser()
         {
-            MpModeSelection.PresentViewController(ServerBrowserViewController, animationDirection: AnimationDirection.Horizontal);
+            MpModeSelection.PresentViewController(ServerBrowserViewController!, animationDirection: AnimationDirection.Horizontal);
         }
     }
 }

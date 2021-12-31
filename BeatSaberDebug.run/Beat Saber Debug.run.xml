@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Beat Saber Debug" type="ConnectRemote" factoryName="Mono Remote" show_console_on_std_err="false" show_console_on_std_out="false" port="10000" address="localhost">
+    <option name="allowRunningInParallel" value="false" />
+    <option name="listenPortForConnections" value="true" />
+    <option name="projectPathOnTarget" />
+    <option name="selectedOptions">
+      <list />
+    </option>
+    <method v="2">
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Start Beat Saber" />
+    </method>
+  </configuration>
+</component>
