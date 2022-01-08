@@ -3,18 +3,19 @@
   "id": "ServerBrowser",
   "name": "ServerBrowser",
   "author": "LookAtHippo",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": [
     "#![ServerBrowser.description.md]",
     "Adds a Server Browser to the Online menu, making it easy to share and join multiplayer games."
   ],
-  "gameVersion": "1.18.3",
+  "gameVersion": "1.19.0",
   "dependsOn": {
-    "BSIPA": "^4.2.0",
-    "BeatSaberMarkupLanguage": "^1.5.5",
-    "SongCore": "^3.7.0"
+    "BSIPA": "^4.2.1",
+    "SongCore": "^3.9.0",
+    "BeatSaberMarkupLanguage": "^1.6.0",
+    "MultiplayerCore": "^1.0.0",
+    "SiraUtil": "^3.0.3"
   },
-  "loadAfter": ["DiscordCore"],
   "icon": "ServerBrowser.Assets.icon.png",
   "links": {
     "project-home": "https://bssb.app",

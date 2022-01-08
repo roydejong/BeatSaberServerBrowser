@@ -1,5 +1,4 @@
-# Server Browser
-**This mod adds a Server Browser to the Online menu, making it easy to share and join custom multiplayer games.**
+**Beat Saber multiplayer mod that adds a Server Browser to the Online menu, making it easy to share and join multiplayer games.**
 
 ### Joining games
 Open the Online menu, then click on the "Server Browser" button. From there, you'll see all public multiplayer games. Click on a game, and then select "Connect" to jump right in.
@@ -24,14 +23,6 @@ Be sure to check if these mods are available for your game version, and grab the
 Beat Saber has enabled cross-play for all platforms on official servers. Unofficial servers like BeatTogether always allow cross play. You'll encounter both Steam and Oculus players when you play.
 
 Please note that different versions of Beat Saber may not be compatible. Make sure everyone is on the same game version for the best experience.
-
-### Rich Presence (BETA)
-
-#### DiscordCore
-If you have DiscordCore installed, you'll be able to send and receive invites to multiplayer games on any channel or via DMs. Your multiplayer status will also be visible.
-
-#### Steam
-If you are playing through Steam, you'll be able to send and receive invites to multiplayer games to and from your Steam friends.
 
 ### Reporting issues
 If you have any issues, please report them via GitHub:

@@ -20,7 +20,7 @@
     <!--<PathMap>$(AppOutputBase)=X:\$(AssemblyName)\</PathMap>-->
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -98,6 +98,12 @@
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SiraUtil, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\Steam\steamapps\common\Beat Saber\Plugins\SiraUtil.dll</HintPath>
+    </Reference>
+    <Reference Include="SiraUtil, Version=3.0.3.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\Steam\steamapps\common\Beat Saber\Plugins\SiraUtil.dll</HintPath>
     </Reference>
     <Reference Include="SongCore, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -204,69 +210,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Sprites.cs" />
-    <Compile Include="Core\AnnounceState.cs" />
-    <Compile Include="Core\GlobalModState.cs" />
-    <Compile Include="Core\HostedGameData.cs" />
-    <Compile Include="Core\HostedGameBrowser.cs" />
-    <Compile Include="Core\HostedGameFilters.cs" />
-    <Compile Include="Core\HostedGamePlayer.cs" />
-    <Compile Include="Core\LaunchArg.cs" />
-    <Compile Include="Core\Responses\AnnounceResult.cs" />
-    <Compile Include="Core\Responses\BrowseResult.cs" />
-    <Compile Include="Game\Models\ConnectToServerEventArgs.cs" />
-    <Compile Include="Game\Models\MultiplayerActivity.cs" />
-    <Compile Include="Game\Models\OnlineMenuOpenedEventArgs.cs" />
-    <Compile Include="Game\Models\SessionConnectedEventArgs.cs" />
-    <Compile Include="Game\Models\StartingMultiplayerLevelEventArgs.cs" />
-    <Compile Include="Game\MpEvents.cs" />
-    <Compile Include="Game\MpLocalPlayer.cs" />
-    <Compile Include="Harmony\CreateServerViewControllerPatch.cs" />
-    <Compile Include="Harmony\GameRestartDetectionPatch.cs" />
-    <Compile Include="Harmony\HandleConnectToServerSuccessPatch.cs" />
-    <Compile Include="Harmony\MainFlowCoordinatorPatch.cs" />
-    <Compile Include="Harmony\MasterServerEndPointPatch.cs" />
-    <Compile Include="Core\GameStateManager.cs" />
-    <Compile Include="Core\BSSBMasterAPI.cs" />
-    <Compile Include="Core\UpdateTimer.cs" />
-    <Compile Include="Game\MpConnect.cs" />
-    <Compile Include="Game\MpModeSelection.cs" />
-    <Compile Include="Game\MpSession.cs" />
-    <Compile Include="Harmony\MpConnectionErrorDialogPatch.cs" />
-    <Compile Include="Harmony\MpLobbyStatePatch.cs" />
-    <Compile Include="Harmony\MpModeSelectionDeactivatedPatch.cs" />
-    <Compile Include="Harmony\PacketEncryptionLayerPatch.cs" />
-    <Compile Include="Harmony\SetLobbyCodePatch.cs" />
-    <Compile Include="Harmony\MpLobbyConnectionTypePatch.cs" />
-    <Compile Include="Harmony\MpModeSelectionButtonPatch.cs" />
-    <Compile Include="Harmony\MpModeSelectionActivatedPatch.cs" />
-    <Compile Include="Harmony\SetPlayerIsPartyOwnerPatch.cs" />
-    <Compile Include="Harmony\StartMultiplayerLevelPatch.cs" />
-    <Compile Include="Harmony\UserCertificateValidatorPatch.cs" />
+    <Compile Include="Installers\ModeSelectionInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
-    <Compile Include="Presence\DiscordCore\DiscordPresenceProvider.cs" />
-    <Compile Include="Presence\IPresenceProvider.cs" />
-    <Compile Include="Presence\PresenceManager.cs" />
-    <Compile Include="Presence\Steam\SteamPresenceProvider.cs" />
-    <Compile Include="Presence\Steam\SteamPresenceEventBehavior.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\Components\CreateServerExtensions.cs" />
-    <Compile Include="UI\Components\HostedGameCellData.cs" />
-    <Compile Include="UI\Components\HostedGameCellExtensions.cs" />
-    <Compile Include="UI\Components\ListLoadingControl.cs" />
-    <Compile Include="UI\PluginUi.cs" />
-    <Compile Include="UI\FloatingNotification.cs" />
-    <Compile Include="UI\ViewControllers\ServerBrowserViewController.cs" />
-    <Compile Include="UI\Components\LobbyConfigPanel.cs" />
-    <Compile Include="Utils\EnumExtensions.cs" />
-    <Compile Include="Utils\ConnectionErrorText.cs" />
-    <Compile Include="Utils\CoverArtGrabber.cs" />
-    <Compile Include="Utils\ModCheck.cs" />
-    <Compile Include="Utils\Serialization\HiveVersionJsonConverter.cs" />
-    <Compile Include="Utils\Serialization\JsonObject.cs" />
-    <Compile Include="Utils\Serialization\IPEndPointJsonConverter.cs" />
-    <Compile Include="Utils\Serialization\MasterServerEndPointJsonConverter.cs" />
+    <Compile Include="UI\ModeSelectionController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -274,9 +221,7 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
-    <EmbeddedResource Include="UI\BSML\LobbyConfigPanel.bsml" />
     <None Include="README.md" />
-    <EmbeddedResource Include="UI\BSML\ServerBrowserViewController.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -286,22 +231,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\BeatSaver.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\Portal.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\Pencil.png" />
+    <EmbeddedResource Include="description.md" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="description.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
