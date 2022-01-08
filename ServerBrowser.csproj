@@ -216,6 +216,7 @@
     <Compile Include="UI\ModeSelectionController.cs" />
     <Compile Include="UI\ServerBrowserFlowCoordinator.cs" />
     <Compile Include="UI\ServerBrowserMainViewController.cs" />
+    <Compile Include="UI\Utils\FlowCoordinatorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />

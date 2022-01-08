@@ -10,12 +10,8 @@ namespace ServerBrowser.Installers
         {
             Container.BindInterfacesAndSelfTo<ModeSelectionController>().AsSingle();
 
-            var serverBrowserMainView = BeatSaberUI.CreateViewController<ServerBrowserMainViewController>();
-            Container.Bind<ServerBrowserMainViewController>().FromInstance(serverBrowserMainView).AsSingle();
-            
-            var flowCoordinator = BeatSaberUI.CreateFlowCoordinator<ServerBrowserFlowCoordinator>();
-            Container.Inject(flowCoordinator);
-            Container.Bind<ServerBrowserFlowCoordinator>().FromInstance(flowCoordinator).AsSingle();
+            Container.Bind<ServerBrowserMainViewController>().FromNewComponentAsViewController().AsSingle();
+            Container.Bind<ServerBrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
         }
     }
 }
