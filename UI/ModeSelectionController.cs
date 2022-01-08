@@ -1,4 +1,5 @@
 using System;
+using BeatSaberMarkupLanguage;
 using HMUI;
 using IPA.Utilities;
 using SiraUtil.Affinity;
@@ -12,8 +13,10 @@ namespace ServerBrowser.UI
     public class ModeSelectionController : IInitializable, IDisposable, IAffinity
     {
         [Inject] private readonly SiraLog _logger = null!;
+        [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _flowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionViewController _modeSelectionView = null!;
+        [Inject] private readonly ServerBrowserFlowCoordinator _serverBrowserFlowCoordinator = null!;
 
         private Button? _btnGameBrowser;
 
@@ -57,11 +60,22 @@ namespace ServerBrowser.UI
         {
             if (menuButton == MultiplayerModeSelectionViewController.MenuButton.GameBrowser)
             {
-                // TODO Launch server browser UI
+                ReplaceFlowCoordinator(_serverBrowserFlowCoordinator);
                 return false;
             }
 
             return true;
+        }
+
+        private void ReplaceFlowCoordinator(FlowCoordinator flowCoordinator, Action finishedCallback = null,
+            ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal,
+            bool immediately = false)
+        {
+            if (!_flowCoordinator.isActivated)
+                return;
+
+            _mainFlowCoordinator.InvokeMethod<object, MainFlowCoordinator>("ReplaceChildFlowCoordinator", 
+                flowCoordinator, finishedCallback, animationDirection, immediately);
         }
     }
 }
