@@ -1,7 +1,7 @@
 using System;
-using BeatSaberMarkupLanguage;
 using HMUI;
 using ServerBrowser.UI.Utils;
+using ServerBrowser.UI.Views;
 using Zenject;
 
 namespace ServerBrowser.UI
@@ -15,15 +15,28 @@ namespace ServerBrowser.UI
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
-            if (firstActivation)
-            {
-                showBackButton = true;
-                SetTitle("Server Browser");
-                ProvideInitialViewControllers(_mainViewController);
-            }
+            if (!firstActivation)
+                return;
+            
+            SetTitle("Server Browser");
+            showBackButton = true;
+            
+            ProvideInitialViewControllers(_mainViewController);
+            
+            _mainViewController.CreateServerClickedEvent += HandleCreateServerClicked;
+        }
+
+        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+        {
+            _mainViewController.CreateServerClickedEvent -= HandleCreateServerClicked;
         }
 
         protected override void BackButtonWasPressed(ViewController topViewController)
+        {
+            ReturnToModeSelection(null);
+        }
+
+        private void HandleCreateServerClicked(object sender, EventArgs e)
         {
             ReturnToModeSelection(MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }

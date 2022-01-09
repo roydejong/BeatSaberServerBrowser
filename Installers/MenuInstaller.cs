@@ -1,4 +1,5 @@
 using ServerBrowser.UI;
+using ServerBrowser.UI.Views;
 using Zenject;
 
 namespace ServerBrowser.Installers

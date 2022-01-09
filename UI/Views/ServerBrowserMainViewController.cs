@@ -2,11 +2,11 @@ using System;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 
-namespace ServerBrowser.UI
+namespace ServerBrowser.UI.Views
 {
     [HotReload]
     public class ServerBrowserMainViewController : BSMLAutomaticViewController
     {
-        public event EventHandler<EventArgs> OnCreateServerClicked;
+        public event EventHandler<EventArgs>? CreateServerClickedEvent;
     }
 }
