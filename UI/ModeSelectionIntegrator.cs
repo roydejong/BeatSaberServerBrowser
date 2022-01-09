@@ -1,17 +1,15 @@
 using System;
-using BeatSaberMarkupLanguage;
 using HMUI;
 using IPA.Utilities;
 using ServerBrowser.UI.Utils;
 using SiraUtil.Affinity;
-using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 namespace ServerBrowser.UI
 {
-    public class ModeSelectionController : IInitializable, IDisposable, IAffinity
+    public class ModeSelectionIntegrator : IInitializable, IDisposable, IAffinity
     {
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _flowCoordinator = null!;
@@ -19,11 +17,16 @@ namespace ServerBrowser.UI
         [Inject] private readonly ServerBrowserFlowCoordinator _serverBrowserFlowCoordinator = null!;
 
         private Button? _btnGameBrowser;
+        private bool _statusCheckComplete;
+        private MultiplayerModeSelectionViewController.MenuButton? _pendingMenuButtonTrigger;
+        
 
         public void Initialize()
         {
-            _btnGameBrowser =
-                _modeSelectionView.GetField<Button, MultiplayerModeSelectionViewController>("_gameBrowserButton");
+            _btnGameBrowser = _modeSelectionView.GetField<Button, MultiplayerModeSelectionViewController>
+                ("_gameBrowserButton");
+            _statusCheckComplete = false;
+            _pendingMenuButtonTrigger = null;
         }
 
         public void Dispose()
@@ -37,8 +40,11 @@ namespace ServerBrowser.UI
 
         [AffinityPostfix]
         [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator), "DidActivate")]
-        private void DidActivate(bool firstActivation)
+        private void HandleFlowCoordinatorActivation(bool firstActivation, bool addedToHierarchy,
+            bool screenSystemEnabling)
         {
+            _statusCheckComplete = false;
+            
             if (_btnGameBrowser != null)
             {
                 _btnGameBrowser.gameObject.SetActive(true);
@@ -54,9 +60,29 @@ namespace ServerBrowser.UI
         }
 
         [AffinityPrefix]
+        [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator), "ProcessDeeplinkingToLobby")]
+        private bool HandleProcessDeeplinkingToLobby()
+        {
+            // ProcessDeeplinkingToLobby is triggered once the flow coordinator has fully set up, and transitions
+            //  are completed. This means status checks are done and we can trigger a submenu if needed.
+            
+            Plugin.Log.Error("ProcessDeeplinkingToLobby");
+            
+            _statusCheckComplete = true;
+
+            if (_pendingMenuButtonTrigger is not null)
+            {
+                TriggerMenuButton(_pendingMenuButtonTrigger.Value);
+                return false;
+            }
+
+            return true;
+        }
+
+        [AffinityPrefix]
         [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator), 
             "HandleMultiplayerLobbyControllerDidFinish")]
-        private bool DidPressMenuButton(MultiplayerModeSelectionViewController.MenuButton menuButton)
+        private bool HandleMenuButtonPress(MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
             if (menuButton == MultiplayerModeSelectionViewController.MenuButton.GameBrowser)
             {
@@ -74,6 +100,20 @@ namespace ServerBrowser.UI
 
             _mainFlowCoordinator.ReplaceChildFlowCoordinator(_serverBrowserFlowCoordinator, null,
                 ViewController.AnimationDirection.Vertical);
+        }
+
+        public void TriggerMenuButton(MultiplayerModeSelectionViewController.MenuButton menuButton)
+        {
+            if (!_statusCheckComplete)
+            {
+                // We can't trigger the button immediately as it will break the server status check
+                _pendingMenuButtonTrigger = menuButton;
+                return;
+            }
+            
+            _pendingMenuButtonTrigger = null;
+            _modeSelectionView.InvokeMethod<object, MultiplayerModeSelectionViewController>(
+                "HandleMenuButton", menuButton);
         }
     }
 }

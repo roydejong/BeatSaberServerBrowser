@@ -12,7 +12,7 @@ namespace ServerBrowser
     public class Plugin
     {
         // ReSharper disable once MemberCanBePrivate.Global
-        public const string HarmonyId = "mod.serverbrowser";
+        public const string HarmonyId = "com.hippomade.serverbrowser";
 
         internal static IPALogger Log { get; private set; } = null!;
         internal static PluginConfig Config { get; private set; } = null!;
@@ -45,7 +45,7 @@ namespace ServerBrowser
             zenjector.UseHttpService();
             zenjector.UseSiraSync(SiraSyncServiceType.GitHub, "roydejong", "BeatSaberServerBrowser");
             
-            zenjector.Install<ModeSelectionInstaller>(Location.Menu);
+            zenjector.Install<MenuInstaller>(Location.Menu);
         }
 
         [OnEnable]
