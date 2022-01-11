@@ -4,6 +4,7 @@ using Zenject;
 
 namespace ServerBrowser.Installers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class MenuInstaller : Installer
     {
         public override void InstallBindings()

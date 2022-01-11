@@ -10,6 +10,7 @@ using IPALogger = IPA.Logging.Logger;
 namespace ServerBrowser
 {
     [Plugin(RuntimeOptions.DynamicInit)]
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class Plugin
     {
         // ReSharper disable once MemberCanBePrivate.Global
@@ -46,6 +47,7 @@ namespace ServerBrowser
             zenjector.UseHttpService();
             zenjector.UseSiraSync(SiraSyncServiceType.GitHub, "roydejong", "BeatSaberServerBrowser");
             
+            zenjector.Install<InitInstaller>(Location.App);
             zenjector.Install<MenuInstaller>(Location.Menu);
         }
 

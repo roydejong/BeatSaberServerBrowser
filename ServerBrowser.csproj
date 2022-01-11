@@ -215,12 +215,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
+    <Compile Include="Installers\InitInstaller.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="UI\CreateServerExtender.cs" />
     <Compile Include="UI\Forms\ExtendedField.cs" />
     <Compile Include="UI\Forms\ExtendedStringField.cs" />
+    <Compile Include="UI\Forms\ExtendedToggleField.cs" />
     <Compile Include="UI\Forms\FormExtender.cs" />
     <Compile Include="UI\ModeSelectionIntegrator.cs" />
     <Compile Include="UI\ServerBrowserFlowCoordinator.cs" />

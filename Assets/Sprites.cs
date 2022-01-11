@@ -10,14 +10,6 @@ namespace ServerBrowser.Assets
     /// </summary>
     internal static class Sprites
     {
-        public static Sprite? BeatSaverIcon;
-        
-        /// Technology - Straight Line icon set by designforeat
-        /// https://www.iconfinder.com/iconsets/technology-straight-line
-        /// License: CC BY 3.0
-        public static Sprite? Portal;
-        public static Sprite? PortalUser;
-        
         /// Octicons icon set by Github
         /// Copyright (c) 2020 GitHub Inc.
         public static Sprite? Pencil;
@@ -28,9 +20,6 @@ namespace ServerBrowser.Assets
         {
             IsInitialized = true;
 
-            //BeatSaverIcon = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
-            //Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
-            //PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
             Pencil = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Pencil.png");
         }
 

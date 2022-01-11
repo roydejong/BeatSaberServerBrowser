@@ -36,10 +36,18 @@ namespace ServerBrowser.UI.Forms
             // Re-apply vertical layout with new height
             formViewVerticalLayout.enabled = true;
         }
-
+        
         public ExtendedStringField CreateTextInput(string label, string? initialValue)
         {
             var field = new ExtendedStringField(_formView, label, initialValue);
+            _fields.Add(field);
+            RefreshVerticalLayout();
+            return field;
+        }
+        
+        public ExtendedToggleField CreateToggleInput(string label, bool initialValue)
+        {
+            var field = new ExtendedToggleField(_formView, label, initialValue);
             _fields.Add(field);
             RefreshVerticalLayout();
             return field;
