@@ -95,6 +95,9 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="MultiplayerCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\Steam\steamapps\common\Beat Saber\Plugins\MultiplayerCore.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
@@ -215,12 +218,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
-    <Compile Include="Installers\InitInstaller.cs" />
+    <Compile Include="Core\ServerBrowserClient.cs" />
+    <Compile Include="Installers\AppInstaller.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
+    <Compile Include="Installers\MultiplayerCoreInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="UI\CreateServerExtender.cs" />
     <Compile Include="UI\Forms\ExtendedField.cs" />
+    <Compile Include="UI\Forms\ExtendedLabelField.cs" />
     <Compile Include="UI\Forms\ExtendedStringField.cs" />
     <Compile Include="UI\Forms\ExtendedToggleField.cs" />
     <Compile Include="UI\Forms\FormExtender.cs" />
@@ -250,10 +256,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core" />
-    <Folder Include="Model" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\Pencil.png" />

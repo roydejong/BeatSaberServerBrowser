@@ -18,8 +18,10 @@ namespace ServerBrowser.UI.Forms
         public void RefreshVerticalLayout()
         {
             var formViewVerticalLayout = _formView.GetComponent<VerticalLayoutGroup>();
+            var parentVerticalLayout = _formView.parent.GetComponent<VerticalLayoutGroup>();
             
             // Disable vertical layout
+            parentVerticalLayout.enabled = false;
             formViewVerticalLayout.enabled = false;
 
             // Calculate extra height and modify size delta
@@ -35,6 +37,7 @@ namespace ServerBrowser.UI.Forms
 
             // Re-apply vertical layout with new height
             formViewVerticalLayout.enabled = true;
+            parentVerticalLayout.enabled = true;
         }
         
         public ExtendedStringField CreateTextInput(string label, string? initialValue)
@@ -48,6 +51,14 @@ namespace ServerBrowser.UI.Forms
         public ExtendedToggleField CreateToggleInput(string label, bool initialValue)
         {
             var field = new ExtendedToggleField(_formView, label, initialValue);
+            _fields.Add(field);
+            RefreshVerticalLayout();
+            return field;
+        }
+        
+        public ExtendedLabelField CreateLabel(string label)
+        {
+            var field = new ExtendedLabelField(_formView, label);
             _fields.Add(field);
             RefreshVerticalLayout();
             return field;

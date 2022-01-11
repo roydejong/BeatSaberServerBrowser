@@ -47,8 +47,9 @@ namespace ServerBrowser
             zenjector.UseHttpService();
             zenjector.UseSiraSync(SiraSyncServiceType.GitHub, "roydejong", "BeatSaberServerBrowser");
             
-            zenjector.Install<InitInstaller>(Location.App);
+            zenjector.Install<AppInstaller>(Location.App);
             zenjector.Install<MenuInstaller>(Location.Menu);
+            zenjector.Install<MultiplayerCoreInstaller>(Location.MultiplayerCore);
         }
 
         [OnEnable]

@@ -21,7 +21,7 @@ namespace ServerBrowser.UI.Forms
             set => _toggleSetting.gameObject.SetActive(value);
         }
 
-        public override float Height => 15f;
+        public override float Height => 7.5f;
 
         public string Label
         {
