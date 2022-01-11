@@ -7,11 +7,15 @@ namespace ServerBrowser.Core
     // ReSharper disable once ClassNeverInstantiated.Global
     public class ServerBrowserClient : IInitializable, IDisposable
     {
-        [Inject] private readonly NetworkConfigPatcher _networkConfig = null!; 
-        
-        public void Initialize()
+        [Inject] private readonly PluginConfig _config = null!;
+        [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
+        [Inject] private readonly NetworkConfigPatcher _networkConfig = null!;
+
+        public UserInfo? PlatformUserInfo;
+
+        public async void Initialize()
         {
-            
+            PlatformUserInfo = await _platformUserModel.GetUserInfo();
         }
 
         public void Dispose()
@@ -22,5 +26,12 @@ namespace ServerBrowser.Core
         public string? MasterServerHost => _networkConfig.MasterServerEndPoint?.hostName;
         public bool UsingOfficialMaster => MasterServerHost == null || MasterServerHost.EndsWith(".beatsaber.com");
         public bool UsingBeatTogether => MasterServerHost?.EndsWith(".beattogether.systems") ?? false;
+
+        public string PreferredServerName => (!string.IsNullOrWhiteSpace(_config.ServerName)
+            ? _config.ServerName
+            : DefaultServerName)!;
+        public string DefaultServerName => PlatformUserInfo is not null
+            ? $"{PlatformUserInfo.userName}'s game"
+            : "Untitled Beat Game";
     }
 }

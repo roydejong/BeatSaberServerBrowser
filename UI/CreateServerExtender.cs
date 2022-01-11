@@ -18,18 +18,18 @@ namespace ServerBrowser.UI
 
         private Transform _wrapper = null!;
         private Transform _formView = null!;
-        
+
         private FormExtender? _formExtender;
         private ExtendedToggleField? _announcePartyField;
         private ExtendedStringField? _serverNameField;
         private ExtendedLabelField? _masterServerText;
-        
+
         public void Initialize()
         {
             _wrapper = _viewController.transform.Find("Wrapper");
             _formView = _wrapper.transform.Find("CreateServerFormView");
         }
-        
+
         [AffinityPostfix]
         [AffinityPatch(typeof(CreateServerViewController), "DidActivate")]
         private void HandleViewDidActivate(bool firstActivation)
@@ -57,10 +57,10 @@ namespace ServerBrowser.UI
         {
             if (!_config.AnnounceParty)
                 return;
-            
+
             // If we are announcing the game, change form data to make the game "Public" on the master server
             // BT may use this in the future to announce from the server side
-            
+
             __result.netDiscoverable = true;
             __result.allowInviteOthers = true;
             __result.usePassword = false;
@@ -69,18 +69,18 @@ namespace ServerBrowser.UI
         private void HandleAnnouncePartyChange(object sender, bool newValue)
         {
             _log.Info($"HandleAnnouncePartyChange: {newValue}");
-            
+
             _config.AnnounceParty = newValue;
-            
+
             UpdateForm();
         }
 
         private void HandleServerNameChange(object sender, string? newValue)
         {
             _log.Info($"HandleServerNameChange: {newValue}");
-            
+
             _config.ServerName = newValue;
-            
+
             UpdateForm();
         }
 
@@ -89,12 +89,13 @@ namespace ServerBrowser.UI
             if (_serverNameField is not null)
             {
                 _serverNameField.Visible = _config.AnnounceParty;
+                _serverNameField.Value = _bssbClient.PreferredServerName;
             }
 
             if (_masterServerText is not null)
             {
                 string text;
-                
+
                 if (_bssbClient.UsingOfficialMaster)
                     text = $"<color=#fbc531>Creating lobby on Official Servers (custom songs NOT supported)";
                 else if (_bssbClient.UsingBeatTogether)
@@ -105,7 +106,7 @@ namespace ServerBrowser.UI
                 _masterServerText.Label = text;
             }
 
-            _formExtender?.RefreshVerticalLayout(); 
+            _formExtender?.RefreshVerticalLayout();
         }
     }
 }
