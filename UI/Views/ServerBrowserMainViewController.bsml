@@ -1,9 +1,26 @@
-<bg>
+﻿<bg>
+
+    <text id="serverMessageText" text="" align="Center" font-size="3.5" anchor-min-y="2"></text>
+
     <vertical id="mainContentRoot">
-        
+
+        <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0" anchor-max-x="0.5">
+            <button id="refreshButton" pad="0" pref-height="8" pref-width="18" on-click="refreshButtonClick" text="Refresh"></button>
+            <button id="searchButton" pad="0" pref-height="8" pref-width="18" on-click="searchButtonClick" text="Search"></button>
+            <button id="createButton" pad="0" pref-height="8" pref-width="26" on-click="createButtonClick" text="Create server"></button>
+            <primary-button id="connectButton" pad="0" pref-height="8" pref-width="26" on-click="connectButtonClick" text="Connect"></primary-button>
+        </horizontal>
+
+        <page-button id="pageUpButton" on-click="pageUpButtonClick" direction="Up"></page-button>
+
+        <list id="lobbyList" expand-cell="true" select-cell="listSelect"></list>
+
+        <page-button id="pageDownButton" on-click="pageDownButtonClick" direction="Down"></page-button>
+
         <horizontal id="statusPanel" anchor-min-y="1" bg="panel-top" pad-left="5" pad-right="5" horizontal-fit="PreferredSize">
-            <text id="statusText" text="Hello world" align="Center" font-size="4"></text>
+            <text id="statusText" text="Loading..." align="Center" font-size="4"></text>
         </horizontal>
 
     </vertical>
+
 </bg>

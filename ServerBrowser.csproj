@@ -214,9 +214,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
+    <Compile Include="UI\CreateServerExtender.cs" />
+    <Compile Include="UI\Forms\ExtendedField.cs" />
+    <Compile Include="UI\Forms\ExtendedStringField.cs" />
+    <Compile Include="UI\Forms\FormExtender.cs" />
     <Compile Include="UI\ModeSelectionIntegrator.cs" />
     <Compile Include="UI\ServerBrowserFlowCoordinator.cs" />
     <Compile Include="UI\Utils\FlowCoordinatorExtensions.cs" />
@@ -246,6 +251,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core" />
+    <Folder Include="Model" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Sprites\Pencil.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

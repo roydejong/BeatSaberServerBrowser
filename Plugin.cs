@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using IPA;
 using IPA.Config.Stores;
+using ServerBrowser.Assets;
 using ServerBrowser.Installers;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;
@@ -52,6 +53,9 @@ namespace ServerBrowser
         public void OnEnable()
         {
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
+            
+            if (!Sprites.IsInitialized)
+                Sprites.Initialize();
         }
 
         [OnDisable]
