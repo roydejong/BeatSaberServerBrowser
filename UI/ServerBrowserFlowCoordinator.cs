@@ -10,19 +10,23 @@ namespace ServerBrowser.UI
     {
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly ServerBrowserMainViewController _mainViewController = null!;
+        [Inject] private readonly ServerBrowserDetailViewController _detailViewController = null!;
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _multiplayerModeSelectionFlowCoordinator = null!;
         [Inject] private readonly ModeSelectionIntegrator _modeSelectionIntegrator = null!;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
-            if (!firstActivation)
-                return;
-            
-            SetTitle("Server Browser");
-            showBackButton = true;
-            
-            ProvideInitialViewControllers(_mainViewController);
-            
+            if (firstActivation)
+            {
+                SetTitle("Server Browser");
+                showBackButton = true;
+
+                ProvideInitialViewControllers(
+                    mainViewController: _mainViewController,
+                    rightScreenViewController: _detailViewController
+                );
+            }
+
             _mainViewController.CreateServerClickedEvent += HandleCreateServerClicked;
         }
 

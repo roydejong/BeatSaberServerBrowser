@@ -14,6 +14,7 @@ namespace ServerBrowser.Installers
             Container.BindInterfacesAndSelfTo<CreateServerExtender>().AsSingle();
 
             Container.Bind<ServerBrowserMainViewController>().FromNewComponentAsViewController().AsSingle();
+            Container.Bind<ServerBrowserDetailViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ServerBrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
         }
     }
