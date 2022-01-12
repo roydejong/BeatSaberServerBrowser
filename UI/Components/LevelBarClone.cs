@@ -53,8 +53,6 @@ namespace ServerBrowser.UI.Components
             
             // Parts
             _bg = transform.Find("BG").GetComponent<ImageView>();
-            (_bg.transform as RectTransform)!.sizeDelta = Vector2.zero;
-            
             _image = transform.Find("SongArtwork").GetComponent<ImageView>();
             
             transform.Find("MultipleLineTextContainer").gameObject.SetActive(false);
@@ -103,6 +101,7 @@ namespace ServerBrowser.UI.Components
         {
             _image.gameObject.SetActive(visible);
             (_textContainer.transform as RectTransform)!.sizeDelta = new Vector2((visible ? -27f : 0), -2);
+            (_bg.transform as RectTransform)!.sizeDelta = (visible ? new Vector2(-4, 0) : Vector2.zero);
         }
         
         public void SetImageSprite(Sprite? sprite)

@@ -14,6 +14,10 @@ namespace ServerBrowser.Assets
         /// Copyright (c) 2020 GitHub Inc.
         public static Sprite? Pencil;
 
+        /// Octicons icon set by Github
+        /// Copyright (c) 2021 GitHub Inc.
+        public static Sprite? Person;
+
         public static bool IsInitialized { get; private set; }
 
         public static void Initialize()

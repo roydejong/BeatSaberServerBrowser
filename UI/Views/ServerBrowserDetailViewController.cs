@@ -15,8 +15,8 @@ namespace ServerBrowser.UI.Views
         private void PostParse()
         {
             var ldc = LevelBarClone.Create(_titleBarRoot.transform);
-            ldc.SetImageVisible(false);
-            ldc.SetBackgroundStyle(LevelBarClone.BackgroundStyle.GrayTitle);
+            ldc.SetImageVisible(true);
+            ldc.SetBackgroundStyle(LevelBarClone.BackgroundStyle.Test);
             ldc.SetText("!Server name!", "!Server type!");
         }
 

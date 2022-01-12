@@ -238,6 +238,7 @@
     <Compile Include="UI\Views\ServerBrowserMainViewController.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Sprites\BSSB.png" />
     <EmbeddedResource Include="manifest.json" />
     <EmbeddedResource Include="UI\Views\ServerBrowserDetailViewController.bsml" />
     <EmbeddedResource Include="UI\Views\ServerBrowserMainViewController.bsml" />
@@ -258,10 +259,10 @@
     <EmbeddedResource Include="description.md" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\icon.png" />
+    <EmbeddedResource Include="Assets\Sprites\Pencil.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\Pencil.png" />
+    <EmbeddedResource Include="Assets\Sprites\Person.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

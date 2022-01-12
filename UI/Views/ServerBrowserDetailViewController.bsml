@@ -10,9 +10,10 @@
         <horizontal preferred-height="2"></horizontal>
         
         <horizontal>
-            <vertical id="titleBarRoot" preferred-width="100" preferred-height="12" vertical-fit="PreferredSize"></vertical>
-            <horizontal preferred-width="20" preferred-height="12" pad="2" bg="panel-top">
-                <text text="5/5" font-size="6" font-align="Center"></text>
+            <vertical id="titleBarRoot" preferred-width="95" preferred-height="14" vertical-fit="PreferredSize"></vertical>
+            <horizontal preferred-width="25" preferred-height="14" pad="2" bg="panel-top">
+                <image src="ServerBrowser.Assets.Sprites.Person.png" preserve-aspect="true" preferred-width="6"></image>
+                <text text="99/99" font-size="6" font-align="Right"></text>
             </horizontal>
         </horizontal>
 
