@@ -1,28 +1,23 @@
-using HMUI;
-using ServerBrowser.Assets;
+using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.ViewControllers;
 using ServerBrowser.UI.Components;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Views
 {
-    public class ServerBrowserDetailViewController : ViewController
+    [HotReload]
+    public class ServerBrowserDetailViewController : BSMLAutomaticViewController
     {
-        public void Awake()
+        [UIComponent("mainContentRoot")] private VerticalLayoutGroup _mainContentRoot;
+        [UIComponent("titleBarRoot")] private VerticalLayoutGroup _titleBarRoot;
+
+        [UIAction("#post-parse")]
+        private void PostParse()
         {
-            var rootContainer = new GameObject("testRoot");
-            rootContainer.transform.SetParent(transform);
-            rootContainer.AddComponent<VerticalLayoutGroup>();
-            
-            var ldc = LevelBarClone.Create(rootContainer.transform);
-            ldc.SetBackgroundStyle(LevelBarClone.BackgroundStyle.Test);
-            ldc.SetImageSprite(Sprites.Pencil);
-            ldc.SetText("Primary", "Secondary");
-            
-            var ldc2 = LevelBarClone.Create(rootContainer.transform);
-            ldc2.SetBackgroundStyle(LevelBarClone.BackgroundStyle.GrayTitle);
-            ldc2.SetImageSprite(Sprites.Pencil);
-            ldc2.SetText("Primary2", "Secondary2");
+            var ldc = LevelBarClone.Create(_titleBarRoot.transform);
+            ldc.SetImageVisible(false);
+            ldc.SetBackgroundStyle(LevelBarClone.BackgroundStyle.GrayTitle);
+            ldc.SetText("!Server name!", "!Server type!");
         }
 
         public void SetData(object serverInfo)

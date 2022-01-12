@@ -1,0 +1,55 @@
+﻿<vertical preferred-width="120" child-align="UpperCenter">
+    <vertical id="mainContentRoot" preferred-width="120" vertical-fit="PreferredSize">
+
+        <horizontal pad-left="5">
+            <vertical bg="panel-top" preferred-width="120">
+                <text text="Server details" font-align="Center"></text>
+            </vertical>
+        </horizontal>
+        
+        <horizontal preferred-height="2"></horizontal>
+        
+        <horizontal>
+            <vertical id="titleBarRoot" preferred-width="100" preferred-height="12" vertical-fit="PreferredSize"></vertical>
+            <horizontal preferred-width="20" preferred-height="12" pad="2" bg="panel-top">
+                <text text="5/5" font-size="6" font-align="Center"></text>
+            </horizontal>
+        </horizontal>
+
+        <horizontal preferred-height="1"></horizontal>
+
+        <horizontal preferred-width="120" preferred-height="10" vertical-fit="PreferredSize" pad-top="1" pad-right="3">
+            <vertical preferred-width="88" preferred-height="8" pad-right="15" vertical-fit="PreferredSize">
+                <tab-selector tab-tag="DetailsTab"></tab-selector>
+            </vertical>
+            <primary-button text="Connect" preferred-width="32" preferred-height="10"></primary-button>
+        </horizontal>
+
+        <horizontal preferred-height="2"></horizontal>
+        
+        <vertical vertical-fit="PreferredSize" preferred-height="50">
+            <tab tags="DetailsTab" tab-name="Server Info">
+                <vertical>
+                    <text text="tab-a"></text>
+                    <text text="tab-a"></text>
+                    <text text="tab-a"></text>
+                </vertical>
+            </tab>
+            <tab tags='DetailsTab' tab-name="Player List" Align="Top">
+                <vertical>
+                    <text text="tab-b"></text>
+                    <text text="tab-b"></text>
+                    <text text="tab-b"></text>
+                </vertical>
+            </tab>
+            <tab tags='DetailsTab' tab-name="Level History" Align="Top">
+                <vertical>
+                    <text text="tab-c"></text>
+                    <text text="tab-c"></text>
+                    <text text="tab-c"></text>
+                </vertical>
+            </tab>
+        </vertical>
+        
+    </vertical>
+</vertical>

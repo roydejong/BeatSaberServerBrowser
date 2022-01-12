@@ -239,6 +239,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
+    <EmbeddedResource Include="UI\Views\ServerBrowserDetailViewController.bsml" />
     <EmbeddedResource Include="UI\Views\ServerBrowserMainViewController.bsml" />
   </ItemGroup>
   <ItemGroup>

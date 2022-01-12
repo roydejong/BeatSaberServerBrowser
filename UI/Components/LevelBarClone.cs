@@ -1,5 +1,6 @@
 using System.Linq;
 using HMUI;
+using IPA.Utilities;
 using UnityEngine;
 
 namespace ServerBrowser.UI.Components
@@ -40,6 +41,7 @@ namespace ServerBrowser.UI.Components
         #region UI Access
         private ImageView _bg = null!;
         private ImageView _image = null!;
+        private Transform _textContainer = null!;
         private CurvedTextMeshPro _titleText = null!;
         private CurvedTextMeshPro _secondaryText = null!;
         
@@ -50,14 +52,17 @@ namespace ServerBrowser.UI.Components
                 Destroy(hoverHint);
             
             // Parts
-            var singleLineTextContainer = transform.Find("SingleLineTextContainer");
-            singleLineTextContainer.gameObject.SetActive(true);
-            transform.Find("MultipleLineTextContainer").gameObject.SetActive(false);
-            
             _bg = transform.Find("BG").GetComponent<ImageView>();
+            (_bg.transform as RectTransform)!.sizeDelta = Vector2.zero;
+            
             _image = transform.Find("SongArtwork").GetComponent<ImageView>();
-            _titleText = singleLineTextContainer.Find("SongNameText").GetComponent<CurvedTextMeshPro>();
-            _secondaryText = singleLineTextContainer.Find("AuthorNameText").GetComponent<CurvedTextMeshPro>();
+            
+            transform.Find("MultipleLineTextContainer").gameObject.SetActive(false);
+            _textContainer = transform.Find("SingleLineTextContainer");
+            _textContainer.gameObject.SetActive(true);
+            
+            _titleText = _textContainer.Find("SongNameText").GetComponent<CurvedTextMeshPro>();
+            _secondaryText = _textContainer.Find("AuthorNameText").GetComponent<CurvedTextMeshPro>();
         }
 
         public enum BackgroundStyle : byte
@@ -67,7 +72,7 @@ namespace ServerBrowser.UI.Components
             GrayTitle
         }
         
-        public void SetBackgroundStyle(BackgroundStyle style = BackgroundStyle.GameDefault)
+        public void SetBackgroundStyle(BackgroundStyle style = BackgroundStyle.GameDefault, bool skew = true)
         {
             // Primary background color
             _bg.color = style switch
@@ -90,8 +95,16 @@ namespace ServerBrowser.UI.Components
                 BackgroundStyle.GrayTitle => new Color(1, 1, 1, 0),
                 _ => new Color(1, 1, 1, .3f)
             };
+            // Skew
+            _bg.SetField("_skew", (skew ? .18f : 0));
         }
 
+        public void SetImageVisible(bool visible)
+        {
+            _image.gameObject.SetActive(visible);
+            (_textContainer.transform as RectTransform)!.sizeDelta = new Vector2((visible ? -27f : 0), -2);
+        }
+        
         public void SetImageSprite(Sprite? sprite)
         {
             _image.sprite = sprite;
