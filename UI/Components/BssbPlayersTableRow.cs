@@ -1,6 +1,8 @@
 using BeatSaberMarkupLanguage.Components;
 using HMUI;
+using ServerBrowser.Assets;
 using ServerBrowser.Models;
+using ServerBrowser.UI.Utils;
 using UnityEngine;
 
 namespace ServerBrowser.UI.Components
@@ -24,13 +26,37 @@ namespace ServerBrowser.UI.Components
             _icon.raycastTarget = false;
         }
         
-        public void SetData(BssbPlayer player)
+        public void SetData(BssbServerPlayer player)
         {
-            // TODO Icon
-            // TODO Secondary text
+            // Icon and color
+            var spriteColor = Color.white;
+            var nameColor = Color.white;
             
+            if (player.IsHost)
+            {
+                _icon.sprite = Sprites.BSSB;
+                nameColor = BssbColorScheme.Pinkish;
+            }
+            else if (player.IsPartyLeader)
+            {
+                _icon.sprite = Sprites.Crown;
+                spriteColor = BssbColorScheme.Gold;
+                nameColor = BssbColorScheme.Gold;
+            }
+            else if (player.IsAnnouncing)
+            {
+                _icon.sprite = Sprites.Announce;
+                nameColor = BssbColorScheme.Blue;
+            }
+
+            _icon.color = spriteColor;
+            _icon.preserveAspect = true;
+
+            // Text
             _nameText.SetText(player.UserName);
-            _secondaryText.SetText("😀");
+            _nameText.color = nameColor;
+            
+            _secondaryText.SetText(player.ListText);
         }
     }
 }

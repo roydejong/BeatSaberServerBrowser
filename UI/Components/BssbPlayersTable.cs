@@ -28,7 +28,7 @@ namespace ServerBrowser.UI.Components
             _rowIterator = 0;
         }
 
-        public void SetData(IEnumerable<BssbPlayer> playerList)
+        public void SetData(IEnumerable<BssbServerPlayer> playerList)
         {
             Clear();
 

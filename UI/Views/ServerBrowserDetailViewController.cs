@@ -50,10 +50,14 @@ namespace ServerBrowser.UI.Views
 
         private void SetPlayerData()
         {
-            var testData = new List<BssbPlayer>();
+            var testData = new List<BssbServerPlayer>();
             
-            for (var i = 0; i < 32; i++)
-                testData.Add(new BssbPlayer() { UserId = $"dummy_user_{i}", UserName = $"User {i}" });
+            testData.Add(new BssbServerPlayer() { UserId = $"dummy_user_host", UserName = $"The Server", IsHost = true });
+            testData.Add(new BssbServerPlayer() { UserId = $"dummy_user_leader", UserName = $"The Leader", IsPartyLeader = true });
+            testData.Add(new BssbServerPlayer() { UserId = $"dummy_user_announcer", UserName = $"The Announcer", IsAnnouncing = true });
+            
+            for (var i = 0; i < 5; i++)
+                testData.Add(new BssbServerPlayer() { UserId = $"dummy_user_{i}", UserName = $"User {i}" });
             
             _playersTable.SetData(testData);
             

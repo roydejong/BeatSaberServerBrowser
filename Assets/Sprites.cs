@@ -10,9 +10,28 @@ namespace ServerBrowser.Assets
     /// </summary>
     internal static class Sprites
     {
-        /// Octicons icon set by Github
-        /// Copyright (c) 2020 GitHub Inc.
+        /// Announce icon
+        /// Icon by RemixIcon (https://www.iconfinder.com/iconsets/remixicon-media)
+        /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+        public static Sprite? Announce;
+        
+        /// BSSB logo
+        public static Sprite? BSSB;
+        
+        /// Crown icon
+        /// Icon by Ivan Boyko (https://www.iconfinder.com/visualpharm)
+        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+        public static Sprite? Crown;
+        
+        /// Pencil icon
+        /// Icon by Github, MIT Licensed
+        /// Copyright (c) 2020 GitHub Inc
         public static Sprite? Pencil;
+        
+        /// Person icon
+        /// Icon by Ivan Boyko (https://www.iconfinder.com/visualpharm)
+        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+        public static Sprite? Person;
 
         public static bool IsInitialized { get; private set; }
 
@@ -20,7 +39,11 @@ namespace ServerBrowser.Assets
         {
             IsInitialized = true;
 
+            Announce = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Announce.png");
+            BSSB = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BSSB.png");
+            Crown = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Crown.png");
             Pencil = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Pencil.png");
+            Person = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Person.png");
         }
 
         private static Sprite? LoadSpriteFromResources(string resourcePath, float pixelsPerUnit = 100.0f)

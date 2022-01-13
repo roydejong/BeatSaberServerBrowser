@@ -38,14 +38,14 @@
                             <horizontal id="playerListRowPrefab" preferred-height="7" pad-top="1"
                                         pad-left="2" pad-right="2" bg="panel-top" child-expand-width="true"
                                         child-align="MiddleLeft">
-                                <vertical preferred-width="6" preferred-height="7" pad-top="1" pad-bottom="2">
-                                    <image src="ServerBrowser.Assets.Sprites.Pencil.png" preserve-aspect="true"></image>
+                                <vertical preferred-width="10" preferred-height="10" pad-top="1" pad-bottom="2">
+                                    <image></image>
                                 </vertical>
-                                <vertical preferred-width="50" preferred-height="7">
+                                <vertical preferred-width="60" preferred-height="7">
                                     <text italics="true" text="!Player name!pf!" preferred-width="100"
                                           overflow-mode="Ellipsis"></text>
                                 </vertical>
-                                <vertical preferred-width="54" preferred-height="7" pad-right="1">
+                                <vertical preferred-width="40" preferred-height="7" pad-right="1">
                                     <text italics="true" text="!Secondary text!" font-align="TopRight"
                                           overflow-mode="Ellipsis" color="#BCBDC2"></text>
                                 </vertical>
@@ -73,6 +73,8 @@
                 </vertical>
             </tab>
         </vertical>
+
+        <horizontal preferred-height="15"></horizontal>
 
     </vertical>
 </vertical>
