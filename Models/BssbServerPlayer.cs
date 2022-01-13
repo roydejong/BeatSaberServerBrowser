@@ -27,5 +27,17 @@ namespace ServerBrowser.Models
                 return $"Player {SortIndex + 1}";
             }
         }
+
+        public static BssbServerPlayer FromConnectedPlayer(IConnectedPlayer player, bool isPartyLeader = false)
+        {
+            return new BssbServerPlayer()
+            {
+                SortIndex = player.sortIndex,
+                IsHost = player.isConnectionOwner,
+                IsPartyLeader = isPartyLeader,
+                IsAnnouncing = false,
+                CurrentLatency = player.currentLatency
+            };
+        }
     }
 }

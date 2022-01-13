@@ -9,7 +9,8 @@ namespace ServerBrowser.Core
     {
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
-        [Inject] private readonly NetworkConfigPatcher _networkConfig = null!;
+        [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
+        [Inject] private readonly BssbDataCollector _dataCollector = null!;
 
         public UserInfo? PlatformUserInfo;
 
@@ -23,7 +24,7 @@ namespace ServerBrowser.Core
             
         }
 
-        public string? MasterServerHost => _networkConfig.MasterServerEndPoint?.hostName;
+        public string? MasterServerHost => _mpCoreNetConfig.MasterServerEndPoint?.hostName;
         public bool UsingOfficialMaster => MasterServerHost == null || MasterServerHost.EndsWith(".beatsaber.com");
         public bool UsingBeatTogether => MasterServerHost?.EndsWith(".beattogether.systems") ?? false;
 

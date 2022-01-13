@@ -10,6 +10,7 @@ namespace ServerBrowser.Installers
         {
             Container.BindInterfacesAndSelfTo<PluginConfig>().FromInstance(Plugin.Config).AsSingle();
             
+            Container.BindInterfacesAndSelfTo<BssbDataCollector>().AsSingle();
             Container.BindInterfacesAndSelfTo<ServerBrowserClient>().AsSingle();
         }
     }

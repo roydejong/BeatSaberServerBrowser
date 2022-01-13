@@ -66,8 +66,6 @@ namespace ServerBrowser.UI
             // ProcessDeeplinkingToLobby is triggered once the flow coordinator has fully set up, and transitions
             //  are completed. This means status checks are done and we can trigger a submenu if needed.
             
-            Plugin.Log.Error("ProcessDeeplinkingToLobby");
-            
             _statusCheckComplete = true;
 
             if (_pendingMenuButtonTrigger is not null)

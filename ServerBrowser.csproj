@@ -218,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
+    <Compile Include="Core\BssbDataCollector.cs" />
     <Compile Include="Core\ServerBrowserClient.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />

@@ -10,5 +10,6 @@ namespace ServerBrowser.Models
         public string OwnerId;
         public string ServerCode;
         public string HostSecret;
+        public int PlayerLimit;
     }
 }
