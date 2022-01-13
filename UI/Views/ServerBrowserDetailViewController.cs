@@ -57,7 +57,6 @@ namespace ServerBrowser.UI.Views
             
             _playersTable.SetData(testData);
             
-            Plugin.Log.Warn("ContentSizeUpdated");
             _playerListScrollable.ContentSizeUpdated();
             _playerListScrollable.ScrollTo(0, false);
         }
