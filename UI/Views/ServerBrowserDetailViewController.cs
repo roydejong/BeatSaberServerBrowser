@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
@@ -16,6 +17,7 @@ namespace ServerBrowser.UI.Views
         // ReSharper disable FieldCanBeMadeReadOnly.Local
         [UIComponent("mainContentRoot")] private VerticalLayoutGroup _mainContentRoot = null!;
         [UIComponent("titleBarRoot")] private VerticalLayoutGroup _titleBarRoot = null!;
+        [UIComponent("playerList-scroll")] private BSMLScrollableContainer _playerListScrollable = null!;
         [UIComponent("playerListRoot")] private VerticalLayoutGroup _playerListRoot = null!;
         [UIComponent("playerListRowPrefab")] private HorizontalLayoutGroup _playerListRowPrefab = null!;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
@@ -35,15 +37,29 @@ namespace ServerBrowser.UI.Views
             // Create players table with prefab
             _playerListRowPrefab.gameObject.SetActive(false);
             _playersTable = new BssbPlayersTable(_playerListRoot.gameObject, _playerListRowPrefab.gameObject);
-            var testData = new List<BssbPlayer>();
-            for (var i = 0; i < 10; i++)
-                testData.Add(new BssbPlayer() { UserId = $"dummy_user_{i}", UserName = $"User {i}" });
-            _playersTable.SetData(testData);
+            
+            SetPlayerData();
         }
 
         public void SetData(object serverInfo)
         {
+            // TODO
             
+            SetPlayerData();
+        }
+
+        private void SetPlayerData()
+        {
+            var testData = new List<BssbPlayer>();
+            
+            for (var i = 0; i < 32; i++)
+                testData.Add(new BssbPlayer() { UserId = $"dummy_user_{i}", UserName = $"User {i}" });
+            
+            _playersTable.SetData(testData);
+            
+            Plugin.Log.Warn("ContentSizeUpdated");
+            _playerListScrollable.ContentSizeUpdated();
+            _playerListScrollable.ScrollTo(0, false);
         }
     }
 }
