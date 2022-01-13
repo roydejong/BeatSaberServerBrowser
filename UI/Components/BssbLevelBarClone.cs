@@ -2,10 +2,11 @@ using System.Linq;
 using HMUI;
 using IPA.Utilities;
 using UnityEngine;
+using Zenject;
 
 namespace ServerBrowser.UI.Components
 {
-    public class LevelBarClone : MonoBehaviour
+    public class BssbLevelBarClone : MonoBehaviour
     {
         #region Template/init
         private static GameObject? _templateCached;
@@ -14,7 +15,7 @@ namespace ServerBrowser.UI.Components
         {
             get
             {
-                if (_templateCached is null)
+                if (_templateCached == null)
                 {
                     _templateCached = Resources.FindObjectsOfTypeAll<StandardLevelDetailView>()
                         .First(x => x.gameObject.name == "LevelDetail")
@@ -26,15 +27,15 @@ namespace ServerBrowser.UI.Components
             }
         }
 
-        public static LevelBarClone Create(Transform parent)
+        public static BssbLevelBarClone Create(DiContainer container, Transform parent)
         {
-            var levelDetailView = Instantiate(Template, parent);
-            levelDetailView.gameObject.name = "BSSBLevelBarClone";
-            levelDetailView.gameObject.SetActive(true);
-            
-            var clone = levelDetailView.gameObject.AddComponent<LevelBarClone>();
-            clone.InitUI();
-            return clone;
+            var clone = Instantiate(Template, parent);
+            clone.gameObject.name = "BssbLevelBarClone";
+            clone.gameObject.SetActive(true);
+
+            var script = clone.gameObject.AddComponent<BssbLevelBarClone>();
+            script.InitUI();
+            return script;
         }
         #endregion
 

@@ -1,9 +1,8 @@
-using ServerBrowser.Core;
 using Zenject;
 
 namespace ServerBrowser.Installers
 {
-    public class MultiplayerCoreInstaller : Installer
+    public class BssbMultiplayerCoreInstaller : Installer
     {
         public override void InstallBindings()
         {

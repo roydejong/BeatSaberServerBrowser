@@ -4,7 +4,7 @@ using Zenject;
 namespace ServerBrowser.Installers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class AppInstaller : Installer
+    public class BssbAppInstaller : Installer
     {
         public override void InstallBindings()
         {

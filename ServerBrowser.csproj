@@ -219,12 +219,15 @@
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\ServerBrowserClient.cs" />
-    <Compile Include="Installers\AppInstaller.cs" />
-    <Compile Include="Installers\MenuInstaller.cs" />
-    <Compile Include="Installers\MultiplayerCoreInstaller.cs" />
+    <Compile Include="Installers\BssbAppInstaller.cs" />
+    <Compile Include="Installers\BssbMenuInstaller.cs" />
+    <Compile Include="Installers\BssbMultiplayerCoreInstaller.cs" />
+    <Compile Include="Models\BssbPlayer.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
-    <Compile Include="UI\Components\LevelBarClone.cs" />
+    <Compile Include="UI\Components\BssbLevelBarClone.cs" />
+    <Compile Include="UI\Components\BssbPlayersTable.cs" />
+    <Compile Include="UI\Components\BssbPlayersTableRow.cs" />
     <Compile Include="UI\CreateServerExtender.cs" />
     <Compile Include="UI\Forms\ExtendedField.cs" />
     <Compile Include="UI\Forms\ExtendedLabelField.cs" />

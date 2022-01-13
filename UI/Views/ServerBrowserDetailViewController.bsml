@@ -3,14 +3,15 @@
 
         <horizontal pad-left="5">
             <vertical bg="panel-top" preferred-width="120">
-                <text text="Server details" font-align="Center"></text>
+                <text text="Server details" font-align="Center" italics="true"></text>
             </vertical>
         </horizontal>
-        
+
         <horizontal preferred-height="2"></horizontal>
-        
+
         <horizontal>
-            <vertical id="titleBarRoot" preferred-width="95" preferred-height="14" vertical-fit="PreferredSize"></vertical>
+            <vertical id="titleBarRoot" preferred-width="95" preferred-height="14"
+                      vertical-fit="PreferredSize"></vertical>
             <horizontal preferred-width="25" preferred-height="14" pad="2" bg="panel-top">
                 <image src="ServerBrowser.Assets.Sprites.Person.png" preserve-aspect="true" preferred-width="6"></image>
                 <text text="99/99" font-size="6" font-align="Right"></text>
@@ -21,36 +22,57 @@
 
         <horizontal preferred-width="120" preferred-height="10" vertical-fit="PreferredSize" pad-top="1" pad-right="3">
             <vertical preferred-width="88" preferred-height="8" pad-right="15" vertical-fit="PreferredSize">
-                <tab-selector tab-tag="DetailsTab"></tab-selector>
+                <tab-selector tab-tag="ServerDetailTabs"></tab-selector>
             </vertical>
             <primary-button text="Connect" preferred-width="32" preferred-height="10"></primary-button>
         </horizontal>
 
         <horizontal preferred-height="2"></horizontal>
-        
+
         <vertical vertical-fit="PreferredSize" preferred-height="50">
-            <tab tags="DetailsTab" tab-name="Server Info">
-                <vertical>
-                    <text text="tab-a"></text>
-                    <text text="tab-a"></text>
-                    <text text="tab-a"></text>
+            <tab tags="ServerDetailTabs" tab-name="Player List">
+                <horizontal spacing="0" horizontal-fit="PreferredSize" vertical-fit="Unconstrained"
+                            child-align="MiddleCenter" preferred-width="120">
+                    <scrollable-container id="playerList-scroll" preferred-width="110">
+                        <vertical id="playerListRoot" spacing="4" pad-top="2" pad-right="10">
+                            <horizontal id="playerListRowPrefab" preferred-height="7" pad-top="1"
+                                        pad-left="2" pad-right="2" bg="panel-top" child-expand-width="true"
+                                        child-align="MiddleLeft">
+                                <vertical preferred-width="6" preferred-height="7" pad-top="1" pad-bottom="2">
+                                    <image src="ServerBrowser.Assets.Sprites.Pencil.png" preserve-aspect="true"></image>
+                                </vertical>
+                                <vertical preferred-width="50" preferred-height="7">
+                                    <text italics="true" text="!Player name!pf!" preferred-width="100"
+                                          overflow-mode="Ellipsis"></text>
+                                </vertical>
+                                <vertical preferred-width="49" preferred-height="7" pad-right="1">
+                                    <text italics="true" text="!Secondary text!" font-align="TopRight"
+                                          overflow-mode="Ellipsis" color="#BCBDC2"></text>
+                                </vertical>
+                            </horizontal>
+                        </vertical>
+                    </scrollable-container>
+                    <vertical preferred-width="1" child-align="MiddleRight" anchor-min-x="0.95" anchor-max-x="1"
+                              ignore-layout="true" spacing="0">
+                        <page-button click-event='playerList-scroll#PageUp' direction='Up' pref-width='5'
+                                     pref-height='2'/>
+                        <vertical-scroll-indicator tags='IndicatorFor:playerList-scroll'/>
+                        <page-button click-event='playerList-scroll#PageDown' direction='Down' pref-width='5'
+                                     pref-height='2'/>
+                    </vertical>
+                </horizontal>
+            </tab>
+            <tab tags="ServerDetailTabs" tab-name="Server Info">
+                <vertical pad="3">
+                    <text text="Coming soon to a tab near you" italics="true" color="#bcbdc2"></text>
                 </vertical>
             </tab>
-            <tab tags='DetailsTab' tab-name="Player List" Align="Top">
-                <vertical>
-                    <text text="tab-b"></text>
-                    <text text="tab-b"></text>
-                    <text text="tab-b"></text>
-                </vertical>
-            </tab>
-            <tab tags='DetailsTab' tab-name="Level History" Align="Top">
-                <vertical>
-                    <text text="tab-c"></text>
-                    <text text="tab-c"></text>
-                    <text text="tab-c"></text>
+            <tab tags="ServerDetailTabs" tab-name="Level History">
+                <vertical pad="3">
+                    <text text="Coming soon to a tab near you" italics="true" color="#bcbdc2"></text>
                 </vertical>
             </tab>
         </vertical>
-        
+
     </vertical>
 </vertical>
