@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net;
+using MultiplayerCore.Patchers;
 using ServerBrowser.Models;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
@@ -11,10 +13,12 @@ namespace ServerBrowser.Core
     {
         [Inject] private SiraLog _log = null!;
         [Inject] private IMultiplayerSessionManager _multiplayerSession = null!;
+        [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
 
         public bool SessionActive { get; private set; }
         public BssbServerDetail Current { get; private set; } = null!;
-
+        public PreConnectInfo? PreConnectInfo { get; private set; } = null;
+        
         public void Initialize()
         {
             _multiplayerSession.connectedEvent += HandleSessionConnected;
@@ -41,14 +45,15 @@ namespace ServerBrowser.Core
 
         private void HandleSessionConnected()
         {
-            _log.Info($"Multiplayer session connected (syncTime={_multiplayerSession.syncTime}, "
-                      + $"maxPlayerCount={_multiplayerSession.maxPlayerCount})");
+            _log.Info($"Multiplayer session connected (syncTime={_multiplayerSession.syncTime})");
 
             SessionActive = true;
 
+            HandlePlayerConnected(_multiplayerSession.connectionOwner);
             HandlePlayerConnected(_multiplayerSession.localPlayer);
 
-            Current.PlayerLimit = _multiplayerSession.maxPlayerCount;
+            if (_multiplayerSession.localPlayer.userId == PreConnectInfo?.ManagerId)
+                Current.PlayerLimit = _multiplayerSession.maxPlayerCount; // Only updated if we are instance creator
         }
 
         private void HandleSessionDisconnected(DisconnectedReason reason)
@@ -81,5 +86,36 @@ namespace ServerBrowser.Core
         }
 
         public bool ContainsPlayer(string userId) => Current.Players.Any(p => p.UserId == userId);
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
+        public void HandlePreConnect(string userId, string userName, IPEndPoint remoteEndPoint, string secret,
+            string code, BeatmapLevelSelectionMask selectionMask, GameplayServerConfiguration configuration,
+            byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom, bool isConnectionOwner,
+            bool isDedicatedServer, string managerId)
+        {
+            // nb: HandleConnectToServerSuccess just means "the master server gave us the info to connect"
+            _log.Info($"Game will connect to server (userId={userId}, userName={userName}, " 
+                + $"remoteEndPoint={remoteEndPoint}, secret={secret}, code={code}, "
+                + $"isDedicatedServer={isDedicatedServer}, managerId={managerId}, "
+                + $"maxPlayerCount={configuration.maxPlayerCount}, "
+                + $"gameplayServerMode={configuration.gameplayServerMode}, "
+                + $"songSelectionMode={configuration.songSelectionMode})");
+            
+            PreConnectInfo = new PreConnectInfo(userId, userName, remoteEndPoint, secret, code, selectionMask,
+                configuration, preMasterSecret, myRandom, remoteRandom, isConnectionOwner, isDedicatedServer,
+                managerId);
+
+            Current.Key = null;
+            Current.OwnerId = userId;
+            Current.ServerCode = code;
+            Current.HostSecret = secret;
+            Current.PlayerLimit = configuration.maxPlayerCount; // Official servers always seem to report 5
+            Current.ManagerId = managerId;
+            Current.EndPoint = remoteEndPoint;
+            
+            if (_mpCoreNetConfig.MasterServerEndPoint is not null)
+                Current.MasterServerEndPoint = _mpCoreNetConfig.MasterServerEndPoint;
+        }
     }
 }

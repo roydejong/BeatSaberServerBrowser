@@ -227,6 +227,7 @@
     <Compile Include="Models\BssbServer.cs" />
     <Compile Include="Models\BssbServerDetail.cs" />
     <Compile Include="Models\BssbServerPlayer.cs" />
+    <Compile Include="Models\PreConnectInfo.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="UI\Components\BssbLevelBarClone.cs" />
