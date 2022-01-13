@@ -6,7 +6,7 @@ namespace ServerBrowser.Models
     /// <see cref="BssbServerPlayer">Extended model</see>
     public class BssbPlayer
     {
-        public string UserId;
-        public string UserName;
+        public string? UserId;
+        public string? UserName;
     }
 }

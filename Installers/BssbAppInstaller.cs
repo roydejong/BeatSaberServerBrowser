@@ -8,9 +8,10 @@ namespace ServerBrowser.Installers
     {
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<PluginConfig>().FromInstance(Plugin.Config).AsSingle();
+            Container.Bind<PluginConfig>().FromInstance(Plugin.Config).AsSingle();
             
             Container.BindInterfacesAndSelfTo<BssbDataCollector>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BssbServerAnnouncer>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<ServerBrowserClient>().AsSingle();
         }
     }

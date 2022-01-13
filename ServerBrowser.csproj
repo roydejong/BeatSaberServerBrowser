@@ -219,13 +219,16 @@
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\BssbDataCollector.cs" />
+    <Compile Include="Core\BssbServerAnnouncer.cs" />
     <Compile Include="Core\ServerBrowserClient.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />
     <Compile Include="Installers\BssbMultiplayerCoreInstaller.cs" />
+    <Compile Include="Models\BssbLevel.cs" />
     <Compile Include="Models\BssbPlayer.cs" />
     <Compile Include="Models\BssbServer.cs" />
     <Compile Include="Models\BssbServerDetail.cs" />
+    <Compile Include="Models\BssbServerLevel.cs" />
     <Compile Include="Models\BssbServerPlayer.cs" />
     <Compile Include="Models\PreConnectInfo.cs" />
     <Compile Include="Plugin.cs" />

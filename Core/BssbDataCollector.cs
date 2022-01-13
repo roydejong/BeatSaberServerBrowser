@@ -18,6 +18,10 @@ namespace ServerBrowser.Core
         public bool SessionActive { get; private set; }
         public BssbServerDetail Current { get; private set; } = null!;
         public PreConnectInfo? PreConnectInfo { get; private set; } = null;
+
+        public event EventHandler? DataChanged; 
+        public event EventHandler<BssbServerDetail>? SessionEstablished; 
+        public event EventHandler? SessionEnded; 
         
         public void Initialize()
         {
@@ -41,6 +45,8 @@ namespace ServerBrowser.Core
         {
             SessionActive = false;
             Current = new BssbServerDetail();
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void HandleSessionConnected()
@@ -49,11 +55,17 @@ namespace ServerBrowser.Core
 
             SessionActive = true;
 
+            if (IsPartyLeader)
+            {
+                Current.PlayerLimit = _multiplayerSession.maxPlayerCount; // Only updated if we are instance creator
+                _log.Info($"MaxPlayerCount updated to {Current.PlayerLimit}");
+            }
+
             HandlePlayerConnected(_multiplayerSession.connectionOwner);
             HandlePlayerConnected(_multiplayerSession.localPlayer);
-
-            if (_multiplayerSession.localPlayer.userId == PreConnectInfo?.ManagerId)
-                Current.PlayerLimit = _multiplayerSession.maxPlayerCount; // Only updated if we are instance creator
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
+            SessionEstablished?.Invoke(this, Current);
         }
 
         private void HandleSessionDisconnected(DisconnectedReason reason)
@@ -61,6 +73,8 @@ namespace ServerBrowser.Core
             _log.Info($"Multiplayer session disconnected (reason={reason})");
 
             Reset();
+            
+            SessionEnded?.Invoke(this, EventArgs.Empty);
         }
 
         private void HandlePlayerConnected(IConnectedPlayer player)
@@ -73,6 +87,8 @@ namespace ServerBrowser.Core
                       + $"currentLatency={player.currentLatency})");
 
             Current.Players.Add(BssbServerPlayer.FromConnectedPlayer(player));
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void HandlePlayerDisconnected(IConnectedPlayer player)
@@ -83,9 +99,13 @@ namespace ServerBrowser.Core
 
             if (playerToRemove != null)
                 Current.Players.Remove(playerToRemove);
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public bool ContainsPlayer(string userId) => Current.Players.Any(p => p.UserId == userId);
+
+        public bool IsPartyLeader => _multiplayerSession.localPlayer.userId == PreConnectInfo?.ManagerId; // TODO Host migrations
 
         [AffinityPostfix]
         [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
@@ -116,6 +136,29 @@ namespace ServerBrowser.Core
             
             if (_mpCoreNetConfig.MasterServerEndPoint is not null)
                 Current.MasterServerEndPoint = _mpCoreNetConfig.MasterServerEndPoint;
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel")]
+        public void HandleStartLevel(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
+            BeatmapCharacteristicSO beatmapCharacteristic, IDifficultyBeatmap difficultyBeatmap,
+            GameplayModifiers gameplayModifiers)
+        {
+            _log.Info($"Starting multiplayer level (levelID={previewBeatmapLevel.levelID}, " +
+                      $"songName={previewBeatmapLevel.songName}, songSubName={previewBeatmapLevel.songSubName}, " +
+                      $"songAuthorName={previewBeatmapLevel.songAuthorName}, " +
+                      $"levelAuthorName={previewBeatmapLevel.levelAuthorName}, " +
+                      $"difficulty={beatmapDifficulty}, characteristic={beatmapCharacteristic}, " +
+                      $"modifiers={gameplayModifiers})");
+
+            Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap);
+            Current.Level.Characteristic = beatmapCharacteristic.serializedName;
+            
+            // TODO Capture modifiers? Maybe? Who cares?
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

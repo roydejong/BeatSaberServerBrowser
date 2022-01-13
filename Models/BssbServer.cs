@@ -16,5 +16,8 @@ namespace ServerBrowser.Models
         public string? ManagerId;
         public IPEndPoint? EndPoint;
         public MasterServerEndPoint? MasterServerEndPoint;
+        public GameplayServerMode? GameplayMode;
+
+        public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
     }
 }

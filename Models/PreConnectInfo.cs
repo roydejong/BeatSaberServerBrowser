@@ -4,19 +4,19 @@ namespace ServerBrowser.Models
 {
     public class PreConnectInfo
     {
-        public string UserId;
-        public string UserName;
-        public IPEndPoint RemoteEndPoint;
-        public string Secret;
-        public string Code;
-        public BeatmapLevelSelectionMask SelectionMask;
-        public GameplayServerConfiguration Configuration;
-        public byte[] PreMasterSecret;
-        public byte[] MyRandom;
-        public byte[] RemoteRandom;
-        public bool IsConnectionOwner;
-        public bool IsDedicatedServer;
-        public string ManagerId;
+        public readonly string UserId;
+        public readonly string UserName;
+        public readonly IPEndPoint RemoteEndPoint;
+        public readonly string Secret;
+        public readonly string Code;
+        public readonly BeatmapLevelSelectionMask SelectionMask;
+        public readonly GameplayServerConfiguration Configuration;
+        public readonly byte[] PreMasterSecret;
+        public readonly byte[] MyRandom;
+        public readonly byte[] RemoteRandom;
+        public readonly bool IsConnectionOwner;
+        public readonly bool IsDedicatedServer;
+        public readonly string ManagerId;
 
         public PreConnectInfo(string userId, string userName, IPEndPoint remoteEndPoint, string secret, string code,
             BeatmapLevelSelectionMask selectionMask, GameplayServerConfiguration configuration, byte[] preMasterSecret,
