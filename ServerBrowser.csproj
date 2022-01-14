@@ -223,7 +223,6 @@
     <Compile Include="Core\ServerBrowserClient.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />
-    <Compile Include="Installers\BssbMultiplayerCoreInstaller.cs" />
     <Compile Include="Models\BssbLevel.cs" />
     <Compile Include="Models\BssbPlayer.cs" />
     <Compile Include="Models\BssbServer.cs" />

@@ -49,7 +49,6 @@ namespace ServerBrowser
             
             zenjector.Install<BssbAppInstaller>(Location.App);
             zenjector.Install<BssbMenuInstaller>(Location.Menu);
-            zenjector.Install<MultiplayerCoreInstaller>(Location.MultiplayerCore);
         }
 
         [OnEnable]
