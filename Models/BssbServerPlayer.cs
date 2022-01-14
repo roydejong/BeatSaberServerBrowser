@@ -6,6 +6,7 @@ namespace ServerBrowser.Models
     public class BssbServerPlayer : BssbPlayer
     {
         public int SortIndex;
+        public bool IsMe;
         public bool IsHost;
         public bool IsPartyLeader;
         public bool IsAnnouncing;
@@ -32,9 +33,12 @@ namespace ServerBrowser.Models
         {
             return new BssbServerPlayer()
             {
+                UserId = player.userId,
+                UserName = player.userName,
                 SortIndex = player.sortIndex,
+                IsMe = player.isMe,
                 IsHost = player.isConnectionOwner,
-                IsPartyLeader = isPartyLeader,
+                IsPartyLeader = false,
                 IsAnnouncing = false,
                 CurrentLatency = player.currentLatency
             };

@@ -16,9 +16,9 @@ namespace ServerBrowser
         // ReSharper disable once MemberCanBePrivate.Global
         public const string HarmonyId = "com.hippomade.serverbrowser";
 
-        internal static IPALogger Log { get; private set; } = null!;
         internal static PluginConfig Config { get; private set; } = null!;
-
+        
+        private IPALogger _log = null!;
         private HarmonyLib.Harmony _harmony = null!;
         
         public static string UserAgent
@@ -35,12 +35,12 @@ namespace ServerBrowser
         }
 
         [Init]
-        public void Init(IPALogger logger, IPA.Config.Config config, Zenjector zenjector)
+        public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config config)
         {
-            Log = logger;
-            Config = config.Generated<PluginConfig>();
-
+            _log = logger;
             _harmony = new HarmonyLib.Harmony(HarmonyId);
+            
+            Config = config.Generated<PluginConfig>();
 
             zenjector.UseMetadataBinder<Plugin>();
             zenjector.UseLogger(logger);

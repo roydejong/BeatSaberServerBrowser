@@ -10,7 +10,6 @@ namespace ServerBrowser.Core
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
         [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
-        [Inject] private readonly BssbDataCollector _dataCollector = null!;
 
         public UserInfo? PlatformUserInfo;
 

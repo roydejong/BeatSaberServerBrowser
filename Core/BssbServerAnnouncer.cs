@@ -9,9 +9,9 @@ namespace ServerBrowser.Core
 {
     public class BssbServerAnnouncer : MonoBehaviour, IInitializable, IDisposable
     {
-        [Inject] private SiraLog _log = null!;
-        [Inject] private PluginConfig _config = null!;
-        [Inject] private BssbDataCollector _dataCollector = null!;
+        [Inject] private readonly SiraLog _log = null!;
+        [Inject] private readonly PluginConfig _config = null!;
+        [Inject] private readonly BssbDataCollector _dataCollector = null!;
 
         private bool _sessionEstablished;
         private Stopwatch _announceStopwatch = null!;
@@ -97,6 +97,9 @@ namespace ServerBrowser.Core
             _log.Info("Starting announcing (session established)");
             
             State = AnnouncerState.AnnouncePending;
+            
+            if (_dataCollector.Current.LocalPlayer is not null)
+                _dataCollector.Current.LocalPlayer.IsAnnouncing = true;
 
             SendAnnounceNow();
         }
@@ -116,6 +119,9 @@ namespace ServerBrowser.Core
             
             State = AnnouncerState.AnnouncePending;
             
+            if (_dataCollector.Current.LocalPlayer is not null)
+                _dataCollector.Current.LocalPlayer.IsAnnouncing = true;
+            
             // TODO Timed/merged updates
         }
 
@@ -126,6 +132,9 @@ namespace ServerBrowser.Core
             _log.Info("Enqueued unannounce (session ended)");
             
             // TODO Unannounce states
+            
+            if (_dataCollector.Current.LocalPlayer is not null)
+                _dataCollector.Current.LocalPlayer.IsAnnouncing = false;
             
             SendUnannounceNow();
         }
