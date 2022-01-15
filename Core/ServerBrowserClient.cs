@@ -33,5 +33,8 @@ namespace ServerBrowser.Core
         public string DefaultServerName => PlatformUserInfo is not null
             ? $"{PlatformUserInfo.userName}'s game"
             : "Untitled Beat Game";
+
+        public bool IsSteam => PlatformUserInfo?.platform == UserInfo.Platform.Steam;
+        public bool IsOculus => PlatformUserInfo?.platform == UserInfo.Platform.Oculus;
     }
 }

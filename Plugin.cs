@@ -20,19 +20,6 @@ namespace ServerBrowser
         
         private IPALogger _log = null!;
         private HarmonyLib.Harmony _harmony = null!;
-        
-        public static string UserAgent
-        {
-            get
-            {
-                var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                var assemblyVersionStr = $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
-
-                var bsVersion = IPA.Utilities.UnityGame.GameVersion.ToString();
-
-                return $"ServerBrowser/{assemblyVersionStr} (BeatSaber/{bsVersion})";
-            }
-        }
 
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config config)

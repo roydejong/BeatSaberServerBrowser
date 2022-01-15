@@ -134,6 +134,7 @@ namespace ServerBrowser.Core
                       + $"remoteEndPoint={remoteEndPoint}, secret={secret}, code={code}, "
                       + $"isDedicatedServer={isDedicatedServer}, managerId={managerId}, "
                       + $"maxPlayerCount={configuration.maxPlayerCount}, "
+                      + $"discoveryPolicy={configuration.discoveryPolicy}, "
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "
                       + $"songSelectionMode={configuration.songSelectionMode})");
 
@@ -146,8 +147,9 @@ namespace ServerBrowser.Core
             Current.ServerCode = code;
             Current.HostSecret = secret;
             Current.PlayerLimit = configuration.maxPlayerCount; // Official servers always seem to report 5
-            Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded User ID
+            Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded Platform User ID
             Current.EndPoint = remoteEndPoint;
+            Current.GameplayMode = configuration.gameplayServerMode;
 
             if (_mpCoreNetConfig.MasterServerEndPoint is not null)
                 Current.MasterServerEndPoint = _mpCoreNetConfig.MasterServerEndPoint;

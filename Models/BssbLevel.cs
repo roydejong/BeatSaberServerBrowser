@@ -1,6 +1,8 @@
+using ServerBrowser.Models.Utils;
+
 namespace ServerBrowser.Models
 {
-    public class BssbLevel
+    public class BssbLevel : JsonObject<BssbLevel>
     {
         public string? LevelId;
         public string? SongName;
