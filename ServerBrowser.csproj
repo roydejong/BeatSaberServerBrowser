@@ -231,6 +231,7 @@
     <Compile Include="Models\BssbServerDetail.cs" />
     <Compile Include="Models\BssbServerLevel.cs" />
     <Compile Include="Models\BssbServerPlayer.cs" />
+    <Compile Include="Models\JsonConverters\HiveVersionJsonConverter.cs" />
     <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
     <Compile Include="Models\JsonConverters\MasterServerEndPointConverter.cs" />
     <Compile Include="Models\PreConnectInfo.cs" />
@@ -258,6 +259,7 @@
     <Compile Include="UI\Utils\FlowCoordinatorExtensions.cs" />
     <Compile Include="UI\Views\ServerBrowserDetailViewController.cs" />
     <Compile Include="UI\Views\ServerBrowserMainViewController.cs" />
+    <Compile Include="Utils\ModCheck.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\BSSB.png" />

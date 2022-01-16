@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using HarmonyLib;
+using Hive.Versioning;
 using MultiplayerCore.Patchers;
+using ServerBrowser.Utils;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using Zenject;
@@ -19,13 +21,26 @@ namespace ServerBrowser.Core
         [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
         [Inject] private readonly BssbDataCollector _dataCollector = null!;
 
-        public UserInfo? PlatformUserInfo;
+        public Version? MultiplayerCoreVersion { get; private set; } = null;
+        public Version? MultiplayerExtensionsVersion { get; private set; } = null;
+        public UserInfo? PlatformUserInfo { get; private set; } = null!;
 
         private MasterServerEndPoint? _lastUsedMasterServerEndPoint = null;
 
         public async void Initialize()
         {
+            LoadModdedStatus();
+            
             await LoadPlatformUserInfo();
+        }
+
+        private void LoadModdedStatus()
+        {
+            MultiplayerCoreVersion = ModCheck.MultiplayerCore.InstalledVersion;
+            MultiplayerExtensionsVersion = ModCheck.MultiplayerExtensions.InstalledVersion;
+            
+            _log.Info($"Checked related mods (multiplayerCoreVersion={MultiplayerCoreVersion}, " +
+                      $"multiplayerExtensionsVersion={MultiplayerExtensionsVersion?.ToString() ?? "Not installed"})");
         }
 
         private async Task LoadPlatformUserInfo()

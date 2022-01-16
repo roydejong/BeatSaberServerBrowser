@@ -168,6 +168,8 @@ namespace ServerBrowser.Core
             Current.LobbyState = null;
             Current.MasterServerEndPoint = _serverBrowserClient.MasterServerEndPoint;
             Current.EndPoint = remoteEndPoint;
+            Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
+            Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
             
             Current.Level = null;
             Current.Players.Clear();

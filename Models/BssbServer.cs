@@ -1,4 +1,5 @@
 using System.Net;
+using Hive.Versioning;
 using Newtonsoft.Json;
 using ServerBrowser.Models.JsonConverters;
 using ServerBrowser.Models.Utils;
@@ -30,6 +31,12 @@ namespace ServerBrowser.Models
 
         [JsonProperty("Endpoint")] [JsonConverter(typeof(IPEndPointJsonConverter))]
         public IPEndPoint? EndPoint;
+
+        [JsonProperty("MpCoreVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        public Version? MultiplayerCoreVersion;
+
+        [JsonProperty("MpExVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        public Version? MultiplayerExtensionsVersion;
 
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
