@@ -1,10 +1,12 @@
 using System;
+using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using ServerBrowser.Models;
+using ServerBrowser.Models.Requests;
 using ServerBrowser.Models.Responses;
 using SiraUtil.Logging;
-using SiraUtil.Web;
 using Zenject;
 
 namespace ServerBrowser.Core
@@ -24,44 +26,66 @@ namespace ServerBrowser.Core
             }
         }
 
-        [Inject] private readonly SiraLog _log;
-        [Inject] private readonly IHttpService _httpService;
-        
+        [Inject] private readonly SiraLog _log = null!;
+        [Inject] private readonly PluginConfig _config = null!;
+
+        private readonly HttpClient _httpClient;
+
+        public BssbApiClient()
+        {
+            _httpClient = new();
+        }
+
         public void Initialize()
         {
-            _httpService.BaseURL = "https://bssb.app/api";
-            _httpService.UserAgent = UserAgent;
-            _httpService.Headers.Add("X-BSSB", "hello");
-            
+            _httpClient.BaseAddress = new Uri(_config.ApiServerUrl);
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+            _httpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
+
             _log.Info($"Initialized API client ({UserAgent})");
         }
 
-        public async Task<AnnounceResponse?> Announce(object announceData)
+        public async Task<AnnounceResponse?> Announce(BssbServer announceData)
         {
             try
             {
-                var response = await _httpService.PostAsync($"/v1/announce");
-                var responseBody = await response.ReadAsStringAsync();
+#if DEBUG
+                var rawJson = announceData.ToJson();
+                _log.Info($"Sending announce payload: {rawJson}");
+                var requestContent = new StringContent(rawJson, Encoding.UTF8, "application/json");
+#else
+                var requestContent = announceData.ToRequestContent();
+#endif
+
+                var response = await _httpClient.PostAsync($"/api/v1/announce", requestContent);
+                
+                response.EnsureSuccessStatusCode();
+
+                var responseBody = await response.Content.ReadAsStringAsync();
                 return AnnounceResponse.FromJson<AnnounceResponse>(responseBody);
             }
             catch (Exception ex)
             {
-                _log.Error($"Announce error: {ex.Message}");
+                _log.Warn(ex);
                 return null;
             }
         }
 
-        public async Task<UnAnnounceResponse?> UnAnnounce()
+        public async Task<UnAnnounceResponse?> UnAnnounce(UnAnnounceParams unannounceData)
         {
             try
             {
-                var response = await _httpService.PostAsync($"/v1/unannounce");
-                var responseBody = await response.ReadAsStringAsync();
+                var response = await _httpClient.PostAsync($"/api/v2/unannounce",
+                    unannounceData.ToRequestContent());
+                
+                response.EnsureSuccessStatusCode();
+
+                var responseBody = await response.Content.ReadAsStringAsync();
                 return UnAnnounceResponse.FromJson(responseBody);
             }
             catch (Exception ex)
             {
-                _log.Error($"UnAnnounce error: {ex.Message}");
+                _log.Warn(ex);
                 return null;
             }
         }
@@ -70,13 +94,16 @@ namespace ServerBrowser.Core
         {
             try
             {
-                var response = await _httpService.GetAsync($"/v1/browse?{queryParams.ToQueryString()}");
-                var responseBody = await response.ReadAsStringAsync();
+                var response = await _httpClient.GetAsync($"/api/v1/browse?{queryParams.ToQueryString()}");
+                
+                response.EnsureSuccessStatusCode();
+
+                var responseBody = await response.Content.ReadAsStringAsync();
                 return BrowseResponse.FromJson(responseBody);
             }
             catch (Exception ex)
             {
-                _log.Error($"Browse error: {ex.Message}");
+                _log.Warn(ex);
                 return null;
             }
         }
@@ -85,14 +112,18 @@ namespace ServerBrowser.Core
         {
             try
             {
-                var response = await _httpService.GetAsync($"/v1/browse/{key}");
-                var responseBody = await response.ReadAsStringAsync();
+                var response = await _httpClient.GetAsync($"/api/v1/browse/{key}");
+                
+                response.EnsureSuccessStatusCode();
+
+                var responseBody = await response.Content.ReadAsStringAsync();
                 // TODO return BssbServerDetail.FromJson(responseBody);
             }
             catch (Exception ex)
             {
-                _log.Error($"BrowseDetail error: {ex.Message}");
+                _log.Warn(ex);
             }
+
             return null;
         }
     }

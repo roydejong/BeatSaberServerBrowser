@@ -31,7 +31,6 @@ namespace ServerBrowser
 
             zenjector.UseMetadataBinder<Plugin>();
             zenjector.UseLogger(logger);
-            zenjector.UseHttpService();
             zenjector.UseSiraSync(SiraSyncServiceType.GitHub, "roydejong", "BeatSaberServerBrowser");
             
             zenjector.Install<BssbAppInstaller>(Location.App);

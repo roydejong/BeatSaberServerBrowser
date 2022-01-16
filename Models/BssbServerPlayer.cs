@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace ServerBrowser.Models
 {
     /// <summary>
@@ -5,13 +7,14 @@ namespace ServerBrowser.Models
     /// </summary>
     public class BssbServerPlayer : BssbPlayer
     {
-        public int SortIndex;
-        public bool IsMe;
-        public bool IsHost;
-        public bool IsPartyLeader;
-        public bool IsAnnouncing;
-        public float CurrentLatency;
-
+        [JsonProperty("SortIndex")] public int SortIndex;
+        [JsonProperty("IsMe")] public bool IsMe;
+        [JsonProperty("IsHost")] public bool IsHost;
+        [JsonProperty("IsPartyLeader")] public bool IsPartyLeader;
+        [JsonProperty("IsAnnouncer")] public bool IsAnnouncing;
+        [JsonProperty("Latency")] public float CurrentLatency;
+        
+        [JsonIgnore]
         /// <summary>
         /// Extra text shown on the player list in the detail view.
         /// </summary>

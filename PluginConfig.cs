@@ -4,6 +4,11 @@
     public class PluginConfig
     {
         /// <summary>
+        /// The base URL for the BSSB API.
+        /// </summary>
+        public virtual string ApiServerUrl { get; set; } = "https://bssb.app/api/";
+        
+        /// <summary>
         /// If true, send server announcements when you are the party leader.
         /// </summary>
         public virtual bool AnnounceParty { get; set; } = true;

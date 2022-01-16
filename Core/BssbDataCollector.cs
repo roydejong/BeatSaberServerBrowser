@@ -15,6 +15,7 @@ namespace ServerBrowser.Core
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
         [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
+        [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
 
         public bool SessionActive { get; private set; }
         public BssbServerDetail Current { get; private set; } = null!;
@@ -30,8 +31,8 @@ namespace ServerBrowser.Core
             _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
             _multiplayerSession.playerConnectedEvent += HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent += HandlePlayerDisconnected;
-
-            Reset();
+            
+            Current = new BssbServerDetail();
         }
 
         public void Dispose()
@@ -40,14 +41,6 @@ namespace ServerBrowser.Core
             _multiplayerSession.disconnectedEvent -= HandleSessionDisconnected;
             _multiplayerSession.playerConnectedEvent -= HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent -= HandlePlayerDisconnected;
-        }
-
-        private void Reset()
-        {
-            SessionActive = false;
-            Current = new BssbServerDetail();
-
-            DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void HandleSessionConnected()
@@ -65,6 +58,8 @@ namespace ServerBrowser.Core
                 //  that's not an issue because their maxPlayerCount is accurate in the pre connect info.
                 
                 Current.PlayerLimit = _multiplayerSession.maxPlayerCount;
+                Current.Name = _serverBrowserClient.PreferredServerName;
+                
                 _log.Info($"MaxPlayerCount updated to {Current.PlayerLimit} (workaround for official servers)");
             }
 
@@ -76,7 +71,6 @@ namespace ServerBrowser.Core
                 _log.Info("Detected a BeatTogether host");
             }
             
-            DataChanged?.Invoke(this, EventArgs.Empty);
             SessionEstablished?.Invoke(this, Current);
         }
 
@@ -84,7 +78,7 @@ namespace ServerBrowser.Core
         {
             _log.Info($"Multiplayer session disconnected (reason={reason})");
 
-            Reset();
+            SessionActive = false;
 
             SessionEnded?.Invoke(this, EventArgs.Empty);
         }
@@ -159,7 +153,7 @@ namespace ServerBrowser.Core
 
         [AffinityPostfix]
         [AffinityPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel")]
-        private void HandleStartLevel(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
+        private void HandleStartMultiplayerLevel(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
             BeatmapCharacteristicSO beatmapCharacteristic, IDifficultyBeatmap difficultyBeatmap,
             GameplayModifiers gameplayModifiers)
         {
@@ -180,7 +174,7 @@ namespace ServerBrowser.Core
 
         [AffinityPostfix]
         [AffinityPatch(typeof(LobbyPlayersDataModel), "SetPlayerIsPartyOwner")]
-        private void HandleSetPartyOwner(string userId, bool isPartyOwner)
+        private void HandleSetPlayerIsPartyOwner(string userId, bool isPartyOwner)
         {
             if (!isPartyOwner)
                 return;
@@ -189,15 +183,23 @@ namespace ServerBrowser.Core
 
             foreach (var player in Current.Players)
             {
+                var wasPartyLeader = player.IsPartyLeader;
                 player.IsPartyLeader = (player.UserId == userId);
 
-                if (player.IsPartyLeader)
+                if (!wasPartyLeader && player.IsPartyLeader)
                 {
                     var isLocalPlayer = _multiplayerSession.localPlayer.userId == player.UserId;
+                    
                     _log.Info($"Party leader changed to (userId={player.UserId}, " +
                               $"userName={player.UserName}, isMe={isLocalPlayer})");
+
+                    if (isLocalPlayer && String.IsNullOrEmpty(Current.Name))
+                        // Set server name if it wasn't set at session start (workaround for BeatTogether hosts)
+                        Current.Name = _serverBrowserClient.PreferredServerName;
                 }
             }
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

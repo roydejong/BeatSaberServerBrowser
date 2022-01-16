@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ServerBrowser.Models;
+using ServerBrowser.Models.Requests;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -9,7 +10,7 @@ namespace ServerBrowser.Core
 {
     public class BssbServerAnnouncer : MonoBehaviour, IInitializable, IDisposable
     {
-        public const float AnnounceIntervalSeconds = 3f;
+        public const float AnnounceIntervalSeconds = 30f;
         
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly PluginConfig _config = null!;
@@ -78,7 +79,7 @@ namespace ServerBrowser.Core
 
         public void OnEnable()
         {
-            InvokeRepeating(nameof(RepeatingTick), 1f, 1f);
+            InvokeRepeating(nameof(RepeatingTick), 3f, 3f);
 
             _sessionEstablished = false;
             _dirtyFlag = true;
@@ -92,36 +93,39 @@ namespace ServerBrowser.Core
 
         private async Task RepeatingTick()
         {
+            if (State == AnnouncerState.NotAnnouncing)
+                // Not enabled
+                return;
+            
             if (_havePendingRequest)
                 // Currently awaiting (un)announce request, do nothing
                 return;
 
-            if (!_dirtyFlag)
+            if (_dirtyFlag)
             {
+                // Have dirty flag, we should send next message now
+                if (State == AnnouncerState.Announcing)
+                {
+                    await SendAnnounceNow();
+                }
+                else if (State == AnnouncerState.Unannouncing)
+                {
+                    if (await SendUnannounceNow())
+                    {
+                        State = AnnouncerState.NotAnnouncing;
+                    }
+                }
+            }
+            else
+            {
+                // Do not have dirty flag, check timing
                 var timeNow = Time.realtimeSinceStartup;
 
-                if (_lastAnnounceTime == null || (_lastAnnounceTime - timeNow) >= AnnounceIntervalSeconds)
+                if (_lastAnnounceTime == null || (timeNow - _lastAnnounceTime) >= AnnounceIntervalSeconds)
                 {
                     // Interval time reached, mark update needed
                     _dirtyFlag = true;
                     _lastAnnounceTime = timeNow;
-                }
-                else
-                {
-                    // No update to send, and interval time has not yet been reached
-                    return;
-                }
-            }
-            
-            if (State == AnnouncerState.Announcing)
-            {
-                await SendAnnounceNow();
-            }
-            else if (State == AnnouncerState.Unannouncing)
-            {
-                if (await SendUnannounceNow())
-                {
-                    State = AnnouncerState.NotAnnouncing;
                 }
             }
         }
@@ -132,49 +136,71 @@ namespace ServerBrowser.Core
 
         private async Task<bool> SendAnnounceNow()
         {
-            _dirtyFlag = false;
-            _havePendingRequest = true;
-            
-            var response = await _apiClient.Announce(_dataCollector.Current);
-            
-            _havePendingRequest = false;
-
-            if (response?.Success ?? false)
+            try
             {
-                _log.Info("Announce OK");
-                return true;
+                _dirtyFlag = false;
+                _havePendingRequest = true;
+
+                var response = await _apiClient.Announce(_dataCollector.Current);
+
+                if (response?.Success ?? false)
+                {
+                    _log.Info("Announce OK");
+                    return true;
+                }
+                else
+                {
+                    _log.Warn($"Announce failed");
+                    _dirtyFlag = true;
+                    return false;
+                }
             }
-
-            var failReason = "unknown";
-
-            if (response is null)
-                failReason = "No response";
-            else if (!response.Success)
-                failReason = "Error response";
-            
-            _log.Error($"Announce failed: {failReason}");
-            _dirtyFlag = true;
-            return false;
+            finally
+            {
+                _havePendingRequest = false;
+            }
         }
 
         private async Task<bool> SendUnannounceNow()
         {
-            _dirtyFlag = false;
-            _havePendingRequest = true;
-            
-            var response = await _apiClient.UnAnnounce();
-            
-            _havePendingRequest = false;
-
-            if (response?.IsOk ?? false)
+            var unAnnounceRequest = new UnAnnounceParams()
             {
-                _log.Info("Unannounce OK");
-                return true;
-            }
+                SelfUserId = _dataCollector.Current?.LocalPlayer?.UserId,
+                HostSecret = _dataCollector.Current?.HostSecret,
+                HostUserId = _dataCollector.Current?.OwnerId,
+            };
             
-            _log.Error("Announce failed");
-            _dirtyFlag = true;
-            return false;
+            if (!unAnnounceRequest.IsComplete)
+                return false;
+            
+            try
+            {
+                _dirtyFlag = false;
+                _havePendingRequest = true;
+
+                var response = await _apiClient.UnAnnounce(unAnnounceRequest);
+
+                if (response?.IsOk ?? false)
+                {
+                    _log.Info("Unannounce OK");
+                    return true;
+                }
+                else
+                {
+                    _log.Warn("Unannounce failed");
+
+                    if (response is null || response.CanRetry)
+                    {
+                        _dirtyFlag = true;
+                    }
+
+                    return false;
+                }
+            }
+            finally
+            {
+                _havePendingRequest = false;
+            }
         }
 
         #endregion
@@ -212,7 +238,7 @@ namespace ServerBrowser.Core
             _dirtyFlag = true;
         }
 
-        private void HandleDataSessionEnded(object sender, EventArgs e)
+        private async void HandleDataSessionEnded(object sender, EventArgs e)
         {
             _sessionEstablished = false;
 
@@ -220,7 +246,7 @@ namespace ServerBrowser.Core
 
             _dirtyFlag = true;
 
-            _ = SendUnannounceNow();
+            await SendUnannounceNow();
         }
 
         #endregion

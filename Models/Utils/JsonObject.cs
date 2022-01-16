@@ -1,3 +1,5 @@
+using System.Net.Http;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace ServerBrowser.Models.Utils
@@ -7,6 +9,11 @@ namespace ServerBrowser.Models.Utils
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
+        }
+
+        public StringContent ToRequestContent()
+        {
+            return new StringContent(ToJson(), Encoding.UTF8, "application/json");
         }
         
         public static TBase FromJson(string json)

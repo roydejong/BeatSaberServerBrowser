@@ -1,7 +1,7 @@
 using System;
 using System.Web;
 
-namespace ServerBrowser.Models
+namespace ServerBrowser.Models.Requests
 {
     public class BrowseQueryParams
     {
