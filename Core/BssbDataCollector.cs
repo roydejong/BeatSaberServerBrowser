@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Net;
-using MultiplayerCore.Patchers;
 using ServerBrowser.Models;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
@@ -17,7 +16,6 @@ namespace ServerBrowser.Core
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
-        [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
         [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
 
         public bool SessionActive { get; private set; }
@@ -82,6 +80,9 @@ namespace ServerBrowser.Core
 
         private void HandleSessionDisconnected(DisconnectedReason reason)
         {
+            if (!SessionActive)
+                return;
+            
             _log.Info($"Multiplayer session disconnected (reason={reason})");
 
             SessionActive = false;
@@ -167,6 +168,9 @@ namespace ServerBrowser.Core
             Current.LobbyState = null;
             Current.MasterServerEndPoint = _serverBrowserClient.MasterServerEndPoint;
             Current.EndPoint = remoteEndPoint;
+            
+            Current.Level = null;
+            Current.Players.Clear();
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
