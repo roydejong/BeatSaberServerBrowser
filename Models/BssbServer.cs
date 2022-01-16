@@ -11,6 +11,9 @@ namespace ServerBrowser.Models
     /// <see cref="BssbServerDetail">Extended model</see>
     public class BssbServer : JsonObject<BssbServer>
     {
+        /// <summary>
+        /// Server side identifier (hash key) for this game.
+        /// </summary>
         [JsonProperty("Key")] public string? Key;
         [JsonProperty("ServerCode")] public string? ServerCode;
         [JsonProperty("OwnerId")] public string? OwnerId;
@@ -19,20 +22,21 @@ namespace ServerBrowser.Models
         [JsonProperty("PlayerLimit")] public int? PlayerLimit;
         [JsonProperty("GameplayMode")] public GameplayServerMode? GameplayMode;
         [JsonProperty("GameName")] public string? Name;
+        [JsonProperty("LobbyState")] public MultiplayerLobbyState? LobbyState;
+        [JsonProperty("Platform")] public string? ReportingPlatformId;
 
-        [JsonProperty("MasterServerEp")]
-        [JsonConverter(typeof(MasterServerEndPointConverter))]
+        [JsonProperty("MasterServerEp")] [JsonConverter(typeof(MasterServerEndPointConverter))]
         public MasterServerEndPoint? MasterServerEndPoint;
-        
-        [JsonProperty("Endpoint")]
-        [JsonConverter(typeof(IPEndPointJsonConverter))]
+
+        [JsonProperty("Endpoint")] [JsonConverter(typeof(IPEndPointJsonConverter))]
         public IPEndPoint? EndPoint;
 
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
         [JsonIgnore]
-        public bool IsOfficial =>
-            MasterServerEndPoint == null || MasterServerEndPoint.hostName.EndsWith(".beatsaber.com");
+        public bool IsOfficial => !IsBeatTogetherHost &&
+                                  (MasterServerEndPoint == null ||
+                                   MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
 
         [JsonIgnore] public bool IsBeatTogetherHost => OwnerId == "ziuMSceapEuNN7wRGQXrZg";
 

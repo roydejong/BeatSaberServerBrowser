@@ -1,3 +1,4 @@
+using ServerBrowser.Core;
 using ServerBrowser.UI;
 using ServerBrowser.UI.Views;
 using Zenject;
@@ -16,6 +17,8 @@ namespace ServerBrowser.Installers
             Container.Bind<ServerBrowserMainViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ServerBrowserDetailViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ServerBrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
+            
+            Container.BindInterfacesAndSelfTo<BssbMenuDataCollector>().AsSingle();
         }
     }
 }

@@ -98,7 +98,7 @@ namespace ServerBrowser.UI
 
                 if (_bssbClient.UsingOfficialMaster)
                     text = $"<color=#fbc531>Creating lobby on Official Servers (custom songs NOT supported)";
-                else if (_bssbClient.UsingBeatTogether)
+                else if (_bssbClient.UsingBeatTogetherMaster)
                     text = $"<color=#4cd137>Creating lobby on BeatTogether (supports custom songs)";
                 else
                     text = $"<color=#00a8ff>Creating lobby on custom master server: {_bssbClient.MasterServerHost}";

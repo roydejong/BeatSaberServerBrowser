@@ -9,6 +9,9 @@ using Zenject;
 
 namespace ServerBrowser.Core
 {
+    /// <summary>
+    /// Collects server and lobby data from the multiplayer session, so it can be relayed to the server browser.
+    /// </summary>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class BssbDataCollector : IInitializable, IDisposable, IAffinity
     {
@@ -18,7 +21,7 @@ namespace ServerBrowser.Core
         [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
 
         public bool SessionActive { get; private set; }
-        public BssbServerDetail Current { get; private set; } = null!;
+        public BssbServerDetail Current { get; private set; } = new();
         public PreConnectInfo? PreConnectInfo { get; private set; } = null;
 
         public event EventHandler? DataChanged;
@@ -31,8 +34,6 @@ namespace ServerBrowser.Core
             _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
             _multiplayerSession.playerConnectedEvent += HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent += HandlePlayerDisconnected;
-            
-            Current = new BssbServerDetail();
         }
 
         public void Dispose()
@@ -42,7 +43,12 @@ namespace ServerBrowser.Core
             _multiplayerSession.playerConnectedEvent -= HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent -= HandlePlayerDisconnected;
         }
-
+        
+        internal void TriggerDataChanged()
+        {
+            DataChanged?.Invoke(this, EventArgs.Empty);
+        }
+        
         private void HandleSessionConnected()
         {
             _log.Info($"Multiplayer session connected (syncTime={_multiplayerSession.syncTime})");
@@ -53,13 +59,13 @@ namespace ServerBrowser.Core
             {
                 // If we're the instance creator, session "maxPlayerCount" will be what they entered on Create Server
                 //  Otherwise, this value won't be updated so we can't use it
-                
+
                 // This value also does NOT work for BeatTogether as their master doesn't set the right Manager ID, but
                 //  that's not an issue because their maxPlayerCount is accurate in the pre connect info.
-                
+
                 Current.PlayerLimit = _multiplayerSession.maxPlayerCount;
                 Current.Name = _serverBrowserClient.PreferredServerName;
-                
+
                 _log.Info($"MaxPlayerCount updated to {Current.PlayerLimit} (workaround for official servers)");
             }
 
@@ -70,7 +76,7 @@ namespace ServerBrowser.Core
             {
                 _log.Info("Detected a BeatTogether host");
             }
-            
+
             SessionEstablished?.Invoke(this, Current);
         }
 
@@ -105,12 +111,26 @@ namespace ServerBrowser.Core
 
             var playerToRemove = Current.Players.FirstOrDefault(p => p.UserId == player.userId);
 
-            if (playerToRemove != null)
-                Current.Players.Remove(playerToRemove);
-
+            if (playerToRemove == null)
+                return;
+            
+            Current.Players.Remove(playerToRemove);
+                
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
+        
+        private void HandleLobbyStateChanged(MultiplayerLobbyState newState)
+        {
+            if (Current.LobbyState == newState)
+                return;
 
+            _log.Info($"Lobby state changed to: {newState}");
+            
+            Current.LobbyState = newState;
+            
+            DataChanged?.Invoke(this, EventArgs.Empty);
+        }
+        
         public bool ContainsPlayer(string userId) => Current.Players.Any(p => p.UserId == userId);
 
         public bool IsPartyLeader =>
@@ -137,23 +157,24 @@ namespace ServerBrowser.Core
                 managerId);
 
             Current.Key = null;
-            Current.OwnerId = userId;
             Current.ServerCode = code;
+            Current.OwnerId = userId;
             Current.HostSecret = secret;
-            Current.PlayerLimit = configuration.maxPlayerCount; // Official servers always seem to report 5
             Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded Platform User ID
-            Current.EndPoint = remoteEndPoint;
+            Current.PlayerLimit = configuration.maxPlayerCount; // Official servers always seem to report 5
             Current.GameplayMode = configuration.gameplayServerMode;
-
-            if (_mpCoreNetConfig.MasterServerEndPoint is not null)
-                Current.MasterServerEndPoint = _mpCoreNetConfig.MasterServerEndPoint;
+            Current.Name = null;
+            Current.LobbyState = null;
+            Current.MasterServerEndPoint = _serverBrowserClient.MasterServerEndPoint;
+            Current.EndPoint = remoteEndPoint;
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
         [AffinityPostfix]
         [AffinityPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel")]
-        private void HandleStartMultiplayerLevel(IPreviewBeatmapLevel previewBeatmapLevel, BeatmapDifficulty beatmapDifficulty,
+        private void HandleStartMultiplayerLevel(IPreviewBeatmapLevel previewBeatmapLevel,
+            BeatmapDifficulty beatmapDifficulty,
             BeatmapCharacteristicSO beatmapCharacteristic, IDifficultyBeatmap difficultyBeatmap,
             GameplayModifiers gameplayModifiers)
         {
@@ -189,7 +210,7 @@ namespace ServerBrowser.Core
                 if (!wasPartyLeader && player.IsPartyLeader)
                 {
                     var isLocalPlayer = _multiplayerSession.localPlayer.userId == player.UserId;
-                    
+
                     _log.Info($"Party leader changed to (userId={player.UserId}, " +
                               $"userName={player.UserName}, isMe={isLocalPlayer})");
 
@@ -198,7 +219,7 @@ namespace ServerBrowser.Core
                         Current.Name = _serverBrowserClient.PreferredServerName;
                 }
             }
-            
+
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
     }

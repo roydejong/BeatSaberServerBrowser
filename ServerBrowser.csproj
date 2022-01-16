@@ -220,6 +220,7 @@
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\BssbApiClient.cs" />
     <Compile Include="Core\BssbDataCollector.cs" />
+    <Compile Include="Core\BssbMenuDataCollector.cs" />
     <Compile Include="Core\BssbServerAnnouncer.cs" />
     <Compile Include="Core\ServerBrowserClient.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />

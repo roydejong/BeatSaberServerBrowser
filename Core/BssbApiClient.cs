@@ -11,6 +11,9 @@ using Zenject;
 
 namespace ServerBrowser.Core
 {
+    /// <summary>
+    /// HTTP client utility for the Server Browser API.
+    /// </summary>
     public class BssbApiClient : IInitializable
     {
         public static string UserAgent

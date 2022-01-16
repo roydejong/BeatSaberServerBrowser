@@ -20,7 +20,7 @@ namespace ServerBrowser.Models.Responses
         /// <summary>
         /// List of servers.
         /// </summary>
-        public List<BssbServer> Lobbies;
+        public List<BssbServer>? Lobbies;
         /// <summary>
         /// Optional message of the day set by the BSSB server.
         /// </summary>

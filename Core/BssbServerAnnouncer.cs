@@ -8,6 +8,9 @@ using Zenject;
 
 namespace ServerBrowser.Core
 {
+    /// <summary>
+    /// Handles sending announce/unannounce requests to the server browser API. 
+    /// </summary>
     public class BssbServerAnnouncer : MonoBehaviour, IInitializable, IDisposable
     {
         public const float AnnounceIntervalSeconds = 30f;
@@ -125,7 +128,6 @@ namespace ServerBrowser.Core
                 {
                     // Interval time reached, mark update needed
                     _dirtyFlag = true;
-                    _lastAnnounceTime = timeNow;
                 }
             }
         }
@@ -145,7 +147,9 @@ namespace ServerBrowser.Core
 
                 if (response?.Success ?? false)
                 {
-                    _log.Info("Announce OK");
+                    _log.Info($"Announce OK (ServerKey={response.Key})");
+                    _lastAnnounceTime = Time.realtimeSinceStartup;
+                    _dataCollector.Current.Key = response.Key;
                     return true;
                 }
                 else

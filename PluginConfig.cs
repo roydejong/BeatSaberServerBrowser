@@ -6,7 +6,7 @@
         /// <summary>
         /// The base URL for the BSSB API.
         /// </summary>
-        public virtual string ApiServerUrl { get; set; } = "https://bssb.app/api/";
+        public virtual string ApiServerUrl { get; set; } = "https://bssb.app/";
         
         /// <summary>
         /// If true, send server announcements when you are the party leader.
