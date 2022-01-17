@@ -74,7 +74,7 @@ namespace ServerBrowser.Assets
             return data;
         }
 
-        private static Sprite? LoadSpriteRaw(byte[] image, float pixelsPerUnit = 100.0f)
+        internal static Sprite? LoadSpriteRaw(byte[] image, float pixelsPerUnit = 100.0f)
         {
             var texture = LoadTextureRaw(image);
 

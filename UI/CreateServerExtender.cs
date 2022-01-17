@@ -28,25 +28,23 @@ namespace ServerBrowser.UI
         {
             _wrapper = _viewController.transform.Find("Wrapper");
             _formView = _wrapper.transform.Find("CreateServerFormView");
+            
+            // Extend form
+            _formExtender = new FormExtender(_formView);
+
+            _announcePartyField = _formExtender.CreateToggleInput("Add to Server Browser", _config.AnnounceParty);
+            _announcePartyField.OnChange += HandleAnnouncePartyChange;
+
+            _serverNameField = _formExtender.CreateTextInput("Server Name", _config.ServerName);
+            _serverNameField.OnChange += HandleServerNameChange;
+
+            _masterServerText = _formExtender.CreateLabel("");
         }
 
         [AffinityPostfix]
         [AffinityPatch(typeof(CreateServerViewController), "DidActivate")]
         private void HandleViewDidActivate(bool firstActivation)
         {
-            if (firstActivation)
-            {
-                _formExtender = new FormExtender(_formView);
-
-                _announcePartyField = _formExtender.CreateToggleInput("Add to Server Browser", _config.AnnounceParty);
-                _announcePartyField.OnChange += HandleAnnouncePartyChange;
-
-                _serverNameField = _formExtender.CreateTextInput("Server Name", _config.ServerName);
-                _serverNameField.OnChange += HandleServerNameChange;
-
-                _masterServerText = _formExtender.CreateLabel("");
-            }
-
             UpdateForm();
         }
 

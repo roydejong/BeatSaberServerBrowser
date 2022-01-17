@@ -14,10 +14,10 @@ namespace ServerBrowser.Models
         [JsonProperty("IsAnnouncer")] public bool IsAnnouncing;
         [JsonProperty("Latency")] public float CurrentLatency;
         
-        [JsonIgnore]
         /// <summary>
         /// Extra text shown on the player list in the detail view.
         /// </summary>
+        [JsonIgnore]
         public string ListText
         {
             get
@@ -27,8 +27,8 @@ namespace ServerBrowser.Models
                 if (IsPartyLeader)
                     return "Party Leader";
                 if (IsAnnouncing)
-                    return "Game Announcer";
-                return $"Player {SortIndex + 1}";
+                    return "Announcer";
+                return $"Player";
             }
         }
 

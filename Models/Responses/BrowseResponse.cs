@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using ServerBrowser.Models.Utils;
 
 namespace ServerBrowser.Models.Responses
@@ -25,5 +27,7 @@ namespace ServerBrowser.Models.Responses
         /// Optional message of the day set by the BSSB server.
         /// </summary>
         public string? Message;
+
+        [JsonIgnore] public int PageCount => (int)Math.Ceiling(Count / (decimal)Limit);
     }
 }

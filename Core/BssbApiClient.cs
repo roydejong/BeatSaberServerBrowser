@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ServerBrowser.Models;
 using ServerBrowser.Models.Requests;
@@ -93,11 +94,12 @@ namespace ServerBrowser.Core
             }
         }
 
-        public async Task<BrowseResponse?> Browse(BrowseQueryParams queryParams)
+        public async Task<BrowseResponse?> Browse(BrowseQueryParams queryParams, CancellationToken cancellationToken)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"/api/v1/browse?{queryParams.ToQueryString()}");
+                var response = await _httpClient.GetAsync($"/api/v1/browse?{queryParams.ToQueryString()}", 
+                    cancellationToken);
                 
                 response.EnsureSuccessStatusCode();
 

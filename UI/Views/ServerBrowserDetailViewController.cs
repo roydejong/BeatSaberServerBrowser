@@ -12,7 +12,7 @@ namespace ServerBrowser.UI.Views
     [HotReload]
     public class ServerBrowserDetailViewController : BSMLAutomaticViewController
     {
-        [Inject] protected readonly DiContainer _container = null!;
+        [Inject] private readonly DiContainer _container = null!;
         
         // ReSharper disable FieldCanBeMadeReadOnly.Local
         [UIComponent("mainContentRoot")] private VerticalLayoutGroup _mainContentRoot = null!;

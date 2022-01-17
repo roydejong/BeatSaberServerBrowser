@@ -219,6 +219,7 @@
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Core\BssbApiClient.cs" />
+    <Compile Include="Core\BssbBrowser.cs" />
     <Compile Include="Core\BssbDataCollector.cs" />
     <Compile Include="Core\BssbMenuDataCollector.cs" />
     <Compile Include="Core\BssbServerAnnouncer.cs" />
@@ -245,8 +246,10 @@
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Components\BssbLevelBarClone.cs" />
+    <Compile Include="UI\Components\BssbLoadingControl.cs" />
     <Compile Include="UI\Components\BssbPlayersTable.cs" />
     <Compile Include="UI\Components\BssbPlayersTableRow.cs" />
+    <Compile Include="UI\CoverArtLoader.cs" />
     <Compile Include="UI\CreateServerExtender.cs" />
     <Compile Include="UI\Forms\ExtendedField.cs" />
     <Compile Include="UI\Forms\ExtendedLabelField.cs" />

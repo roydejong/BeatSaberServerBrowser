@@ -10,15 +10,19 @@ namespace ServerBrowser.Installers
     {
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<ModeSelectionIntegrator>().AsSingle();
+            // BSSB Core
+            Container.BindInterfacesAndSelfTo<BssbBrowser>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BssbMenuDataCollector>().AsSingle();
             
+            // UI Core
+            Container.BindInterfacesAndSelfTo<ModeSelectionIntegrator>().AsSingle();
             Container.BindInterfacesAndSelfTo<CreateServerExtender>().AsSingle();
-
+            Container.BindInterfacesAndSelfTo<CoverArtLoader>().FromNewComponentOnNewGameObject().AsSingle();
+            
+            // UI Views
             Container.Bind<ServerBrowserMainViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ServerBrowserDetailViewController>().FromNewComponentAsViewController().AsSingle();
             Container.Bind<ServerBrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
-            
-            Container.BindInterfacesAndSelfTo<BssbMenuDataCollector>().AsSingle();
         }
     }
 }

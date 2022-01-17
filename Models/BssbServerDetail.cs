@@ -6,7 +6,6 @@ namespace ServerBrowser.Models
     public class BssbServerDetail : BssbServer
     {
         public List<BssbServerPlayer> Players = new();
-        public BssbServerLevel? Level;
 
         public BssbServerPlayer? LocalPlayer => Players.FirstOrDefault(p => p.IsMe);
         public BssbServerPlayer? HostPlayer => Players.FirstOrDefault(p => p.IsHost);
