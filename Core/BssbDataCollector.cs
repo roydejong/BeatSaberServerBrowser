@@ -16,6 +16,7 @@ namespace ServerBrowser.Core
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
+        [Inject] private readonly IUnifiedNetworkPlayerModel _unifiedNetworkPlayerModel = null!;
         [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
 
         public bool SessionActive { get; private set; }
@@ -55,13 +56,7 @@ namespace ServerBrowser.Core
 
             if (IsPartyLeader)
             {
-                // If we're the instance creator, session "maxPlayerCount" will be what they entered on Create Server
-                //  Otherwise, this value won't be updated so we can't use it
-
-                // This value also does NOT work for BeatTogether as their master doesn't set the right Manager ID, but
-                //  that's not an issue because their maxPlayerCount is accurate in the pre connect info.
-
-                Current.PlayerLimit = _multiplayerSession.maxPlayerCount;
+                Current.PlayerLimit = _unifiedNetworkPlayerModel.configuration.maxPlayerCount;
                 Current.Name = _serverBrowserClient.PreferredServerName;
 
                 _log.Info($"MaxPlayerCount updated to {Current.PlayerLimit} (workaround for official servers)");
