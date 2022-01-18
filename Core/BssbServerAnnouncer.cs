@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using ServerBrowser.Models;
 using ServerBrowser.Models.Requests;
+using ServerBrowser.Models.Responses;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -24,6 +25,7 @@ namespace ServerBrowser.Core
         private bool _dirtyFlag;
         private bool _havePendingRequest;
         private float? _lastAnnounceTime;
+        private AnnounceResponse? _lastSuccessResponse;
 
         public BssbServerDetail Data => _dataCollector.Current;
 
@@ -87,6 +89,8 @@ namespace ServerBrowser.Core
             _sessionEstablished = false;
             _dirtyFlag = true;
             _havePendingRequest = false;
+            _lastAnnounceTime = null;
+            _lastSuccessResponse = null;
         }
 
         public void OnDisable()
@@ -149,6 +153,7 @@ namespace ServerBrowser.Core
                 {
                     _log.Info($"Announce OK (ServerKey={response.Key})");
                     _lastAnnounceTime = Time.realtimeSinceStartup;
+                    _lastSuccessResponse = response;
                     _dataCollector.Current.Key = response.Key;
                     return true;
                 }
@@ -220,10 +225,9 @@ namespace ServerBrowser.Core
                 return;
 
             _log.Info("Starting announcing (session established)");
-
             State = AnnouncerState.Announcing;
-
             _dirtyFlag = true;
+            _lastSuccessResponse = null;
         }
 
         private void HandleDataChanged(object sender, EventArgs e)
@@ -232,12 +236,16 @@ namespace ServerBrowser.Core
                 // We never announce until session is fully established
                 return;
 
-            if (State is not AnnouncerState.Announcing)
+            if (State != AnnouncerState.Announcing)
+            {
                 // We are NOT already announcing; we can start now if allowed (e.g. after host migration)
                 if (!ShouldAnnounce)
                     return;
-
-            State = AnnouncerState.Announcing;
+                
+                _log.Info("Starting announcing (late/host migration)");
+                State = AnnouncerState.Announcing;
+                _lastSuccessResponse = null;
+            }
 
             _dirtyFlag = true;
         }
@@ -246,10 +254,17 @@ namespace ServerBrowser.Core
         {
             _sessionEstablished = false;
 
+            if (State != AnnouncerState.Announcing)
+                // We are not announcing
+                return;
+            
             State = AnnouncerState.Unannouncing;
-
+            
+            if (_lastSuccessResponse == null)
+                // We do not have a successful announce to cancel
+                return;
+            
             _dirtyFlag = true;
-
             await SendUnannounceNow();
         }
 
