@@ -57,14 +57,16 @@ namespace ServerBrowser.UI
         private void HandleFormCompletion(ref CreateServerFormData __result)
         {
             if (!_config.AnnounceParty)
+                // Announce disabled; do not modify
                 return;
 
-            // If we are announcing the game, change form data to make the game "Public" on the master server
-            // BT may use this in the future to announce from the server side
-
-            __result.netDiscoverable = true;
             __result.allowInviteOthers = true;
             __result.usePassword = false;
+            
+            // If we are announcing the game, change form data to make the game "Public" on the master server
+            // BT may use this in the future to announce from the server side
+            // We can not set this for Official Servers as it forces the player limit to 5
+            __result.netDiscoverable = !_bssbClient.UsingOfficialMaster;
         }
 
         private void HandleAnnouncePartyChange(object sender, bool newValue)
