@@ -54,18 +54,7 @@ namespace ServerBrowser.Core
             SessionActive = true;
 
             if (IsPartyLeader)
-            {
-                // If we're the instance creator, session "maxPlayerCount" will be what they entered on Create Server
-                //  Otherwise, this value won't be updated so we can't use it
-
-                // This value also does NOT work for BeatTogether as their master doesn't set the right Manager ID, but
-                //  that's not an issue because their maxPlayerCount is accurate in the pre connect info.
-
-                Current.PlayerLimit = _multiplayerSession.maxPlayerCount;
                 Current.Name = _serverBrowserClient.PreferredServerName;
-
-                _log.Info($"MaxPlayerCount updated to {Current.PlayerLimit} (workaround for official servers)");
-            }
 
             HandlePlayerConnected(_multiplayerSession.connectionOwner);
             HandlePlayerConnected(_multiplayerSession.localPlayer);
@@ -162,7 +151,7 @@ namespace ServerBrowser.Core
             Current.OwnerId = userId;
             Current.HostSecret = secret;
             Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded Platform User ID
-            Current.PlayerLimit = configuration.maxPlayerCount; // Official servers always seem to report 5
+            Current.PlayerLimit = configuration.maxPlayerCount;
             Current.GameplayMode = configuration.gameplayServerMode;
             Current.Name = null;
             Current.LobbyState = null;
