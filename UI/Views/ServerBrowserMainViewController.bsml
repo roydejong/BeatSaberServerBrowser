@@ -1,7 +1,5 @@
 ﻿<vertical id="mainContentRoot" preferred-width="120" child-align="UpperCenter">
 
-    <horizontal id="loadingRoot" child-align="MiddleCenter" ignore-layout="true" pad-top="0"/>
-
     <horizontal horizontal-fit="PreferredSize" pref-height="8" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0"
                 anchor-max-x="0.5" preferred-width="120" pad-left="2">
         <button id="refreshButton" pad="0" pref-height="8" pref-width="27" on-click="refreshButtonClick"

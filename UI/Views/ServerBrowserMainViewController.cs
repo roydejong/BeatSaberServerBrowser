@@ -5,6 +5,7 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
+using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
 using SiraUtil.Logging;
 using UnityEngine.UI;
@@ -23,16 +24,18 @@ namespace ServerBrowser.UI.Views
         [UIComponent("filterButton")] private Button _filterButton = null!;
         [UIComponent("createButton")] private Button _createButton = null!;
         [UIComponent("connectButton")] private Button _connectButton = null!;
-        [UIComponent("loadingRoot")] private HorizontalLayoutGroup _loadingRoot = null!;
         [UIComponent("scrollIndicator")] private VerticalScrollIndicator _scrollIndicator = null!;
         [UIComponent("pageUpButton")] private Button _pageUpButton = null!;
         [UIComponent("pageDownButton")] private Button _pageDownButton = null!;
-        [UIComponent("serverList")] private CustomListTableData _gameList = null!;
+        [UIComponent("serverList")] private CustomListTableData _serverList = null!;
 
         private bool _bsmlReady;
         private LoadingControl? _loadingControl;
+        private BssbServer? _selectedServer;
 
         public event EventHandler<EventArgs>? CreateServerClickedEvent;
+        public event EventHandler<BssbServer?>? ServerSelectedEvent;
+        public event EventHandler<BssbServer>? ConnectClickedEvent;
 
         #region Unity lifecycle
 
@@ -46,7 +49,7 @@ namespace ServerBrowser.UI.Views
             _scrollIndicator.progress = 0f;
             
             // Attach loading control
-            _loadingControl = BssbLoadingControl.Create(_loadingRoot.transform);
+            _loadingControl = BssbLoadingControl.Create(_serverList.transform);
 
             if (_loadingControl != null)
             {
@@ -60,15 +63,17 @@ namespace ServerBrowser.UI.Views
 
         public async void OnEnable()
         {
-            UpdateLoadingState(true);
-
+            ClearSelection();
+            
             _browser.UpdateEvent += HandleBrowserUpdate;
+            
             await _browser.Reset();
         }
 
         public void OnDisable()
         {
             _browser.CancelLoading();
+            
             _browser.UpdateEvent -= HandleBrowserUpdate;
         }
 
@@ -96,8 +101,8 @@ namespace ServerBrowser.UI.Views
             _log.Info($"!HandleBrowserUpdate!");
             
             // Clear out table view completely
-            _gameList.data.Clear();
-            _gameList.tableView.DeleteCells(0, _gameList.tableView.numberOfCells);
+            _serverList.data.Clear();
+            _serverList.tableView.DeleteCells(0, _serverList.tableView.numberOfCells);
             
             // Sometimes the non-primary buttons become disabled if the server browser
             //  isn't opened until after level selection, so let's ensure they're active
@@ -111,26 +116,26 @@ namespace ServerBrowser.UI.Views
             // Fill data
             if (_browser.PageData?.Lobbies is not null)
             {
-                _log.Warn("!Fill start!");
                 foreach (var lobby in _browser.PageData.Lobbies)
                 {
-                    _log.Warn("!Fill item!");
-                    _gameList.data.Add(new(lobby.Name, lobby.Key, Sprites.Crown));
+                    _serverList.data.Add(new(lobby.Name, lobby.Key, Sprites.Crown));
                 }
             }
                 
-            _gameList.tableView.RefreshCellsContent();
-            _gameList.tableView.selectionType = TableViewSelectionType.Single;
-            _gameList.tableView.ReloadData(); // should cause visibleCells to be updated
+            _serverList.tableView.RefreshCellsContent();
+            _serverList.tableView.selectionType = TableViewSelectionType.Single;
+            _serverList.tableView.ReloadData(); // should cause visibleCells to be updated
+            
+            ClearSelection();
         }
 
-        private void UpdateLoadingState(bool? setLoading = null)
+        private void UpdateLoadingState()
         {
             if (!_bsmlReady)
                 return;
             
-            var showLoading = ((setLoading.HasValue && setLoading.Value) || _browser.IsLoading);
-            var showError = _browser.LoadingErrored;
+            var showLoading = _browser.IsLoading;
+            var showError = !showLoading && _browser.LoadingErrored;
             var showNoData = !showLoading && !showError && (_browser.PageData?.Lobbies?.Count ?? 0) == 0;
 
             _log.Info(
@@ -154,7 +159,8 @@ namespace ServerBrowser.UI.Views
                 _connectButton.interactable = false;
                 _pageUpButton.interactable = false;
                 _pageDownButton.interactable = false;
-                _gameList.tableView.gameObject.SetActive(false);
+                
+                _serverList.tableView.gameObject.SetActive(false);
             }
             else
             {
@@ -177,13 +183,25 @@ namespace ServerBrowser.UI.Views
                 _scrollIndicator.normalizedPageHeight = (1f / pageCount);
                 _scrollIndicator.progress = scrollProgress;
                 
-                _log.Error($"normalizedPageHeight={_scrollIndicator.normalizedPageHeight}, " +
+                _log.Warn($"normalizedPageHeight={_scrollIndicator.normalizedPageHeight}, " +
                            $"progress={_scrollIndicator.progress}, pageCount={pageCount}");
                 
-                _gameList.tableView.gameObject.SetActive(true);
+                _serverList.tableView.gameObject.SetActive(true);
             }
         }
 
+        private void ClearSelection()
+        {
+            if (_bsmlReady)
+            {
+                _serverList.tableView.ClearSelection();
+                _connectButton.interactable = false;
+            }
+
+            _selectedServer = null;
+            ServerSelectedEvent?.Invoke(this, null);
+        }
+        
         #endregion
 
         #region BSML Actions
@@ -191,8 +209,8 @@ namespace ServerBrowser.UI.Views
         [UIAction("refreshButtonClick")]
         private async void HandleRefreshButtonClick()
         {
-            UpdateLoadingState(true);
-            await _browser.Refresh();
+            ClearSelection();
+            await _browser.Reset();
         }
 
         [UIAction("createButtonClick")]
@@ -201,20 +219,43 @@ namespace ServerBrowser.UI.Views
             CreateServerClickedEvent?.Invoke(this, EventArgs.Empty);
         }
 
-        [UIAction("pageUpButtonClick")]
-        private void HandlePageUpButtonClick()
+        [UIAction("connectButtonClick")]
+        private void HandleConnectButtonClick()
         {
-            _log.Error("PageUp!");
-            _ = _browser.PageUp();
+            if (_selectedServer is null)
+                return;
+            
+            ConnectClickedEvent?.Invoke(this, _selectedServer);
+        }
+
+        [UIAction("pageUpButtonClick")]
+        private async void HandlePageUpButtonClick()
+        {
+            await _browser.PageUp();
         }
 
         [UIAction("pageDownButtonClick")]
-        private void HandlePageDownButtonClick()
+        private async void HandlePageDownButtonClick()
         {
-            _log.Error("PageDown!");
-            _ = _browser.PageDown();
+            await _browser.PageDown();
         }
 
+        [UIAction("listSelect")]
+        private void ListSelect(TableView tableView, int row)
+        {
+            _selectedServer = _browser.PageData?.Lobbies?[row];
+
+            if (_selectedServer == null)
+            {
+                ClearSelection();
+                return;
+            }
+
+            _connectButton.interactable = true;
+            
+            ServerSelectedEvent?.Invoke(this, _selectedServer);
+        }
+        
         #endregion
     }
 }

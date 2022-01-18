@@ -13,6 +13,13 @@ namespace ServerBrowser.Models
         [JsonProperty("IsPartyLeader")] public bool IsPartyLeader;
         [JsonProperty("IsAnnouncer")] public bool IsAnnouncing;
         [JsonProperty("Latency")] public float CurrentLatency;
+
+        /// <summary>
+        /// Indicates whether this player is invisible in the lobby.
+        /// Invisible/ghost players do not take up a slot count.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsGhost => SortIndex < 0;
         
         /// <summary>
         /// Extra text shown on the player list in the detail view.

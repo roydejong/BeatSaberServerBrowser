@@ -110,7 +110,7 @@ namespace ServerBrowser.UI.Components
             _image.sprite = sprite;
         }
         
-        public void SetText(string titleText, string secondaryText)
+        public void SetText(string? titleText, string? secondaryText)
         {
             _titleText.SetText(titleText);
             _secondaryText.SetText(secondaryText);

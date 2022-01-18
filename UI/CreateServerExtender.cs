@@ -39,6 +39,9 @@ namespace ServerBrowser.UI
             _serverNameField.OnChange += HandleServerNameChange;
 
             _masterServerText = _formExtender.CreateLabel("");
+            
+            // Set initial values
+            UpdateForm();
         }
 
         [AffinityPostfix]

@@ -13,6 +13,8 @@ namespace ServerBrowser.UI.Components
 
         public BssbPlayersTable(GameObject parent, GameObject rowPrefab)
         {
+            rowPrefab.gameObject.SetActive(false);
+            
             _parent = parent;
             _parent.name = "BssbPlayersTable";
             _rowPrefab = rowPrefab;
@@ -54,6 +56,8 @@ namespace ServerBrowser.UI.Components
                 go.transform.SetSiblingIndex(_rowIterator);
                 
                 row = go.AddComponent<BssbPlayersTableRow>();
+
+                _rows[_rowIterator] = row;
             }
             
             row.gameObject.SetActive(true);

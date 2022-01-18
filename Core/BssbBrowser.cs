@@ -8,6 +8,10 @@ using Zenject;
 
 namespace ServerBrowser.Core
 {
+    /// <summary>
+    /// Utility for browsing paginated lobbies on the Server Browser API.
+    /// </summary>
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class BssbBrowser
     {
         public const int DefaultPageSize = 6;
@@ -39,7 +43,7 @@ namespace ServerBrowser.Core
         public async Task Refresh()
         {
             CancelLoading();
-            SetLoadingState(true);
+            TriggerUpdate(true);
 
             // Calculate pagination offset
             var pageSize = PageData?.Limit ?? DefaultPageSize;
@@ -52,7 +56,7 @@ namespace ServerBrowser.Core
             {
                 PageData = await _apiClient.Browse(QueryParams, _loadingCts!.Token);
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
                 PageData = null;
             }
@@ -64,8 +68,7 @@ namespace ServerBrowser.Core
                 _log.Info("Received NULL response!");
             
             // Trigger update
-            SetLoadingState(false, (PageData == null));
-            UpdateEvent?.Invoke(this, EventArgs.Empty);
+            TriggerUpdate(false, (PageData == null));
         }
 
         public async Task PageUp()
@@ -92,17 +95,18 @@ namespace ServerBrowser.Core
 
             if (IsLoading)
             {
-                SetLoadingState(false, true);
-                UpdateEvent?.Invoke(this, EventArgs.Empty);
+                TriggerUpdate(false, true);
             }
         }
 
-        private void SetLoadingState(bool isLoading, bool didError = false)
+        private void TriggerUpdate(bool isLoading, bool didError = false)
         {
             _log.Info($"Data loading state set (isLoading={isLoading}, didError={didError})");
             
             IsLoading = isLoading;
             LoadingErrored = didError;
+            
+            UpdateEvent?.Invoke(this, EventArgs.Empty);
         }
     }
 }

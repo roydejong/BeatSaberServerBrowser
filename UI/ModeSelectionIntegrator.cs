@@ -1,8 +1,10 @@
 using System;
 using HMUI;
 using IPA.Utilities;
+using ServerBrowser.Models;
 using ServerBrowser.UI.Utils;
 using SiraUtil.Affinity;
+using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -11,6 +13,7 @@ namespace ServerBrowser.UI
 {
     public class ModeSelectionIntegrator : IInitializable, IDisposable, IAffinity
     {
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _flowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionViewController _modeSelectionView = null!;
@@ -19,7 +22,7 @@ namespace ServerBrowser.UI
         private Button? _btnGameBrowser;
         private bool _statusCheckComplete;
         private MultiplayerModeSelectionViewController.MenuButton? _pendingMenuButtonTrigger;
-        
+        private BssbServer? _pendingConnectToServer;
 
         public void Initialize()
         {
@@ -64,11 +67,16 @@ namespace ServerBrowser.UI
         private bool HandleProcessDeeplinkingToLobby()
         {
             // ProcessDeeplinkingToLobby is triggered once the flow coordinator has fully set up, and transitions
-            //  are completed. This means status checks are done and we can trigger a submenu if needed.
+            //  are completed. This means status checks are done and we can trigger secondary actions now
             
             _statusCheckComplete = true;
-
-            if (_pendingMenuButtonTrigger is not null)
+            
+            if (_pendingConnectToServer is not null)
+            {
+                ConnectToServer(_pendingConnectToServer);
+                return false;
+            }
+            else if (_pendingMenuButtonTrigger is not null)
             {
                 TriggerMenuButton(_pendingMenuButtonTrigger.Value);
                 return false;
@@ -112,6 +120,29 @@ namespace ServerBrowser.UI
             _pendingMenuButtonTrigger = null;
             _modeSelectionView.InvokeMethod<object, MultiplayerModeSelectionViewController>(
                 "HandleMenuButton", menuButton);
+        }
+        
+        public void ConnectToServer(BssbServer server)
+        {
+            if (!_statusCheckComplete)
+            {
+                // We can't trigger the connect immediately as it will break the server status check
+                _pendingConnectToServer = server;
+                return;
+            }
+            
+            _log.Info($"Trying to connect to selected server (Key={server.Key}, Name={server.Name}, " +
+                      $"GameplayMode={server.GameplayMode}, MasterServerEndPoint={server.MasterServerEndPoint}, " +
+                      $"ServerCode={server.ServerCode}, HostSecret={server.HostSecret}, " +
+                      $"ServerTypeCode={server.ServerTypeCode})");
+
+            _pendingConnectToServer = null;
+            _pendingMenuButtonTrigger = null;
+
+            // TODO Init cancel token
+            // TODO Master server override
+            // TODO Lobby destination
+            // TODO Connect call
         }
     }
 }

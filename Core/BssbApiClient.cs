@@ -122,7 +122,7 @@ namespace ServerBrowser.Core
                 response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStringAsync();
-                // TODO return BssbServerDetail.FromJson(responseBody);
+                return BssbServerDetail.FromJson<BssbServerDetail>(responseBody);
             }
             catch (Exception ex)
             {
