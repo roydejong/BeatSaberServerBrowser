@@ -11,7 +11,7 @@ namespace ServerBrowser.UI.Utils
             ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal,
             bool immediately = false)
         {
-            parentFlowCoordinator.InvokeMethod<object, FlowCoordinator>("ReplaceChildFlowCoordinator", 
+            parentFlowCoordinator.InvokeMethod<object, FlowCoordinator>("ReplaceChildFlowCoordinator",
                 childFlowCoordinator, finishedCallback, animationDirection, immediately);
         }
     }

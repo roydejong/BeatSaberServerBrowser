@@ -1,6 +1,7 @@
 using System;
 using HMUI;
 using IPA.Utilities;
+using MultiplayerCore.Patchers;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Utils;
 using SiraUtil.Affinity;
@@ -18,11 +19,11 @@ namespace ServerBrowser.UI
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _flowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionViewController _modeSelectionView = null!;
         [Inject] private readonly ServerBrowserFlowCoordinator _serverBrowserFlowCoordinator = null!;
+        [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
 
         private Button? _btnGameBrowser;
         private bool _statusCheckComplete;
         private MultiplayerModeSelectionViewController.MenuButton? _pendingMenuButtonTrigger;
-        private BssbServer? _pendingConnectToServer;
 
         public void Initialize()
         {
@@ -47,7 +48,7 @@ namespace ServerBrowser.UI
             bool screenSystemEnabling)
         {
             _statusCheckComplete = false;
-            
+
             if (_btnGameBrowser != null)
             {
                 _btnGameBrowser.gameObject.SetActive(true);
@@ -68,15 +69,10 @@ namespace ServerBrowser.UI
         {
             // ProcessDeeplinkingToLobby is triggered once the flow coordinator has fully set up, and transitions
             //  are completed. This means status checks are done and we can trigger secondary actions now
-            
+
             _statusCheckComplete = true;
-            
-            if (_pendingConnectToServer is not null)
-            {
-                ConnectToServer(_pendingConnectToServer);
-                return false;
-            }
-            else if (_pendingMenuButtonTrigger is not null)
+
+            if (_pendingMenuButtonTrigger is not null)
             {
                 TriggerMenuButton(_pendingMenuButtonTrigger.Value);
                 return false;
@@ -86,7 +82,7 @@ namespace ServerBrowser.UI
         }
 
         [AffinityPrefix]
-        [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator), 
+        [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator),
             "HandleMultiplayerLobbyControllerDidFinish")]
         private bool HandleMenuButtonPress(MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
@@ -116,33 +112,39 @@ namespace ServerBrowser.UI
                 _pendingMenuButtonTrigger = menuButton;
                 return;
             }
-            
+
             _pendingMenuButtonTrigger = null;
             _modeSelectionView.InvokeMethod<object, MultiplayerModeSelectionViewController>(
                 "HandleMenuButton", menuButton);
         }
-        
+
+        private void ReplaceTopViewController(ViewController viewController, Action finishedCallback = null,
+            ViewController.AnimationType animationType = ViewController.AnimationType.In,
+            ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal)
+        {
+            _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController",
+                viewController, finishedCallback, animationType, animationDirection);
+        }
+
         public void ConnectToServer(BssbServer server)
         {
-            if (!_statusCheckComplete)
-            {
-                // We can't trigger the connect immediately as it will break the server status check
-                _pendingConnectToServer = server;
-                return;
-            }
-            
             _log.Info($"Trying to connect to selected server (Key={server.Key}, Name={server.Name}, " +
                       $"GameplayMode={server.GameplayMode}, MasterServerEndPoint={server.MasterServerEndPoint}, " +
                       $"ServerCode={server.ServerCode}, HostSecret={server.HostSecret}, " +
                       $"ServerTypeCode={server.ServerTypeCode})");
 
-            _pendingConnectToServer = null;
-            _pendingMenuButtonTrigger = null;
+            // Set master server
+            if (server.IsOfficial || server.MasterServerEndPoint is null)
+                _mpCoreNetConfig.UseOfficialServer();
+            else 
+                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, null);
+            
+            // Set up lobby destination via deeplink
+            _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
 
-            // TODO Init cancel token
-            // TODO Master server override
-            // TODO Lobby destination
-            // TODO Connect call
+            // If we are already on mode selection, trigger deeplink now
+            if (_statusCheckComplete)
+                _flowCoordinator.ProcessDeeplinkingToLobby();
         }
     }
 }

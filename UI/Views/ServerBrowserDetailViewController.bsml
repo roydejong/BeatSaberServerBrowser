@@ -35,7 +35,7 @@
             <vertical preferred-width="88" preferred-height="8" pad-right="15" vertical-fit="PreferredSize">
                 <tab-selector tab-tag="ServerDetailTabs"/>
             </vertical>
-            <primary-button click-event="connectButtonClick" text="Connect" preferred-width="32" preferred-height="10"/>
+            <primary-button on-click="connectButtonClick" text="Connect" preferred-width="32" preferred-height="10"/>
         </horizontal>
 
         <horizontal preferred-height="2"/>
