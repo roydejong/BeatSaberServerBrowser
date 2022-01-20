@@ -14,8 +14,8 @@
     <vertical id="mainRoot" preferred-width="120" vertical-fit="PreferredSize">
 
         <horizontal pad-left="5">
-            <vertical bg="panel-top" preferred-width="120">
-                <text text="Server details" font-align="Center" italics="true"/>
+            <vertical bg="panel-top" id="headerPanelTop" preferred-width="120">
+                <text text="SERVER DETAILS" font-align="Midline" italics="true"/>
             </vertical>
         </horizontal>
 

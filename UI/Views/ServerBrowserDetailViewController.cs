@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
+using HMUI;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
@@ -28,8 +29,10 @@ namespace ServerBrowser.UI.Views
         [UIComponent("idleRoot")] private VerticalLayoutGroup _idleRoot = null!;
         [UIComponent("loadRoot")] private VerticalLayoutGroup _loadRoot = null!;
         [UIComponent("mainRoot")] private VerticalLayoutGroup _mainRoot = null!;
-
+        
         [UIComponent("errorText")] private FormattableText _errorText = null!;
+        
+        [UIComponent("headerPanelTop")] private VerticalLayoutGroup _headerPanelTop = null!;
         [UIComponent("titleBarRoot")] private VerticalLayoutGroup _titleBarRoot = null!;
         [UIComponent("playerCountText")] private FormattableText _playerCountText = null!;
         [UIComponent("playerList-scroll")] private BSMLScrollableContainer _playerListScrollable = null!;
@@ -51,6 +54,12 @@ namespace ServerBrowser.UI.Views
         [UIAction("#post-parse")]
         private void PostParse()
         {
+            // Set correct colors for header panel background
+            var headerPanelTopBg = _headerPanelTop.GetComponent<ImageView>();
+            headerPanelTopBg.color = new Color(1, 1, 1, .2f);
+            headerPanelTopBg.color0 = Color.white;
+            headerPanelTopBg.color1 = new Color(1, 1, 1, 0);
+
             // Create BssbLevelBarClone for title
             _levelBar = BssbLevelBarClone.Create(_container, _titleBarRoot.transform);
             _levelBar.SetImageVisible(true);
