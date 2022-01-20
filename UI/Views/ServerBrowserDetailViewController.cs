@@ -69,7 +69,10 @@ namespace ServerBrowser.UI.Views
             // Create players table with prefab
             _playersTable = new BssbPlayersTable(_playerListRoot.gameObject, _playerListRowPrefab.gameObject);
 
-            ClearData();
+            if (_currentDetail is null)
+                ClearData();
+            else
+                SetData(_currentDetail);
         }
 
         public void OnEnable()
