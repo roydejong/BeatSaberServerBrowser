@@ -47,6 +47,9 @@
                     <scrollable-container id="playerList-scroll" preferred-width="110" mask-overflow="true">
                         <vertical id="playerListRoot" spacing="1" pad-top="2" pad-right="5" vertical-fit="PreferredSize">
                             
+                            <text id="playerListEmptyText" text="No player information available"
+                                  italics="true" color="#bcbdc2"/>
+                            
                             <!-- Prefab for player list item -->
                             <horizontal id="playerListRowPrefab" preferred-height="7" pad-top="1"
                                         pad-left="2" pad-right="2" bg="panel-top" child-expand-width="true"
@@ -55,7 +58,7 @@
                                     <image/>
                                 </vertical>
                                 <vertical preferred-width="60" preferred-height="7">
-                                    <text italics="true" text="!Player name!pf!" preferred-width="100"
+                                    <text italics="true" text="!Player name!" preferred-width="100"
                                           overflow-mode="Ellipsis"/>
                                 </vertical>
                                 <vertical preferred-width="40" preferred-height="7" pad-right="1">

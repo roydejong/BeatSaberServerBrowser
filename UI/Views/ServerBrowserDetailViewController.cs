@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
@@ -34,6 +35,7 @@ namespace ServerBrowser.UI.Views
         [UIComponent("playerList-scroll")] private BSMLScrollableContainer _playerListScrollable = null!;
         [UIComponent("playerListRoot")] private VerticalLayoutGroup _playerListRoot = null!;
 
+        [UIComponent("playerListEmptyText")] private FormattableText _playerListEmptyText = null!;
         [UIComponent("playerListRowPrefab")] private HorizontalLayoutGroup _playerListRowPrefab = null!;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
 
@@ -142,13 +144,13 @@ namespace ServerBrowser.UI.Views
         {
             _currentDetail = serverDetail;
 
-            SetHeaderData(serverDetail);
-            SetPlayerData(serverDetail.Players);
-
             _errorRoot.gameObject.SetActive(false);
             _idleRoot.gameObject.SetActive(false);
             _loadRoot.gameObject.SetActive(false);
             _mainRoot.gameObject.SetActive(true);
+
+            SetHeaderData(serverDetail);
+            SetPlayerData(serverDetail.Players);
         }
 
         private void SetHeaderData(BssbServerDetail serverDetail)
@@ -161,10 +163,17 @@ namespace ServerBrowser.UI.Views
             _playerCountText.color = (playerCount < playerLimit ? Color.white : BssbColorScheme.Red);
         }
 
-        private void SetPlayerData(IEnumerable<BssbServerPlayer> players)
+        private void SetPlayerData(IReadOnlyCollection<BssbServerPlayer> players)
         {
+            _playerListEmptyText.gameObject.SetActive(!players.Any());
+            
             _playersTable.SetData(players);
+            
+            ResetPlayerListScroll();
+        }
 
+        private void ResetPlayerListScroll()
+        {
             _playerListScrollable.ContentSizeUpdated();
             _playerListScrollable.ScrollTo(0, false);
         }

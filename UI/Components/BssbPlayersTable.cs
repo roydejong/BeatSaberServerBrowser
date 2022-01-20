@@ -30,7 +30,7 @@ namespace ServerBrowser.UI.Components
             _rowIterator = 0;
         }
 
-        public void SetData(IEnumerable<BssbServerPlayer> playerList)
+        public void SetData(IReadOnlyCollection<BssbServerPlayer> playerList)
         {
             Clear();
 
