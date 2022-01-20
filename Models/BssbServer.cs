@@ -68,6 +68,10 @@ namespace ServerBrowser.Models
         /// Provided by the API when querying lobbies.
         /// </summary>
         [JsonProperty("CoverUrl")] public string? CoverArtUrl;
+        /// <summary>
+        /// Identifies what type of server this is for announce messages.
+        /// </summary>
+        [JsonProperty("ServerType")] public string ServerTypeCode;
 
         /// <summary>
         /// The endpoint for the master server this lobby exists on.
@@ -113,23 +117,6 @@ namespace ServerBrowser.Models
                                    MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
 
         [JsonIgnore] public bool IsBeatTogetherHost => OwnerId == "ziuMSceapEuNN7wRGQXrZg";
-
-        /// <summary>
-        /// Identifies what type of server this is for announce messages.
-        /// </summary>
-        [JsonProperty("ServerType")]
-        public string ServerTypeCode
-        {
-            get
-            {
-                if (IsOfficial)
-                    return IsQuickPlay ? "vanilla_quickplay" : "vanilla_dedicated";
-                else if (IsBeatTogetherHost)
-                    return IsQuickPlay ? "beattogether_quickplay" : "beattogether_dedicated";
-                else
-                    return "unknown";
-            }
-        }
 
         [JsonIgnore]
         public string ServerTypeText

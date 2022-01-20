@@ -63,6 +63,8 @@ namespace ServerBrowser.Core
             {
                 _log.Info("Detected a BeatTogether host");
             }
+            
+            Current.ServerTypeCode = DetermineServerType();
 
             SessionEstablished?.Invoke(this, Current);
         }
@@ -121,6 +123,17 @@ namespace ServerBrowser.Core
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
         
+        private string DetermineServerType()
+        {
+            if (Current.IsOfficial)
+                return Current.IsQuickPlay ? "vanilla_quickplay" : "vanilla_dedicated";
+            
+            if (Current.IsBeatTogetherHost)
+                return Current.IsQuickPlay ? "beattogether_quickplay" : "beattogether_dedicated";
+            
+            return "unknown";
+        }
+        
         public bool ContainsPlayer(string userId) => Current.Players.Any(p => p.UserId == userId);
 
         public bool IsPartyLeader =>
@@ -167,6 +180,8 @@ namespace ServerBrowser.Core
                 Current.Difficulty = selectionMask.difficulties.FromMask();
             else
                 Current.Difficulty = null;
+
+            Current.ServerTypeCode = DetermineServerType();
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
