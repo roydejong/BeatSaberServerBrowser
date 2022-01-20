@@ -163,6 +163,11 @@ namespace ServerBrowser.Core
             Current.Level = null;
             Current.Players.Clear();
 
+            if (selectionMask.difficulties != BeatmapDifficultyMask.All)
+                Current.Difficulty = selectionMask.difficulties.FromMask();
+            else
+                Current.Difficulty = null;
+
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -183,6 +188,8 @@ namespace ServerBrowser.Core
             Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap);
             Current.Level.Characteristic = beatmapCharacteristic.serializedName;
 
+            Current.Difficulty = difficultyBeatmap.difficulty;
+            
             // TODO Capture modifiers? Maybe? Who cares?
 
             DataChanged?.Invoke(this, EventArgs.Empty);

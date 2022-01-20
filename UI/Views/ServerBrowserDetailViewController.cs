@@ -10,6 +10,7 @@ using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
 using ServerBrowser.UI.Utils;
+using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -21,7 +22,9 @@ namespace ServerBrowser.UI.Views
     {
         public const float RefreshIntervalSecs = 30f;
 
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly DiContainer _container = null!;
+        [Inject] private readonly ServerBrowserClient _bssbClient = null!;
         [Inject] private readonly BssbApiClient _apiClient = null!;
 
         // ReSharper disable FieldCanBeMadeReadOnly.Local
@@ -29,16 +32,25 @@ namespace ServerBrowser.UI.Views
         [UIComponent("idleRoot")] private VerticalLayoutGroup _idleRoot = null!;
         [UIComponent("loadRoot")] private VerticalLayoutGroup _loadRoot = null!;
         [UIComponent("mainRoot")] private VerticalLayoutGroup _mainRoot = null!;
-        
+
         [UIComponent("errorText")] private FormattableText _errorText = null!;
-        
+
         [UIComponent("headerPanelTop")] private VerticalLayoutGroup _headerPanelTop = null!;
         [UIComponent("titleBarRoot")] private VerticalLayoutGroup _titleBarRoot = null!;
         [UIComponent("playerCountText")] private FormattableText _playerCountText = null!;
+
+        [UIComponent("txtServerType")] private FormattableText _txtServerType = null!;
+        [UIComponent("txtMasterServer")] private FormattableText _txtMasterServer = null!;
+        [UIComponent("txtLobbyStatus")] private FormattableText _txtLobbyStatus = null!;
+        [UIComponent("txtDifficulty")] private FormattableText _txtDifficulty = null!;
+        [UIComponent("txtGameVersion")] private FormattableText _txtGameVersion = null!;
+        [UIComponent("txtMpCore")] private FormattableText _txtMpCore = null!;
+        [UIComponent("txtMpEx")] private FormattableText _txtMpEx = null!;
+
         [UIComponent("playerList-scroll")] private BSMLScrollableContainer _playerListScrollable = null!;
         [UIComponent("playerListRoot")] private VerticalLayoutGroup _playerListRoot = null!;
-
         [UIComponent("playerListEmptyText")] private FormattableText _playerListEmptyText = null!;
+
         [UIComponent("playerListRowPrefab")] private HorizontalLayoutGroup _playerListRowPrefab = null!;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
 
@@ -89,7 +101,7 @@ namespace ServerBrowser.UI.Views
         {
             if (_busyLoading)
                 return;
-            
+
             if (_currentDetail?.Key == null)
                 return;
 
@@ -154,15 +166,24 @@ namespace ServerBrowser.UI.Views
 
         public void SetData(BssbServerDetail serverDetail)
         {
-            _currentDetail = serverDetail;
+            try
+            {
+                _currentDetail = serverDetail;
 
-            _errorRoot.gameObject.SetActive(false);
-            _idleRoot.gameObject.SetActive(false);
-            _loadRoot.gameObject.SetActive(false);
-            _mainRoot.gameObject.SetActive(true);
+                _errorRoot.gameObject.SetActive(false);
+                _idleRoot.gameObject.SetActive(false);
+                _loadRoot.gameObject.SetActive(false);
+                _mainRoot.gameObject.SetActive(true);
 
-            SetHeaderData(serverDetail);
-            SetPlayerData(serverDetail.Players);
+                SetHeaderData(serverDetail);
+                SetInfoTabData(serverDetail);
+                SetPlayerData(serverDetail.Players);
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+                ShowError("Error while presenting data");
+            }
         }
 
         private void SetHeaderData(BssbServerDetail serverDetail)
@@ -175,12 +196,51 @@ namespace ServerBrowser.UI.Views
             _playerCountText.color = (playerCount < playerLimit ? Color.white : BssbColorScheme.Red);
         }
 
+        private void SetInfoTabData(BssbServerDetail serverDetail)
+        {
+            _txtServerType.SetText(serverDetail.ServerTypeText);
+            _txtMasterServer.SetText(serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
+            _txtDifficulty.SetText(serverDetail.DifficultyNameWithColor);
+            _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
+
+            _txtGameVersion.SetText($"Beat Saber {serverDetail.GameVersion}");
+            _txtGameVersion.color = (serverDetail.GameVersion?.Equals(IPA.Utilities.UnityGame.GameVersion) ?? false)
+                ? BssbColorScheme.Green
+                : BssbColorScheme.Gold;
+
+            if (serverDetail.MultiplayerCoreVersion is not null)
+            {
+                _txtMpCore.SetText($"Core v{serverDetail.MultiplayerCoreVersion}");
+                _txtMpCore.color = _bssbClient.MultiplayerCoreVersion == serverDetail.MultiplayerCoreVersion
+                    ? BssbColorScheme.Green
+                    : BssbColorScheme.Red;
+            }
+            else
+            {
+                _txtMpCore.SetText($"None");
+                _txtMpCore.color = BssbColorScheme.MutedGray;
+            }
+
+            if (serverDetail.MultiplayerExtensionsVersion is not null)
+            {
+                _txtMpEx.SetText($"Extensions v{serverDetail.MultiplayerExtensionsVersion}");
+                _txtMpEx.color = _bssbClient.MultiplayerExtensionsVersion == serverDetail.MultiplayerExtensionsVersion
+                    ? BssbColorScheme.Green
+                    : BssbColorScheme.Red;
+            }
+            else
+            {
+                _txtMpEx.SetText($"None");
+                _txtMpEx.color = BssbColorScheme.MutedGray;
+            }
+        }
+
         private void SetPlayerData(IReadOnlyCollection<BssbServerPlayer> players)
         {
             _playerListEmptyText.gameObject.SetActive(!players.Any());
-            
+
             _playersTable.SetData(players);
-            
+
             ResetPlayerListScroll();
         }
 

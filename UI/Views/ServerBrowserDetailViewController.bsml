@@ -35,12 +35,58 @@
             <vertical preferred-width="88" preferred-height="8" pad-right="15" vertical-fit="PreferredSize">
                 <tab-selector tab-tag="ServerDetailTabs"/>
             </vertical>
-            <primary-button on-click="connectButtonClick" text="Connect" preferred-width="32" preferred-height="10"/>
+            <primary-button on-click="connectButtonClick" text="Connect" preferred-width="32" preferred-height="9.5"/>
         </horizontal>
 
         <horizontal preferred-height="2"/>
 
         <vertical vertical-fit="PreferredSize" preferred-height="50">
+            <tab tags="ServerDetailTabs" tab-name="Server Info">
+                <vertical pad="3" preferred-width="120">
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="Server type"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtServerType" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="Master server"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtMasterServer" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="Lobby status"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtLobbyStatus" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="Difficulty"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtDifficulty" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="Game version"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtGameVersion" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="MultiplayerCore"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtMpCore" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="MultiplayerExtensions"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtMpEx" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                </vertical>
+            </tab>
             <tab tags="ServerDetailTabs" tab-name="Player List">
                 <horizontal spacing="0" horizontal-fit="PreferredSize" vertical-fit="Unconstrained"
                             child-align="MiddleCenter" preferred-width="120">
@@ -78,11 +124,6 @@
                                      pref-height='2'/>
                     </vertical>
                 </horizontal>
-            </tab>
-            <tab tags="ServerDetailTabs" tab-name="Server Info">
-                <vertical pad="3">
-                    <text text="Coming soon to a tab near you" italics="true" color="#bcbdc2"/>
-                </vertical>
             </tab>
             <tab tags="ServerDetailTabs" tab-name="Level History">
                 <vertical pad="3">

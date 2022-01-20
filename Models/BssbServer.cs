@@ -60,6 +60,10 @@ namespace ServerBrowser.Models
         /// </summary>
         [JsonProperty("Level")] public BssbServerLevel? Level;
         /// <summary>
+        /// Lobby difficulty (for Quick Play), or last played difficulty.
+        /// </summary>
+        [JsonProperty("Difficulty")] public BeatmapDifficulty? Difficulty;
+        /// <summary>
         /// HTTP URL for the cover art associated with the level, if any.
         /// Provided by the API when querying lobbies.
         /// </summary>
@@ -76,6 +80,16 @@ namespace ServerBrowser.Models
         /// </summary>
         [JsonProperty("Endpoint")] [JsonConverter(typeof(IPEndPointJsonConverter))]
         public IPEndPoint? EndPoint;
+
+        /// <summary>
+        /// The announcer's game version, or a server's compatible game version.
+        /// </summary>
+        /// <remarks>
+        /// This field is not filled by the mod/client.
+        /// The BSSB API derives it from the user agent.
+        /// </remarks>
+        [JsonProperty("GameVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        public Version? GameVersion;
 
         /// <summary>
         /// The announcer's installed or compatibility version of MultiplayerCore.
@@ -115,6 +129,74 @@ namespace ServerBrowser.Models
                 else
                     return "unknown";
             }
+        }
+
+        [JsonIgnore]
+        public string ServerTypeText
+        {
+            get
+            {
+                return ServerTypeCode switch
+                {
+                    "vanilla_quickplay" => "Official Quickplay",
+                    "vanilla_dedicated" => "Official Dedicated",
+                    "beattogether_quickplay" => "BeatTogether Quickplay",
+                    "beattogether_dedicated" => "BeatTogether Dedicated",
+                    _ => ServerTypeCode
+                };
+            }
+        }
+
+        [JsonIgnore]
+        public string LobbyStateText
+        {
+            get
+            {
+                return LobbyState switch
+                {
+                    MultiplayerLobbyState.None => "None",
+                    MultiplayerLobbyState.LobbySetup => "In lobby (setup)",
+                    MultiplayerLobbyState.LobbyCountdown => "In lobby (countdown)",
+                    MultiplayerLobbyState.GameStarting => "Level starting",
+                    MultiplayerLobbyState.GameRunning => "Playing level",
+                    MultiplayerLobbyState.Error => "Error",
+                    _ => "Unknown"
+                };
+            }
+        }
+
+        [JsonIgnore]
+        public string DifficultyName
+        {
+            get
+            {
+                return Difficulty switch
+                {
+                    BeatmapDifficulty.Easy => "Easy",
+                    BeatmapDifficulty.Normal => "Normal",
+                    BeatmapDifficulty.Hard => "Hard",
+                    BeatmapDifficulty.Expert => "Expert",
+                    BeatmapDifficulty.ExpertPlus => "Expert+",
+                    _ => "Unknown"
+                };
+            }
+        }
+        
+        [JsonIgnore]
+        public string DifficultyNameWithColor
+        {
+            get
+            {
+                return Difficulty switch
+                {
+                    BeatmapDifficulty.Easy => "<color=#3cb371>Easy</color>",
+                    BeatmapDifficulty.Normal => "<color=#59b0f4>Normal</color>",
+                    BeatmapDifficulty.Hard => "<color=#ff6347>Hard</color>",
+                    BeatmapDifficulty.Expert => "<color=#bf2a42>Expert</color>",
+                    BeatmapDifficulty.ExpertPlus => "<color=#8f48db>Expert+</color>",
+                    _ => "<color=#bcbdc2>Unknown</color>"
+                };
+            }    
         }
     }
 }
