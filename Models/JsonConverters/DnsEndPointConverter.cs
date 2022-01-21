@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace ServerBrowser.Models.JsonConverters
 {
-    internal class MasterServerEndPointConverter : JsonConverter<MasterServerEndPoint?>
+    internal class DnsEndPointConverter : JsonConverter<DnsEndPoint?>
     {
-        public override void WriteJson(JsonWriter writer, MasterServerEndPoint? value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, DnsEndPoint? value, JsonSerializer serializer)
         {
             if (value is null)
             {
@@ -16,8 +16,8 @@ namespace ServerBrowser.Models.JsonConverters
             writer.WriteValue($"{value.hostName}:{value.port}");
         }
 
-        public override MasterServerEndPoint? ReadJson(JsonReader reader, Type objectType,
-            MasterServerEndPoint? existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override DnsEndPoint? ReadJson(JsonReader reader, Type objectType,
+            DnsEndPoint? existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             if (reader.Value is null)
             {
@@ -31,7 +31,7 @@ namespace ServerBrowser.Models.JsonConverters
             if (valueParts.Length == 2
                 && int.TryParse(valueParts[1], out var port))
             {
-                return new MasterServerEndPoint(valueParts[0], port);
+                return new DnsEndPoint(valueParts[0], port);
             }
 
             return null;

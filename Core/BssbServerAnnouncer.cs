@@ -176,7 +176,7 @@ namespace ServerBrowser.Core
             {
                 SelfUserId = _dataCollector.Current?.LocalPlayer?.UserId,
                 HostSecret = _dataCollector.Current?.HostSecret,
-                HostUserId = _dataCollector.Current?.OwnerId,
+                HostUserId = _dataCollector.Current?.RemoteUserId,
             };
             
             if (!unAnnounceRequest.IsComplete)

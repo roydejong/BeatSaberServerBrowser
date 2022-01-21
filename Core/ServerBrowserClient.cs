@@ -46,9 +46,9 @@ namespace ServerBrowser.Core
 
         #region Master Server
 
-        private MasterServerEndPoint? _lastUsedMasterServerEndPoint = null;
+        private DnsEndPoint? _lastUsedMasterServerEndPoint = null;
 
-        public MasterServerEndPoint? MasterServerEndPoint =>
+        public DnsEndPoint? MasterServerEndPoint =>
             _mpCoreNetConfig.MasterServerEndPoint ?? _lastUsedMasterServerEndPoint;
 
         public string? MasterServerHost => MasterServerEndPoint?.hostName;
@@ -59,7 +59,7 @@ namespace ServerBrowser.Core
         [AffinityPatch(typeof(NetworkConfigSO), nameof(NetworkConfigSO.masterServerEndPoint),
             AffinityMethodType.Getter)]
         [AffinityPriority(Priority.Last)] // we want to read the final used value that may be influenced by mods
-        private void HandleMasterServerEndpointRead(MasterServerEndPoint __result)
+        private void HandleMasterServerEndpointRead(DnsEndPoint __result)
         {
             if (_lastUsedMasterServerEndPoint?.Equals(__result) ?? false)
                 return;

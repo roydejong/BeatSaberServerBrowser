@@ -23,7 +23,11 @@ namespace ServerBrowser.Models
         /// <summary>
         /// User ID for the lobby host (unique per dedicated server).
         /// </summary>
-        [JsonProperty("OwnerId")] public string? OwnerId;
+        [JsonProperty("OwnerId")] public string? RemoteUserId;
+        /// <summary>
+        /// User name for the lobby host (unique per dedicated server).
+        /// </summary>
+        [JsonProperty("OwnerName")] public string? RemoteUserName;
         /// <summary>
         /// Unique lobby secret. Can be used to access specific Quick Play lobbies via matchmaking.
         /// </summary>
@@ -76,8 +80,8 @@ namespace ServerBrowser.Models
         /// <summary>
         /// The endpoint for the master server this lobby exists on.
         /// </summary>
-        [JsonProperty("MasterServerEp")] [JsonConverter(typeof(MasterServerEndPointConverter))]
-        public MasterServerEndPoint? MasterServerEndPoint;
+        [JsonProperty("MasterServerEp")] [JsonConverter(typeof(DnsEndPointConverter))]
+        public DnsEndPoint? MasterServerEndPoint;
 
         /// <summary>
         /// The endpoint for the dedicated server instance this lobby is hosted on.
@@ -116,7 +120,7 @@ namespace ServerBrowser.Models
                                   (MasterServerEndPoint == null ||
                                    MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
 
-        [JsonIgnore] public bool IsBeatTogetherHost => OwnerId == "ziuMSceapEuNN7wRGQXrZg";
+        [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
 
         [JsonIgnore]
         public string ServerTypeText

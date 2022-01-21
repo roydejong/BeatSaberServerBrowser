@@ -141,13 +141,13 @@ namespace ServerBrowser.Core
 
         [AffinityPostfix]
         [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
-        private void HandlePreConnect(string userId, string userName, IPEndPoint remoteEndPoint, string secret,
-            string code, BeatmapLevelSelectionMask selectionMask, GameplayServerConfiguration configuration,
-            byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom, bool isConnectionOwner,
-            bool isDedicatedServer, string managerId)
+        private void HandlePreConnect(string remoteUserId, string remoteUserName, IPEndPoint remoteEndPoint,
+            string secret, string code, BeatmapLevelSelectionMask selectionMask,
+            GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
+            bool isConnectionOwner, bool isDedicatedServer, string managerId)
         {
             // nb: HandleConnectToServerSuccess just means "the master server gave us the info to connect"
-            _log.Info($"Game will connect to server (userId={userId}, userName={userName}, "
+            _log.Info($"Game will connect to server (remoteUserId={remoteUserId}, remoteUserName={remoteUserName}, "
                       + $"remoteEndPoint={remoteEndPoint}, secret={secret}, code={code}, "
                       + $"isDedicatedServer={isDedicatedServer}, managerId={managerId}, "
                       + $"maxPlayerCount={configuration.maxPlayerCount}, "
@@ -155,13 +155,14 @@ namespace ServerBrowser.Core
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "
                       + $"songSelectionMode={configuration.songSelectionMode})");
 
-            PreConnectInfo = new PreConnectInfo(userId, userName, remoteEndPoint, secret, code, selectionMask,
-                configuration, preMasterSecret, myRandom, remoteRandom, isConnectionOwner, isDedicatedServer,
-                managerId);
+            PreConnectInfo = new PreConnectInfo(remoteUserName, remoteUserId, remoteEndPoint, secret, code,
+                selectionMask, configuration, preMasterSecret, myRandom, remoteRandom, isConnectionOwner,
+                isDedicatedServer, managerId);
 
             Current.Key = null;
             Current.ServerCode = code;
-            Current.OwnerId = userId;
+            Current.RemoteUserId = remoteUserId;
+            Current.RemoteUserName = remoteUserName;
             Current.HostSecret = secret;
             Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded Platform User ID
             Current.PlayerLimit = configuration.maxPlayerCount;

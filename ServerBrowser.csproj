@@ -234,7 +234,7 @@
     <Compile Include="Models\BssbServerPlayer.cs" />
     <Compile Include="Models\JsonConverters\HiveVersionJsonConverter.cs" />
     <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
-    <Compile Include="Models\JsonConverters\MasterServerEndPointConverter.cs" />
+    <Compile Include="Models\JsonConverters\DnsEndPointConverter.cs" />
     <Compile Include="Models\PreConnectInfo.cs" />
     <Compile Include="Models\Requests\BrowseQueryParams.cs" />
     <Compile Include="Models\Requests\UnAnnounceParams.cs" />
