@@ -1,9 +1,11 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using ServerBrowser.Models;
 using ServerBrowser.Models.Requests;
 using ServerBrowser.Models.Responses;
@@ -70,7 +72,7 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                _log.Warn(ex);
+                LogWebException(ex);
                 return null;
             }
         }
@@ -89,7 +91,7 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                _log.Warn(ex);
+                LogWebException(ex);
                 return null;
             }
         }
@@ -108,7 +110,7 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                _log.Warn(ex);
+                LogWebException(ex);
                 return null;
             }
         }
@@ -126,10 +128,36 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                _log.Warn(ex);
+                LogWebException(ex);
             }
 
             return null;
+        }
+
+        private void LogWebException(Exception ex)
+        {
+            // Try to reduce verbosity of simple network errors in the log
+            if (ex is HttpException or HttpRequestException)
+            {
+                if (ex.InnerException is WebException)
+                {
+                    ex = ex.InnerException;
+                }
+                else
+                {
+                    _log.Error($"HTTP request failed: {ex.Message}");
+                    return;
+                }
+            }
+
+            if (ex is WebException)
+            {
+                _log.Error($"Web request failed: {ex.Message}");
+                return;
+            }
+            
+            // Fallback for unexpected errors
+            _log.Error(ex);
         }
     }
 }
