@@ -19,6 +19,8 @@ namespace ServerBrowser.UI
         private Transform _wrapper = null!;
         private Transform _formView = null!;
 
+        private bool _isActivated = false;
+        
         private FormExtender? _formExtender;
         private ExtendedToggleField? _announcePartyField;
         private ExtendedStringField? _serverNameField;
@@ -42,12 +44,45 @@ namespace ServerBrowser.UI
             
             // Set initial values
             UpdateForm();
+            
+            // Bind events
+            _viewController.didActivateEvent += HandleViewActivated;
+            _viewController.didDeactivateEvent += HandleViewDeactivated;
         }
 
-        [AffinityPostfix]
-        [AffinityPatch(typeof(CreateServerViewController), "DidActivate")]
-        private void HandleViewDidActivate(bool firstActivation)
+        private void HandleViewActivated(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
+            UpdateForm();
+
+            _isActivated = true;
+        }
+
+        private void HandleViewDeactivated(bool removedFromHierarchy, bool screenSystemDisabling)
+        {
+            _isActivated = false;
+        }
+
+        private void HandleAnnouncePartyChange(object sender, bool newValue)
+        {
+            if (!_isActivated)
+                return;
+            
+            _log.Info($"HandleAnnouncePartyChange: {newValue}");
+
+            _config.AnnounceParty = newValue;
+
+            UpdateForm();
+        }
+
+        private void HandleServerNameChange(object sender, string? newValue)
+        {
+            if (!_isActivated)
+                return;
+            
+            _log.Info($"HandleServerNameChange: {newValue}");
+
+            _config.ServerName = newValue;
+
             UpdateForm();
         }
 
@@ -69,26 +104,13 @@ namespace ServerBrowser.UI
             __result.netDiscoverable = !_bssbClient.UsingOfficialMaster;
         }
 
-        private void HandleAnnouncePartyChange(object sender, bool newValue)
-        {
-            _log.Info($"HandleAnnouncePartyChange: {newValue}");
-
-            _config.AnnounceParty = newValue;
-
-            UpdateForm();
-        }
-
-        private void HandleServerNameChange(object sender, string? newValue)
-        {
-            _log.Info($"HandleServerNameChange: {newValue}");
-
-            _config.ServerName = newValue;
-
-            UpdateForm();
-        }
-
         private void UpdateForm()
         {
+            if (_announcePartyField is not null)
+            {
+                _announcePartyField.Value = _config.AnnounceParty;
+            }
+            
             if (_serverNameField is not null)
             {
                 _serverNameField.Visible = _config.AnnounceParty;
