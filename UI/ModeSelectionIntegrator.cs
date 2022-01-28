@@ -134,7 +134,7 @@ namespace ServerBrowser.UI
                       $"ServerTypeCode={server.ServerTypeCode})");
 
             // Set master server
-            if (server.IsOfficial || server.MasterServerEndPoint is null)
+            if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
                 _mpCoreNetConfig.UseOfficialServer();
             else 
                 _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, null);

@@ -41,12 +41,12 @@ namespace ServerBrowser.Core
             _multiplayerSession.playerConnectedEvent -= HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent -= HandlePlayerDisconnected;
         }
-        
+
         internal void TriggerDataChanged()
         {
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
-        
+
         private void HandleSessionConnected()
         {
             _log.Info($"Multiplayer session connected (syncTime={_multiplayerSession.syncTime})");
@@ -60,10 +60,10 @@ namespace ServerBrowser.Core
             HandlePlayerConnected(_multiplayerSession.localPlayer);
 
             if (Current.IsBeatTogetherHost)
-            {
                 _log.Info("Detected a BeatTogether host");
-            }
-            
+            else if (Current.IsGameLiftHost)
+                _log.Info("Detected an Amazon GameLift host");
+
             Current.ServerTypeCode = DetermineServerType();
 
             SessionEstablished?.Invoke(this, Current);
@@ -73,7 +73,7 @@ namespace ServerBrowser.Core
         {
             if (!SessionActive)
                 return;
-            
+
             _log.Info($"Multiplayer session disconnected (reason={reason})");
 
             SessionActive = false;
@@ -105,35 +105,35 @@ namespace ServerBrowser.Core
 
             if (playerToRemove == null)
                 return;
-            
+
             Current.Players.Remove(playerToRemove);
-                
+
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
-        
+
         private void HandleLobbyStateChanged(MultiplayerLobbyState newState)
         {
             if (Current.LobbyState == newState)
                 return;
 
             _log.Info($"Lobby state changed to: {newState}");
-            
+
             Current.LobbyState = newState;
-            
+
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
-        
+
         private string DetermineServerType()
         {
             if (Current.IsOfficial)
                 return Current.IsQuickPlay ? "vanilla_quickplay" : "vanilla_dedicated";
-            
+
             if (Current.IsBeatTogetherHost)
                 return Current.IsQuickPlay ? "beattogether_quickplay" : "beattogether_dedicated";
-            
+
             return "unknown";
         }
-        
+
         public bool ContainsPlayer(string userId) => Current.Players.Any(p => p.UserId == userId);
 
         public bool IsPartyLeader =>
@@ -141,12 +141,14 @@ namespace ServerBrowser.Core
 
         [AffinityPostfix]
         [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
-        private void HandlePreConnect(string remoteUserId, string remoteUserName, IPEndPoint remoteEndPoint,
+        private void HandleMasterServerPreConnect(string remoteUserId, string remoteUserName, IPEndPoint remoteEndPoint,
             string secret, string code, BeatmapLevelSelectionMask selectionMask,
             GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
             bool isConnectionOwner, bool isDedicatedServer, string managerId)
         {
             // nb: HandleConnectToServerSuccess just means "the master server gave us the info to connect"
+            //  we are not yet successfully connected to a dedicated server instance
+
             _log.Info($"Game will connect to server (remoteUserId={remoteUserId}, remoteUserName={remoteUserName}, "
                       + $"remoteEndPoint={remoteEndPoint}, secret={secret}, code={code}, "
                       + $"isDedicatedServer={isDedicatedServer}, managerId={managerId}, "
@@ -155,11 +157,10 @@ namespace ServerBrowser.Core
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "
                       + $"songSelectionMode={configuration.songSelectionMode})");
 
-            PreConnectInfo = new PreConnectInfo(remoteUserName, remoteUserId, remoteEndPoint, secret, code,
+            PreConnectInfo = new PreConnectInfo(remoteUserId, remoteUserName, remoteEndPoint, secret, code,
                 selectionMask, configuration, preMasterSecret, myRandom, remoteRandom, isConnectionOwner,
                 isDedicatedServer, managerId);
 
-            Current.Key = null;
             Current.ServerCode = code;
             Current.RemoteUserId = remoteUserId;
             Current.RemoteUserName = remoteUserName;
@@ -167,20 +168,75 @@ namespace ServerBrowser.Core
             Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded Platform User ID
             Current.PlayerLimit = configuration.maxPlayerCount;
             Current.GameplayMode = configuration.gameplayServerMode;
-            Current.Name = null;
-            Current.LobbyState = null;
             Current.MasterServerEndPoint = _serverBrowserClient.MasterServerEndPoint;
             Current.EndPoint = remoteEndPoint;
             Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
             Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
-            
-            Current.Level = null;
-            Current.Players.Clear();
 
             if (selectionMask.difficulties != BeatmapDifficultyMask.All)
                 Current.Difficulty = selectionMask.difficulties.FromMask();
             else
                 Current.Difficulty = null;
+
+            FinishPreConnectHandling();
+        }
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(GameLiftConnectionManager), "HandleConnectToServerSuccess")]
+        private void HandleGameLiftPreConnect(string playerSessionId, IPEndPoint remoteEndPoint, string gameSessionId,
+            string secret, string code, BeatmapLevelSelectionMask selectionMask,
+            GameplayServerConfiguration configuration)
+        {
+            // nb: HandleConnectToServerSuccess just means "the GameLift API gave us the info to connect"
+            //   we are not yet successfully connected to the dedicated server instance
+            
+            _log.Info($"Game will connect to GameLift session (playerSessionId={playerSessionId}, "
+                      + $"remoteEndPoint={remoteEndPoint}, gameSessionId={gameSessionId}, secret={secret}, code={code}, "
+                      + $"maxPlayerCount={configuration.maxPlayerCount}, "
+                      + $"discoveryPolicy={configuration.discoveryPolicy}, "
+                      + $"gameplayServerMode={configuration.gameplayServerMode}, "
+                      + $"songSelectionMode={configuration.songSelectionMode})");
+            
+            // https://docs.aws.amazon.com/gamelift/latest/apireference/API_PlayerSession.html
+            
+            // playerSessionId is "psess-{GUID}"
+            //  A unique identifier for a player session.
+
+            // gameSessionId is an AWS identifier (ARN) starting with "arn:aws:gamelift:" and equals the dedi's user id
+            //  A unique identifier for the game session that the player session is connected to.
+
+            PreConnectInfo = new PreConnectInfo(playerSessionId, gameSessionId, remoteEndPoint,
+                secret, code, selectionMask, configuration, null, null, null,
+                false, true, null);
+
+            Current.ServerCode = code;
+            Current.RemoteUserId = gameSessionId;
+            Current.RemoteUserName = null;
+            Current.HostSecret = secret;
+            Current.ManagerId = null;
+            Current.PlayerLimit = configuration.maxPlayerCount;
+            Current.GameplayMode = configuration.gameplayServerMode;
+            Current.MasterServerEndPoint = null;
+            Current.EndPoint = remoteEndPoint;
+
+            if (selectionMask.difficulties != BeatmapDifficultyMask.All)
+                Current.Difficulty = selectionMask.difficulties.FromMask();
+            else
+                Current.Difficulty = null;
+            
+            FinishPreConnectHandling();
+        }
+
+        private void FinishPreConnectHandling()
+        {
+            Current.Key = null;
+            Current.Name = null;
+            Current.LobbyState = null;
+            Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
+            Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
+
+            Current.Level = null;
+            Current.Players.Clear();
 
             Current.ServerTypeCode = DetermineServerType();
 
@@ -205,7 +261,7 @@ namespace ServerBrowser.Core
             Current.Level.Characteristic = beatmapCharacteristic.serializedName;
 
             Current.Difficulty = difficultyBeatmap.difficulty;
-            
+
             // TODO Capture modifiers? Maybe? Who cares?
 
             DataChanged?.Invoke(this, EventArgs.Empty);
