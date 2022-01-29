@@ -200,9 +200,13 @@ namespace ServerBrowser.UI.Views
         {
             _txtServerType.SetText(serverDetail.ServerTypeText ?? "Unknown");
             _txtMasterServer.SetText(serverDetail.MasterServerText ?? serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
-            _txtDifficulty.SetText(serverDetail.DifficultyNameWithColor);
             _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
 
+            if (!serverDetail.IsQuickPlay && serverDetail.Difficulty != null)
+                _txtDifficulty.SetText(serverDetail.DifficultyNameWithColor);
+            else
+                _txtDifficulty.SetText("New lobby");
+            
             _txtGameVersion.SetText($"Beat Saber {serverDetail.GameVersion}");
             _txtGameVersion.color = (serverDetail.GameVersion?.Equals(IPA.Utilities.UnityGame.GameVersion) ?? false)
                 ? BssbColorScheme.Green
