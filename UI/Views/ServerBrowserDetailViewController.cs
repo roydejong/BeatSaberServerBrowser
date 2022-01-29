@@ -198,8 +198,8 @@ namespace ServerBrowser.UI.Views
 
         private void SetInfoTabData(BssbServerDetail serverDetail)
         {
-            _txtServerType.SetText(serverDetail.ServerTypeText);
-            _txtMasterServer.SetText(serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
+            _txtServerType.SetText(serverDetail.ServerTypeText ?? "Unknown");
+            _txtMasterServer.SetText(serverDetail.MasterServerText ?? serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
             _txtDifficulty.SetText(serverDetail.DifficultyNameWithColor);
             _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
 
