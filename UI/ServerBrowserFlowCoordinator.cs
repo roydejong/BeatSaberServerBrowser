@@ -20,6 +20,7 @@ namespace ServerBrowser.UI
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
+            _mainViewController.RefreshStartedEvent += HandleRefreshStartedEvent;
             _mainViewController.CreateServerClickedEvent += HandleCreateServerClicked;
             _mainViewController.ServerSelectedEvent += HandleServerSelected;
             _mainViewController.ConnectClickedEvent += HandleConnectClicked;
@@ -43,6 +44,7 @@ namespace ServerBrowser.UI
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
+            _mainViewController.RefreshStartedEvent -= HandleRefreshStartedEvent;
             _mainViewController.CreateServerClickedEvent -= HandleCreateServerClicked;
             _mainViewController.ServerSelectedEvent -= HandleServerSelected;
             _mainViewController.ConnectClickedEvent -= HandleConnectClicked;
@@ -52,6 +54,11 @@ namespace ServerBrowser.UI
         protected override void BackButtonWasPressed(ViewController topViewController)
         {
             ReturnToModeSelection();
+        }
+
+        private async void HandleRefreshStartedEvent(object sender, EventArgs e)
+        {
+            await _detailViewController.Refresh();
         }
 
         private void HandleCreateServerClicked(object sender, EventArgs e)

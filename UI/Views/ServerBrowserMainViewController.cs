@@ -33,6 +33,7 @@ namespace ServerBrowser.UI.Views
         private LoadingControl? _loadingControl;
         private BssbServer? _selectedServer;
 
+        public event EventHandler<EventArgs>? RefreshStartedEvent;
         public event EventHandler<EventArgs>? CreateServerClickedEvent;
         public event EventHandler<BssbServer?>? ServerSelectedEvent;
         public event EventHandler<BssbServer>? ConnectClickedEvent;
@@ -210,6 +211,7 @@ namespace ServerBrowser.UI.Views
         private async void HandleRefreshButtonClick()
         {
             ClearSelection();
+            RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
             await _browser.Reset();
         }
 

@@ -72,7 +72,7 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                LogWebException(ex);
+                LogApiException(ex);
                 return null;
             }
         }
@@ -91,7 +91,7 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                LogWebException(ex);
+                LogApiException(ex);
                 return null;
             }
         }
@@ -110,16 +110,16 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                LogWebException(ex);
+                LogApiException(ex);
                 return null;
             }
         }
 
-        public async Task<BssbServerDetail?> BrowseDetail(string key)
+        public async Task<BssbServerDetail?> BrowseDetail(string key, CancellationToken cancellationToken)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"/api/v1/browse/{key}");
+                var response = await _httpClient.GetAsync($"/api/v1/browse/{key}", cancellationToken);
                 
                 response.EnsureSuccessStatusCode();
 
@@ -128,15 +128,20 @@ namespace ServerBrowser.Core
             }
             catch (Exception ex)
             {
-                LogWebException(ex);
+                LogApiException(ex);
+                return null;
             }
-
-            return null;
         }
 
-        private void LogWebException(Exception ex)
+        private void LogApiException(Exception ex)
         {
             // Try to reduce verbosity of simple network errors in the log
+            if (ex is TaskCanceledException)
+            {
+                _log.Warn($"HTTP request was cancelled");
+                return;
+            }
+            
             if (ex is HttpException or HttpRequestException)
             {
                 if (ex.InnerException is WebException)

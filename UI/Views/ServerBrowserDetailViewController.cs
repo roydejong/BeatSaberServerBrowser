@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
@@ -58,6 +59,7 @@ namespace ServerBrowser.UI.Views
         private BssbPlayersTable _playersTable = null!;
         private BssbServerDetail? _currentDetail = null!;
         private bool _busyLoading = false;
+        private CancellationTokenSource? _loadingCts;
 
         public event EventHandler<BssbServer>? ConnectClickedEvent;
 
@@ -102,10 +104,15 @@ namespace ServerBrowser.UI.Views
             if (_busyLoading)
                 return;
 
+            await Refresh(true);
+        }
+
+        public async Task Refresh(bool soft = false)
+        {
             if (_currentDetail?.Key == null)
                 return;
 
-            await LoadDetailsAsync(_currentDetail.Key);
+            await LoadDetailsAsync(_currentDetail.Key, soft);
         }
 
         #endregion
@@ -136,6 +143,8 @@ namespace ServerBrowser.UI.Views
 
         public async Task LoadDetailsAsync(string serverKey, bool soft = false)
         {
+            CancelLoading();
+            
             _busyLoading = true;
 
             try
@@ -148,7 +157,7 @@ namespace ServerBrowser.UI.Views
                     _mainRoot.gameObject.SetActive(false);
                 }
 
-                var serverDetail = await _apiClient.BrowseDetail(serverKey);
+                var serverDetail = await _apiClient.BrowseDetail(serverKey, _loadingCts!.Token);
 
                 if (serverDetail == null)
                 {
@@ -162,6 +171,14 @@ namespace ServerBrowser.UI.Views
             {
                 _busyLoading = false;
             }
+        }
+        
+        public void CancelLoading()
+        {
+            _loadingCts?.Cancel();
+            _loadingCts?.Dispose();
+            
+            _loadingCts = new();
         }
 
         public void SetData(BssbServerDetail serverDetail)
