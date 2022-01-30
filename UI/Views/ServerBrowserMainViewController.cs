@@ -61,7 +61,8 @@ namespace ServerBrowser.UI.Views
             }
 
             // Refresh
-            HandleRefreshButtonClick();
+            if (!_browser.IsLoading)
+                HandleRefreshButtonClick();
         }
 
         public async void OnEnable()
@@ -252,9 +253,8 @@ namespace ServerBrowser.UI.Views
         [UIAction("refreshButtonClick")]
         private async void HandleRefreshButtonClick()
         {
-            ClearSelection();
             RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
-            await _browser.Reset();
+            await _browser.Refresh();
         }
 
         [UIAction("createButtonClick")]
