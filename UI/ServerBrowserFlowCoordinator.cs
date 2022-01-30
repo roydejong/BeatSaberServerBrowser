@@ -7,15 +7,13 @@ using Zenject;
 
 namespace ServerBrowser.UI
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ServerBrowserFlowCoordinator : FlowCoordinator
     {
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly ServerBrowserMainViewController _mainViewController = null!;
         [Inject] private readonly ServerBrowserDetailViewController _detailViewController = null!;
-
-        [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _multiplayerModeSelectionFlowCoordinator =
-            null!;
-
+        [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _modeSelectionFlowCoordinator = null!;
         [Inject] private readonly ModeSelectionIntegrator _modeSelectionIntegrator = null!;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -88,7 +86,7 @@ namespace ServerBrowser.UI
                     _modeSelectionIntegrator.TriggerMenuButton(targetButton.Value);
             });
 
-            _mainFlowCoordinator.ReplaceChildFlowCoordinator(_multiplayerModeSelectionFlowCoordinator,
+            _mainFlowCoordinator.ReplaceChildFlowCoordinator(_modeSelectionFlowCoordinator,
                 finishedCallback, ViewController.AnimationDirection.Vertical, false);
         }
     }

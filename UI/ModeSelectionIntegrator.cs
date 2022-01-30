@@ -12,6 +12,7 @@ using Zenject;
 
 namespace ServerBrowser.UI
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ModeSelectionIntegrator : IInitializable, IDisposable, IAffinity
     {
         [Inject] private readonly SiraLog _log = null!;
@@ -118,7 +119,7 @@ namespace ServerBrowser.UI
                 "HandleMenuButton", menuButton);
         }
 
-        private void ReplaceTopViewController(ViewController viewController, Action finishedCallback = null,
+        private void ReplaceTopViewController(ViewController viewController, Action? finishedCallback = null,
             ViewController.AnimationType animationType = ViewController.AnimationType.In,
             ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal)
         {
@@ -137,7 +138,7 @@ namespace ServerBrowser.UI
             if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
                 _mpCoreNetConfig.UseOfficialServer();
             else 
-                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, null);
+                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, null!);
             
             // Set up lobby destination via deeplink
             _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));

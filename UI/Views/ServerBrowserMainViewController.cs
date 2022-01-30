@@ -18,7 +18,6 @@ namespace ServerBrowser.UI.Views
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
-        [Inject] private readonly CoverArtLoader _coverArtLoader = null!;
 
         [UIComponent("refreshButton")] private Button _refreshButton = null!;
         [UIComponent("filterButton")] private Button _filterButton = null!;

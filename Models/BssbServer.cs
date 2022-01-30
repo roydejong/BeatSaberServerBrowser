@@ -89,7 +89,7 @@ namespace ServerBrowser.Models
         /// <summary>
         /// Identifies what type of server this is for announce messages.
         /// </summary>
-        [JsonProperty("ServerType")] public string ServerTypeCode;
+        [JsonProperty("ServerType")] public string? ServerTypeCode;
 
         /// <summary>
         /// The endpoint for the master server this lobby exists on.

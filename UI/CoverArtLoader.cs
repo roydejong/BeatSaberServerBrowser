@@ -10,6 +10,7 @@ using Zenject;
 
 namespace ServerBrowser.UI
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class CoverArtLoader : MonoBehaviour
     {
         [Inject] private SiraLog _log = null!;
