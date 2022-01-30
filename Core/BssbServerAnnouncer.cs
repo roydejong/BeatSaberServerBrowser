@@ -12,9 +12,10 @@ namespace ServerBrowser.Core
     /// <summary>
     /// Handles sending announce/unannounce requests to the server browser API. 
     /// </summary>
-    public class BssbServerAnnouncer : MonoBehaviour, IInitializable, IDisposable
+    public class BssbServerAnnouncer : MonoBehaviour, IInitializable
     {
-        public const float AnnounceIntervalSeconds = 30f;
+        private const float AnnounceIntervalSeconds = 30f;
+        private const int MaxConsecutiveErrorsForUnannounce = 3; 
         
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly PluginConfig _config = null!;
@@ -26,6 +27,7 @@ namespace ServerBrowser.Core
         private bool _havePendingRequest;
         private float? _lastAnnounceTime;
         private AnnounceResponse? _lastSuccessResponse;
+        private int _consecutiveErrors = 0;
 
         public BssbServerDetail Data => _dataCollector.Current;
 
@@ -62,7 +64,7 @@ namespace ServerBrowser.Core
             }
         }
 
-        #region Zenject lifecycle
+        #region Lifecycle
 
         public void Initialize()
         {
@@ -70,17 +72,6 @@ namespace ServerBrowser.Core
             _dataCollector.DataChanged += HandleDataChanged;
             _dataCollector.SessionEnded += HandleDataSessionEnded;
         }
-
-        public void Dispose()
-        {
-            _dataCollector.SessionEstablished -= HandleDataSessionEstablished;
-            _dataCollector.DataChanged -= HandleDataChanged;
-            _dataCollector.SessionEnded -= HandleDataSessionEnded;
-        }
-
-        #endregion
-
-        #region Unity events
 
         public void OnEnable()
         {
@@ -91,6 +82,7 @@ namespace ServerBrowser.Core
             _havePendingRequest = false;
             _lastAnnounceTime = null;
             _lastSuccessResponse = null;
+            _consecutiveErrors = 0;
         }
 
         public void OnDisable()
@@ -119,6 +111,11 @@ namespace ServerBrowser.Core
                 {
                     if (await SendUnannounceNow())
                     {
+                        State = AnnouncerState.NotAnnouncing;
+                    }
+                    else if (_consecutiveErrors >= MaxConsecutiveErrorsForUnannounce)
+                    {
+                        _log.Warn($"Unannounce aborted: {_consecutiveErrors} consecutive errors");
                         State = AnnouncerState.NotAnnouncing;
                     }
                 }
@@ -151,6 +148,7 @@ namespace ServerBrowser.Core
 
                 if (response?.Success ?? false)
                 {
+                    _consecutiveErrors = 0;
                     _log.Info($"Announce OK (ServerKey={response.Key})");
                     _lastAnnounceTime = Time.realtimeSinceStartup;
                     _lastSuccessResponse = response;
@@ -159,6 +157,7 @@ namespace ServerBrowser.Core
                 }
                 else
                 {
+                    _consecutiveErrors++;
                     _log.Warn($"Announce failed");
                     _dirtyFlag = true;
                     return false;
@@ -191,11 +190,13 @@ namespace ServerBrowser.Core
 
                 if (response?.IsOk ?? false)
                 {
+                    _consecutiveErrors = 0;
                     _log.Info("Unannounce OK");
                     return true;
                 }
                 else
                 {
+                    _consecutiveErrors++;
                     _log.Warn("Unannounce failed");
 
                     if (response is null || response.CanRetry)
