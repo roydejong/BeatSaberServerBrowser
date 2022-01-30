@@ -3,11 +3,12 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
+using IPA.Utilities;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
-using SiraUtil.Logging;
+using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -16,7 +17,6 @@ namespace ServerBrowser.UI.Views
     [HotReload]
     public class ServerBrowserMainViewController : BSMLAutomaticViewController
     {
-        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
 
         [UIComponent("refreshButton")] private Button _refreshButton = null!;
@@ -37,17 +37,20 @@ namespace ServerBrowser.UI.Views
         public event EventHandler<BssbServer?>? ServerSelectedEvent;
         public event EventHandler<BssbServer>? ConnectClickedEvent;
 
-        #region Unity lifecycle
+        #region Lifecycle
 
         [UIAction("#post-parse")]
         private void PostParse()
         {
             _bsmlReady = true;
-            
-            // Empty scroll indicator
-            _scrollIndicator.normalizedPageHeight = 0f;
-            _scrollIndicator.progress = 0f;
-            
+
+            // Hide scroll bar initially
+            DisableScrollBar(true);
+
+            // Enlarge scroll up/down buttons
+            _pageUpButton.GetComponentInChildren<ImageView>().rectTransform.sizeDelta = new Vector2(1.5f, 1.5f);
+            _pageDownButton.GetComponentInChildren<ImageView>().rectTransform.sizeDelta = new Vector2(1.5f, 1.5f);
+
             // Attach loading control
             _loadingControl = BssbLoadingControl.Create(_serverList.transform);
 
@@ -56,7 +59,7 @@ namespace ServerBrowser.UI.Views
                 _loadingControl.didPressRefreshButtonEvent += HandleRefreshButtonClick;
                 UpdateLoadingState();
             }
-            
+
             // Refresh
             HandleRefreshButtonClick();
         }
@@ -64,16 +67,16 @@ namespace ServerBrowser.UI.Views
         public async void OnEnable()
         {
             ClearSelection();
-            
+
             _browser.UpdateEvent += HandleBrowserUpdate;
-            
+
             await _browser.Reset();
         }
 
         public void OnDisable()
         {
             _browser.CancelLoading();
-            
+
             _browser.UpdateEvent -= HandleBrowserUpdate;
         }
 
@@ -98,12 +101,10 @@ namespace ServerBrowser.UI.Views
             if (!_bsmlReady)
                 return;
 
-            _log.Info($"!HandleBrowserUpdate!");
-            
             // Clear out table view completely
             _serverList.data.Clear();
             _serverList.tableView.DeleteCells(0, _serverList.tableView.numberOfCells);
-            
+
             // Sometimes the non-primary buttons become disabled if the server browser
             //  isn't opened until after level selection, so let's ensure they're active
             _refreshButton.gameObject.SetActive(true);
@@ -112,20 +113,20 @@ namespace ServerBrowser.UI.Views
 
             // Update loading state + scroll indicator
             UpdateLoadingState();
-            
+
             // Fill data
-            if (_browser.PageData?.Lobbies is not null)
+            if (_browser.PageData?.Servers is not null)
             {
-                foreach (var lobby in _browser.PageData.Lobbies)
+                foreach (var lobby in _browser.PageData.Servers)
                 {
                     _serverList.data.Add(new(lobby.Name, lobby.Key, Sprites.Crown));
                 }
             }
-                
+
             _serverList.tableView.RefreshCellsContent();
             _serverList.tableView.selectionType = TableViewSelectionType.Single;
             _serverList.tableView.ReloadData(); // should cause visibleCells to be updated
-            
+
             ClearSelection();
         }
 
@@ -133,13 +134,10 @@ namespace ServerBrowser.UI.Views
         {
             if (!_bsmlReady)
                 return;
-            
+
             var showLoading = _browser.IsLoading;
             var showError = !showLoading && _browser.LoadingErrored;
-            var showNoData = !showLoading && !showError && (_browser.PageData?.Lobbies?.Count ?? 0) == 0;
-
-            _log.Info(
-                $"UpdateLoadingState (showLoading={showLoading}, showError={showError}, showNoData={showNoData})");
+            var showNoData = !showLoading && !showError && (_browser.PageData?.Servers?.Count ?? 0) == 0;
 
             if (_loadingControl != null)
             {
@@ -159,33 +157,21 @@ namespace ServerBrowser.UI.Views
                 _connectButton.interactable = false;
                 _pageUpButton.interactable = false;
                 _pageDownButton.interactable = false;
-                
+
                 _serverList.tableView.gameObject.SetActive(false);
+
+                // Disable scroll bar, or hide it if we never initialized it with page data
+                DisableScrollBar(hide: _browser.PageData is null);
             }
             else
             {
-                var pageCount = 1;
-                var scrollProgress = 0f;
-                var canMoveUp = false;
-                var canMoveDown = false;
-
                 if (_browser.PageData is not null)
-                {
-                    pageCount = _browser.PageData.PageCount;
-                    scrollProgress = _browser.PageData.Offset / (float) _browser.PageData.Count;
-                    canMoveUp = _browser.PageData.Offset > 0;
-                    canMoveDown = (pageCount > 0 && scrollProgress < 1f);
-                }
+                    UpdateScrollBar(_browser.PageData.TotalResultCount > 0, true,
+                        _browser.PageData.TotalResultCount, _browser.PageData.PageOffset,
+                        _browser.PageData.PageSize);
 
                 _refreshButton.interactable = true;
-                _pageUpButton.interactable = canMoveUp;
-                _pageDownButton.interactable = canMoveDown;
-                _scrollIndicator.normalizedPageHeight = (1f / pageCount);
-                _scrollIndicator.progress = scrollProgress;
-                
-                _log.Warn($"normalizedPageHeight={_scrollIndicator.normalizedPageHeight}, " +
-                           $"progress={_scrollIndicator.progress}, pageCount={pageCount}");
-                
+
                 _serverList.tableView.gameObject.SetActive(true);
             }
         }
@@ -201,7 +187,64 @@ namespace ServerBrowser.UI.Views
             _selectedServer = null;
             ServerSelectedEvent?.Invoke(this, null);
         }
-        
+
+        #endregion
+
+        #region UI Helpers
+
+        private void UpdateScrollBar(bool makeVisible, bool makeInteractable, int totalItems,
+            int currentOffset, int pageSize)
+        {
+            if (makeVisible && makeInteractable)
+            {
+                var canScrollUp = currentOffset > 0;
+                var pageUpperBound = currentOffset + pageSize;
+                var canScrollDown = pageUpperBound < totalItems;
+
+                _pageUpButton.interactable = canScrollUp;
+                _pageDownButton.interactable = canScrollDown;
+
+                if (totalItems > 0)
+                {
+                    // normalizedPageHeight = 0-1f range to control handle height, where 1f is the full scrollbar height
+                    _scrollIndicator.normalizedPageHeight = ((float) pageSize / (float) totalItems);
+                    
+                    // progress = 0-1f range to set middle(?) of handle position
+                    if (currentOffset <= 0)
+                        _scrollIndicator.progress = 0f;
+                    else if (pageUpperBound >= totalItems)
+                        _scrollIndicator.progress = 1f;
+                    else
+                        _scrollIndicator.progress = ((float) currentOffset / (float) totalItems);
+
+                    _scrollIndicator.SetField("_padding", .5f);
+                }
+            }
+            else if (!makeInteractable)
+            {
+                _pageUpButton.interactable = false;
+                _pageDownButton.interactable = false;
+            }
+
+            _pageUpButton.gameObject.SetActive(makeVisible);
+            _pageDownButton.gameObject.SetActive(makeVisible);
+            _scrollIndicator.gameObject.SetActive(makeVisible);
+
+            _scrollIndicator.RefreshHandle();
+
+            // Work around scroll handle being incorrectly sized on first activation
+            if (makeVisible)
+            {
+                HMMainThreadDispatcher.instance.Enqueue(() =>
+                {
+                    _scrollIndicator.RefreshHandle();
+                });   
+            }
+        }
+
+        private void DisableScrollBar(bool hide) =>
+            UpdateScrollBar(!hide, false, 0, 0, 0);
+
         #endregion
 
         #region BSML Actions
@@ -225,7 +268,7 @@ namespace ServerBrowser.UI.Views
         {
             if (_selectedServer is null)
                 return;
-            
+
             ConnectClickedEvent?.Invoke(this, _selectedServer);
         }
 
@@ -244,7 +287,7 @@ namespace ServerBrowser.UI.Views
         [UIAction("listSelect")]
         private void ListSelect(TableView tableView, int row)
         {
-            _selectedServer = _browser.PageData?.Lobbies?[row];
+            _selectedServer = _browser.PageData?.Servers?[row];
 
             if (_selectedServer == null)
             {
@@ -253,10 +296,10 @@ namespace ServerBrowser.UI.Views
             }
 
             _connectButton.interactable = true;
-            
+
             ServerSelectedEvent?.Invoke(this, _selectedServer);
         }
-        
+
         #endregion
     }
 }

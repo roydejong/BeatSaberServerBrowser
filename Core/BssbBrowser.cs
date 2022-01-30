@@ -46,7 +46,7 @@ namespace ServerBrowser.Core
             TriggerUpdate(true);
 
             // Calculate pagination offset
-            var pageSize = PageData?.Limit ?? DefaultPageSize;
+            var pageSize = PageData?.PageSize ?? DefaultPageSize;
             QueryParams.Offset = (_pageIndex * pageSize);
             
             _log.Info($"Loading page (index={_pageIndex})...");
@@ -62,8 +62,8 @@ namespace ServerBrowser.Core
             }
 
             if (PageData is not null)
-                _log.Info($"BrowseData received (TotalCount={PageData.Count}, Limit={PageData.Limit}, " +
-                          $"LobbiesCount={PageData.Lobbies?.Count ?? 0}, Message={PageData.Message})");
+                _log.Info($"BrowseData received (TotalCount={PageData.TotalResultCount}, Limit={PageData.PageSize}, " +
+                          $"LobbiesCount={PageData.Servers?.Count ?? 0}, Message={PageData.MessageOfTheDay})");
             else
                 _log.Info("Received NULL response!");
             

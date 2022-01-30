@@ -10,24 +10,24 @@ namespace ServerBrowser.Models.Responses
         /// <summary>
         /// Total amount of matching lobbies for the request parameters.
         /// </summary>
-        public int Count;
+        [JsonProperty("Count")] public int TotalResultCount;
         /// <summary>
         /// Current offset from the start of the lobby list, for pagination.
         /// </summary>
-        public int Offset;
+        [JsonProperty("Offset")] public int PageOffset;
         /// <summary>
         /// Page size. Maximum amount of lobbies returned in the response.
         /// </summary>
-        public int Limit;
+        [JsonProperty("Limit")] public int PageSize;
         /// <summary>
         /// List of servers.
         /// </summary>
-        public List<BssbServer>? Lobbies;
+        [JsonProperty("Lobbies")] public List<BssbServer>? Servers;
         /// <summary>
         /// Optional message of the day set by the BSSB server.
         /// </summary>
-        public string? Message;
+        [JsonProperty("Message")] public string? MessageOfTheDay;
 
-        [JsonIgnore] public int PageCount => (int)Math.Ceiling(Count / (decimal)Limit);
+        [JsonIgnore] public int PageCount => (int) Math.Ceiling(TotalResultCount / (decimal) PageSize);
     }
 }
