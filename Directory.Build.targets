@@ -100,5 +100,7 @@
 		<Copy SourceFiles="$(OutputAssemblyName).dll" DestinationFiles="$(PluginDir)\$(AssemblyName).dll" Condition="$(CanCopyToPlugins)"  />
 		<Copy SourceFiles="$(OutputAssemblyName).pdb" DestinationFiles="$(PluginDir)\$(AssemblyName).pdb" Condition="'$(CanCopyToPlugins)' == 'True' AND Exists('$(OutputAssemblyName).pdb')"  />
 		<Warning Text="Beat Saber is running, restart the game to use the latest build." Condition="'$(IsRunning)' == 'True'" />
+		<Delete Files="$(BeatSaberDir)\IPA\Pending\Plugins\$(AssemblyName).dll" Condition="'$(IsRunning)' == 'False'" />
+		<Delete Files="$(BeatSaberDir)\IPA\Pending\Plugins\$(AssemblyName).pdb" Condition="'$(IsRunning)' == 'False'" />
 	</Target>
 </Project>
