@@ -43,6 +43,15 @@ namespace ServerBrowser.Models
         [JsonProperty("ManagerId")] public string? ManagerId;
 
         /// <summary>
+        /// The current amount of non-ghost players in this lobby.
+        /// </summary>
+        /// <remarks>
+        /// This field is not filled by the mod/client.
+        /// The BSSB API derives it from the "players" list in the detailed announce.
+        /// </remarks>
+        [JsonProperty("PlayerCount")] public int? ReadOnlyPlayerCount;
+        
+        /// <summary>
         /// The maximum amount of players permitted in this lobby.
         /// </summary>
         [JsonProperty("PlayerLimit")] public int? PlayerLimit;
@@ -81,10 +90,16 @@ namespace ServerBrowser.Models
         [JsonProperty("Difficulty")] public BeatmapDifficulty? Difficulty;
 
         /// <summary>
+        /// Current or last played level id.
+        /// Provided by the API when querying lobbies.
+        /// </summary>
+        [JsonProperty("LevelId")] public string? ReadOnlyLevelId;
+        
+        /// <summary>
         /// HTTP URL for the cover art associated with the level, if any.
         /// Provided by the API when querying lobbies.
         /// </summary>
-        [JsonProperty("CoverUrl")] public string? CoverArtUrl;
+        [JsonProperty("CoverUrl")] public string? ReadOnlyCoverArtUrl;
 
         /// <summary>
         /// Identifies what type of server this is for announce messages.

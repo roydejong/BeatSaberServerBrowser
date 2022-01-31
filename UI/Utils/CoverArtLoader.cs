@@ -9,7 +9,7 @@ using SiraUtil.Web;
 using UnityEngine;
 using Zenject;
 
-namespace ServerBrowser.UI
+namespace ServerBrowser.UI.Utils
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class CoverArtLoader : MonoBehaviour
@@ -17,7 +17,7 @@ namespace ServerBrowser.UI
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IHttpService _httpService = null!;
 
-        private Dictionary<string, Sprite> _coverArtCache;
+        private readonly Dictionary<string, Sprite> _coverArtCache;
 
         public CoverArtLoader()
         {
@@ -66,6 +66,8 @@ namespace ServerBrowser.UI
 
         public async Task<Sprite?> FetchCoverArt(CoverArtRequest request)
         {
+            request.CancellationToken.ThrowIfCancellationRequested();
+            
             if (request.LevelId != null)
             {
                 // Check if cover art is already in cache
@@ -156,8 +158,8 @@ namespace ServerBrowser.UI
 
             public CoverArtRequest(BssbServer serverInfo, CancellationToken cancellationToken)
             {
-                LevelId = serverInfo.Level?.LevelId;
-                CoverArtUrl = serverInfo.CoverArtUrl ?? serverInfo.Level?.CoverArtUrl;
+                LevelId = serverInfo.ReadOnlyLevelId ?? serverInfo.Level?.LevelId;
+                CoverArtUrl = serverInfo.ReadOnlyCoverArtUrl ?? serverInfo.Level?.CoverArtUrl;
                 CancellationToken = cancellationToken;
             }
         }

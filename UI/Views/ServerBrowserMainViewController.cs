@@ -1,10 +1,10 @@
 using System;
+using System.Threading;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
-using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
@@ -17,6 +17,7 @@ namespace ServerBrowser.UI.Views
     [HotReload]
     public class ServerBrowserMainViewController : BSMLAutomaticViewController
     {
+        [Inject] private readonly DiContainer _di = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
 
         [UIComponent("refreshButton")] private Button _refreshButton = null!;
@@ -31,6 +32,7 @@ namespace ServerBrowser.UI.Views
         private bool _bsmlReady;
         private LoadingControl? _loadingControl;
         private BssbServer? _selectedServer;
+        private CancellationTokenSource? _coverArtCts;
 
         public event EventHandler<EventArgs>? RefreshStartedEvent;
         public event EventHandler<EventArgs>? CreateServerClickedEvent;
@@ -67,7 +69,7 @@ namespace ServerBrowser.UI.Views
 
         public async void OnEnable()
         {
-            ClearSelection();
+            ResetSelection();
 
             _browser.UpdateEvent += HandleBrowserUpdate;
 
@@ -120,17 +122,50 @@ namespace ServerBrowser.UI.Views
             {
                 foreach (var lobby in _browser.PageData.Servers)
                 {
-                    _serverList.data.Add(new(lobby.Name, lobby.Key, Sprites.Crown));
+                    _serverList.data.Add(new BssbServerCellInfo(lobby));
                 }
             }
+            
+            AfterCellsCreated();
+        }
 
-            _serverList.tableView.RefreshCellsContent();
+        private void AfterCellsCreated()
+        {
+            CancelCoverArtLoading();
+            
             _serverList.tableView.selectionType = TableViewSelectionType.Single;
             _serverList.tableView.ReloadData(); // should cause visibleCells to be updated
 
-            ClearSelection();
-        }
+            var restoredSelection = false;
 
+            foreach (var cell in _serverList.tableView.visibleCells)
+            {
+                var extensions = cell.gameObject.GetComponent<BssbServerCellExtensions>();
+                var cellInfo = _serverList.data[cell.idx] as BssbServerCellInfo;
+
+                if (cellInfo is null)
+                    continue;
+
+                if (_selectedServer is not null && cellInfo.Server.Key == _selectedServer.Key)
+                {
+                    _serverList.tableView.SelectCellWithIdx(cell.idx);
+                    restoredSelection = true;
+                }
+
+                if (extensions == null)
+                {
+                    extensions = cell.gameObject.AddComponent<BssbServerCellExtensions>();
+                    _di.Inject(extensions);
+                }
+
+                extensions.SetData(cell, cellInfo, cellInfo.Server);
+                _ = extensions.SetCoverArt(_coverArtCts!.Token);
+            }
+
+            if (!restoredSelection)
+                ResetSelection();
+        }
+        
         private void UpdateLoadingState()
         {
             if (!_bsmlReady)
@@ -177,7 +212,7 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void ClearSelection()
+        private void ResetSelection()
         {
             if (_bsmlReady)
             {
@@ -187,6 +222,14 @@ namespace ServerBrowser.UI.Views
 
             _selectedServer = null;
             ServerSelectedEvent?.Invoke(this, null);
+        }
+        
+        public void CancelCoverArtLoading()
+        {
+            _coverArtCts?.Cancel();
+            _coverArtCts?.Dispose();
+            
+            _coverArtCts = new();
         }
 
         #endregion
@@ -291,7 +334,7 @@ namespace ServerBrowser.UI.Views
 
             if (_selectedServer == null)
             {
-                ClearSelection();
+                ResetSelection();
                 return;
             }
 
