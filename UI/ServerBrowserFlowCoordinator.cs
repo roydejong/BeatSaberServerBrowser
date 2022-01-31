@@ -15,6 +15,7 @@ namespace ServerBrowser.UI
         [Inject] private readonly ServerBrowserDetailViewController _detailViewController = null!;
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _modeSelectionFlowCoordinator = null!;
         [Inject] private readonly ModeSelectionIntegrator _modeSelectionIntegrator = null!;
+        [Inject] private readonly CoverArtLoader _coverArtLoader = null!;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -28,7 +29,9 @@ namespace ServerBrowser.UI
             {
                 SetTitle("Server Browser");
                 showBackButton = true;
-
+                
+                _coverArtLoader.UnloadCache();
+                
                 ProvideInitialViewControllers(
                     mainViewController: _mainViewController,
                     rightScreenViewController: _detailViewController
@@ -47,6 +50,9 @@ namespace ServerBrowser.UI
             _mainViewController.ServerSelectedEvent -= HandleServerSelected;
             _mainViewController.ConnectClickedEvent -= HandleConnectClicked;
             _detailViewController.ConnectClickedEvent -= HandleConnectClicked;
+            
+            if (removedFromHierarchy)
+                _coverArtLoader.UnloadCache();
         }
 
         protected override void BackButtonWasPressed(ViewController topViewController)

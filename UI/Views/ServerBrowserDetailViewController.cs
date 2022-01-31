@@ -7,6 +7,7 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
+using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
@@ -27,6 +28,7 @@ namespace ServerBrowser.UI.Views
         [Inject] private readonly DiContainer _container = null!;
         [Inject] private readonly ServerBrowserClient _bssbClient = null!;
         [Inject] private readonly BssbApiClient _apiClient = null!;
+        [Inject] private readonly CoverArtLoader _coverArtLoader = null!;
 
         // ReSharper disable FieldCanBeMadeReadOnly.Local
         [UIComponent("errorRoot")] private VerticalLayoutGroup _errorRoot = null!;
@@ -192,7 +194,7 @@ namespace ServerBrowser.UI.Views
                 _loadRoot.gameObject.SetActive(false);
                 _mainRoot.gameObject.SetActive(true);
 
-                SetHeaderData(serverDetail);
+                _ = SetHeaderData(serverDetail);
                 SetInfoTabData(serverDetail);
                 SetPlayerData(serverDetail.Players);
             }
@@ -203,14 +205,24 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void SetHeaderData(BssbServerDetail serverDetail)
+        private async Task SetHeaderData(BssbServerDetail serverDetail)
         {
             _levelBar.SetText(serverDetail.Name, serverDetail.EndPoint?.ToString());
 
+            // Player count
             var playerCount = serverDetail.PlayerCount;
             var playerLimit = serverDetail.PlayerLimit ?? 5;
             _playerCountText.SetText($"{playerCount}/{playerLimit}");
             _playerCountText.color = (playerCount < playerLimit ? Color.white : BssbColorScheme.Red);
+
+            // Cover art 
+            _levelBar.SetImageSprite(Sprites.BSSB);
+            
+            var coverArt = await _coverArtLoader.FetchCoverArt(new CoverArtLoader.CoverArtRequest(serverDetail,
+                _loadingCts!.Token));
+
+            if (coverArt != null)
+                _levelBar.SetImageSprite(coverArt);
         }
 
         private void SetInfoTabData(BssbServerDetail serverDetail)

@@ -48,7 +48,7 @@ namespace ServerBrowser.Core
             _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
             _httpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
-            _log.Info($"Initialized API client ({UserAgent})");
+            _log.Info($"Initialized API client [{_config.ApiServerUrl}, {UserAgent}]");
         }
 
         public async Task<AnnounceResponse?> Announce(BssbServer announceData)
