@@ -89,9 +89,6 @@ namespace ServerBrowser.UI.Components
                 _songBpm.gameObject.SetActive(true);
                 _songBpm.text = _server.ServerTypeText;
             }
-
-
-            
         }
 
         public async Task SetCoverArt(CancellationToken token)
@@ -101,13 +98,21 @@ namespace ServerBrowser.UI.Components
                 if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
                     return;
 
+                if (_server.IsInLobby || _server.ReadOnlyLevelId is null)
+                {
+                    // Not in level, show lobby icon
+                    _coverImage.sprite = Sprites.PortalUser;
+                    return;
+                }
+                
+                // Playing level, show cover art
+                _coverImage.sprite = Sprites.BeatSaverLogo;
+                
                 var coverSprite =
                     await _coverArtLoader.FetchCoverArt(new CoverArtLoader.CoverArtRequest(_server, token));
 
                 if (coverSprite != null)
                     _coverImage.sprite = coverSprite;
-                else
-                    _coverImage.sprite = Sprites.BSSB;
             }
             catch (Exception ex)
             {

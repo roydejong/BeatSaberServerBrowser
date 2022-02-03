@@ -207,7 +207,7 @@ namespace ServerBrowser.UI.Views
 
         private async Task SetHeaderData(BssbServerDetail serverDetail)
         {
-            _levelBar.SetText(serverDetail.Name, serverDetail.EndPoint?.ToString());
+            _levelBar.SetText(serverDetail.Name, serverDetail.LobbyStateTextExtended);
 
             // Player count
             var playerCount = serverDetail.PlayerCount;
@@ -216,13 +216,22 @@ namespace ServerBrowser.UI.Views
             _playerCountText.color = (playerCount < playerLimit ? Color.white : BssbColorScheme.Red);
 
             // Cover art 
-            _levelBar.SetImageSprite(Sprites.BSSB);
+            if (serverDetail.IsInLobby)
+            {
+                // Not in game, show lobby icon
+                _levelBar.SetImageSprite(Sprites.PortalUser);
+            }
+            else
+            {
+                // In game, show cover art
+                _levelBar.SetImageSprite(Sprites.BeatSaverLogo);
             
-            var coverArt = await _coverArtLoader.FetchCoverArt(new CoverArtLoader.CoverArtRequest(serverDetail,
-                _loadingCts!.Token));
+                var coverArt = await _coverArtLoader.FetchCoverArt(new CoverArtLoader.CoverArtRequest(serverDetail,
+                    _loadingCts!.Token));
 
-            if (coverArt != null)
-                _levelBar.SetImageSprite(coverArt);
+                if (coverArt != null)
+                    _levelBar.SetImageSprite(coverArt);
+            }
         }
 
         private void SetInfoTabData(BssbServerDetail serverDetail)

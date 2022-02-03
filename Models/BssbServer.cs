@@ -191,6 +191,18 @@ namespace ServerBrowser.Models
         }
 
         [JsonIgnore]
+        public string LobbyStateTextExtended
+        {
+            get
+            {
+                if (IsInGameplay && Level != null)
+                    return $"Playing {Level.ListDescription}";
+                else
+                    return LobbyStateText;
+            }
+        }
+
+        [JsonIgnore]
         public string DifficultyName
         {
             get
@@ -223,5 +235,13 @@ namespace ServerBrowser.Models
                 };
             }
         }
+
+        [JsonIgnore]
+        public bool IsInLobby => LobbyState is MultiplayerLobbyState.None or MultiplayerLobbyState.Error
+            or MultiplayerLobbyState.LobbyCountdown or MultiplayerLobbyState.LobbySetup;
+
+        [JsonIgnore]
+        public bool IsInGameplay =>
+            LobbyState is MultiplayerLobbyState.GameStarting or MultiplayerLobbyState.GameRunning;
     }
 }

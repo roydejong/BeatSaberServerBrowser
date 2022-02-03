@@ -5,9 +5,12 @@ using UnityEngine;
 namespace ServerBrowser.Assets
 {
     /// <summary>
+    /// Utilities for using embedded and downloaded sprite assets in the UI.
+    /// </summary>
+    /// <remarks>
     /// Helper code taken from BeatSaverDownloader
     /// Copyright (c) 2018 andruzzzhka (MIT Licensed)
-    /// </summary>
+    /// </remarks>
     internal static class Sprites
     {
         /// Announce icon
@@ -16,7 +19,10 @@ namespace ServerBrowser.Assets
         public static Sprite? Announce;
         
         /// BSSB logo
-        public static Sprite? BSSB;
+        public static Sprite? ServerBrowserLogo;
+
+        /// BeatSaver logo
+        public static Sprite? BeatSaverLogo;
         
         /// Crown icon
         /// Icon by Ivan Boyko (https://www.iconfinder.com/visualpharm)
@@ -32,6 +38,21 @@ namespace ServerBrowser.Assets
         /// Icon by Ivan Boyko (https://www.iconfinder.com/visualpharm)
         /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
         public static Sprite? Person;
+        
+        /// Portal icon
+        /// Straight Line icon set by designforeat (https://www.iconfinder.com/iconsets/technology-straight-line)
+        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+        public static Sprite? Portal;
+        
+        /// Portal user icon
+        /// Straight Line icon set by designforeat (https://www.iconfinder.com/iconsets/technology-straight-line)
+        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+        public static Sprite? PortalUser;
+        
+        /// Robot icon
+        /// Fluent Solid 24px vol.1 icon pack by Microsoft (https://www.iconfinder.com/iconsets/fluent-solid-24px-vol-1)
+        /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+        public static Sprite? Robot;
 
         public static bool IsInitialized { get; private set; }
 
@@ -40,10 +61,14 @@ namespace ServerBrowser.Assets
             IsInitialized = true;
 
             Announce = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Announce.png");
-            BSSB = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BSSB.png");
+            ServerBrowserLogo = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BSSB.png");
+            BeatSaverLogo = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
             Crown = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Crown.png");
             Pencil = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Pencil.png");
             Person = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Person.png");
+            Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
+            PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
+            Robot = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Robot.png");
         }
 
         private static Sprite? LoadSpriteFromResources(string resourcePath, float pixelsPerUnit = 100.0f)

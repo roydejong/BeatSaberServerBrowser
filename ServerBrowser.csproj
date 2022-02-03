@@ -294,6 +294,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\Announce.png" />
+    <EmbeddedResource Include="Assets\Sprites\BeatSaver.png" />
+    <EmbeddedResource Include="Assets\Sprites\Portal.png" />
+    <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
+    <EmbeddedResource Include="Assets\Sprites\Robot.png" />
     <Content Include="ATTRIBUTION.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

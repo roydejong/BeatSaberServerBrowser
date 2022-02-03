@@ -37,28 +37,39 @@ namespace ServerBrowser.UI.Components
             Initialize();
 
             // Icon and color
+            Sprite? sprite = Sprites.Person;
             var spriteColor = Color.white;
             var nameColor = Color.white;
             
             if (player.IsHost)
             {
-                _icon.sprite = Sprites.BSSB;
+                sprite = Sprites.Robot;
+                spriteColor = BssbColorScheme.Pinkish;
                 nameColor = BssbColorScheme.Pinkish;
             }
             else if (player.IsPartyLeader)
             {
-                _icon.sprite = Sprites.Crown;
+                sprite = Sprites.Crown;
                 spriteColor = BssbColorScheme.Gold;
                 nameColor = BssbColorScheme.Gold;
             }
             else if (player.IsAnnouncing)
             {
-                _icon.sprite = Sprites.Announce;
+                sprite = Sprites.Announce;
                 nameColor = BssbColorScheme.Blue;
             }
 
-            _icon.color = spriteColor;
-            _icon.preserveAspect = true;
+            if (sprite != null)
+            {
+                _icon.sprite = sprite;
+                _icon.color = spriteColor;
+                _icon.preserveAspect = true;
+                _icon.gameObject.SetActive(true);
+            }
+            else
+            {
+                _icon.gameObject.SetActive(false);
+            }
 
             // Text
             _nameText.SetText(player.UserName);

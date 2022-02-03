@@ -7,7 +7,7 @@ namespace ServerBrowser.UI.Components
     {
         public readonly BssbServer Server;
         
-        public BssbServerCellInfo(BssbServer server) : base(server.Name, server.LobbyStateText, null)
+        public BssbServerCellInfo(BssbServer server) : base(server.Name, server.LobbyStateTextExtended, null)
         {
             Server = server;
         }

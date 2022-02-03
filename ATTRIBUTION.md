@@ -13,15 +13,6 @@
 
 [Icons by Ivan Boyko](https://www.iconfinder.com/iconsets/users-android-l-lollipop), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 
-### Technology - Straight Line icon set by designforeat
-
-- `Assets/Sprites/Portal.png`
-- `Assets/Sprites/PortalUser.png`
-
-https://www.iconfinder.com/iconsets/technology-straight-line
-
-License: CC BY 3.0
-
 ### Octicons icon set by Github
 
 - `Assets/Sprites/Pencil.png`
@@ -47,3 +38,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+### Technology - Straight Line icon set by designforeat
+
+- `Assets/Sprites/Portal.png`
+- `Assets/Sprites/PortalUser.png`
+
+[Icons by designforeat](https://www.iconfinder.com/iconsets/technology-straight-line), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+
+### Fluent Solid 24px vol.1 icon pack by Microsoft
+
+- `Assets/Sprites/Robot.png`
+
+[Icons by Microsoft](https://www.iconfinder.com/iconsets/fluent-solid-24px-vol-1), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

@@ -24,7 +24,7 @@
         <horizontal>
             <vertical id="titleBarRoot" preferred-width="95" preferred-height="14" vertical-fit="PreferredSize"/>
             <horizontal preferred-width="25" preferred-height="14" pad="2" bg="panel-top">
-                <image src="ServerBrowser.Assets.Sprites.Person.png" preserve-aspect="true" preferred-width="6"/>
+                <image src="ServerBrowser.Assets.Sprites.Person.png" preserve-aspect="true" preferred-width="4"/>
                 <text id="playerCountText" text="99/99" font-size="6" font-align="Right"/>
             </horizontal>
         </horizontal>
