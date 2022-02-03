@@ -32,6 +32,7 @@ namespace ServerBrowser.UI.Views
         private bool _bsmlReady;
         private LoadingControl? _loadingControl;
         private BssbServer? _selectedServer;
+        private bool _selectionValid;
         private CancellationTokenSource? _coverArtCts;
 
         public event EventHandler<EventArgs>? RefreshStartedEvent;
@@ -162,8 +163,12 @@ namespace ServerBrowser.UI.Views
                 _ = extensions.SetCoverArt(_coverArtCts!.Token);
             }
 
-            if (!restoredSelection)
-                ResetSelection();
+            if (restoredSelection)
+                _selectionValid = true;
+            else
+                ResetSelection(false);
+            
+            _connectButton.interactable = _selectionValid;
         }
         
         private void UpdateLoadingState()
@@ -212,7 +217,7 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void ResetSelection()
+        private void ResetSelection(bool hard = true)
         {
             if (_bsmlReady)
             {
@@ -220,8 +225,13 @@ namespace ServerBrowser.UI.Views
                 _connectButton.interactable = false;
             }
 
-            _selectedServer = null;
-            ServerSelectedEvent?.Invoke(this, null);
+            if (hard)
+            {
+                _selectedServer = null;
+                ServerSelectedEvent?.Invoke(this, null);
+            }
+
+            _selectionValid = false;
         }
         
         public void CancelCoverArtLoading()
@@ -309,7 +319,7 @@ namespace ServerBrowser.UI.Views
         [UIAction("connectButtonClick")]
         private void HandleConnectButtonClick()
         {
-            if (_selectedServer is null)
+            if (_selectedServer is null || !_selectionValid)
                 return;
 
             ConnectClickedEvent?.Invoke(this, _selectedServer);
@@ -338,6 +348,7 @@ namespace ServerBrowser.UI.Views
                 return;
             }
 
+            _selectionValid = true;
             _connectButton.interactable = true;
 
             ServerSelectedEvent?.Invoke(this, _selectedServer);
