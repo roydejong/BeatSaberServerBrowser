@@ -212,7 +212,7 @@ namespace ServerBrowser.Core
             Current.ServerCode = code;
             Current.RemoteUserId = gameSessionId;
             Current.RemoteUserName = null;
-            Current.HostSecret = secret;
+            Current.HostSecret = (string.IsNullOrEmpty(secret) ? gameSessionId : secret);
             Current.ManagerId = null;
             Current.PlayerLimit = configuration.maxPlayerCount;
             Current.GameplayMode = configuration.gameplayServerMode;
