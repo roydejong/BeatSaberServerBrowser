@@ -44,6 +44,7 @@ namespace ServerBrowser.UI.Views
 
         [UIComponent("txtServerType")] private FormattableText _txtServerType = null!;
         [UIComponent("txtMasterServer")] private FormattableText _txtMasterServer = null!;
+        [UIComponent("txtUptime")] private FormattableText _txtUptime = null!;
         [UIComponent("txtLobbyStatus")] private FormattableText _txtLobbyStatus = null!;
         [UIComponent("txtDifficulty")] private FormattableText _txtDifficulty = null!;
         [UIComponent("txtGameVersion")] private FormattableText _txtGameVersion = null!;
@@ -238,6 +239,7 @@ namespace ServerBrowser.UI.Views
         {
             _txtServerType.SetText(serverDetail.ServerTypeText ?? "Unknown");
             _txtMasterServer.SetText(serverDetail.MasterServerText ?? serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
+            _txtUptime.SetText(serverDetail.LobbyLifetimeText);
             _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
 
             if (!serverDetail.IsQuickPlay && serverDetail.Difficulty != null)

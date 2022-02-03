@@ -42,7 +42,7 @@
 
         <vertical vertical-fit="PreferredSize" preferred-height="50">
             <tab tags="ServerDetailTabs" tab-name="Server Info">
-                <vertical pad="3" preferred-width="120">
+                <vertical pad-left="3" pad-right="3" pad-top="1" pad-bottom="0" preferred-width="120">
                     <horizontal child-expand-width="true" child-align="MiddleLeft">
                         <text italics="true" text="Server type"
                               overflow-mode="Ellipsis"/>
@@ -53,6 +53,12 @@
                         <text italics="true" text="Master server"
                               overflow-mode="Ellipsis"/>
                         <text id="txtMasterServer" italics="true" text="!Value!" font-align="TopRight"
+                              overflow-mode="Ellipsis"/>
+                    </horizontal>
+                    <horizontal child-expand-width="true" child-align="MiddleLeft">
+                        <text italics="true" text="Lobby uptime"
+                              overflow-mode="Ellipsis"/>
+                        <text id="txtUptime" italics="true" text="!Value!" font-align="TopRight"
                               overflow-mode="Ellipsis"/>
                     </horizontal>
                     <horizontal child-expand-width="true" child-align="MiddleLeft">

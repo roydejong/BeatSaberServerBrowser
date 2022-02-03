@@ -261,6 +261,7 @@
     <Compile Include="UI\Views\ServerBrowserDetailViewController.cs" />
     <Compile Include="UI\Views\ServerBrowserMainViewController.cs" />
     <Compile Include="Utils\ModCheck.cs" />
+    <Compile Include="Utils\TimeSpanExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Sprites\BSSB.png" />

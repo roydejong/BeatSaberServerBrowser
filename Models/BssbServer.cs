@@ -1,8 +1,10 @@
+using System;
 using System.Net;
-using Hive.Versioning;
 using Newtonsoft.Json;
 using ServerBrowser.Models.JsonConverters;
 using ServerBrowser.Models.Utils;
+using ServerBrowser.Utils;
+using Version = Hive.Versioning.Version;
 
 namespace ServerBrowser.Models
 {
@@ -161,6 +163,12 @@ namespace ServerBrowser.Models
         /// </remarks>
         [JsonProperty("MasterServerText")]
         public string? MasterServerText;
+        
+        [JsonProperty("FirstSeen")]
+        public DateTime? ReadOnlyFirstSeen;
+        
+        [JsonProperty("LastUpdate")]
+        public DateTime? ReadOnlyLastSeen;
 
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
@@ -243,5 +251,11 @@ namespace ServerBrowser.Models
         [JsonIgnore]
         public bool IsInGameplay =>
             LobbyState is MultiplayerLobbyState.GameStarting or MultiplayerLobbyState.GameRunning;
+
+        [JsonIgnore]
+        public TimeSpan? LobbyLifetime => ReadOnlyFirstSeen != null ? DateTime.Now - ReadOnlyFirstSeen : null;
+
+        [JsonIgnore]
+        public string LobbyLifetimeText => LobbyLifetime?.ToReadableString() ?? "Unknown";
     }
 }
