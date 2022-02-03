@@ -67,7 +67,7 @@ namespace ServerBrowser.UI.Components
         public enum BackgroundStyle : byte
         {
             GameDefault,
-            Test,
+            ColorfulGradient,
             GrayTitle
         }
         
@@ -76,21 +76,21 @@ namespace ServerBrowser.UI.Components
             // Primary background color
             _bg.color = style switch
             {
-                BackgroundStyle.Test => Color.white,
+                BackgroundStyle.ColorfulGradient => Color.white,
                 BackgroundStyle.GrayTitle => new Color(1, 1, 1, .2f),
                 _ => Color.black
             };
             // Gradient left color
             _bg.color0 = style switch
             {
-                BackgroundStyle.Test => new Color(0, .55f, .99f, 0f),
+                BackgroundStyle.ColorfulGradient => new Color(0, .55f, .99f, 0f),
                 BackgroundStyle.GrayTitle => Color.white,
                 _ => new Color(1, 1, 1, 0)
             };
             // Gradient right color
             _bg.color1 = style switch
             {
-                BackgroundStyle.Test => new Color(1f, 0, .5f, 1f),
+                BackgroundStyle.ColorfulGradient => new Color(1f, 0, .5f, 1f),
                 BackgroundStyle.GrayTitle => new Color(1, 1, 1, 0),
                 _ => new Color(1, 1, 1, .3f)
             };

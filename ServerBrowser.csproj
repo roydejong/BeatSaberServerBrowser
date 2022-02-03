@@ -241,6 +241,8 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Components\BssbFloatingAlert.cs" />
+    <Compile Include="UI\Components\BssbFloatingAlertMenuInit.cs" />
     <Compile Include="UI\Components\BssbLevelBarClone.cs" />
     <Compile Include="UI\Components\BssbLoadingControl.cs" />
     <Compile Include="UI\Components\BssbPlayersTable.cs" />

@@ -1,4 +1,5 @@
 using ServerBrowser.Core;
+using ServerBrowser.UI.Components;
 using Zenject;
 
 namespace ServerBrowser.Installers
@@ -14,6 +15,8 @@ namespace ServerBrowser.Installers
             Container.BindInterfacesAndSelfTo<BssbDataCollector>().AsSingle();
             Container.BindInterfacesAndSelfTo<BssbServerAnnouncer>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<ServerBrowserClient>().AsSingle();
+            
+            Container.BindInterfacesAndSelfTo<BssbFloatingAlert>().FromNewComponentOnNewGameObject().AsSingle();
         }
     }
 }
