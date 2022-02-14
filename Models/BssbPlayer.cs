@@ -10,5 +10,6 @@ namespace ServerBrowser.Models
     {
         public string? UserId;
         public string? UserName;
+        public MultiplayerAvatarData? AvatarData;
     }
 }

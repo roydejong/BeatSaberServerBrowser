@@ -45,6 +45,7 @@ namespace ServerBrowser.Models
             {
                 UserId = player.userId,
                 UserName = player.userName,
+                AvatarData = player.multiplayerAvatarData,
                 SortIndex = player.sortIndex,
                 IsMe = player.isMe,
                 IsHost = player.isConnectionOwner,
