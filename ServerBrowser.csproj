@@ -219,6 +219,7 @@
     <Compile Include="Core\BssbDataCollector.cs" />
     <Compile Include="Core\BssbMenuDataCollector.cs" />
     <Compile Include="Core\BssbServerAnnouncer.cs" />
+    <Compile Include="Core\BssbSessionNotifier.cs" />
     <Compile Include="Core\ServerBrowserClient.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />

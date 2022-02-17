@@ -12,7 +12,7 @@ namespace ServerBrowser.UI.Components
     {
         private const float BasePosX = 0f;
         private const float BasePosY = 1.5f;
-        private const float BasePosZ = 4.2f;
+        private const float BasePosZ = 3f;
         private const float AnimationDuration = .15f;
         private const float AnimationOffsetY = -.5f;
         private const float DisplayTime = 5f;
@@ -65,7 +65,6 @@ namespace ServerBrowser.UI.Components
 
             if (_pendingNotifications.Count == 0)
             {
-                _log.Info("No more notifications to display, disabling");
                 gameObject.SetActive(false);
                 return;
             }
@@ -93,6 +92,8 @@ namespace ServerBrowser.UI.Components
         {
             _pendingNotifications.Enqueue(notification);
             
+            _log.Info($"Enqueue notification: {notification.Title} / {notification.MessageText}");
+            
             if (!isActiveAndEnabled)
                 gameObject.SetActive(true);
             
@@ -117,6 +118,17 @@ namespace ServerBrowser.UI.Components
             _isPresenting = true;
             
             StartCoroutine(nameof(AnimateIn));
+        }
+
+        public void DismissAllPending()
+        {
+            _pendingNotifications.Clear();
+        }
+        
+        public void DismissAllImmediate()
+        {
+            StopPresentingImmediate();
+            DismissAllPending();
         }
 
         #region Animation/Coroutines

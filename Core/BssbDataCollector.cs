@@ -61,6 +61,14 @@ namespace ServerBrowser.Core
             HandlePlayerConnected(_multiplayerSession.connectionOwner);
             HandlePlayerConnected(_multiplayerSession.localPlayer);
 
+            foreach (var connectedPlayer in _multiplayerSession.connectedPlayers)
+            {
+                if (!connectedPlayer.isConnected || connectedPlayer.isKicked)
+                    continue;
+
+                HandlePlayerConnected(connectedPlayer);
+            }
+
             if (Current.IsBeatTogetherHost)
                 _log.Info("Detected a BeatTogether host");
             else if (Current.IsGameLiftHost)

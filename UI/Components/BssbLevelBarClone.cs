@@ -68,16 +68,21 @@ namespace ServerBrowser.UI.Components
         {
             GameDefault,
             ColorfulGradient,
-            GrayTitle
+            GrayTitle,
+            SolidBlue,
+            SolidCerise
         }
         
-        public void SetBackgroundStyle(BackgroundStyle style = BackgroundStyle.GameDefault, bool skew = true)
+        public void SetBackgroundStyle(BackgroundStyle style = BackgroundStyle.GameDefault, bool skew = true,
+            bool enableRaycast = false)
         {
             // Primary background color
             _bg.color = style switch
             {
                 BackgroundStyle.ColorfulGradient => Color.white,
                 BackgroundStyle.GrayTitle => new Color(1, 1, 1, .2f),
+                BackgroundStyle.SolidBlue => new Color(52f / 255f, 31f / 255f, 151f / 255f),
+                BackgroundStyle.SolidCerise => new Color(207f / 255f, 3f / 255f, 137f / 255f),
                 _ => Color.black
             };
             // Gradient left color
@@ -85,6 +90,8 @@ namespace ServerBrowser.UI.Components
             {
                 BackgroundStyle.ColorfulGradient => new Color(0, .55f, .99f, 0f),
                 BackgroundStyle.GrayTitle => Color.white,
+                BackgroundStyle.SolidBlue => Color.white,
+                BackgroundStyle.SolidCerise => Color.white,
                 _ => new Color(1, 1, 1, 0)
             };
             // Gradient right color
@@ -92,10 +99,18 @@ namespace ServerBrowser.UI.Components
             {
                 BackgroundStyle.ColorfulGradient => new Color(1f, 0, .5f, 1f),
                 BackgroundStyle.GrayTitle => new Color(1, 1, 1, 0),
+                BackgroundStyle.SolidBlue => Color.white,
+                BackgroundStyle.SolidCerise => Color.white,
                 _ => new Color(1, 1, 1, .3f)
             };
             // Skew
             _bg.SetField("_skew", (skew ? .18f : 0));
+            // Pad left
+            var padLeft = (style == BackgroundStyle.SolidBlue || style == BackgroundStyle.SolidCerise);
+            (_image.transform as RectTransform)!.localPosition = new Vector3(padLeft ? -46 : -50, -14, 0);
+            (_textContainer as RectTransform)!.localPosition = new Vector3(padLeft ? 4.9f : 3.5f, -7, 0);
+            // Raycast
+            _image.raycastTarget = enableRaycast;
         }
 
         public void SetImageVisible(bool visible)
