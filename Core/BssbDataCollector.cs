@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using MultiplayerCore.Players;
 using ServerBrowser.Models;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
@@ -17,6 +18,7 @@ namespace ServerBrowser.Core
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
         [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
+        [Inject] private readonly MpPlayerManager _mpPlayerManager = null!;
 
         public bool SessionActive { get; private set; }
         public BssbServerDetail Current { get; private set; } = new();
@@ -92,6 +94,23 @@ namespace ServerBrowser.Core
 
             var bssbServerPlayer = BssbServerPlayer.FromConnectedPlayer(player);
             bssbServerPlayer.IsPartyLeader = (Current.ManagerId == player.userId);
+
+            if (bssbServerPlayer.IsMe)
+            {
+                bssbServerPlayer.PlatformType = _serverBrowserClient.PlatformKey;
+                bssbServerPlayer.PlatformUserId = _serverBrowserClient.PlatformUserInfo?.platformUserId;
+            }
+            else
+            {
+                var extendedPlayerInfo = _mpPlayerManager.GetPlayer(bssbServerPlayer.UserId!);
+
+                if (extendedPlayerInfo != null)
+                {
+                    bssbServerPlayer.PlatformType = extendedPlayerInfo.Platform.ToString();
+                    bssbServerPlayer.PlatformUserId = extendedPlayerInfo.PlatformId;
+                }
+            }
+
             Current.Players.Add(bssbServerPlayer);
 
             DataChanged?.Invoke(this, EventArgs.Empty);
