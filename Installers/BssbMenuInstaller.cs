@@ -28,6 +28,9 @@ namespace ServerBrowser.Installers
             
             // Helpers
             Container.BindInterfacesAndSelfTo<BssbFloatingAlertMenuInit>().AsSingle();
+            
+            // UI Extras
+            Container.BindInterfacesAndSelfTo<JoiningLobbyExtender>().AsSingle();
         }
     }
 }
