@@ -160,7 +160,7 @@ namespace ServerBrowser.UI.Views
                 }
 
                 extensions.SetData(cell, cellInfo, cellInfo.Server);
-                _ = extensions.SetCoverArt(_coverArtCts!.Token);
+                extensions.SetCoverArt(_coverArtCts!.Token);
             }
 
             if (restoredSelection)

@@ -147,7 +147,7 @@ namespace ServerBrowser.UI.Views
         public async Task LoadDetailsAsync(string serverKey, bool soft = false)
         {
             CancelLoading();
-            
+
             _busyLoading = true;
 
             try
@@ -175,12 +175,12 @@ namespace ServerBrowser.UI.Views
                 _busyLoading = false;
             }
         }
-        
+
         public void CancelLoading()
         {
             _loadingCts?.Cancel();
             _loadingCts?.Dispose();
-            
+
             _loadingCts = new();
         }
 
@@ -195,7 +195,7 @@ namespace ServerBrowser.UI.Views
                 _loadRoot.gameObject.SetActive(false);
                 _mainRoot.gameObject.SetActive(true);
 
-                _ = SetHeaderData(serverDetail);
+                SetHeaderData(serverDetail);
                 SetInfoTabData(serverDetail);
                 SetPlayerData(serverDetail.Players);
             }
@@ -206,7 +206,7 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private async Task SetHeaderData(BssbServerDetail serverDetail)
+        private void SetHeaderData(BssbServerDetail serverDetail)
         {
             _levelBar.SetText(serverDetail.Name, serverDetail.LobbyStateTextExtended);
 
@@ -226,19 +226,21 @@ namespace ServerBrowser.UI.Views
             {
                 // In game, show cover art
                 _levelBar.SetImageSprite(Sprites.BeatSaverLogo);
-            
-                var coverArt = await _coverArtLoader.FetchCoverArt(new CoverArtLoader.CoverArtRequest(serverDetail,
-                    _loadingCts!.Token));
 
-                if (coverArt != null)
-                    _levelBar.SetImageSprite(coverArt);
+                _coverArtLoader.FetchCoverArtAsync(new CoverArtLoader.CoverArtRequest(serverDetail, _loadingCts!.Token,
+                    sprite =>
+                    {
+                        if (sprite != null)
+                            _levelBar.SetImageSprite(sprite);
+                    }));
             }
         }
 
         private void SetInfoTabData(BssbServerDetail serverDetail)
         {
             _txtServerType.SetText(serverDetail.ServerTypeText ?? "Unknown");
-            _txtMasterServer.SetText(serverDetail.MasterServerText ?? serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
+            _txtMasterServer.SetText(serverDetail.MasterServerText ??
+                                     serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
             _txtUptime.SetText(serverDetail.LobbyLifetimeText);
             _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
 
@@ -246,7 +248,7 @@ namespace ServerBrowser.UI.Views
                 _txtDifficulty.SetText(serverDetail.DifficultyNameWithColor);
             else
                 _txtDifficulty.SetText("New lobby");
-            
+
             _txtGameVersion.SetText($"Beat Saber {serverDetail.GameVersion}");
             _txtGameVersion.color = (serverDetail.GameVersion?.Equals(IPA.Utilities.UnityGame.GameVersion) ?? false)
                 ? BssbColorScheme.Green
