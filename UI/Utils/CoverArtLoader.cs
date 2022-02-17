@@ -158,8 +158,8 @@ namespace ServerBrowser.UI.Utils
 
             public CoverArtRequest(BssbServer serverInfo, CancellationToken cancellationToken)
             {
-                LevelId = serverInfo.ReadOnlyLevelId ?? serverInfo.Level?.LevelId;
-                CoverArtUrl = serverInfo.ReadOnlyCoverArtUrl ?? serverInfo.Level?.CoverArtUrl;
+                LevelId = serverInfo.Level?.LevelId;
+                CoverArtUrl = serverInfo.Level?.CoverArtUrl;
                 CancellationToken = cancellationToken;
             }
         }

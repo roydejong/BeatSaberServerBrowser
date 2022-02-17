@@ -92,18 +92,6 @@ namespace ServerBrowser.Models
         [JsonProperty("Difficulty")] public BeatmapDifficulty? Difficulty;
 
         /// <summary>
-        /// Current or last played level id.
-        /// Provided by the API when querying lobbies.
-        /// </summary>
-        [JsonProperty("LevelId")] public string? ReadOnlyLevelId;
-        
-        /// <summary>
-        /// HTTP URL for the cover art associated with the level, if any.
-        /// Provided by the API when querying lobbies.
-        /// </summary>
-        [JsonProperty("CoverUrl")] public string? ReadOnlyCoverArtUrl;
-
-        /// <summary>
         /// Identifies what type of server this is for announce messages.
         /// </summary>
         [JsonProperty("ServerType")] public string? ServerTypeCode;

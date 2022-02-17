@@ -98,7 +98,7 @@ namespace ServerBrowser.UI.Components
                 if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
                     return;
 
-                if (_server.IsInLobby || _server.ReadOnlyLevelId is null)
+                if (_server.IsInLobby || _server.Level is null)
                 {
                     // Not in level, show lobby icon
                     _coverImage.sprite = Sprites.PortalUser;

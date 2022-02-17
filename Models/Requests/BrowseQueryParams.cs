@@ -30,6 +30,7 @@ namespace ServerBrowser.Models.Requests
             var queryString = HttpUtility.ParseQueryString("");
 
             queryString.Add("limit", 7.ToString());
+            queryString.Add("includeLevel", "1");
             
             if (Offset > 0)
                 queryString.Add("offset", Offset.ToString());
