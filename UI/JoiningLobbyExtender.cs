@@ -32,22 +32,18 @@ namespace ServerBrowser.UI
         }
 
         #region View events
+
         [AffinityPostfix]
         [AffinityPatch(typeof(JoiningLobbyViewController), "Init")]
         private void HandleViewInit(string text)
         {
             if (text == Localization.Get(LocalizationKeyJoiningLobby)
                 || text == Localization.Get(LocalizationKeyJoiningGame)
-                || text == Localization.Get(LocalizationKeyCreatingServer))
+                || text == Localization.Get(LocalizationKeyCreatingServer)
+                || text == Localization.Get(LocalizationKeyJoiningQuickPlay))
             {
                 _weAreHandling = true;
                 _isQuickPlay = false;
-                _originalText = text;
-            }
-            else if (text == Localization.Get(LocalizationKeyJoiningQuickPlay))
-            {
-                _weAreHandling = true;
-                _isQuickPlay = true;
                 _originalText = text;
             }
             else
@@ -55,7 +51,7 @@ namespace ServerBrowser.UI
                 _weAreHandling = false;
             }
         }
-        
+
         private void HandleViewDidActivate(bool firstactivation, bool addedtohierarchy, bool screensystemenabling)
         {
             if (_weAreHandling)
@@ -63,9 +59,21 @@ namespace ServerBrowser.UI
                 SetText(_starterText ?? "Connecting to master server...");
             }
         }
+
         #endregion
 
         #region Connection events
+
+        [AffinityPrefix]
+        [AffinityPatch(typeof(MasterServerConnectionManager), "MasterServerConnectToServer")]
+        private void HandleMasterServerConnectToServer()
+        {
+            // Regular master server: connect
+            _starterText = "Connecting to master server...";
+
+            SetText(_starterText);
+        }
+
         [AffinityPrefix]
         [AffinityPatch(typeof(GameLiftPlayerSessionProvider), "GetGameLiftPlayerSessionInfo")]
         private void HandleGetGameLiftPlayerSessionInfo(GameplayServerConfiguration gameplayServerConfiguration)
@@ -73,41 +81,53 @@ namespace ServerBrowser.UI
             // GameLift API: Request a multiplayer server instance
             // This seems to happen before the loading view inits
             if (gameplayServerConfiguration.gameplayServerMode == GameplayServerMode.Countdown) // Quick Play
-                _starterText = "Looking for players..."; 
+                _starterText = "Looking for players...";
             else
                 _starterText = "Requesting server instance...";
-            
+
             SetText(_starterText);
         }
-        
+
         [AffinityPrefix]
         [AffinityPatch(typeof(GameLiftClientMessageHandler), "AuthenticateWithGameLiftServer")]
         private void HandleAuthenticateWithGameLiftServer()
         {
+            if (!_weAreHandling)
+                return;
+
             // GameLift master server connection starting
             SetText("Connecting to master server...");
         }
-        
+
         [AffinityPrefix]
         [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
         private void HandleMasterServerPreConnect()
         {
+            if (!_weAreHandling)
+                return;
+
             // Normal master server connected; gameplay server info received
             SetText("Connecting to game server...");
         }
-        
+
         [AffinityPrefix]
         [AffinityPatch(typeof(GameLiftConnectionManager), "HandleConnectToServerSuccess")]
         private void HandleGameLiftPreConnect()
         {
+            if (!_weAreHandling)
+                return;
+
             // GameLift master server connected; gameplay server info received
             SetText("Connecting to game server...");
         }
-        
+
         [AffinityPrefix]
         [AffinityPatch(typeof(MultiplayerSessionManager), "UpdateConnectionState")]
         private void HandleUpdateSessionConnectionState(UpdateConnectionStateReason updateReason)
         {
+            if (!_weAreHandling)
+                return;
+
             switch (updateReason)
             {
                 case UpdateConnectionStateReason.SyncTimeInitialized:
@@ -116,18 +136,25 @@ namespace ServerBrowser.UI
                     break;
             }
         }
+
         #endregion
 
         #region View utils
+
         private string GetCurrentText() => _viewController.GetField<string, JoiningLobbyViewController>("_text");
 
         private void SetText(string text)
         {
-            _log.Error(text);
-            var loadingControl =
-                _viewController.GetField<LoadingControl, JoiningLobbyViewController>("_loadingControl");
-            loadingControl.ShowLoading(text);
+            if (GetCurrentText() == text)
+                return;
+
+            _log.Info($"Extended join status: {text}");
+
+            _viewController
+                .GetField<LoadingControl, JoiningLobbyViewController>("_loadingControl")
+                .ShowLoading(text);
         }
+
         #endregion
     }
 }
