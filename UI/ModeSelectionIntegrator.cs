@@ -2,6 +2,7 @@ using System;
 using HMUI;
 using IPA.Utilities;
 using MultiplayerCore.Patchers;
+using Polyglot;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Utils;
 using SiraUtil.Affinity;
@@ -19,6 +20,9 @@ namespace ServerBrowser.UI
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _flowCoordinator = null!;
         [Inject] private readonly MultiplayerModeSelectionViewController _modeSelectionView = null!;
+        [Inject] private readonly MultiplayerLobbyConnectionController _multiplayerLobbyConnectionController = null!;
+        [Inject] private readonly JoiningLobbyViewController _joiningLobbyViewController = null!;
+        [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
         [Inject] private readonly ServerBrowserFlowCoordinator _serverBrowserFlowCoordinator = null!;
         [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
 
@@ -42,6 +46,8 @@ namespace ServerBrowser.UI
                 _btnGameBrowser = null;
             }
         }
+
+        #region Flow coordinator patches
 
         [AffinityPostfix]
         [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator), "DidActivate")]
@@ -96,14 +102,66 @@ namespace ServerBrowser.UI
             return true;
         }
 
-        private void LaunchServerBrowser()
+        /// <summary>
+        /// This patch makes connection errors more useful.
+        /// </summary>
+        [AffinityPrefix]
+        [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator),
+            "PresentConnectionErrorDialog")]
+        private bool HandlePresentConnectionErrorDialog(
+            MultiplayerLobbyConnectionController.LobbyConnectionType connectionType, ref ConnectionFailedReason reason)
         {
-            if (!_flowCoordinator.isActivated)
-                return;
+            _multiplayerLobbyConnectionController.LeaveLobby();
+            _joiningLobbyViewController.HideLoading();
 
-            _mainFlowCoordinator.ReplaceChildFlowCoordinator(_serverBrowserFlowCoordinator, null,
-                ViewController.AnimationDirection.Vertical);
+            if (reason == ConnectionFailedReason.ConnectionCanceled)
+            {
+                DismissViewController(_joiningLobbyViewController, ViewController.AnimationDirection.Vertical);
+                return false;
+            }
+
+            var errorTitle = Localization.Get("LABEL_CONNECTION_ERROR");
+            var errorMessage = ConnectionErrorTextProvider.Generate(connectionType, reason);
+            var buttonTextDismiss = Localization.Get("BUTTON_OK");
+            
+            _log.Info($"Extended connection error: {errorMessage}");
+
+            _simpleDialogPromptViewController.Init(errorTitle, errorMessage, buttonTextDismiss,
+                delegate(int btnId)
+                {
+                    DismissViewController(_simpleDialogPromptViewController,
+                        ViewController.AnimationDirection.Vertical);
+                });
+
+            ReplaceTopViewController(_simpleDialogPromptViewController, null,
+                ViewController.AnimationType.In, ViewController.AnimationDirection.Vertical);
+
+            return false;
         }
+
+        #endregion
+
+        #region Method accessors
+
+        private void DismissViewController(ViewController viewController,
+            ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal,
+            Action? finishedCallback = null, bool immediately = false)
+        {
+            _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("DismissViewController",
+                viewController, animationDirection, finishedCallback, immediately);
+        }
+
+        private void ReplaceTopViewController(ViewController viewController, Action? finishedCallback = null,
+            ViewController.AnimationType animationType = ViewController.AnimationType.In,
+            ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal)
+        {
+            _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController",
+                viewController, finishedCallback, animationType, animationDirection);
+        }
+
+        #endregion
+
+        #region API
 
         public void TriggerMenuButton(MultiplayerModeSelectionViewController.MenuButton menuButton)
         {
@@ -119,14 +177,6 @@ namespace ServerBrowser.UI
                 "HandleMenuButton", menuButton);
         }
 
-        private void ReplaceTopViewController(ViewController viewController, Action? finishedCallback = null,
-            ViewController.AnimationType animationType = ViewController.AnimationType.In,
-            ViewController.AnimationDirection animationDirection = ViewController.AnimationDirection.Horizontal)
-        {
-            _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ReplaceTopViewController",
-                viewController, finishedCallback, animationType, animationDirection);
-        }
-
         public void ConnectToServer(BssbServer server)
         {
             _log.Info($"Trying to connect to selected server (Key={server.Key}, Name={server.Name}, " +
@@ -137,9 +187,9 @@ namespace ServerBrowser.UI
             // Set master server
             if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
                 _mpCoreNetConfig.UseOfficialServer();
-            else 
+            else
                 _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, null!);
-            
+
             // Set up lobby destination via deeplink
             _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
 
@@ -147,5 +197,16 @@ namespace ServerBrowser.UI
             if (_statusCheckComplete)
                 _flowCoordinator.ProcessDeeplinkingToLobby();
         }
+
+        private void LaunchServerBrowser()
+        {
+            if (!_flowCoordinator.isActivated)
+                return;
+
+            _mainFlowCoordinator.ReplaceChildFlowCoordinator(_serverBrowserFlowCoordinator, null,
+                ViewController.AnimationDirection.Vertical);
+        }
+
+        #endregion
     }
 }
