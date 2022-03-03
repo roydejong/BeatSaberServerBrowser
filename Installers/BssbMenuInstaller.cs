@@ -30,7 +30,10 @@ namespace ServerBrowser.Installers
             Container.BindInterfacesAndSelfTo<BssbFloatingAlertMenuInit>().AsSingle();
             
             // UI Extras
-            Container.BindInterfacesAndSelfTo<JoiningLobbyExtender>().AsSingle();
+            if (Plugin.Config.EnableJoiningLobbyExtender)
+            {
+                Container.BindInterfacesAndSelfTo<JoiningLobbyExtender>().AsSingle();
+            }
         }
     }
 }

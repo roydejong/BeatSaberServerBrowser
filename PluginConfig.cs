@@ -22,5 +22,11 @@
         /// Custom server name to use with party leader announcements.
         /// </summary>
         public virtual string? ServerName { get; set; } = null;
+
+        /// <summary>
+        /// Controls whether the JoiningLobbyExtender patches are applied.
+        /// If enabled, extended connection status is shown during connect (English only).
+        /// </summary>
+        public virtual bool EnableJoiningLobbyExtender { get; set; }
     }
 }
