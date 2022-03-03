@@ -109,7 +109,7 @@ namespace ServerBrowser.UI
         [AffinityPatch(typeof(MultiplayerModeSelectionFlowCoordinator),
             "PresentConnectionErrorDialog")]
         private bool HandlePresentConnectionErrorDialog(
-            MultiplayerLobbyConnectionController.LobbyConnectionType connectionType, ref ConnectionFailedReason reason)
+            MultiplayerLobbyConnectionController.LobbyConnectionType connectionType, ConnectionFailedReason reason)
         {
             _multiplayerLobbyConnectionController.LeaveLobby();
             _joiningLobbyViewController.HideLoading();
@@ -124,7 +124,7 @@ namespace ServerBrowser.UI
             var errorMessage = ConnectionErrorTextProvider.Generate(connectionType, reason);
             var buttonTextDismiss = Localization.Get("BUTTON_OK");
             
-            _log.Info($"Extended connection error: {errorMessage}");
+            _log.Info($"Extended connection error: {errorMessage.Replace(Environment.NewLine, " ")}");
 
             _simpleDialogPromptViewController.Init(errorTitle, errorMessage, buttonTextDismiss,
                 delegate(int btnId)

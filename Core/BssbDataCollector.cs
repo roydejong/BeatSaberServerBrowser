@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using IPA.Utilities;
 using MultiplayerCore.Players;
 using ServerBrowser.Models;
 using SiraUtil.Affinity;
@@ -322,6 +323,20 @@ namespace ServerBrowser.Core
             }
 
             DataChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(MultiplayerController), "PerformSongStartSync")]
+        private void HandleSongStartSync(MultiplayerPlayerStartState localPlayerSyncState,
+            MultiplayerController __instance)
+        {
+            var sessionGameId = __instance.GetField<string, MultiplayerController>("_sessionGameId");
+            
+            _log.Info($"Multiplayer song started (sessionGameId={sessionGameId}, " +
+                      $"localPlayerSyncState={localPlayerSyncState})");
+
+            if (Current.Level is not null)
+                Current.Level.SessionGameId = sessionGameId;
         }
     }
 }

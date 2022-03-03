@@ -43,7 +43,7 @@ namespace ServerBrowser.UI
                 || text == Localization.Get(LocalizationKeyJoiningQuickPlay))
             {
                 _weAreHandling = true;
-                _isQuickPlay = false;
+                _isQuickPlay = (text == Localization.Get(LocalizationKeyJoiningQuickPlay));
                 _originalText = text;
             }
             else

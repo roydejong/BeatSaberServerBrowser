@@ -2,6 +2,7 @@ namespace ServerBrowser.Models
 {
     public class BssbServerLevel : BssbLevel
     {
+        public string? SessionGameId;
         public BeatmapDifficulty? Difficulty;
         /// <summary>
         /// Serialized name of the Beatmap characteristic.

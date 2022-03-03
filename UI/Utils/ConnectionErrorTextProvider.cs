@@ -3,7 +3,7 @@ using ServerBrowser.Utils;
 
 namespace ServerBrowser.UI.Utils
 {
-    public class ConnectionErrorTextProvider
+    public static class ConnectionErrorTextProvider
     {
         public static string Generate(MultiplayerLobbyConnectionController.LobbyConnectionType connectionType,
             ConnectionFailedReason reason)
@@ -28,7 +28,7 @@ namespace ServerBrowser.UI.Utils
                     break;
                 
                 case ConnectionFailedReason.ServerUnreachable: // CFR-3
-                    msg.AppendLine("Could not connect to the master server.");
+                    msg.AppendLine("Could not connect to the game server.");
                     break;
                 
                 case ConnectionFailedReason.ServerAlreadyExists: // CFR-4
