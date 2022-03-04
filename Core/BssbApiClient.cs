@@ -77,6 +77,30 @@ namespace ServerBrowser.Core
             }
         }
 
+        public async Task<bool> AnnounceResults(AnnounceResultsData resultsData)
+        {
+            try
+            {
+#if DEBUG
+                var rawJson = resultsData.ToJson();
+                _log.Info($"Sending results announce payload: {rawJson}");
+                var requestContent = new StringContent(rawJson, Encoding.UTF8, "application/json");
+#else
+                var requestContent = resultsData.ToRequestContent();
+#endif
+
+                var response = await _httpClient.PostAsync($"/api/v1/announce_results", requestContent);
+                
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogApiException(ex);
+                return false;
+            }
+        }
+
         public async Task<UnAnnounceResponse?> UnAnnounce(UnAnnounceParams unannounceData)
         {
             try

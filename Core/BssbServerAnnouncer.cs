@@ -28,6 +28,7 @@ namespace ServerBrowser.Core
         private float? _lastAnnounceTime;
         private AnnounceResponse? _lastSuccessResponse;
         private int _consecutiveErrors = 0;
+        private string? _lastResultsSessionId;
 
         public BssbServerDetail Data => _dataCollector.Current;
 
@@ -153,6 +154,9 @@ namespace ServerBrowser.Core
                     _lastAnnounceTime = Time.realtimeSinceStartup;
                     _lastSuccessResponse = response;
                     _dataCollector.Current.Key = response.Key;
+                    
+                    await SendAnnounceResultsIfNeededNow();
+                    
                     return true;
                 }
                 else
@@ -160,6 +164,39 @@ namespace ServerBrowser.Core
                     _consecutiveErrors++;
                     _log.Warn($"Announce failed");
                     _dirtyFlag = true;
+                    return false;
+                }
+            }
+            finally
+            {
+                _havePendingRequest = false;
+            }
+        }
+        
+        private async Task<bool> SendAnnounceResultsIfNeededNow()
+        {
+            if (_dataCollector.LastResults is null)
+                // No results available to announce
+                return false;
+
+            if (_lastResultsSessionId == _dataCollector.LastResults.gameId)
+                // These results were already successfully announced
+                return false;
+            
+            try
+            {
+                var resultsData = AnnounceResultsData.FromMultiplayerResultsData(_dataCollector.LastResults);
+                var responseOk = await _apiClient.AnnounceResults(resultsData);
+
+                if (responseOk)
+                {
+                    _log.Info($"Level results announced OK (SessionGameId={resultsData.SessionGameId})");
+                    _lastResultsSessionId = resultsData.SessionGameId;
+                    return true;
+                }
+                else
+                {
+                    _log.Warn($"Level results announce failed");
                     return false;
                 }
             }

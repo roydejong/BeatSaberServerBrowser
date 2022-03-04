@@ -23,6 +23,7 @@ namespace ServerBrowser.Core
 
         public bool SessionActive { get; private set; }
         public BssbServerDetail Current { get; private set; } = new();
+        public MultiplayerResultsData? LastResults { get; private set; } = null;
         public PreConnectInfo? PreConnectInfo { get; private set; } = null;
 
         public event EventHandler? DataChanged;
@@ -338,6 +339,14 @@ namespace ServerBrowser.Core
 
             if (Current.Level is not null)
                 Current.Level.SessionGameId = sessionGameId;
+        }
+
+        [AffinityPostfix]
+        [AffinityPatch(typeof(MultiplayerLevelScenesTransitionSetupDataSO), "Finish")]
+        private void HandleMultiplayerLevelFinish(MultiplayerResultsData resultsData)
+        {
+            LastResults = resultsData;
+            TriggerDataChanged();
         }
     }
 }

@@ -236,6 +236,7 @@
     <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
     <Compile Include="Models\JsonConverters\DnsEndPointConverter.cs" />
     <Compile Include="Models\PreConnectInfo.cs" />
+    <Compile Include="Models\Requests\AnnounceResultsData.cs" />
     <Compile Include="Models\Requests\BrowseQueryParams.cs" />
     <Compile Include="Models\Requests\UnAnnounceParams.cs" />
     <Compile Include="Models\Responses\AnnounceResponse.cs" />
