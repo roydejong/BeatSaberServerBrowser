@@ -35,6 +35,7 @@ namespace ServerBrowser.Core
             _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
             _multiplayerSession.playerConnectedEvent += HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent += HandlePlayerDisconnected;
+            _mpPlayerManager.PlayerConnectedEvent += HandleExtendedPlayerConnected;
         }
 
         public void Dispose()
@@ -43,6 +44,7 @@ namespace ServerBrowser.Core
             _multiplayerSession.disconnectedEvent -= HandleSessionDisconnected;
             _multiplayerSession.playerConnectedEvent -= HandlePlayerConnected;
             _multiplayerSession.playerDisconnectedEvent -= HandlePlayerDisconnected;
+            _mpPlayerManager.PlayerConnectedEvent -= HandleExtendedPlayerConnected;
         }
 
         internal void TriggerDataChanged()
@@ -138,17 +140,16 @@ namespace ServerBrowser.Core
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        private void HandleLobbyStateChanged(MultiplayerLobbyState newState)
+        
+        private void HandleExtendedPlayerConnected(IConnectedPlayer basePlayer, MpPlayerData extendedPlayerInfo)
         {
-            if (Current.LobbyState == newState)
+            var dataPlayer = Current.Players.FirstOrDefault(p => p.UserId == basePlayer.userId);
+
+            if (dataPlayer is null)
                 return;
-
-            _log.Info($"Lobby state changed to: {newState}");
-
-            Current.LobbyState = newState;
-
-            DataChanged?.Invoke(this, EventArgs.Empty);
+            
+            dataPlayer.PlatformType = extendedPlayerInfo.Platform.ToString();
+            dataPlayer.PlatformUserId = extendedPlayerInfo.PlatformId;
         }
 
         private string DetermineServerType()

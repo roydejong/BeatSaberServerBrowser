@@ -19,7 +19,6 @@ namespace ServerBrowser.UI
 
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly JoiningLobbyViewController _viewController = null!;
-        [Inject] private readonly IMultiplayerSessionManager _sessionManager = null!;
 
         private bool _weAreHandling;
         private bool _isQuickPlay;
