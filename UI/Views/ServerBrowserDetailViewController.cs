@@ -80,7 +80,7 @@ namespace ServerBrowser.UI.Views
             // Create BssbLevelBarClone for title
             _levelBar = BssbLevelBarClone.Create(_container, _titleBarRoot.transform);
             _levelBar.SetImageVisible(true);
-            _levelBar.SetBackgroundStyle(BssbLevelBarClone.BackgroundStyle.ColorfulGradient);
+            _levelBar.SetBackgroundStyle(BssbLevelBarClone.BackgroundStyle.ColorfulGradient, enableRaycast: true);
             _levelBar.SetText("!Server name!", "!Server type!");
 
             // Create players table with prefab

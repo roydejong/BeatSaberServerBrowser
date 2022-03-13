@@ -74,7 +74,7 @@ namespace ServerBrowser.UI.Components
         }
         
         public void SetBackgroundStyle(BackgroundStyle style = BackgroundStyle.GameDefault, bool skew = true,
-            bool enableRaycast = false)
+            bool enableRaycast = false, bool padLeft = false)
         {
             // Primary background color
             _bg.color = style switch
@@ -106,11 +106,13 @@ namespace ServerBrowser.UI.Components
             // Skew
             _bg.SetField("_skew", (skew ? .18f : 0));
             // Pad left
-            var padLeft = (style == BackgroundStyle.SolidBlue || style == BackgroundStyle.SolidCerise);
-            (_image.transform as RectTransform)!.localPosition = new Vector3(padLeft ? -46 : -50, -14, 0);
-            (_textContainer as RectTransform)!.localPosition = new Vector3(padLeft ? 4.9f : 3.5f, -7, 0);
+            const float imageBaseX = -59.33f;
+            (_image.transform as RectTransform)!.localPosition = new Vector3(padLeft ? (imageBaseX + 13.5f) : imageBaseX, -14, 0);
+            const float textBaseX = 3.5f;
+            (_textContainer as RectTransform)!.localPosition = new Vector3(padLeft ? (textBaseX + 2f) : 3.5f, -7, 0);
             // Raycast
             _image.raycastTarget = enableRaycast;
+            _bg.raycastTarget = enableRaycast;
         }
 
         public void SetImageVisible(bool visible)

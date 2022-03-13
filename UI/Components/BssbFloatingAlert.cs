@@ -109,7 +109,7 @@ namespace ServerBrowser.UI.Components
             
             gameObject.SetActive(true);
             
-            _levelBar.SetBackgroundStyle(notification.BackgroundStyle);
+            _levelBar.SetBackgroundStyle(notification.BackgroundStyle, padLeft: true);
             _levelBar.SetImageSprite(notification.Sprite);
             _levelBar.SetText(notification.Title, notification.MessageText);
             

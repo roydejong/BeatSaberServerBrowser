@@ -19,6 +19,7 @@ namespace ServerBrowser.UI.Views
     {
         [Inject] private readonly DiContainer _di = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
+        [Inject] private readonly BssbFloatingAlert _floaty = null!;
 
         [UIComponent("refreshButton")] private Button _refreshButton = null!;
         [UIComponent("filterButton")] private Button _filterButton = null!;
