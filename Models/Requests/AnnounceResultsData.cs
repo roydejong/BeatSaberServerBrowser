@@ -28,7 +28,7 @@ namespace ServerBrowser.Models.Requests
             public PlayerResultsItemBadge? Badge;
             public MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndState? LevelEndState;
             public MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason? LevelEndReason;
-            public int? RawScore;
+            public int? MultipliedScore;
             public int? ModifiedScore;
             public int? Rank;
             public int? GoodCuts;
@@ -49,12 +49,12 @@ namespace ServerBrowser.Models.Requests
                 if (outerResults != null)
                 {
                     item.LevelEndState = outerResults.playerLevelEndState;
-                    item.LevelEndState = outerResults.playerLevelEndState;
+                    item.LevelEndReason = outerResults.playerLevelEndReason;
 
                     var innerResults = outerResults.levelCompletionResults;
                     if (innerResults != null)
                     {
-                        item.RawScore = innerResults.rawScore; // will change in 1.20
+                        item.MultipliedScore = innerResults.multipliedScore;
                         item.ModifiedScore = innerResults.modifiedScore;
                         item.Rank = (int)innerResults.rank;
                         item.GoodCuts = innerResults.goodCutsCount;

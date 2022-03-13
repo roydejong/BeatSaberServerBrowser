@@ -141,14 +141,14 @@ namespace ServerBrowser.Core
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
-        
+
         private void HandleExtendedPlayerConnected(IConnectedPlayer basePlayer, MpPlayerData extendedPlayerInfo)
         {
             var dataPlayer = Current.Players.FirstOrDefault(p => p.UserId == basePlayer.userId);
 
             if (dataPlayer is null)
                 return;
-            
+
             dataPlayer.PlatformType = extendedPlayerInfo.Platform.ToString();
             dataPlayer.PlatformUserId = extendedPlayerInfo.PlatformId;
         }
@@ -219,16 +219,16 @@ namespace ServerBrowser.Core
         {
             // nb: HandleConnectToServerSuccess just means "the GameLift API gave us the info to connect"
             //   we are not yet successfully connected to the dedicated server instance
-            
+
             _log.Info($"Game will connect to GameLift session (playerSessionId={playerSessionId}, "
                       + $"remoteEndPoint={remoteEndPoint}, gameSessionId={gameSessionId}, secret={secret}, code={code}, "
                       + $"maxPlayerCount={configuration.maxPlayerCount}, "
                       + $"discoveryPolicy={configuration.discoveryPolicy}, "
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "
                       + $"songSelectionMode={configuration.songSelectionMode})");
-            
+
             // https://docs.aws.amazon.com/gamelift/latest/apireference/API_PlayerSession.html
-            
+
             // playerSessionId is "psess-{GUID}"
             //  A unique identifier for a player session.
 
@@ -253,7 +253,7 @@ namespace ServerBrowser.Core
                 Current.Difficulty = selectionMask.difficulties.FromMask();
             else
                 Current.Difficulty = null;
-            
+
             FinishPreConnectHandling();
         }
 
@@ -275,11 +275,14 @@ namespace ServerBrowser.Core
 
         [AffinityPostfix]
         [AffinityPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel")]
-        private void HandleStartMultiplayerLevel(IPreviewBeatmapLevel previewBeatmapLevel,
-            BeatmapDifficulty beatmapDifficulty,
-            BeatmapCharacteristicSO beatmapCharacteristic, IDifficultyBeatmap difficultyBeatmap,
-            GameplayModifiers gameplayModifiers)
+        private void HandleStartMultiplayerLevel(ILevelGameplaySetupData gameplaySetupData,
+            IDifficultyBeatmap difficultyBeatmap, Action beforeSceneSwitchCallback)
         {
+            var previewBeatmapLevel = gameplaySetupData.beatmapLevel.beatmapLevel;
+            var beatmapDifficulty = gameplaySetupData.beatmapLevel.beatmapDifficulty;
+            var beatmapCharacteristic = gameplaySetupData.beatmapLevel.beatmapCharacteristic;
+            var gameplayModifiers = gameplaySetupData.gameplayModifiers;
+            
             _log.Info($"Starting multiplayer level (levelID={previewBeatmapLevel.levelID}, " +
                       $"songName={previewBeatmapLevel.songName}, songSubName={previewBeatmapLevel.songSubName}, " +
                       $"songAuthorName={previewBeatmapLevel.songAuthorName}, " +
@@ -333,7 +336,7 @@ namespace ServerBrowser.Core
             MultiplayerController __instance)
         {
             var sessionGameId = __instance.GetField<string, MultiplayerController>("_sessionGameId");
-            
+
             _log.Info($"Multiplayer song started (sessionGameId={sessionGameId}, " +
                       $"localPlayerSyncState={localPlayerSyncState})");
 
