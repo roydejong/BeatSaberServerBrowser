@@ -122,7 +122,11 @@ namespace ServerBrowser.UI.Components
 
         public void DismissAllPending()
         {
+            if (_pendingNotifications.Count == 0)
+                return;
+            
             _pendingNotifications.Clear();
+            _log.Info("Cleared all pending notifications");
         }
         
         public void DismissAllImmediate()
