@@ -290,12 +290,9 @@ namespace ServerBrowser.Core
                       $"difficulty={beatmapDifficulty}, characteristic={beatmapCharacteristic}, " +
                       $"modifiers={gameplayModifiers})");
 
-            Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap);
-            Current.Level.Characteristic = beatmapCharacteristic.serializedName;
-
-            Current.Difficulty = difficultyBeatmap.difficulty;
-
-            // TODO Capture modifiers? Maybe? Who cares?
+            Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap, gameplayModifiers,
+                beatmapCharacteristic.serializedName);
+            Current.Difficulty = Current.Level.Difficulty;
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }

@@ -4,12 +4,14 @@ namespace ServerBrowser.Models
     {
         public string? SessionGameId;
         public BeatmapDifficulty? Difficulty;
+        public GameplayModifiers? Modifiers;
         /// <summary>
         /// Serialized name of the Beatmap characteristic.
         /// </summary>
         public string? Characteristic;
 
-        public static BssbServerLevel FromDifficultyBeatmap(IDifficultyBeatmap db)
+        public static BssbServerLevel FromDifficultyBeatmap(IDifficultyBeatmap db, GameplayModifiers? modifiers,
+            string? characteristic)
         {
             return new BssbServerLevel()
             {
@@ -18,7 +20,9 @@ namespace ServerBrowser.Models
                 SongSubName = db.level.songSubName,
                 SongAuthorName = db.level.songAuthorName,
                 LevelAuthorName = db.level.levelAuthorName,
-                Difficulty = db.difficulty
+                Difficulty = db.difficulty,
+                Modifiers = modifiers,
+                Characteristic = characteristic 
             };
         }
     }
