@@ -84,6 +84,9 @@ namespace ServerBrowser.UI
         private void ReturnToModeSelection(BssbServer? targetServer = null,
             MultiplayerModeSelectionViewController.MenuButton? targetButton = null)
         {
+            if (targetServer is not null)
+                _modeSelectionIntegrator.SetMasterServerOverride(targetServer);
+            
             var finishedCallback = new Action(() =>
             {
                 if (targetServer is not null)

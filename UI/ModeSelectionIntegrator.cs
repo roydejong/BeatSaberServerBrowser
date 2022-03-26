@@ -184,11 +184,7 @@ namespace ServerBrowser.UI
                       $"ServerCode={server.ServerCode}, HostSecret={server.HostSecret}, " +
                       $"ServerTypeCode={server.ServerTypeCode})");
 
-            // Set master server
-            if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
-                _mpCoreNetConfig.UseOfficialServer();
-            else
-                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, null!);
+            SetMasterServerOverride(server);
 
             // Set up lobby destination via deeplink
             _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
@@ -196,6 +192,14 @@ namespace ServerBrowser.UI
             // If we are already on mode selection, trigger deeplink now
             if (_statusCheckComplete)
                 _flowCoordinator.ProcessDeeplinkingToLobby();
+        }
+
+        public void SetMasterServerOverride(BssbServer server)
+        {
+            if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
+                _mpCoreNetConfig.UseOfficialServer();
+            else
+                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, "");
         }
 
         private void LaunchServerBrowser()
