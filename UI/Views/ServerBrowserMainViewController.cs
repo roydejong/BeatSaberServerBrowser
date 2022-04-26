@@ -5,6 +5,7 @@ using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
+using ModestTree;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
@@ -21,14 +22,15 @@ namespace ServerBrowser.UI.Views
         [Inject] private readonly BssbBrowser _browser = null!;
         [Inject] private readonly BssbFloatingAlert _floaty = null!;
 
-        [UIComponent("refreshButton")] private Button _refreshButton = null!;
-        [UIComponent("filterButton")] private Button _filterButton = null!;
-        [UIComponent("createButton")] private Button _createButton = null!;
-        [UIComponent("connectButton")] private Button _connectButton = null!;
-        [UIComponent("scrollIndicator")] private VerticalScrollIndicator _scrollIndicator = null!;
-        [UIComponent("pageUpButton")] private Button _pageUpButton = null!;
-        [UIComponent("pageDownButton")] private Button _pageDownButton = null!;
-        [UIComponent("serverList")] private CustomListTableData _serverList = null!;
+        [UIComponent("refreshButton")] private readonly Button _refreshButton = null!;
+        [UIComponent("filterButton")] private readonly Button _filterButton = null!;
+        [UIComponent("createButton")] private readonly Button _createButton = null!;
+        [UIComponent("connectButton")] private readonly Button _connectButton = null!;
+        [UIComponent("scrollIndicator")] private readonly VerticalScrollIndicator _scrollIndicator = null!;
+        [UIComponent("pageUpButton")] private readonly Button _pageUpButton = null!;
+        [UIComponent("pageDownButton")] private readonly Button _pageDownButton = null!;
+        [UIComponent("serverList")] private readonly CustomListTableData _serverList = null!;
+        [UIComponent("paginatorText")] private readonly FormattableText _paginatorText = null!;
 
         private bool _bsmlReady;
         private LoadingControl? _loadingControl;
@@ -199,8 +201,8 @@ namespace ServerBrowser.UI.Views
                 _connectButton.interactable = false;
                 _pageUpButton.interactable = false;
                 _pageDownButton.interactable = false;
-
                 _serverList.tableView.gameObject.SetActive(false);
+                _paginatorText.gameObject.SetActive(false);
 
                 // Disable scroll bar, or hide it if we never initialized it with page data
                 DisableScrollBar(hide: _browser.PageData is null);
@@ -208,13 +210,25 @@ namespace ServerBrowser.UI.Views
             else
             {
                 if (_browser.PageData is not null)
+                {
                     UpdateScrollBar(_browser.PageData.TotalResultCount > 0, true,
                         _browser.PageData.TotalResultCount, _browser.PageData.PageOffset,
                         _browser.PageData.PageSize);
-
+                }
+                
                 _refreshButton.interactable = true;
-
                 _serverList.tableView.gameObject.SetActive(true);
+                
+                if (_browser.PageData is not null && _browser.PageData.TotalResultCount > 0 &&
+                    _browser.PageData.Servers is not null && !_browser.PageData.Servers.IsEmpty())
+                {
+                    _paginatorText.SetText($"Showing {_browser.PageData.LowerBoundNumber} - {_browser.PageData.UpperBoundNumber} of {_browser.PageData.TotalResultCount} servers (Page {_browser.PageData.PageNumber} of {_browser.PageData.PageCount})");
+                    _paginatorText.gameObject.SetActive(true);
+                }
+                else
+                {
+                    _paginatorText.gameObject.SetActive(false);
+                }
             }
         }
 

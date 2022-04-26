@@ -18,6 +18,8 @@
         <vertical pad-left="10" pad-right="20" pad-top="3">
             <list id="serverList" expand-cell="true" select-cell="listSelect" preferred-width="110"
                   mask-overflow="true"/>
+            <text id="paginatorText" font-align="Center" text="!PaginatorText!"
+                  italics="true" font-color="#95a5a6" bg="panel-top"/>
         </vertical>
 
         <vertical preferred-width="1.6" child-align="MiddleRight" anchor-min-x="0.95" anchor-max-x="1"

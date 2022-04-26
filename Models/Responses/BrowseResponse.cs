@@ -28,6 +28,9 @@ namespace ServerBrowser.Models.Responses
         /// </summary>
         [JsonProperty("Message")] public string? MessageOfTheDay;
 
+        [JsonIgnore] public int LowerBoundNumber => PageOffset + 1;
+        [JsonIgnore] public int UpperBoundNumber => PageOffset + (Servers?.Count ?? 0);
+        [JsonIgnore] public int PageNumber => (int) Math.Floor(PageOffset / (decimal) PageSize) + 1;
         [JsonIgnore] public int PageCount => (int) Math.Ceiling(TotalResultCount / (decimal) PageSize);
     }
 }

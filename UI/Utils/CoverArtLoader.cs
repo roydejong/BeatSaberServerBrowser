@@ -127,7 +127,10 @@ namespace ServerBrowser.UI.Utils
                         }
 
                         // Request could not be dealt with
-                        request.Callback.Invoke(null);
+                        HMMainThreadDispatcher.instance.Enqueue(() =>
+                        {
+                            request.Callback.Invoke(null);
+                        });
                     }
                     catch (OperationCanceledException) { }
                     catch (Exception ex)
