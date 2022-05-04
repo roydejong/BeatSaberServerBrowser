@@ -7,6 +7,9 @@ namespace ServerBrowser.Utils
     {
         internal static string ToStringWithSpaces<T>(this T value) where T : Enum
         {
+            if (value is BeatmapDifficulty.ExpertPlus)
+                return "Expert+";
+            
             return Regex.Replace(value.ToString(), "(\\B[A-Z])", " $1");
         }
 

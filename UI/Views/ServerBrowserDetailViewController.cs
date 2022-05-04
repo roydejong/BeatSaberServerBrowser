@@ -13,6 +13,7 @@ using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
 using ServerBrowser.UI.Utils;
+using ServerBrowser.Utils;
 using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,8 +24,6 @@ namespace ServerBrowser.UI.Views
     [HotReload]
     public class ServerBrowserDetailViewController : BSMLAutomaticViewController
     {
-        public const float RefreshIntervalSecs = 30f;
-
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly DiContainer _container = null!;
         [Inject] private readonly ServerBrowserClient _bssbClient = null!;
@@ -63,7 +62,6 @@ namespace ServerBrowser.UI.Views
         private BssbLevelBarClone _levelBar = null!;
         private BssbPlayersTable _playersTable = null!;
         private BssbServerDetail? _currentDetail = null!;
-        private bool _busyLoading = false;
         private CancellationTokenSource? _loadingCts;
 
         public event EventHandler<BssbServer>? ConnectClickedEvent;
@@ -91,25 +89,7 @@ namespace ServerBrowser.UI.Views
             if (_currentDetail is null)
                 ClearData();
             else
-                SetData(_currentDetail);
-        }
-
-        public void OnEnable()
-        {
-            InvokeRepeating(nameof(RefreshTick), RefreshIntervalSecs, RefreshIntervalSecs);
-        }
-
-        public void OnDisable()
-        {
-            CancelInvoke(nameof(RefreshTick));
-        }
-
-        private async void RefreshTick()
-        {
-            if (_busyLoading)
-                return;
-
-            await Refresh(true);
+                SetData(_currentDetail, false);
         }
 
         public async Task Refresh(bool soft = false)
@@ -118,6 +98,18 @@ namespace ServerBrowser.UI.Views
                 return;
 
             await LoadDetailsAsync(_currentDetail.Key, soft);
+        }
+
+        private async void DelayedLayoutFix()
+        {
+            // This magically fixes a variety of layout issues :)
+            
+            await Task.Delay(100).ConfigureAwait(true);
+            
+            if (_currentDetail is null)
+                return;
+            
+            SetData(_currentDetail, true);
         }
 
         #endregion
@@ -150,32 +142,24 @@ namespace ServerBrowser.UI.Views
         {
             CancelLoading();
 
-            _busyLoading = true;
-
-            try
+            if (!soft)
             {
-                if (!soft)
-                {
-                    _errorRoot.gameObject.SetActive(false);
-                    _idleRoot.gameObject.SetActive(false);
-                    _loadRoot.gameObject.SetActive(true);
-                    _mainRoot.gameObject.SetActive(false);
-                }
-
-                var serverDetail = await _apiClient.BrowseDetail(serverKey, _loadingCts!.Token);
-
-                if (serverDetail == null)
-                {
-                    ShowError("Failed to load server details");
-                    return;
-                }
-
-                SetData(serverDetail);
+                _errorRoot.gameObject.SetActive(false);
+                _idleRoot.gameObject.SetActive(false);
+                _loadRoot.gameObject.SetActive(true);
+                _mainRoot.gameObject.SetActive(false);
             }
-            finally
+
+            var serverDetail = await _apiClient.BrowseDetail(serverKey, _loadingCts!.Token);
+
+            if (serverDetail == null)
             {
-                _busyLoading = false;
+                ShowError("Failed to load server details");
+                return;
             }
+
+            SetData(serverDetail, soft);
+            DelayedLayoutFix();
         }
 
         public void CancelLoading()
@@ -186,7 +170,7 @@ namespace ServerBrowser.UI.Views
             _loadingCts = new();
         }
 
-        public void SetData(BssbServerDetail serverDetail)
+        public void SetData(BssbServerDetail serverDetail, bool soft)
         {
             try
             {
@@ -199,8 +183,8 @@ namespace ServerBrowser.UI.Views
                 
                 SetHeaderData(serverDetail);
                 SetInfoTabData(serverDetail);
-                SetPlayerData(serverDetail.Players);
-                SetLevelHistoryData(serverDetail.LevelHistory);
+                SetPlayerData(serverDetail.Players, soft);
+                SetLevelHistoryData(serverDetail.LevelHistory, soft);
             }
             catch (Exception ex)
             {
@@ -284,22 +268,24 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void SetPlayerData(IReadOnlyCollection<BssbServerPlayer> players)
+        private void SetPlayerData(IReadOnlyCollection<BssbServerPlayer> players, bool soft)
         {
             _playerListEmptyText.gameObject.SetActive(!players.Any());
 
             _playersTable.SetData(players);
 
-            ResetPlayerListScroll();
+            ResetPlayerListScroll(soft);
         }
 
-        private void ResetPlayerListScroll()
+        private void ResetPlayerListScroll(bool soft)
         {
             _playerListScrollable.ContentSizeUpdated();
-            _playerListScrollable.ScrollTo(0, false);
+            
+            if (!soft)
+                _playerListScrollable.ScrollTo(0, false);
         }
 
-        private void SetLevelHistoryData(IReadOnlyCollection<BssbServerLevel> levelHistory)
+        private void SetLevelHistoryData(IReadOnlyCollection<BssbServerLevel> levelHistory, bool soft)
         {
             // Clear previous entries
             foreach (var childElement in _levelHistoryRoot.GetComponentsInChildren<BssbLevelBarClone>())
@@ -319,7 +305,11 @@ namespace ServerBrowser.UI.Views
             foreach (var historyItem in levelHistory)
             {
                 var levelBar = BssbLevelBarClone.Create(_container, _levelHistoryRoot.transform, true);
-                levelBar.SetText(historyItem.SongName ?? "A song", historyItem.SongAuthorName ?? historyItem.LevelAuthorName ?? historyItem.SessionGameId ?? "pls bro");
+                levelBar.SetText
+                (
+                    titleText: (historyItem.SongName ?? "Unknown song") + $" - {historyItem.Difficulty.ToStringWithSpaces()}",
+                    secondaryText: historyItem.SongAuthorName ?? "Unknown author"
+                );
                 levelBar.SetBackgroundStyle(BssbLevelBarClone.BackgroundStyle.GameDefault);
                 
                 levelBar.SetImageSprite(Sprites.BeatSaverLogo);
@@ -331,13 +321,15 @@ namespace ServerBrowser.UI.Views
                     }));
             }
             
-            ResetLevelHistoryScroll();
+            ResetLevelHistoryScroll(soft);
         }
 
-        private void ResetLevelHistoryScroll()
+        private void ResetLevelHistoryScroll(bool soft)
         {
             _levelHistoryScrollable.ContentSizeUpdated();
-            _levelHistoryScrollable.ScrollTo(0, false);
+            
+            if (!soft)
+                _levelHistoryScrollable.ScrollTo(0, false);
         }
 
         #endregion
@@ -351,6 +343,12 @@ namespace ServerBrowser.UI.Views
                 return;
 
             ConnectClickedEvent?.Invoke(this, _currentDetail);
+        }
+
+        [UIAction("tabSelectorChange")]
+        private void HandleTabSelectorChange(SegmentedControl control, int index)
+        {
+            DelayedLayoutFix();
         }
 
         #endregion
