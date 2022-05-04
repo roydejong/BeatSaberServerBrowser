@@ -8,7 +8,8 @@ namespace ServerBrowser.Models
     {
         [JsonProperty("Players")] public List<BssbServerPlayer> Players = new();
         [JsonProperty("PlayerCount")] public int PlayerCount => Players.Count(p => !p.IsGhost);
-
+        [JsonProperty("LevelHistory")] public List<BssbServerLevel> LevelHistory = new();
+ 
         [JsonIgnore] public BssbServerPlayer? LocalPlayer => Players.FirstOrDefault(p => p.IsMe);
         [JsonIgnore] public BssbServerPlayer? HostPlayer => Players.FirstOrDefault(p => p.IsHost);
         [JsonIgnore] public BssbServerPlayer? PartyLeaderPlayer => Players.FirstOrDefault(p => p.IsPartyLeader);

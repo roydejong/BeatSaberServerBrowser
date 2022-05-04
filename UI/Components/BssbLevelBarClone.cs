@@ -2,6 +2,7 @@ using System.Linq;
 using HMUI;
 using IPA.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace ServerBrowser.UI.Components
@@ -27,12 +28,20 @@ namespace ServerBrowser.UI.Components
             }
         }
 
-        public static BssbLevelBarClone Create(DiContainer container, Transform parent)
+        public static BssbLevelBarClone Create(DiContainer container, Transform parent, bool occupyLayoutSpace = false)
         {
             var clone = Instantiate(Template, parent);
             clone.gameObject.name = "BssbLevelBarClone";
-            clone.gameObject.SetActive(true);
 
+            if (occupyLayoutSpace)
+            {
+                var layoutElement = clone.gameObject.AddComponent<LayoutElement>();
+                layoutElement.minWidth = 120;
+                layoutElement.minHeight = 14;
+            }
+
+            clone.gameObject.SetActive(true);
+            
             var script = clone.gameObject.AddComponent<BssbLevelBarClone>();
             script.InitUI();
             return script;
@@ -129,8 +138,8 @@ namespace ServerBrowser.UI.Components
         
         public void SetText(string? titleText, string? secondaryText)
         {
-            _titleText.SetText(titleText);
-            _secondaryText.SetText(secondaryText);
+            _titleText.SetText(titleText ?? "");
+            _secondaryText.SetText(secondaryText ?? "");
         }
         #endregion
     }

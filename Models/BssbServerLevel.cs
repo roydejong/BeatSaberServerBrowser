@@ -1,14 +1,16 @@
+using Newtonsoft.Json;
+
 namespace ServerBrowser.Models
 {
     public class BssbServerLevel : BssbLevel
     {
-        public string? SessionGameId;
-        public BeatmapDifficulty? Difficulty;
-        public GameplayModifiers? Modifiers;
+        [JsonProperty("SessionGameId")] public string? SessionGameId;
+        [JsonProperty("Difficulty")] public BeatmapDifficulty? Difficulty;
+        [JsonProperty("Modifiers")] public GameplayModifiers? Modifiers;
         /// <summary>
         /// Serialized name of the Beatmap characteristic.
         /// </summary>
-        public string? Characteristic;
+        [JsonProperty("Characteristic")] public string? Characteristic;
 
         public static BssbServerLevel FromDifficultyBeatmap(IDifficultyBeatmap db, GameplayModifiers? modifiers,
             string? characteristic)

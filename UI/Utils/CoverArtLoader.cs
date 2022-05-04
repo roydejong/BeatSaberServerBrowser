@@ -246,12 +246,17 @@ namespace ServerBrowser.UI.Utils
             public readonly CancellationToken CancellationToken;
             public readonly Action<Sprite?> Callback;
 
-            public CoverArtRequest(BssbServer serverInfo, CancellationToken cancellationToken, Action<Sprite?> callback)
+            public CoverArtRequest(BssbLevel? levelInfo, CancellationToken cancellationToken, Action<Sprite?> callback)
             {
-                LevelId = serverInfo.Level?.LevelId;
-                CoverArtUrl = serverInfo.Level?.CoverArtUrl;
+                LevelId = levelInfo?.LevelId;
+                CoverArtUrl = levelInfo?.CoverArtUrl;
                 CancellationToken = cancellationToken;
                 Callback = callback;
+            }
+
+            public CoverArtRequest(BssbServer serverInfo, CancellationToken cancellationToken, Action<Sprite?> callback)
+                : this(serverInfo.Level, cancellationToken, callback)
+            {
             }
         }
     }

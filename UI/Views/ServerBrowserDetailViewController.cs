@@ -7,6 +7,7 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
+using ModestTree;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
@@ -30,33 +31,34 @@ namespace ServerBrowser.UI.Views
         [Inject] private readonly BssbApiClient _apiClient = null!;
         [Inject] private readonly CoverArtLoader _coverArtLoader = null!;
 
-        // ReSharper disable FieldCanBeMadeReadOnly.Local
-        [UIComponent("errorRoot")] private VerticalLayoutGroup _errorRoot = null!;
-        [UIComponent("idleRoot")] private VerticalLayoutGroup _idleRoot = null!;
-        [UIComponent("loadRoot")] private VerticalLayoutGroup _loadRoot = null!;
-        [UIComponent("mainRoot")] private VerticalLayoutGroup _mainRoot = null!;
+        [UIComponent("errorRoot")] private readonly VerticalLayoutGroup _errorRoot = null!;
+        [UIComponent("idleRoot")] private readonly VerticalLayoutGroup _idleRoot = null!;
+        [UIComponent("loadRoot")] private readonly VerticalLayoutGroup _loadRoot = null!;
+        [UIComponent("mainRoot")] private readonly VerticalLayoutGroup _mainRoot = null!;
 
-        [UIComponent("errorText")] private FormattableText _errorText = null!;
+        [UIComponent("errorText")] private readonly FormattableText _errorText = null!;
 
-        [UIComponent("headerPanelTop")] private VerticalLayoutGroup _headerPanelTop = null!;
-        [UIComponent("titleBarRoot")] private VerticalLayoutGroup _titleBarRoot = null!;
-        [UIComponent("playerCountText")] private FormattableText _playerCountText = null!;
+        [UIComponent("headerPanelTop")] private readonly VerticalLayoutGroup _headerPanelTop = null!;
+        [UIComponent("titleBarRoot")] private readonly VerticalLayoutGroup _titleBarRoot = null!;
+        [UIComponent("playerCountText")] private readonly FormattableText _playerCountText = null!;
 
-        [UIComponent("txtServerType")] private FormattableText _txtServerType = null!;
-        [UIComponent("txtMasterServer")] private FormattableText _txtMasterServer = null!;
-        [UIComponent("txtUptime")] private FormattableText _txtUptime = null!;
-        [UIComponent("txtLobbyStatus")] private FormattableText _txtLobbyStatus = null!;
-        [UIComponent("txtDifficulty")] private FormattableText _txtDifficulty = null!;
-        [UIComponent("txtGameVersion")] private FormattableText _txtGameVersion = null!;
-        [UIComponent("txtMpCore")] private FormattableText _txtMpCore = null!;
-        [UIComponent("txtMpEx")] private FormattableText _txtMpEx = null!;
+        [UIComponent("txtServerType")] private readonly FormattableText _txtServerType = null!;
+        [UIComponent("txtMasterServer")] private readonly FormattableText _txtMasterServer = null!;
+        [UIComponent("txtUptime")] private readonly FormattableText _txtUptime = null!;
+        [UIComponent("txtLobbyStatus")] private readonly FormattableText _txtLobbyStatus = null!;
+        [UIComponent("txtDifficulty")] private readonly FormattableText _txtDifficulty = null!;
+        [UIComponent("txtGameVersion")] private readonly FormattableText _txtGameVersion = null!;
+        [UIComponent("txtMpCore")] private readonly FormattableText _txtMpCore = null!;
+        [UIComponent("txtMpEx")] private readonly FormattableText _txtMpEx = null!;
 
-        [UIComponent("playerList-scroll")] private BSMLScrollableContainer _playerListScrollable = null!;
-        [UIComponent("playerListRoot")] private VerticalLayoutGroup _playerListRoot = null!;
-        [UIComponent("playerListEmptyText")] private FormattableText _playerListEmptyText = null!;
+        [UIComponent("playerList-scroll")] private readonly BSMLScrollableContainer _playerListScrollable = null!;
+        [UIComponent("playerListRoot")] private readonly VerticalLayoutGroup _playerListRoot = null!;
+        [UIComponent("playerListEmptyText")] private readonly FormattableText _playerListEmptyText = null!;
+        [UIComponent("playerListRowPrefab")] private readonly HorizontalLayoutGroup _playerListRowPrefab = null!;
 
-        [UIComponent("playerListRowPrefab")] private HorizontalLayoutGroup _playerListRowPrefab = null!;
-        // ReSharper restore FieldCanBeMadeReadOnly.Local
+        [UIComponent("levelHistory-scroll")] private readonly BSMLScrollableContainer _levelHistoryScrollable = null!;
+        [UIComponent("levelHistoryRoot")] private readonly VerticalLayoutGroup _levelHistoryRoot = null!;
+        [UIComponent("levelHistoryEmptyText")] private readonly FormattableText _levelHistoryEmptyText = null!;
 
         private BssbLevelBarClone _levelBar = null!;
         private BssbPlayersTable _playersTable = null!;
@@ -194,10 +196,11 @@ namespace ServerBrowser.UI.Views
                 _idleRoot.gameObject.SetActive(false);
                 _loadRoot.gameObject.SetActive(false);
                 _mainRoot.gameObject.SetActive(true);
-
+                
                 SetHeaderData(serverDetail);
                 SetInfoTabData(serverDetail);
                 SetPlayerData(serverDetail.Players);
+                SetLevelHistoryData(serverDetail.LevelHistory);
             }
             catch (Exception ex)
             {
@@ -294,6 +297,49 @@ namespace ServerBrowser.UI.Views
         {
             _playerListScrollable.ContentSizeUpdated();
             _playerListScrollable.ScrollTo(0, false);
+        }
+
+        private void SetLevelHistoryData(IReadOnlyCollection<BssbServerLevel> levelHistory)
+        {
+            _log.Info($"Filling {levelHistory.Count} level history items");
+            
+            // Clear previous entries
+            foreach (var childElement in _levelHistoryRoot.GetComponentsInChildren<BssbLevelBarClone>())
+                if (childElement != null)
+                    Destroy(childElement.gameObject);
+
+            // Show "empty" text if needed
+            if (levelHistory.IsEmpty())
+            {
+                _levelHistoryEmptyText.gameObject.SetActive(true);
+                return;
+            }
+
+            _levelHistoryEmptyText.gameObject.SetActive(false);
+
+            // Insert level bars
+            foreach (var historyItem in levelHistory)
+            {
+                var levelBar = BssbLevelBarClone.Create(_container, _levelHistoryRoot.transform, true);
+                levelBar.SetText(historyItem.SongName ?? "A song", historyItem.SongAuthorName ?? historyItem.LevelAuthorName ?? historyItem.SessionGameId ?? "pls bro");
+                levelBar.SetBackgroundStyle(BssbLevelBarClone.BackgroundStyle.GameDefault);
+                
+                levelBar.SetImageSprite(Sprites.BeatSaverLogo);
+                _coverArtLoader.FetchCoverArtAsync(new CoverArtLoader.CoverArtRequest(historyItem, _loadingCts!.Token,
+                    sprite =>
+                    {
+                        if (sprite != null)
+                            levelBar.SetImageSprite(sprite);
+                    }));
+            }
+            
+            ResetLevelHistoryScroll();
+        }
+
+        private void ResetLevelHistoryScroll()
+        {
+            _levelHistoryScrollable.ContentSizeUpdated();
+            _levelHistoryScrollable.ScrollTo(0, false);
         }
 
         #endregion

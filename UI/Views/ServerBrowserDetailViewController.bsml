@@ -132,9 +132,25 @@
                 </horizontal>
             </tab>
             <tab tags="ServerDetailTabs" tab-name="Level History">
-                <vertical pad="3">
-                    <text text="Coming soon to a tab near you" italics="true" color="#bcbdc2"/>
-                </vertical>
+                <horizontal spacing="0" horizontal-fit="PreferredSize" vertical-fit="Unconstrained"
+                            child-align="MiddleCenter" preferred-width="120">
+                    <scrollable-container id="levelHistory-scroll" preferred-width="110" mask-overflow="true">
+                        <vertical id="levelHistoryRoot" spacing="1" pad-top="2" vertical-fit="PreferredSize">
+
+                            <text id="levelHistoryEmptyText" text="No levels played yet"
+                                  italics="true" color="#bcbdc2"/>
+
+                        </vertical>
+                    </scrollable-container>
+                    <vertical preferred-width="1.6" child-align="MiddleRight" anchor-min-x="0.95" anchor-max-x="1"
+                              ignore-layout="true" spacing="0">
+                        <page-button click-event='levelHistory-scroll#PageUp' direction='Up' pref-width='5'
+                                     pref-height='2'/>
+                        <vertical-scroll-indicator tags='IndicatorFor:levelHistory-scroll'/>
+                        <page-button click-event='levelHistory-scroll#PageDown' direction='Down' pref-width='5'
+                                     pref-height='2'/>
+                    </vertical>
+                </horizontal>
             </tab>
         </vertical>
 
