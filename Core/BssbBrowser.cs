@@ -49,8 +49,6 @@ namespace ServerBrowser.Core
             var pageSize = PageData?.PageSize ?? DefaultPageSize;
             QueryParams.Offset = (_pageIndex * pageSize);
             
-            _log.Info($"Loading page (index={_pageIndex})...");
-            
             // Query API (load page)
             try
             {
@@ -62,10 +60,11 @@ namespace ServerBrowser.Core
             }
 
             if (PageData is not null)
-                _log.Info($"BrowseData received (TotalCount={PageData.TotalResultCount}, Limit={PageData.PageSize}, " +
-                          $"LobbiesCount={PageData.Servers?.Count ?? 0}, Message={PageData.MessageOfTheDay})");
+                _log.Debug($"BrowseData loaded page (Index={_pageIndex}, TotalCount={PageData.TotalResultCount}, " +
+                          $"Limit={PageData.PageSize}, LobbiesCount={PageData.Servers?.Count ?? 0}, " +
+                          $"MOTD={PageData.MessageOfTheDay})");
             else
-                _log.Info("Received NULL response!");
+                _log.Error($"BrowseData page load failed - received null response (Index={_pageIndex})");
             
             // Trigger update
             TriggerUpdate(false, (PageData == null));
@@ -101,8 +100,6 @@ namespace ServerBrowser.Core
 
         private void TriggerUpdate(bool isLoading, bool didError = false)
         {
-            _log.Info($"Data loading state set (isLoading={isLoading}, didError={didError})");
-            
             IsLoading = isLoading;
             LoadingErrored = didError;
             

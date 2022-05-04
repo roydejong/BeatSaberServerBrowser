@@ -301,8 +301,6 @@ namespace ServerBrowser.UI.Views
 
         private void SetLevelHistoryData(IReadOnlyCollection<BssbServerLevel> levelHistory)
         {
-            _log.Info($"Filling {levelHistory.Count} level history items");
-            
             // Clear previous entries
             foreach (var childElement in _levelHistoryRoot.GetComponentsInChildren<BssbLevelBarClone>())
                 if (childElement != null)

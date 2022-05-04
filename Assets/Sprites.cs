@@ -17,6 +17,10 @@ namespace ServerBrowser.Assets
         /// Icon by RemixIcon (https://www.iconfinder.com/iconsets/remixicon-media)
         /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
         public static Sprite? Announce;
+        /// Announce icon, padded version
+        /// Icon by RemixIcon (https://www.iconfinder.com/iconsets/remixicon-media)
+        /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+        public static Sprite? AnnouncePadded;
 
         /// BSSB logo
         public static Sprite? ServerBrowserLogo;
@@ -61,6 +65,7 @@ namespace ServerBrowser.Assets
             IsInitialized = true;
 
             Announce = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Announce.png");
+            AnnouncePadded = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.AnnouncePadded.png");
             ServerBrowserLogo = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BSSB.png");
             BeatSaverLogo = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
             Crown = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Crown.png");

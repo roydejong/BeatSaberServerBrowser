@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using HMUI;
@@ -26,6 +27,7 @@ namespace ServerBrowser.UI.Components
         private CanvasGroup? _canvasGroup;
         private Queue<NotificationData> _pendingNotifications;
         private bool _isPresenting;
+        private NotificationData? _lastNotification = null;
 
         public BssbFloatingAlert()
         {
@@ -90,9 +92,13 @@ namespace ServerBrowser.UI.Components
 
         public void PresentNotification(NotificationData notification)
         {
+            if (_isPresenting && _lastNotification is not null && _lastNotification.Equals(notification))
+                // Ignore duplicate
+                return;
+            
             _pendingNotifications.Enqueue(notification);
             
-            _log.Info($"Enqueue notification: {notification.Title} / {notification.MessageText}");
+            _log.Debug($"Enqueue notification: {notification.Title} / {notification.MessageText}");
             
             if (!isActiveAndEnabled)
                 gameObject.SetActive(true);
@@ -103,6 +109,10 @@ namespace ServerBrowser.UI.Components
         public void PresentNotificationImmediate(NotificationData notification)
         {
             if (_levelBar is null || _canvasGroup is null)
+                return;
+
+            if (_isPresenting && _lastNotification is not null && _lastNotification.Equals(notification))
+                // Ignore duplicate
                 return;
             
             StopPresentingImmediate();
@@ -116,8 +126,9 @@ namespace ServerBrowser.UI.Components
             _log.Info($"Presenting notification ({notification.Title}, {notification.MessageText})");
 
             _isPresenting = true;
+            _lastNotification = notification;
             
-            StartCoroutine(nameof(AnimateIn));
+            StartCoroutine(AnimateIn(autoDismiss: !notification.Pinned));
         }
 
         public void DismissAllPending()
@@ -128,6 +139,18 @@ namespace ServerBrowser.UI.Components
             _pendingNotifications.Clear();
             _log.Info("Cleared all pending notifications");
         }
+
+        public bool DismissPinned()
+        {
+            if (!_isPresenting)
+                return false;
+
+            if (_lastNotification is null || !_lastNotification.Pinned)
+                return false;
+            
+            StartCoroutine(nameof(AnimateOut));
+            return true;
+        }
         
         public void DismissAllImmediate()
         {
@@ -136,7 +159,7 @@ namespace ServerBrowser.UI.Components
         }
 
         #region Animation/Coroutines
-        private IEnumerator AnimateIn()
+        private IEnumerator AnimateIn(bool autoDismiss = true)
         {
             if (_canvasGroup is null)
                 yield break;
@@ -158,9 +181,12 @@ namespace ServerBrowser.UI.Components
             _canvasGroup.alpha = 1f;
             transform.position = BasePos;
 
-            // Wait for some time then animate out
-            yield return new WaitForSeconds(DisplayTime);
-            StartCoroutine(nameof(AnimateOut));
+            if (autoDismiss)
+            {
+                // Wait for some time then animate out
+                yield return new WaitForSeconds(DisplayTime);
+                StartCoroutine(nameof(AnimateOut));
+            }
         }
         
         private IEnumerator AnimateOut()
@@ -197,14 +223,33 @@ namespace ServerBrowser.UI.Components
             public readonly string Title;
             public readonly string MessageText;
             public readonly BssbLevelBarClone.BackgroundStyle BackgroundStyle;
+            public readonly bool Pinned;
 
             public NotificationData(Sprite? sprite, string title, string messageText,
-                BssbLevelBarClone.BackgroundStyle backgroundStyle = BssbLevelBarClone.BackgroundStyle.ColorfulGradient)
+                BssbLevelBarClone.BackgroundStyle backgroundStyle = BssbLevelBarClone.BackgroundStyle.ColorfulGradient,
+                bool pinned = false)
             {
                 Sprite = sprite;
                 Title = title;
                 MessageText = messageText;
                 BackgroundStyle = backgroundStyle;
+                Pinned = pinned;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is NotificationData otherNotification)
+                {
+                    return Title.Equals(otherNotification.Title, StringComparison.InvariantCulture)
+                        && MessageText.Equals(otherNotification.MessageText, StringComparison.InvariantCulture);
+                }
+
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return Title.GetHashCode() * 17 + MessageText.GetHashCode();
             }
         }
     }

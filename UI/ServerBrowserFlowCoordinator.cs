@@ -1,6 +1,7 @@
 using System;
 using HMUI;
 using ServerBrowser.Models;
+using ServerBrowser.UI.Components;
 using ServerBrowser.UI.Utils;
 using ServerBrowser.UI.Views;
 using Zenject;
@@ -16,6 +17,7 @@ namespace ServerBrowser.UI
         [Inject] private readonly MultiplayerModeSelectionFlowCoordinator _modeSelectionFlowCoordinator = null!;
         [Inject] private readonly ModeSelectionIntegrator _modeSelectionIntegrator = null!;
         [Inject] private readonly CoverArtLoader _coverArtLoader = null!;
+        [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -41,6 +43,8 @@ namespace ServerBrowser.UI
             {
                 _detailViewController.ClearData();
             }
+            
+            _floatingAlert.DismissAllImmediate();
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
@@ -53,6 +57,9 @@ namespace ServerBrowser.UI
             
             if (removedFromHierarchy)
                 _coverArtLoader.UnloadCache();
+            
+            _floatingAlert.DismissAllPending();
+            _floatingAlert.DismissPinned();
         }
 
         protected override void BackButtonWasPressed(ViewController topViewController)

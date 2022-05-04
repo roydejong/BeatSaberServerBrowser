@@ -6,6 +6,7 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
 using ModestTree;
+using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
@@ -20,6 +21,7 @@ namespace ServerBrowser.UI.Views
     {
         [Inject] private readonly DiContainer _di = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
+        [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
 
         [UIComponent("refreshButton")] private readonly Button _refreshButton = null!;
         [UIComponent("filterButton")] private readonly Button _filterButton = null!;
@@ -128,8 +130,26 @@ namespace ServerBrowser.UI.Views
                     _serverList.data.Add(new BssbServerCellInfo(lobby));
                 }
             }
-            
+
             AfterCellsCreated();
+            
+            // Service alert
+            if (_browser.PageData is not null && !string.IsNullOrWhiteSpace(_browser.PageData.MessageOfTheDay))
+            {
+                _floatingAlert.DismissAllPending();
+                _floatingAlert.PresentNotification(new BssbFloatingAlert.NotificationData
+                (
+                    Sprites.AnnouncePadded,
+                    "Service Message",
+                    _browser.PageData.MessageOfTheDay!,
+                    BssbLevelBarClone.BackgroundStyle.SolidBlue,
+                    true
+                ));
+            }
+            else
+            {
+                _floatingAlert.DismissPinned();
+            }
         }
 
         private void AfterCellsCreated()

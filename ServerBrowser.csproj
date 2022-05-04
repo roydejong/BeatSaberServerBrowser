@@ -274,6 +274,7 @@
     <Compile Include="Utils\TimeSpanExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Sprites\AnnouncePadded.png" />
     <EmbeddedResource Include="Assets\Sprites\BSSB.png" />
     <EmbeddedResource Include="manifest.json" />
     <EmbeddedResource Include="UI\Views\ServerBrowserDetailViewController.bsml" />
