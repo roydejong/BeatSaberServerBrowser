@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace ServerBrowser.Models
@@ -11,6 +12,19 @@ namespace ServerBrowser.Models
         /// Serialized name of the Beatmap characteristic.
         /// </summary>
         [JsonProperty("Characteristic")] public string? Characteristic;
+
+        [JsonIgnore]
+        public string CharacteristicText
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(Characteristic))
+                    return "Standard";
+                
+                // To string with spaces
+                return Regex.Replace(Characteristic!, "(\\B[A-Z])", " $1");
+            }
+        }
 
         public static BssbServerLevel FromDifficultyBeatmap(IDifficultyBeatmap db, GameplayModifiers? modifiers,
             string? characteristic)

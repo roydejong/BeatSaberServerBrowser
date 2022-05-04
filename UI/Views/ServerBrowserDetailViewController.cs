@@ -307,8 +307,8 @@ namespace ServerBrowser.UI.Views
                 var levelBar = BssbLevelBarClone.Create(_container, _levelHistoryRoot.transform, true);
                 levelBar.SetText
                 (
-                    titleText: (historyItem.SongName ?? "Unknown song") + $" - {historyItem.Difficulty.ToStringWithSpaces()}",
-                    secondaryText: historyItem.SongAuthorName ?? "Unknown author"
+                    titleText: historyItem.ListDescription,
+                    secondaryText: $"{historyItem.CharacteristicText}, {historyItem.Difficulty.ToStringWithSpaces()}" 
                 );
                 levelBar.SetBackgroundStyle(BssbLevelBarClone.BackgroundStyle.GameDefault);
                 
