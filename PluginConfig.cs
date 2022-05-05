@@ -24,6 +24,11 @@
         public virtual string? ServerName { get; set; } = null;
 
         /// <summary>
+        /// Controls whether the join/leave notifications should be shown.
+        /// </summary>
+        public virtual bool EnableJoinNotifications { get; set; } = true;
+
+        /// <summary>
         /// Controls whether the JoiningLobbyExtender patches are applied.
         /// If enabled, extended connection status is shown during connect (English only).
         /// </summary>

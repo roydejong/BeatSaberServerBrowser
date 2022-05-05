@@ -8,6 +8,7 @@ namespace ServerBrowser.Core
     // ReSharper disable once ClassNeverInstantiated.Global
     public class BssbSessionNotifier : IInitializable
     {
+        [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly IMultiplayerSessionManager _sessionManager = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
 
@@ -43,6 +44,9 @@ namespace ServerBrowser.Core
 
         private void HandlePlayerConnected(IConnectedPlayer player)
         {
+            if (!_config.EnableJoinNotifications)
+                return;
+            
             if (!_isConnected || TimeSinceConnected.TotalSeconds <= 3)
                 // On join, "player connected" is raised for all players; don't notify unless we've been connected awhile
                 return;
@@ -58,6 +62,9 @@ namespace ServerBrowser.Core
 
         private void HandlePlayerDisconnected(IConnectedPlayer player)
         {
+            if (!_config.EnableJoinNotifications)
+                return;
+            
             if (!_isConnected)
                 // On disconnect, "player disconnected" is raised for all players; don't notify unless connected
                 return;
