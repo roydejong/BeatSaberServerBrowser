@@ -191,7 +191,12 @@ namespace ServerBrowser.UI
 
             // If we are already on mode selection, trigger deeplink now
             if (_statusCheckComplete)
-                _flowCoordinator.ProcessDeeplinkingToLobby();
+                ProcessDeeplinkingToLobby();
+        }
+
+        public void ProcessDeeplinkingToLobby()
+        {
+            _flowCoordinator.InvokeMethod<object, MultiplayerModeSelectionFlowCoordinator>("ProcessDeeplinkingToLobby");
         }
 
         public void SetMasterServerOverride(BssbServer server)

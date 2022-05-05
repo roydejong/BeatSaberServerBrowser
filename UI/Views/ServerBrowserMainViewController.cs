@@ -317,17 +317,6 @@ namespace ServerBrowser.UI.Views
             _pageUpButton.gameObject.SetActive(makeVisible);
             _pageDownButton.gameObject.SetActive(makeVisible);
             _scrollIndicator.gameObject.SetActive(makeVisible);
-
-            _scrollIndicator.RefreshHandle();
-
-            // Work around scroll handle being incorrectly sized on first activation
-            if (makeVisible)
-            {
-                HMMainThreadDispatcher.instance.Enqueue(() =>
-                {
-                    _scrollIndicator.RefreshHandle();
-                });   
-            }
         }
 
         private void DisableScrollBar(bool hide) =>
