@@ -21,6 +21,7 @@ namespace ServerBrowser.Core
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly BssbDataCollector _dataCollector = null!;
         [Inject] private readonly BssbApiClient _apiClient = null!;
+        [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
 
         private bool _sessionEstablished;
         private bool _dirtyFlag;
@@ -52,18 +53,30 @@ namespace ServerBrowser.Core
             Unannouncing
         }
 
-        public AnnouncerState State { get; private set; } = AnnouncerState.NotAnnouncing;
+        private AnnouncerState _stateBackingField = AnnouncerState.NotAnnouncing;
 
-        public bool ShouldAnnounce
+        public AnnouncerState State
         {
-            get
+            get => _stateBackingField;
+            set
             {
-                if (Data.IsQuickPlay)
-                    return _config.AnnounceQuickPlay; // Quick Play: All players should announce, if not disabled
-
-                return _config.AnnounceParty && _dataCollector.IsPartyLeader;
+                if (_stateBackingField == value)
+                    return;
+                
+                _stateBackingField = value;
+                _lastSuccessResponse = null;
+                _dirtyFlag = true;
+                
+                OnStateChange?.Invoke(this, value);
             }
         }
+
+        public bool HaveAnnounceSuccess => State == AnnouncerState.Announcing && _lastSuccessResponse is not null &&
+                                           _lastSuccessResponse.Success;
+        
+        public event EventHandler<AnnounceResponse?>? OnAnnounceResult;
+        public event EventHandler<bool>? OnUnAnnounceResult;
+        public event EventHandler<AnnouncerState>? OnStateChange;
 
         #region Lifecycle
 
@@ -89,6 +102,48 @@ namespace ServerBrowser.Core
         public void OnDisable()
         {
             CancelInvoke(nameof(RepeatingTick));
+        }
+        
+        #endregion
+
+        #region Logic
+
+        private bool GetShouldAnnounce()
+        {
+            if (Data.IsQuickPlay)
+                return _config.AnnounceQuickPlay; // Quick Play: All players should announce, if not disabled
+
+            return _config.AnnounceParty && _dataCollector.IsPartyLeader;
+        }
+
+        public async void RefreshPreferences()
+        {
+            var isAnnouncing = State is AnnouncerState.Announcing;
+            var shouldAnnounce = GetShouldAnnounce();
+
+            if (_sessionEstablished)
+            {
+                if (shouldAnnounce && !isAnnouncing)
+                {
+                    _log.Info($"User preferences updated: starting announce");
+                    State = AnnouncerState.Announcing;
+                }
+                else if (!shouldAnnounce && isAnnouncing)
+                {
+                    _log.Info($"User preferences updated: starting unannounce");
+                    State = AnnouncerState.Unannouncing;
+                }
+
+                var prefName = _serverBrowserClient.PreferredServerName;
+                    
+                if ((Data.LocalPlayer?.IsPartyLeader ?? false) && Data.Name != prefName)
+                {
+                    _log.Info($"User preferences updated: set game name to {prefName}");
+                    Data.Name = prefName;
+                }
+            }
+
+            await RepeatingTick();
         }
 
         private async Task RepeatingTick()
@@ -140,6 +195,10 @@ namespace ServerBrowser.Core
 
         private async Task<bool> SendAnnounceNow()
         {
+            if (Data.LobbyState == MultiplayerLobbyState.None)
+                // Not in a lobby (anymore); do not announce
+                return false;
+            
             try
             {
                 _dirtyFlag = false;
@@ -151,19 +210,24 @@ namespace ServerBrowser.Core
                 {
                     _consecutiveErrors = 0;
                     _log.Info($"Announce OK (ServerKey={response.Key})");
+                    
                     _lastAnnounceTime = Time.realtimeSinceStartup;
                     _lastSuccessResponse = response;
                     _dataCollector.Current.Key = response.Key;
                     
                     await SendAnnounceResultsIfNeededNow();
                     
+                    OnAnnounceResult?.Invoke(this, response);
                     return true;
                 }
                 else
                 {
                     _consecutiveErrors++;
                     _log.Warn($"Announce failed");
+                    
                     _dirtyFlag = true;
+                    
+                    OnAnnounceResult?.Invoke(this, null);
                     return false;
                 }
             }
@@ -229,6 +293,8 @@ namespace ServerBrowser.Core
                 {
                     _consecutiveErrors = 0;
                     _log.Info("Unannounce OK");
+                    
+                    OnUnAnnounceResult?.Invoke(this, true);
                     return true;
                 }
                 else
@@ -240,7 +306,8 @@ namespace ServerBrowser.Core
                     {
                         _dirtyFlag = true;
                     }
-
+                    
+                    OnUnAnnounceResult?.Invoke(this, false);
                     return false;
                 }
             }
@@ -259,13 +326,11 @@ namespace ServerBrowser.Core
             // Data established for a new session; begin announcing if appropriate for lobby and config
             _sessionEstablished = true;
 
-            if (!ShouldAnnounce)
+            if (!GetShouldAnnounce())
                 return;
 
             _log.Info("Starting announcing (session established)");
             State = AnnouncerState.Announcing;
-            _dirtyFlag = true;
-            _lastSuccessResponse = null;
         }
 
         private void HandleDataChanged(object sender, EventArgs e)
@@ -277,12 +342,11 @@ namespace ServerBrowser.Core
             if (State != AnnouncerState.Announcing)
             {
                 // We are NOT already announcing; we can start now if allowed (e.g. after host migration)
-                if (!ShouldAnnounce)
+                if (!GetShouldAnnounce())
                     return;
                 
                 _log.Info("Starting announcing (late/host migration)");
                 State = AnnouncerState.Announcing;
-                _lastSuccessResponse = null;
             }
 
             _dirtyFlag = true;
@@ -296,13 +360,14 @@ namespace ServerBrowser.Core
                 // We are not announcing
                 return;
             
-            State = AnnouncerState.Unannouncing;
-            
-            if (_lastSuccessResponse == null)
+            if (!HaveAnnounceSuccess)
+            {
                 // We do not have a successful announce to cancel
+                State = AnnouncerState.NotAnnouncing;
                 return;
-            
-            _dirtyFlag = true;
+            }
+
+            State = AnnouncerState.Unannouncing;
             await SendUnannounceNow();
         }
 

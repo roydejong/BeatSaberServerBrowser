@@ -148,7 +148,9 @@ namespace ServerBrowser.UI.Components
             if (_lastNotification is null || !_lastNotification.Pinned)
                 return false;
             
-            StartCoroutine(nameof(AnimateOut));
+            if (gameObject.activeSelf)
+                StartCoroutine(nameof(AnimateOut));
+            
             return true;
         }
         
@@ -156,6 +158,14 @@ namespace ServerBrowser.UI.Components
         {
             StopPresentingImmediate();
             DismissAllPending();
+        }
+
+        public void DismissAnimated()
+        {
+            DismissAllPending();
+            
+            if (gameObject.activeSelf)
+                StartCoroutine(nameof(AnimateOut));
         }
 
         #region Animation/Coroutines
@@ -185,7 +195,9 @@ namespace ServerBrowser.UI.Components
             {
                 // Wait for some time then animate out
                 yield return new WaitForSeconds(DisplayTime);
-                StartCoroutine(nameof(AnimateOut));
+                
+                if (gameObject.activeSelf)
+                    StartCoroutine(nameof(AnimateOut));
             }
         }
         

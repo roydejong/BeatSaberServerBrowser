@@ -1,6 +1,7 @@
 using ServerBrowser.Core;
 using ServerBrowser.UI;
 using ServerBrowser.UI.Components;
+using ServerBrowser.UI.Lobby;
 using ServerBrowser.UI.Utils;
 using ServerBrowser.UI.Views;
 using Zenject;
@@ -28,6 +29,10 @@ namespace ServerBrowser.Installers
             
             // Helpers
             Container.BindInterfacesAndSelfTo<BssbFloatingAlertMenuInit>().AsSingle();
+            
+            // Inject LobbyConfigPanel dependencies
+            Container.Inject(LobbyConfigPanel.instance);
+            LobbyConfigPanel.instance.Initialize();
             
             // UI Extras
             if (Plugin.Config.EnableJoiningLobbyExtender)
