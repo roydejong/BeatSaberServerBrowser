@@ -195,7 +195,7 @@ namespace ServerBrowser.UI.Views
 
         private void SetHeaderData(BssbServerDetail serverDetail)
         {
-            _levelBar.SetText(serverDetail.Name, serverDetail.LobbyStateTextExtended);
+            _levelBar.SetText(serverDetail.Name, serverDetail.BrowserDetailText);
 
             // Player count
             var playerCount = serverDetail.PlayerCount;

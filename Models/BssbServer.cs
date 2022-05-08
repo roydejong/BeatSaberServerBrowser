@@ -187,31 +187,21 @@ namespace ServerBrowser.Models
         }
 
         [JsonIgnore]
-        public string LobbyStateTextExtended
+        public string BrowserDetailText
         {
             get
             {
-                if (IsInGameplay && Level != null)
-                    return $"Playing {Level.ListDescription}";
-                else
-                    return LobbyStateText;
-            }
-        }
+                var extendedText = "";
 
-        [JsonIgnore]
-        public string DifficultyName
-        {
-            get
-            {
-                return Difficulty switch
-                {
-                    BeatmapDifficulty.Easy => "Easy",
-                    BeatmapDifficulty.Normal => "Normal",
-                    BeatmapDifficulty.Hard => "Hard",
-                    BeatmapDifficulty.Expert => "Expert",
-                    BeatmapDifficulty.ExpertPlus => "Expert+",
-                    _ => "Unknown"
-                };
+                if (Difficulty is not null)
+                    extendedText = DifficultyNameWithColor + " : ";
+                
+                if (IsInGameplay && Level != null)
+                    extendedText += $"Playing {Level.ListDescription}";
+                else
+                    extendedText += LobbyStateText;
+
+                return extendedText;
             }
         }
 

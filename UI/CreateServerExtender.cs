@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using ServerBrowser.Core;
 using ServerBrowser.UI.Forms;
 using SiraUtil.Affinity;
-using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 
@@ -11,7 +10,6 @@ namespace ServerBrowser.UI
     // ReSharper disable once ClassNeverInstantiated.Global
     public class CreateServerExtender : IInitializable, IAffinity
     {
-        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly ServerBrowserClient _bssbClient = null!;
         [Inject] private readonly CreateServerViewController _viewController = null!;
@@ -19,7 +17,7 @@ namespace ServerBrowser.UI
         private Transform _wrapper = null!;
         private Transform _formView = null!;
 
-        private bool _isActivated = false;
+        private bool _isActivated;
         
         private FormExtender? _formExtender;
         private ExtendedToggleField? _announcePartyField;
@@ -66,8 +64,6 @@ namespace ServerBrowser.UI
         {
             if (!_isActivated)
                 return;
-            
-            _log.Info($"HandleAnnouncePartyChange: {newValue}");
 
             _config.AnnounceParty = newValue;
 
@@ -78,8 +74,6 @@ namespace ServerBrowser.UI
         {
             if (!_isActivated)
                 return;
-            
-            _log.Info($"HandleServerNameChange: {newValue}");
 
             _config.ServerName = newValue;
 

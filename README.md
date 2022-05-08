@@ -20,9 +20,6 @@
     </tr>
 </table>
 
-
-
-
 ## Installation
 👉 **Server Browser is *usually* available on [ModAssistant](https://github.com/Assistant/ModAssistant/blob/master/README.md), which is the easiest way to install it!**
 
@@ -31,7 +28,7 @@ You can also install the mod manually by following the instructions below.
 If you need help, you can ask in the [Beat Saber Modding Group](https://discord.com/invite/beatsabermods) Discord (#pc-help).
 
 ### Requirements
-- Beat Saber 1.19+ on PC (Steam or Oculus)
+- Beat Saber 1.22+ on PC (Steam or Oculus)
 - With the latest version of the following mods:
   - Core mods (BSIPA and SongCore) 
   - SiraUtil 
@@ -50,16 +47,16 @@ If the mod is installed successfully, you will see `ServerBrowser.dll` in your B
 ## Custom Songs
 Want to play Custom Songs in Beat Saber Multiplayer? Here's what you'll need:
 
-- **A modded copy of Beat Saber 1.19+**
+- **A modded copy of Beat Saber 1.22+**
 - **[MultiplayerCore](https://github.com/Goobwabber/MultiplayerCore):** This mod makes multiplayer modding possible, and makes custom songs work.
 - **[BeatTogether]()**: BeatTogether provides multiplayer servers that allow modded content to work.
 
-The Server Browser mod is NOT required for custom songs, but it can help you find modded servers to play on.
+The Server Browser mod isn't required for custom songs, but it's here to help you find multiplayer lobbies.
 
-The [MultiplayerExtensions](https://github.com/Goobwabber/MultiplayerExtensions) mod adds additional multiplayer features and is recommended, but not required anymore.
+The [MultiplayerExtensions](https://github.com/Goobwabber/MultiplayerExtensions) mod adds additional multiplayer features and is recommended but not required anymore.
 
 Here's some important things you should know:
 - Official servers do **NOT** allow Custom Songs at all; it doesn't matter what mods you have.
-- The BeatTogether mod will let you choose servers to play on. Make sure you choose a BeatTogether server if you want to play custom songs!
+- The BeatTogether mod will let you choose which master server to play on. Make sure you choose BeatTogether or another modded master server if you want to play custom songs!
 
 If you need more help, you can ask in the [BeatTogether Discord](https://discord.com/invite/gezGrFG4tz) (#help).

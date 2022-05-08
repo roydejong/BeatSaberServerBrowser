@@ -58,8 +58,11 @@ namespace ServerBrowser.UI.Components
             (_songName.transform as RectTransform)!.anchorMax = new Vector2(0.8f, 0.5f);
             (_songAuthor.transform as RectTransform)!.anchorMax = new Vector2(0.8f, 0.5f);
 
-            // Allow bigger player count size (just in case we get those fat 100/100 lobbies)
+            // Allow bigger player count size (just in case we get those fat 127/127 lobbies)
             (_songTime.transform as RectTransform)!.offsetMin = new Vector2(-13.0f, -2.3f);
+            
+            // Enable rich text for subtext
+            _songAuthor.richText = true;
         }
 
         private void RefreshContent()
@@ -80,6 +83,9 @@ namespace ServerBrowser.UI.Components
                 _songTime.gameObject.SetActive(true);
                 _songTime.text = $"{_server.ReadOnlyPlayerCount}/{_server.PlayerLimit}";
                 _songTime.fontSize = 4;
+                _songTime.color = _server.ReadOnlyPlayerCount >= _server.PlayerLimit
+                    ? BssbColorScheme.MutedGray
+                    : BssbColorScheme.White;
             }
 
             // Lobby type
@@ -87,6 +93,13 @@ namespace ServerBrowser.UI.Components
             {
                 _songBpm.gameObject.SetActive(true);
                 _songBpm.text = _server.ServerTypeText;
+
+                if (_server.IsOfficial)
+                    _songBpm.color = BssbColorScheme.Gold;
+                else if (_server.IsBeatTogetherHost)
+                    _songBpm.color = BssbColorScheme.Green;
+                else 
+                    _songBpm.color = BssbColorScheme.Blue;
             }
         }
 

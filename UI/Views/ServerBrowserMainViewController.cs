@@ -23,6 +23,7 @@ namespace ServerBrowser.UI.Views
         [Inject] private readonly BssbBrowser _browser = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
 
+        [UIComponent("mainContentRoot")] private readonly VerticalLayoutGroup _mainContentRoot = null!;
         [UIComponent("refreshButton")] private readonly Button _refreshButton = null!;
         [UIComponent("filterButton")] private readonly Button _filterButton = null!;
         [UIComponent("createButton")] private readonly Button _createButton = null!;
@@ -66,6 +67,13 @@ namespace ServerBrowser.UI.Views
                 _loadingControl.didPressRefreshButtonEvent += HandleRefreshButtonClick;
                 UpdateLoadingState();
             }
+            
+            // Make entire main view background raycast target
+            //  (makes it easier to aim, feels nicer)
+            var dummyBg = _mainContentRoot.gameObject.GetComponent<ImageView>()
+                          ?? _mainContentRoot.gameObject.AddComponent<ImageView>();
+            dummyBg.color = Color.clear;
+            dummyBg.raycastTarget = true;
 
             // Refresh
             if (!_browser.IsLoading)

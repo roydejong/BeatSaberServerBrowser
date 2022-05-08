@@ -11,6 +11,7 @@ namespace ServerBrowser.UI
     // ReSharper disable once ClassNeverInstantiated.Global
     public class ServerBrowserFlowCoordinator : FlowCoordinator
     {
+        [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly ServerBrowserMainViewController _mainViewController = null!;
         [Inject] private readonly ServerBrowserDetailViewController _detailViewController = null!;
@@ -74,6 +75,8 @@ namespace ServerBrowser.UI
 
         private void HandleCreateServerClicked(object sender, EventArgs e)
         {
+            _config.AnnounceParty = true; // turn the announce switch on when creating server from our UI
+            
             ReturnToModeSelection(targetButton: MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
