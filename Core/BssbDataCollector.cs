@@ -339,6 +339,8 @@ namespace ServerBrowser.Core
 
             if (Current.Level is not null)
                 Current.Level.SessionGameId = sessionGameId;
+
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
         [AffinityPostfix]
