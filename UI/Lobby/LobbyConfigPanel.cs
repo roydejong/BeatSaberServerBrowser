@@ -27,15 +27,8 @@ namespace ServerBrowser.UI.Lobby
 
         #region Events
 
-        private bool _didInitialize = false;
-
         public void Initialize()
         {
-            if (_didInitialize)
-                return;
-
-            _didInitialize = true;
-
             _dataCollector.DataChanged += (sender, args) => Refresh();
 
             _serverAnnouncer.OnAnnounceResult += (sender, response) => Refresh();
