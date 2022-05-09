@@ -64,6 +64,8 @@ namespace ServerBrowser.UI.Views
         private BssbServerDetail? _currentDetail = null!;
         private CancellationTokenSource? _loadingCts;
 
+        public BssbServerDetail? CurrentSelection => _currentDetail;
+
         public event EventHandler<BssbServer>? ConnectClickedEvent;
 
         #region Lifecycle events

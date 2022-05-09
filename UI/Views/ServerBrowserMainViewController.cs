@@ -182,6 +182,14 @@ namespace ServerBrowser.UI.Views
             _serverList.tableView.selectionType = TableViewSelectionType.Single;
             _serverList.tableView.ReloadData(); // should cause visibleCells to be updated
 
+            TryRestoreSelection();
+        }
+
+        public void TryRestoreSelection(BssbServer? overrideSelection = null)
+        {
+            if (overrideSelection != null)
+                _selectedServer = overrideSelection;
+            
             var restoredSelection = false;
 
             foreach (var cell in _serverList.tableView.visibleCells)
