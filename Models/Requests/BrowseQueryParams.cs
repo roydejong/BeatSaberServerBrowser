@@ -9,20 +9,25 @@ namespace ServerBrowser.Models.Requests
         public string? TextSearch;
         public bool HideFullGames;
         public bool HideModdedGames;
+        public bool HideVanillaGames;
         public bool HideInProgressGames;
+        public bool HideQuickPlay;
 
         /// <summary>
         /// Indicates whether any filters have been activated.
         /// </summary>
         public bool AnyFiltersActive =>
-            !String.IsNullOrEmpty(TextSearch) || HideFullGames || HideModdedGames || HideInProgressGames;
+            !String.IsNullOrEmpty(TextSearch) || HideFullGames || HideModdedGames || HideVanillaGames
+            || HideInProgressGames || HideQuickPlay;
 
         public void Reset()
         {
             TextSearch = null;
             HideFullGames = false;
             HideModdedGames = false;
+            HideVanillaGames = false;
             HideInProgressGames = false;
+            HideQuickPlay = false;
         }
 
         public string ToQueryString()
@@ -43,9 +48,14 @@ namespace ServerBrowser.Models.Requests
             
             if (HideModdedGames)
                 queryString.Add("filterModded", "1");
+            else if (HideVanillaGames)
+                queryString.Add("filterVanilla", "1");
             
             if (HideInProgressGames)
                 queryString.Add("filterInProgress", "1");
+            
+            if (HideQuickPlay)
+                queryString.Add("filterQuickPlay", "1");
 
             return queryString.ToString();
         }

@@ -31,7 +31,8 @@ namespace ServerBrowser.UI.Views
         [UIComponent("filterButton")] private readonly Button _filterButton = null!;
         [UIComponent("filterFull")] private readonly Button _filterSubButtonFull = null!;
         [UIComponent("filterInProgress")] private readonly Button _filterSubButtonInProgress = null!;
-        [UIComponent("filterModded")] private readonly Button _filterSubButtonModded = null!;
+        [UIComponent("filterVanilla")] private readonly Button _filterSubButtonVanilla = null!;
+        [UIComponent("filterQuickPlay")] private readonly Button _filterSubButtonQuickPlay = null!;
         [UIComponent("createButton")] private readonly Button _createButton = null!;
         [UIComponent("connectButton")] private readonly Button _connectButton = null!;
         [UIComponent("scrollIndicator")] private readonly VerticalScrollIndicator _scrollIndicator = null!;
@@ -93,6 +94,9 @@ namespace ServerBrowser.UI.Views
             ResetSelection();
 
             _browser.UpdateEvent += HandleBrowserUpdate;
+            
+            _browser.QueryParams.Reset();
+            RefreshFilterStates();
 
             await _browser.ResetRefresh();
         }
@@ -420,28 +424,35 @@ namespace ServerBrowser.UI.Views
         }
 
         [UIAction("filterFullClick")]
-        private void FilterFullClick()
+        private void HandleFilterFullClick()
         {
             _browser.QueryParams.HideFullGames = !_browser.QueryParams.HideFullGames;
             RefreshFilterStates();
         }
 
         [UIAction("filterInProgressClick")]
-        private void FilterInProgressClick()
+        private void HandleFilterInProgressClick()
         {
             _browser.QueryParams.HideInProgressGames = !_browser.QueryParams.HideInProgressGames;
             RefreshFilterStates();
         }
 
-        [UIAction("filterModdedClick")]
-        private void FilterModdedClick()
+        [UIAction("filterVanillaClick")]
+        private void HandleFilterVanillaClick()
         {
-            _browser.QueryParams.HideModdedGames = !_browser.QueryParams.HideModdedGames;
+            _browser.QueryParams.HideVanillaGames = !_browser.QueryParams.HideVanillaGames;
+            RefreshFilterStates();
+        }
+
+        [UIAction("filterQuickPlayClick")]
+        private void HandleFilterQuickPlayClick()
+        {
+            _browser.QueryParams.HideQuickPlay = !_browser.QueryParams.HideQuickPlay;
             RefreshFilterStates();
         }
         
         [UIAction("searchKeyboardSubmit")]
-        private async void SearchKeyboardSubmit(string text)
+        private async void HandleSearchKeyboardSubmit(string text)
         {
             _browser.QueryParams.TextSearch = text;
             RefreshFilterStates();
@@ -468,7 +479,10 @@ namespace ServerBrowser.UI.Views
             _filterSubButtonInProgress.SetButtonFaceColor(_browser.QueryParams.HideInProgressGames
                 ? BssbColorScheme.Green
                 : BssbColorScheme.White);
-            _filterSubButtonModded.SetButtonFaceColor(_browser.QueryParams.HideModdedGames
+            _filterSubButtonVanilla.SetButtonFaceColor(_browser.QueryParams.HideVanillaGames
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
+            _filterSubButtonQuickPlay.SetButtonFaceColor(_browser.QueryParams.HideQuickPlay
                 ? BssbColorScheme.Green
                 : BssbColorScheme.White);
         }
