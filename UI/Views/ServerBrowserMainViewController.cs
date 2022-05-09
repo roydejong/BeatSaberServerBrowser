@@ -10,6 +10,7 @@ using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Components;
+using ServerBrowser.UI.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -22,10 +23,15 @@ namespace ServerBrowser.UI.Views
         [Inject] private readonly DiContainer _di = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
-
+        
+        [UIParams] private readonly BeatSaberMarkupLanguage.Parser.BSMLParserParams _parserParams = null!;
+        
         [UIComponent("mainContentRoot")] private readonly VerticalLayoutGroup _mainContentRoot = null!;
         [UIComponent("refreshButton")] private readonly Button _refreshButton = null!;
         [UIComponent("filterButton")] private readonly Button _filterButton = null!;
+        [UIComponent("filterFull")] private readonly Button _filterSubButtonFull = null!;
+        [UIComponent("filterInProgress")] private readonly Button _filterSubButtonInProgress = null!;
+        [UIComponent("filterModded")] private readonly Button _filterSubButtonModded = null!;
         [UIComponent("createButton")] private readonly Button _createButton = null!;
         [UIComponent("connectButton")] private readonly Button _connectButton = null!;
         [UIComponent("scrollIndicator")] private readonly VerticalScrollIndicator _scrollIndicator = null!;
@@ -68,14 +74,16 @@ namespace ServerBrowser.UI.Views
                 UpdateLoadingState();
             }
             
-            // Make entire main view background raycast target
-            //  (makes it easier to aim, feels nicer)
+            // Make entire main view background raycast target; makes it easier to aim, feels nicer
             var dummyBg = _mainContentRoot.gameObject.GetComponent<ImageView>()
                           ?? _mainContentRoot.gameObject.AddComponent<ImageView>();
             dummyBg.color = Color.clear;
             dummyBg.raycastTarget = true;
 
-            // Refresh
+            // Filter states
+            RefreshFilterStates();
+            
+            // Trigger refresh
             if (!_browser.IsLoading)
                 HandleRefreshButtonClick();
         }
@@ -86,11 +94,13 @@ namespace ServerBrowser.UI.Views
 
             _browser.UpdateEvent += HandleBrowserUpdate;
 
-            await _browser.Reset();
+            await _browser.ResetRefresh();
         }
 
         public void OnDisable()
         {
+            _parserParams.EmitEvent("closeSearchKeyboard");
+            
             _browser.CancelLoading();
 
             _browser.UpdateEvent -= HandleBrowserUpdate;
@@ -217,7 +227,10 @@ namespace ServerBrowser.UI.Views
                 else if (showError)
                     _loadingControl.ShowText("Failed to load servers", true);
                 else if (showNoData)
-                    _loadingControl.ShowText("No servers found", true);
+                    _loadingControl.ShowText(
+                        _browser.QueryParams.AnyFiltersActive
+                            ? "No servers found (filters active)"
+                            : "No servers found", true);
                 else
                     _loadingControl.Hide();
             }
@@ -225,11 +238,14 @@ namespace ServerBrowser.UI.Views
             if (showLoading)
             {
                 _refreshButton.interactable = false;
+                _filterButton.interactable = false;
                 _connectButton.interactable = false;
                 _pageUpButton.interactable = false;
                 _pageDownButton.interactable = false;
                 _serverList.tableView.gameObject.SetActive(false);
                 _paginatorText.gameObject.SetActive(false);
+                
+                _parserParams.EmitEvent("closeSearchKeyboard");
 
                 // Disable scroll bar, or hide it if we never initialized it with page data
                 DisableScrollBar(hide: _browser.PageData is null);
@@ -244,6 +260,7 @@ namespace ServerBrowser.UI.Views
                 }
                 
                 _refreshButton.interactable = true;
+                _filterButton.interactable = true;
                 _serverList.tableView.gameObject.SetActive(true);
                 
                 if (_browser.PageData is not null && _browser.PageData.TotalResultCount > 0 &&
@@ -383,6 +400,77 @@ namespace ServerBrowser.UI.Views
             _connectButton.interactable = true;
 
             ServerSelectedEvent?.Invoke(this, _selectedServer);
+        }
+
+        #endregion
+
+        #region Search / Filters
+
+        [UIValue("searchValue")]
+        public string SearchValue
+        {
+            get => _browser.QueryParams.TextSearch ?? "";
+            set => _browser.QueryParams.TextSearch = value;
+        }
+        
+        [UIAction("filterButtonClick")]
+        private void HandleFilterButtonClick()
+        {
+            _parserParams.EmitEvent("openSearchKeyboard");
+        }
+
+        [UIAction("filterFullClick")]
+        private void FilterFullClick()
+        {
+            _browser.QueryParams.HideFullGames = !_browser.QueryParams.HideFullGames;
+            RefreshFilterStates();
+        }
+
+        [UIAction("filterInProgressClick")]
+        private void FilterInProgressClick()
+        {
+            _browser.QueryParams.HideInProgressGames = !_browser.QueryParams.HideInProgressGames;
+            RefreshFilterStates();
+        }
+
+        [UIAction("filterModdedClick")]
+        private void FilterModdedClick()
+        {
+            _browser.QueryParams.HideModdedGames = !_browser.QueryParams.HideModdedGames;
+            RefreshFilterStates();
+        }
+        
+        [UIAction("searchKeyboardSubmit")]
+        private async void SearchKeyboardSubmit(string text)
+        {
+            _browser.QueryParams.TextSearch = text;
+            RefreshFilterStates();
+
+            // Make main content visible again
+            _mainContentRoot.gameObject.SetActive(true);
+
+            // Go back to first page & refresh
+            RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
+            await _browser.ResetRefresh();
+        }
+
+        private void RefreshFilterStates()
+        {
+            if (!_bsmlReady)
+                return;
+            
+            _filterButton.SetButtonFaceColor(_browser.QueryParams.AnyFiltersActive
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
+            _filterSubButtonFull.SetButtonFaceColor(_browser.QueryParams.HideFullGames
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
+            _filterSubButtonInProgress.SetButtonFaceColor(_browser.QueryParams.HideInProgressGames
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
+            _filterSubButtonModded.SetButtonFaceColor(_browser.QueryParams.HideModdedGames
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
         }
 
         #endregion

@@ -33,7 +33,7 @@ namespace ServerBrowser.Core
         public bool IsLoading { get; private set; }
         public bool LoadingErrored { get; private set; }
 
-        public async Task Reset()
+        public async Task ResetRefresh()
         {
             CancelLoading();
             _pageIndex = 0;

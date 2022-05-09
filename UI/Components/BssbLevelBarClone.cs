@@ -71,6 +71,9 @@ namespace ServerBrowser.UI.Components
             
             _titleText = _textContainer.Find("SongNameText").GetComponent<CurvedTextMeshPro>();
             _secondaryText = _textContainer.Find("AuthorNameText").GetComponent<CurvedTextMeshPro>();
+            
+            // Enable rich text for detail text
+            _secondaryText.richText = true;
         }
 
         public enum BackgroundStyle : byte
