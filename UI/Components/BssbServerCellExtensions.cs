@@ -63,6 +63,14 @@ namespace ServerBrowser.UI.Components
             
             // Enable rich text for subtext
             _songAuthor.richText = true;
+            
+            // Events
+            _cell.selectionDidChangeEvent += HandleCellSelectionChange;
+        }
+        
+        private void HandleCellSelectionChange(SelectableCell x, SelectableCell.TransitionType y, object z)
+        {
+            RefreshContent();
         }
 
         private void RefreshContent()
@@ -94,11 +102,13 @@ namespace ServerBrowser.UI.Components
                 _songBpm.gameObject.SetActive(true);
                 _songBpm.text = _server.ServerTypeText;
 
-                if (_server.IsOfficial)
+                if (_cell != null && _cell.selected)
+                    _songBpm.color = BssbColorScheme.White;
+                else if (_server.IsOfficial)
                     _songBpm.color = BssbColorScheme.Gold;
                 else if (_server.IsBeatTogetherHost)
                     _songBpm.color = BssbColorScheme.Green;
-                else 
+                else
                     _songBpm.color = BssbColorScheme.Blue;
             }
         }

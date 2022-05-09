@@ -187,23 +187,14 @@ namespace ServerBrowser.Models
         }
 
         [JsonIgnore]
-        public string BrowserDetailText
-        {
-            get
-            {
-                var extendedText = "";
+        public string BrowserDetailTextWithDifficulty => Difficulty is not null 
+            ? $"{DifficultyNameWithColor} : {BrowserDetailText}" 
+            : BrowserDetailText;
 
-                if (Difficulty is not null)
-                    extendedText = DifficultyNameWithColor + " : ";
-                
-                if (IsInGameplay && Level != null)
-                    extendedText += $"Playing {Level.ListDescription}";
-                else
-                    extendedText += LobbyStateText;
-
-                return extendedText;
-            }
-        }
+        [JsonIgnore]
+        public string BrowserDetailText => (IsInGameplay && Level != null)
+            ? $"Playing {Level.ListDescription}"
+            : LobbyStateText;
 
         [JsonIgnore]
         public string DifficultyNameWithColor
