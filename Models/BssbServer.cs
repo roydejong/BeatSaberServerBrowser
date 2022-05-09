@@ -103,6 +103,11 @@ namespace ServerBrowser.Models
         public DnsEndPoint? MasterServerEndPoint;
 
         /// <summary>
+        /// The multiplayer status check URL associated with the master server.
+        /// </summary>
+        [JsonProperty("MasterStatusUrl")] public string? MasterStatusUrl;
+
+        /// <summary>
         /// The endpoint for the dedicated server instance this lobby is hosted on.
         /// </summary>
         [JsonProperty("Endpoint")] [JsonConverter(typeof(IPEndPointJsonConverter))]

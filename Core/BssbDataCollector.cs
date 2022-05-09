@@ -199,6 +199,7 @@ namespace ServerBrowser.Core
             Current.PlayerLimit = configuration.maxPlayerCount;
             Current.GameplayMode = configuration.gameplayServerMode;
             Current.MasterServerEndPoint = _serverBrowserClient.MasterServerEndPoint;
+            Current.MasterStatusUrl = _serverBrowserClient.MasterStatusUrl;
             Current.EndPoint = remoteEndPoint;
             Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
             Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
@@ -247,6 +248,7 @@ namespace ServerBrowser.Core
             Current.PlayerLimit = configuration.maxPlayerCount;
             Current.GameplayMode = configuration.gameplayServerMode;
             Current.MasterServerEndPoint = null;
+            Current.MasterStatusUrl = _serverBrowserClient.MasterStatusUrl;
             Current.EndPoint = remoteEndPoint;
 
             if (selectionMask.difficulties != BeatmapDifficultyMask.All)

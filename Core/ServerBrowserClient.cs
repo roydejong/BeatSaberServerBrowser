@@ -52,6 +52,8 @@ namespace ServerBrowser.Core
         public bool UsingBeatTogetherMaster =>
             !_networkConfig.forceGameLift && MasterServerHost.EndsWith(".beattogether.systems");
 
+        public string MasterStatusUrl => _networkConfig.multiplayerStatusUrl;
+
         #endregion
 
         #region Server Name

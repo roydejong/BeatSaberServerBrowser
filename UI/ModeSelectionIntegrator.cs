@@ -184,6 +184,7 @@ namespace ServerBrowser.UI
                       $"ServerCode={server.ServerCode}, HostSecret={server.HostSecret}, " +
                       $"ServerTypeCode={server.ServerTypeCode})");
 
+            // MultiplayerCore network patching
             SetMasterServerOverride(server);
 
             // Set up lobby destination via deeplink
@@ -204,7 +205,7 @@ namespace ServerBrowser.UI
             if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
                 _mpCoreNetConfig.UseOfficialServer();
             else
-                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, "");
+                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, server.MasterStatusUrl ?? "");
         }
 
         private void LaunchServerBrowser()
