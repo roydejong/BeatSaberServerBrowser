@@ -19,7 +19,7 @@ namespace ServerBrowser.Core
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbApiClient _apiClient = null!;
 
-        public readonly BrowseQueryParams QueryParams = new();
+        public BrowseQueryParams QueryParams = new();
         public BrowseResponse? PageData { get; private set; }
 
         /// <summary>

@@ -21,6 +21,7 @@ namespace ServerBrowser.UI.Views
     public class ServerBrowserMainViewController : BSMLAutomaticViewController
     {
         [Inject] private readonly DiContainer _di = null!;
+        [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
         
@@ -94,8 +95,8 @@ namespace ServerBrowser.UI.Views
             ResetSelection();
 
             _browser.UpdateEvent += HandleBrowserUpdate;
-            
-            _browser.QueryParams.Reset();
+            _browser.QueryParams = _config.FilterSet ?? new(); 
+                
             RefreshFilterStates();
 
             await _browser.ResetRefresh();
@@ -463,6 +464,9 @@ namespace ServerBrowser.UI.Views
             // Go back to first page & refresh
             RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
             await _browser.ResetRefresh();
+            
+            // Commit filter set to config
+            _config.FilterSet = _browser.QueryParams;
         }
 
         private void RefreshFilterStates()

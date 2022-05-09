@@ -1,4 +1,6 @@
-﻿namespace ServerBrowser
+﻿using ServerBrowser.Models.Requests;
+
+namespace ServerBrowser
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class PluginConfig
@@ -33,5 +35,10 @@
         /// If enabled, extended connection status is shown during connect (English only).
         /// </summary>
         public virtual bool EnableJoiningLobbyExtender { get; set; } = true;
+
+        /// <summary>
+        /// Stores filter preferences for the main server browser view.
+        /// </summary>
+        public virtual BrowseQueryParams? FilterSet { get; set; } = new();
     }
 }
