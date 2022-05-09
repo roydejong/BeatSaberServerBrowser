@@ -470,21 +470,16 @@ namespace ServerBrowser.UI.Views
             if (!_bsmlReady)
                 return;
             
-            _filterButton.SetButtonFaceColor(_browser.QueryParams.AnyFiltersActive
-                ? BssbColorScheme.Green
-                : BssbColorScheme.White);
-            _filterSubButtonFull.SetButtonFaceColor(_browser.QueryParams.HideFullGames
-                ? BssbColorScheme.Green
-                : BssbColorScheme.White);
-            _filterSubButtonInProgress.SetButtonFaceColor(_browser.QueryParams.HideInProgressGames
-                ? BssbColorScheme.Green
-                : BssbColorScheme.White);
-            _filterSubButtonVanilla.SetButtonFaceColor(_browser.QueryParams.HideVanillaGames
-                ? BssbColorScheme.Green
-                : BssbColorScheme.White);
-            _filterSubButtonQuickPlay.SetButtonFaceColor(_browser.QueryParams.HideQuickPlay
-                ? BssbColorScheme.Green
-                : BssbColorScheme.White);
+            _filterButton.SetButtonFaceAndUnderlineColor(_browser.QueryParams.AnyFiltersActive
+                ? BssbColorScheme.Green : BssbColorScheme.White);
+            _filterSubButtonFull.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideFullGames
+                ? BssbColorScheme.Green : BssbColorScheme.White);
+            _filterSubButtonInProgress.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideInProgressGames
+                ? BssbColorScheme.Green : BssbColorScheme.White);
+            _filterSubButtonVanilla.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideVanillaGames
+                ? BssbColorScheme.Green : BssbColorScheme.White);
+            _filterSubButtonQuickPlay.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideQuickPlay
+                ? BssbColorScheme.Green : BssbColorScheme.White);
         }
 
         #endregion
