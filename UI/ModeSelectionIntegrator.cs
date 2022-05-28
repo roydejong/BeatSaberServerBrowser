@@ -205,7 +205,8 @@ namespace ServerBrowser.UI
             if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
                 _mpCoreNetConfig.UseOfficialServer();
             else
-                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, server.MasterStatusUrl ?? "");
+                _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, server.MasterStatusUrl ?? "", 
+                    null, null);
         }
 
         private void LaunchServerBrowser()
