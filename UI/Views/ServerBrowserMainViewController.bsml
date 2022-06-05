@@ -1,0 +1,51 @@
+﻿<vertical id="mainContentRoot" preferred-width="120" child-align="UpperCenter">
+
+    <modal-keyboard id="searchKeyboard" move-to-center="true" value="searchValue" show-event="openSearchKeyboard"
+                    hide-event="closeSearchKeyboard" clear-on-open="false" on-enter="searchKeyboardSubmit"
+                    clickerino-offerino-closerino="false">
+        <horizontal horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0" anchor-max-x="1.1" anchor-max-y="1.315">
+            <button id="filterFull" pad="0" pref-height="6.15" pref-width="26" on-click="filterFullClick"
+                    text="Hide full" hover-hint="Hide lobbies that are full" italics="false"/>
+            <button id="filterInProgress" pad="0" pref-height="6.15" pref-width="26" on-click="filterInProgressClick"
+                    text="Hide playing" hover-hint="Hide lobbies that are playing a level" italics="false"/>
+            <button id="filterVanilla" pad="0" pref-height="6.15" pref-width="26" on-click="filterVanillaClick"
+                    text="Hide unmodded" hover-hint="Hide lobbies that don't support custom levels" italics="false"/>
+            <button id="filterQuickPlay" pad="0" pref-height="6.15" pref-width="26" on-click="filterQuickPlayClick"
+                    text="Hide quickplay" hover-hint="Hide Quick Play lobbies" italics="false"/>
+        </horizontal>
+    </modal-keyboard>
+    
+    <horizontal horizontal-fit="PreferredSize" pref-height="8" vertical-fit="PreferredSize" spacing="2" anchor-min-x="0"
+                anchor-max-x="0.5" preferred-width="120" pad-left="2">
+        <button id="refreshButton" pad="0" pref-height="8" pref-width="27" on-click="refreshButtonClick"
+                text="Refresh" hover-hint="Reload server list"/>
+        <button id="filterButton" pad="0" pref-height="8" pref-width="27" on-click="filterButtonClick" text="Search"
+            hover-hint="Text search and filters"/>
+        <button id="createButton" pad="0" pref-height="8" pref-width="28" on-click="createButtonClick"
+                text="Create server" hover-hint="Create a new server"/>
+        <primary-button id="connectButton" pad="0" pref-height="8" pref-width="30" on-click="connectButtonClick"
+                        text="Connect" hover-hint="Connect to selected server"/>
+    </horizontal>
+
+    <horizontal spacing="0" horizontal-fit="PreferredSize" vertical-fit="Unconstrained"
+                child-align="MiddleCenter" preferred-width="120" pref-height="85">
+
+        <vertical pad-left="10" pad-right="20" pad-top="3">
+            <list id="serverList" expand-cell="true" select-cell="listSelect" preferred-width="110"
+                  mask-overflow="true"/>
+            <text id="paginatorText" font-align="Center" text="!PaginatorText!"
+                  italics="true" font-color="#95a5a6" bg="panel-top"/>
+        </vertical>
+
+        <vertical preferred-width="1.6" child-align="MiddleRight" anchor-min-x="0.95" anchor-max-x="1"
+                  ignore-layout="true" spacing="0">
+            <page-button id="pageUpButton" on-click="pageUpButtonClick" direction="Up" pref-width="5"
+                         pref-height="2"/>
+            <vertical-scroll-indicator id="scrollIndicator"/>
+            <page-button id="pageDownButton" on-click="pageDownButtonClick" direction="Down" pref-width="5"
+                         pref-height="2"/>
+        </vertical>
+
+    </horizontal>
+
+</vertical>

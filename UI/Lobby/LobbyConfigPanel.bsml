@@ -1,0 +1,20 @@
+<bg>
+    <modal-keyboard id="nameKeyboard" move-to-center="true" value="nameValue" show-event="openNameKeyboard"
+                    hide-event="nameSearchKeyboard" clear-on-open="false" on-enter="nameKeyboardSubmit"
+                    clickerino-offerino-closerino="false"/>
+    <vertical id="mainContentRoot">
+        <modifier-container>
+            <toggle-setting id="lobbyAnnounceToggle" value="lobbyAnnounceToggle"
+                            text="Add this lobby to the Server Browser" bind-value="true" apply-on-change="true"/>
+        </modifier-container>
+        <vertical pad-left="3" pad-right="3">
+            <text id="statusText" text="Unknown status" color="#ff0000"/>
+            <button id="nameButton" pad="0" pref-height="8" pref-width="32" text="Set server name" anchor-pos-y="-10"
+                on-click="nameButtonClick"/>
+        </vertical>
+        <modifier-container>
+            <toggle-setting id="joinNotificationsEnabled" value="joinNotificationsEnabled"
+                            text="Enable join/leave notifications" bind-value="true" apply-on-change="true"/>
+        </modifier-container>
+    </vertical>
+</bg>

@@ -1,38 +1,44 @@
-﻿namespace ServerBrowser
+﻿using ServerBrowser.Models.Requests;
+
+namespace ServerBrowser
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class PluginConfig
     {
         /// <summary>
-        /// If enabled, when hosting a custom lobby, it will be shared to the server browser.
-        /// This can be toggled from the "Create Server" dialog and the in-lobby modifiers panel.
+        /// The base URL for the BSSB API.
         /// </summary>
-        public bool LobbyAnnounceToggle { get; set; } = true;
+        public virtual string ApiServerUrl { get; set; } = "https://bssb.app/";
         
         /// <summary>
-        /// If enabled, when joining a Quick Play lobby, it will be shared to the server browser.
-        /// This can be toggled from the in-lobby modifiers panel.
+        /// If true, send server announcements when you are the party leader.
         /// </summary>
-        public bool ShareQuickPlayGames { get; set; } = true;
-        
-        /// <summary>
-        /// If a value is set, this name will be used when announcing the game to the server browser and master server. 
-        /// </summary>
-        public string CustomGameName { get; set; } = null;
-        
-        /// <summary>
-        /// If enabled, overhead join/leave notifications will appear in the lobby and in multiplayer games.
-        /// This can be toggled from the in-lobby modifiers panel.
-        /// </summary>
-        public bool JoinNotificationsEnabled { get; set; } = true;
+        public virtual bool AnnounceParty { get; set; } = true;
 
         /// <summary>
-        /// This setting controls whether the Discord Rich Presence feature is globally enabled or not.
+        /// If true, send Quick Play server announcements.
         /// </summary>
-        public bool DiscordRichPresenceEnabled { get; set; } = true;
+        public virtual bool AnnounceQuickPlay { get; set; } = true;
 
         /// <summary>
-        /// This setting controls whether the Steam Rich Presence feature is globally enabled or not.
+        /// Custom server name to use with party leader announcements.
         /// </summary>
-        public bool SteamRichPresenceEnabled { get; set; } = true;
+        public virtual string? ServerName { get; set; } = null;
+
+        /// <summary>
+        /// Controls whether the join/leave notifications should be shown.
+        /// </summary>
+        public virtual bool EnableJoinNotifications { get; set; } = true;
+
+        /// <summary>
+        /// Controls whether the JoiningLobbyExtender patches are applied.
+        /// If enabled, extended connection status is shown during connect (English only).
+        /// </summary>
+        public virtual bool EnableJoiningLobbyExtender { get; set; } = true;
+
+        /// <summary>
+        /// Stores filter preferences for the main server browser view.
+        /// </summary>
+        public virtual BrowseQueryParams? FilterSet { get; set; } = new();
     }
 }
