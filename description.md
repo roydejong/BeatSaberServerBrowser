@@ -12,8 +12,9 @@ If you're the party leader or lobby owner, you can control these settings from t
 
 ### Custom songs
 If you want to use custom songs, you'll need the following mods as well:
+
+- **MultiplayerCore**: Lets you choose custom songs in multiplayer lobbies, and will download any missing songs from BeatSaver automatically.
 - **BeatTogether**: Provides custom dedicated servers that allow modded content.
-- **MultiplayerExtensions**: Lets you choose custom songs in multiplayer lobbies, and will download any missing songs from BeatSaver automatically.
  
 Be sure to check if these mods are available for your game version, and grab them if you can.
 
@@ -22,7 +23,7 @@ Be sure to check if these mods are available for your game version, and grab the
 ### Cross-play
 Beat Saber has enabled cross-play for all platforms on official servers. Unofficial servers like BeatTogether always allow cross play. You'll encounter both Steam and Oculus players when you play.
 
-Please note that different versions of Beat Saber may not be compatible. Make sure everyone is on the same game version for the best experience.
+Please note that different versions of Beat Saber, MultiplayerCore, etc., may not be compatible. Make sure everyone is on the same game version for the best experience.
 
 ### Reporting issues
 If you have any issues, please report them via GitHub:
