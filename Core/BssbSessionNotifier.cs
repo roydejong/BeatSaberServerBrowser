@@ -55,7 +55,7 @@ namespace ServerBrowser.Core
             (
                 Sprites.PortalUser,
                 $"{player.userName} joined!",
-                $"{_sessionManager.connectedPlayerCount} players connected",
+                $"{_sessionManager.connectedPlayerCount + 1} players connected",
                 BssbLevelBarClone.BackgroundStyle.SolidBlue
             ));
         }
@@ -73,8 +73,8 @@ namespace ServerBrowser.Core
             (
                 Sprites.Portal,
                 $"{player.userName} disconnected",
-                _sessionManager.connectedPlayerCount > 1
-                    ? $"{_sessionManager.connectedPlayerCount} players remaining"
+                _sessionManager.connectedPlayerCount >= 1
+                    ? $"{_sessionManager.connectedPlayerCount + 1} players remaining"
                     : "You're all alone",
                 BssbLevelBarClone.BackgroundStyle.SolidCerise
             ));
