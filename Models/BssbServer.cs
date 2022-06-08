@@ -166,11 +166,12 @@ namespace ServerBrowser.Models
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
         [JsonIgnore]
-        public bool IsOfficial => !IsBeatTogetherHost &&
+        public bool IsOfficial => !IsBeatTogetherHost && !IsBeatUpServerHost &&
                                   (IsGameLiftHost || MasterServerEndPoint == null ||
                                    MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
 
         [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
+        [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId == "dtxJlHm56k6ZXcnxhbyfiA";
         [JsonIgnore] public bool IsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
 
         [JsonIgnore]

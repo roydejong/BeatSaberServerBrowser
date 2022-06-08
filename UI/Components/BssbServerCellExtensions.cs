@@ -108,6 +108,8 @@ namespace ServerBrowser.UI.Components
                     _songBpm.color = BssbColorScheme.Gold;
                 else if (_server.IsBeatTogetherHost)
                     _songBpm.color = BssbColorScheme.Green;
+                else if (_server.IsBeatUpServerHost)
+                    _songBpm.color = BssbColorScheme.Pinkish;
                 else
                     _songBpm.color = BssbColorScheme.Blue;
             }

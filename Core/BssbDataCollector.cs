@@ -75,6 +75,8 @@ namespace ServerBrowser.Core
 
             if (Current.IsBeatTogetherHost)
                 _log.Info("Detected a BeatTogether host");
+            else if (Current.IsBeatUpServerHost)
+                _log.Info("Detected a BeatUpServer host");
             else if (Current.IsGameLiftHost)
                 _log.Info("Detected an Amazon GameLift host");
 
@@ -160,6 +162,9 @@ namespace ServerBrowser.Core
 
             if (Current.IsBeatTogetherHost)
                 return Current.IsQuickPlay ? "beattogether_quickplay" : "beattogether_dedicated";
+
+            if (Current.IsBeatUpServerHost)
+                return Current.IsQuickPlay ? "beatupserver_dedicated" : "beatupserver_quickplay";
 
             return "unknown";
         }
