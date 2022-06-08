@@ -164,7 +164,7 @@ namespace ServerBrowser.Core
                 return Current.IsQuickPlay ? "beattogether_quickplay" : "beattogether_dedicated";
 
             if (Current.IsBeatUpServerHost)
-                return Current.IsQuickPlay ? "beatupserver_dedicated" : "beatupserver_quickplay";
+                return Current.IsQuickPlay ? "beatupserver_quickplay" : "beatupserver_dedicated";
 
             return "unknown";
         }
