@@ -88,6 +88,9 @@ namespace ServerBrowser.UI.Components
         public void SetBackgroundStyle(BackgroundStyle style = BackgroundStyle.GameDefault, bool skew = true,
             bool enableRaycast = false, bool padLeft = false)
         {
+            if (_bg == null || _image == null || _textContainer == null)
+                return;
+            
             // Primary background color
             _bg.color = style switch
             {
@@ -129,20 +132,29 @@ namespace ServerBrowser.UI.Components
 
         public void SetImageVisible(bool visible)
         {
-            _image.gameObject.SetActive(visible);
-            (_textContainer.transform as RectTransform)!.sizeDelta = new Vector2((visible ? -27f : 0), -2);
-            (_bg.transform as RectTransform)!.sizeDelta = (visible ? new Vector2(-4, 0) : Vector2.zero);
+            if (_image != null)
+                _image.gameObject.SetActive(visible);
+            
+            if (_textContainer != null)
+                (_textContainer.transform as RectTransform)!.sizeDelta = new Vector2((visible ? -27f : 0), -2);
+            
+            if (_bg != null)
+                (_bg.transform as RectTransform)!.sizeDelta = (visible ? new Vector2(-4, 0) : Vector2.zero);
         }
         
         public void SetImageSprite(Sprite? sprite)
         {
-            _image.sprite = sprite;
+            if (_image != null)
+                _image.sprite = sprite;
         }
         
         public void SetText(string? titleText, string? secondaryText)
         {
-            _titleText.SetText(titleText ?? "");
-            _secondaryText.SetText(secondaryText ?? "");
+            if (_titleText != null)
+                _titleText.SetText(titleText ?? "");
+            
+            if (_secondaryText != null)
+                _secondaryText.SetText(secondaryText ?? "");
         }
         #endregion
     }

@@ -159,7 +159,6 @@ namespace ServerBrowser.UI.Utils
             {
                 if (newSprite != null)
                 {
-                    _log.Warn($"Prevented dupe cache - levelId={levelId}"); // is this actually needed?
                     UnloadSprite(newSprite);
                 }
 
