@@ -137,16 +137,6 @@ namespace ServerBrowser.UI
                 return false;
             }
 
-            if (server.MultiplayerExtensionsVersion != null
-                && server.MultiplayerExtensionsVersion != ModCheck.MultiplayerExtensions.InstalledVersion)
-            {
-                // MultiplayerExtensions mismatch
-                PresentVersionMismatchError("MultiplayerExtensions",
-                    server.MultiplayerExtensionsVersion,
-                    ModCheck.MultiplayerExtensions.InstalledVersion);
-                return false;
-            }
-
             // No issues found
             return true;
         }
