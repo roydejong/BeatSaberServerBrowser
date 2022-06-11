@@ -92,7 +92,7 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="MultiplayerCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\Steam\steamapps\common\Beat Saber\Plugins\MultiplayerCore.dll</HintPath>
+      <HintPath>$(BeatSaberDir)\Plugins\MultiplayerCore.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -100,7 +100,7 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Polyglot, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\Polyglot.dll</HintPath>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Polyglot.dll</HintPath>
     </Reference>
     <Reference Include="SiraUtil, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
