@@ -185,7 +185,7 @@ namespace ServerBrowser.UI.Lobby
                         _labelStatus.color = BssbColorScheme.Gold;
                     }
 
-                    _buttonServerName.interactable = true;
+                    _buttonServerName.interactable = !_serverAnnouncer.Data.IsQuickPlay;
                     break;
                 }
                 case BssbServerAnnouncer.AnnouncerState.Unannouncing:
