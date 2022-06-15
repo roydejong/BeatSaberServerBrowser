@@ -73,6 +73,9 @@ namespace ServerBrowser.Core
 
         public bool HaveAnnounceSuccess => State == AnnouncerState.Announcing && _lastSuccessResponse is not null &&
                                            _lastSuccessResponse.Success;
+
+        public string? AnnounceServerMessage => State == AnnouncerState.Announcing
+            ? _lastSuccessResponse?.ServerMessage : null;
         
         public event EventHandler<AnnounceResponse?>? OnAnnounceResult;
         public event EventHandler<bool>? OnUnAnnounceResult;
@@ -209,7 +212,7 @@ namespace ServerBrowser.Core
                 if (response?.Success ?? false)
                 {
                     _consecutiveErrors = 0;
-                    _log.Info($"Announce OK (ServerKey={response.Key})");
+                    _log.Info($"Announce OK (ServerKey={response.Key}, ServerMessage={response.ServerMessage})");
                     
                     _lastAnnounceTime = Time.realtimeSinceStartup;
                     _lastSuccessResponse = response;
@@ -223,7 +226,7 @@ namespace ServerBrowser.Core
                 else
                 {
                     _consecutiveErrors++;
-                    _log.Warn($"Announce failed");
+                    _log.Warn($"Announce failed (ServerMessage={response?.ServerMessage})");
                     
                     _dirtyFlag = true;
                     

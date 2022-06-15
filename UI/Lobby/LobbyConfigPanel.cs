@@ -168,7 +168,12 @@ namespace ServerBrowser.UI.Lobby
             {
                 case BssbServerAnnouncer.AnnouncerState.Announcing:
                 {
-                    if (_serverAnnouncer.HaveAnnounceSuccess)
+                    if (_serverAnnouncer.AnnounceServerMessage != null)
+                    {
+                        _labelStatus.text = $"{_serverAnnouncer.AnnounceServerMessage}";
+                        _labelStatus.color = BssbColorScheme.Red;
+                    }
+                    else if (_serverAnnouncer.HaveAnnounceSuccess)
                     {
                         _labelStatus.text =
                             $"Players can join from the Server Browser!\r\n{_serverAnnouncer.Data.Name}";
