@@ -245,6 +245,10 @@ namespace ServerBrowser.Core
             if (_dataCollector.LastResults is null)
                 // No results available to announce
                 return false;
+            
+            if (string.IsNullOrEmpty(_dataCollector.LastResults.gameId))
+                // Gameplay Session ID (GUID) sometimes doesn't get set, which means it cannot be announced
+                return false;
 
             if (_lastResultsSessionId == _dataCollector.LastResults.gameId)
                 // These results were already successfully announced
