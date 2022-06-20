@@ -171,7 +171,8 @@ namespace ServerBrowser.Models
                                    MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
 
         [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
-        [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId == "dtxJlHm56k6ZXcnxhbyfiA";
+        [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId?.StartsWith("beatupserver:", 
+            StringComparison.OrdinalIgnoreCase) ?? false;
         [JsonIgnore] public bool IsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
 
         [JsonIgnore]
