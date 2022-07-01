@@ -166,14 +166,18 @@ namespace ServerBrowser.Models
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
         [JsonIgnore]
-        public bool IsOfficial => !IsBeatTogetherHost && !IsBeatUpServerHost &&
+        public bool IsOfficial => !IsBeatTogetherHost && !IsBeatUpServerHost && !IsBeatDediHost &&
                                   (IsGameLiftHost || MasterServerEndPoint == null ||
                                    MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
 
         [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
         [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId?.StartsWith("beatupserver:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
+        [JsonIgnore] public bool IsBeatDediHost => RemoteUserId?.StartsWith("beatdedi:", 
+            StringComparison.OrdinalIgnoreCase) ?? false;
         [JsonIgnore] public bool IsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
+
+        [JsonIgnore] public bool IsDirectConnect => !IsOfficial && MasterServerEndPoint is null && EndPoint is not null;
 
         [JsonIgnore]
         public string LobbyStateText
@@ -233,5 +237,29 @@ namespace ServerBrowser.Models
 
         [JsonIgnore]
         public string LobbyLifetimeText => LobbyLifetime?.ToReadableString() ?? "Unknown";
+
+        [JsonIgnore]
+        public GameplayServerMode LogicalGameplayServerMode
+        {
+            get
+            {
+                if (GameplayMode is not null)
+                    return GameplayMode.Value;
+                
+                return IsQuickPlay ? GameplayServerMode.Countdown : GameplayServerMode.Managed;
+            }
+        }
+        
+        [JsonIgnore]
+        public SongSelectionMode LogicalSongSelectionMode
+        {
+            get
+            {
+                if (GameplayMode == GameplayServerMode.Countdown || IsQuickPlay)
+                    return SongSelectionMode.Vote;
+                
+                return SongSelectionMode.OwnerPicks;
+            }
+        }
     }
 }

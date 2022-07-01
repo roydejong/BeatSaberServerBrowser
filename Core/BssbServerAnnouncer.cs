@@ -113,6 +113,10 @@ namespace ServerBrowser.Core
 
         private bool GetShouldAnnounce()
         {
+            if (Data.IsDirectConnect || Data.IsBeatDediHost)
+                // Direct connect hosts handle their own announcements and may be intentionally private
+                return false;
+            
             if (Data.IsQuickPlay)
                 return _config.AnnounceQuickPlay; // Quick Play: All players should announce, if not disabled
 

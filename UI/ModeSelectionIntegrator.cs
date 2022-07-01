@@ -3,6 +3,7 @@ using HMUI;
 using IPA.Utilities;
 using MultiplayerCore.Patchers;
 using Polyglot;
+using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Utils;
 using SiraUtil.Affinity;
@@ -25,6 +26,7 @@ namespace ServerBrowser.UI
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
         [Inject] private readonly ServerBrowserFlowCoordinator _serverBrowserFlowCoordinator = null!;
         [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
+        [Inject] private readonly DirectConnectionPatcher _directConnectPatcher = null!;
 
         private Button? _btnGameBrowser;
         private bool _statusCheckComplete;
@@ -188,7 +190,18 @@ namespace ServerBrowser.UI
             SetMasterServerOverride(server);
 
             // Set up lobby destination via deeplink
-            _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
+            if (server.IsDirectConnect)
+            {
+                // Direct connect
+                _directConnectPatcher.Enable(server);
+                _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(NetworkUtility.GenerateId(), ""));
+            }
+            else
+            {
+                // Regular connect
+                _directConnectPatcher.Disable();
+                _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
+            }
 
             // If we are already on mode selection, trigger deeplink now
             if (_statusCheckComplete)
@@ -202,7 +215,7 @@ namespace ServerBrowser.UI
 
         public void SetMasterServerOverride(BssbServer server)
         {
-            if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null)
+            if (server.IsGameLiftHost || server.IsOfficial || server.MasterServerEndPoint is null || server.IsDirectConnect)
                 _mpCoreNetConfig.UseOfficialServer();
             else
                 _mpCoreNetConfig.UseMasterServer(server.MasterServerEndPoint, server.MasterStatusUrl ?? "", 

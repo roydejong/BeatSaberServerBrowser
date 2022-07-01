@@ -151,6 +151,16 @@ namespace ServerBrowser.UI.Lobby
                 return;
             }
 
+            if ((SessionInfo?.IsDirectConnect ?? false) || (SessionInfo?.IsBeatDediHost ?? false))
+            {
+                _labelStatus.text = "This server controls its own announcements";
+                _labelStatus.color = BssbColorScheme.Gold;
+
+                _toggleAnnounce.interactable = false;
+                _buttonServerName.interactable = false;
+                return;
+            }
+
             if (!IsQuickPlay && !IsPartyLeader)
             {
                 _labelStatus.text = "You are not the party leader";
