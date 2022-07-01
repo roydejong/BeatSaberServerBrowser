@@ -80,18 +80,18 @@ namespace ServerBrowser.Core
                 // IPEndPoint remoteEndPoint
                 TargetServer!.EndPoint!,
                 // string gameSessionId,
-                "DirectConnect",
+                TargetServer!.RemoteUserId ?? "DirectConnect",
                 // string secret
-                "DirectConnect",
+                TargetServer!.HostSecret ?? "DirectConnect",
                 // string code
-                "DirectConnect",
+                TargetServer!.ServerCode ?? "DirectConnect",
                 // BeatmapLevelSelectionMask selectionMask
                 new BeatmapLevelSelectionMask(BeatmapDifficultyMask.All, GameplayModifierMask.All,
                     SongPackMask.all),
                 // GameplayServerConfiguration configuration
-                new GameplayServerConfiguration(127, DiscoveryPolicy.WithCode, InvitePolicy.AnyoneCanInvite,
-                    TargetServer.LogicalGameplayServerMode, TargetServer.LogicalSongSelectionMode,
-                    GameplayServerControlSettings.All)
+                new GameplayServerConfiguration(TargetServer.PlayerLimit!.Value, DiscoveryPolicy.WithCode,
+                    InvitePolicy.AnyoneCanInvite, TargetServer.LogicalGameplayServerMode,
+                    TargetServer.LogicalSongSelectionMode, GameplayServerControlSettings.All)
             });
 
             return false;
