@@ -15,8 +15,6 @@ namespace ServerBrowser.Core
         public bool Enabled { get; private set; }
 
         [Inject] private readonly SiraLog _log = null!;
-        [Inject] private readonly ServerBrowserClient _bssbClient = null!;
-        [Inject] private readonly LocalNetworkPlayerModel _localNetworkPlayerModel = null!;
 
         #region Control
 
@@ -94,6 +92,26 @@ namespace ServerBrowser.Core
                     TargetServer.LogicalSongSelectionMode, GameplayServerControlSettings.All)
             });
 
+            return false;
+        }
+
+        #endregion
+
+        #region Patch - Custom Songs
+
+        [AffinityPrefix]
+        [AffinityPatch(typeof(MultiplayerLevelSelectionFlowCoordinator), "enableCustomLevels", AffinityMethodType.Getter)]
+        [AffinityAfter("com.goobwabber.multiplayercore.affinity")]
+        [AffinityPriority(1)]
+        private bool PrefixCustomLevelsEnabled(ref bool __result, SongPackMask ____songPackMask)
+        {
+            // MultiplayerCore requires a master server to be set for custom songs to be enabled
+            // We have to take over that job here if direct connecting
+            
+            if (!Enabled)
+                return true;
+
+            __result = ____songPackMask.Contains(new SongPackMask("custom_levelpack_CustomLevels"));;
             return false;
         }
 
