@@ -101,6 +101,8 @@ namespace ServerBrowser.UI
                 return false;
             }
 
+            // Other menu buttons: disable special patches only used during connect action
+            _directConnectPatcher.Disable();
             return true;
         }
 
