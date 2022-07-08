@@ -107,6 +107,9 @@ namespace ServerBrowser.UI.Utils
                                 // Sprite creation has to happen on the main thread or Unity will crash
                                 HMMainThreadDispatcher.instance.Enqueue(() =>
                                 {
+                                    if (request.CancellationToken.IsCancellationRequested)
+                                        return;
+                                
                                     var sprite = Sprites.LoadSpriteRaw(remoteCoverArtBytes,
                                         spriteMeshType: SpriteMeshType.FullRect);
 

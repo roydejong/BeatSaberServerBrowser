@@ -140,9 +140,9 @@ namespace ServerBrowser.UI.Components
                         _coverImage.sprite = sprite;
                 }));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex);
+                // Intentionally suppressing Unity errors that can happen here due to async loads
             }
         }
     }

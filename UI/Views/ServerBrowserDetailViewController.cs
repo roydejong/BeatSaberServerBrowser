@@ -160,6 +160,9 @@ namespace ServerBrowser.UI.Views
                 return;
             }
 
+            if (_loadingCts.IsCancellationRequested)
+                return;
+
             SetData(serverDetail, soft);
             DelayedLayoutFix();
         }
@@ -202,8 +205,12 @@ namespace ServerBrowser.UI.Views
             // Player count
             var playerCount = serverDetail.PlayerCount;
             var playerLimit = serverDetail.PlayerLimit ?? 5;
-            _playerCountText.SetText($"{playerCount}/{playerLimit}");
-            _playerCountText.color = (playerCount < playerLimit ? Color.white : BssbColorScheme.Red);
+
+            if (_playerCountText != null)
+            {
+                _playerCountText.SetText($"{playerCount}/{playerLimit}");
+                _playerCountText.color = (playerCount < playerLimit ? Color.white : BssbColorScheme.Red);
+            }
 
             // Cover art 
             if (serverDetail.IsInLobby)

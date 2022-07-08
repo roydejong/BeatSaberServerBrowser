@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using HMUI;
 using IPA.Utilities;
@@ -144,8 +145,15 @@ namespace ServerBrowser.UI.Components
         
         public void SetImageSprite(Sprite? sprite)
         {
-            if (_image != null)
-                _image.sprite = sprite;
+            try
+            {
+                if (_image != null)
+                    _image.sprite = sprite;
+            }
+            catch (Exception)
+            {
+                // Intentionally suppressing Unity errors that can happen here due to async loads
+            }
         }
         
         public void SetText(string? titleText, string? secondaryText)
