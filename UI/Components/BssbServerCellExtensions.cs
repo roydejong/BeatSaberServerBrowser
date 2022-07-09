@@ -49,21 +49,6 @@ namespace ServerBrowser.UI.Components
             _songBpm = _cell.transform.Find("SongBpm").GetComponent<CurvedTextMeshPro>();
             _bpmIcon = _cell.transform.Find("BpmIcon").GetComponent<ImageView>();
             
-            // Re-align BPM text and allow more horizontal space - we use this for extended lobby type
-            var songBpmTransform = (_songBpm.transform as RectTransform)!;
-            songBpmTransform.anchorMax = new Vector2(1.03f, 0.5f);
-            songBpmTransform.offsetMin = new Vector2(-32.00f, -4.60f);
-
-            // Limit text size for server name and song name
-            (_songName.transform as RectTransform)!.anchorMax = new Vector2(0.8f, 0.5f);
-            (_songAuthor.transform as RectTransform)!.anchorMax = new Vector2(0.8f, 0.5f);
-
-            // Allow bigger player count size (just in case we get those fat 127/127 lobbies)
-            (_songTime.transform as RectTransform)!.offsetMin = new Vector2(-13.0f, -2.3f);
-            
-            // Enable rich text for subtext
-            _songAuthor.richText = true;
-            
             // Events
             _cell.selectionDidChangeEvent += HandleCellSelectionChange;
         }
@@ -78,6 +63,29 @@ namespace ServerBrowser.UI.Components
             if (_server is null)
                 return;
             
+            // Re-align BPM text and allow more horizontal space - we use this for extended lobby type
+            if (_songBpm != null)
+            {
+                var songBpmTransform = (_songBpm.transform as RectTransform)!;
+                songBpmTransform.anchorMax = new Vector2(1.03f, 0.5f);
+                songBpmTransform.offsetMin = new Vector2(-32.00f, -4.60f);
+            }
+
+            // Limit text size for server name and song name
+            if (_songName != null)
+                (_songName.transform as RectTransform)!.anchorMax = new Vector2(0.8f, 0.5f);
+            
+            if (_songAuthor != null)
+                (_songAuthor.transform as RectTransform)!.anchorMax = new Vector2(0.8f, 0.5f);
+
+            // Allow bigger player count size (just in case we get those fat 127/127 lobbies)
+            if (_songTime != null)
+                (_songTime.transform as RectTransform)!.offsetMin = new Vector2(-13.0f, -2.3f);
+            
+            // Enable rich text for subtext
+            if (_songAuthor != null)
+                _songAuthor.richText = true;
+                
             // Unused parts
             if (_favoritesIcon != null)
                 _favoritesIcon.gameObject.SetActive(false);
