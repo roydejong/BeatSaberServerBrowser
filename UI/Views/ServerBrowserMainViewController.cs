@@ -482,6 +482,11 @@ namespace ServerBrowser.UI.Views
             if (!_bsmlReady)
                 return;
             
+            _filterSubButtonFull.gameObject.SetActive(true);
+            _filterSubButtonInProgress.gameObject.SetActive(true);
+            _filterSubButtonVanilla.gameObject.SetActive(true);
+            _filterSubButtonQuickPlay.gameObject.SetActive(true);
+
             _filterButton.SetButtonFaceAndUnderlineColor(_browser.QueryParams.AnyFiltersActive
                 ? BssbColorScheme.Green : BssbColorScheme.White);
             _filterSubButtonFull.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideFullGames
