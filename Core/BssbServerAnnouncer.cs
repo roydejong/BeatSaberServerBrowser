@@ -132,12 +132,12 @@ namespace ServerBrowser.Core
             {
                 if (shouldAnnounce && !isAnnouncing)
                 {
-                    _log.Info($"User preferences updated: starting announce");
+                    _log.Debug($"User preferences updated: starting announce");
                     State = AnnouncerState.Announcing;
                 }
                 else if (!shouldAnnounce && isAnnouncing)
                 {
-                    _log.Info($"User preferences updated: starting unannounce");
+                    _log.Debug($"User preferences updated: starting unannounce");
                     State = AnnouncerState.Unannouncing;
                 }
 
@@ -145,7 +145,7 @@ namespace ServerBrowser.Core
                     
                 if ((Data.LocalPlayer?.IsPartyLeader ?? false) && Data.Name != prefName)
                 {
-                    _log.Info($"User preferences updated: set game name to {prefName}");
+                    _log.Debug($"User preferences updated: set game name to {prefName}");
                     Data.Name = prefName;
                 }
             }

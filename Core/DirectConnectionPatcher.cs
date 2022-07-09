@@ -23,17 +23,23 @@ namespace ServerBrowser.Core
             if (!server.IsDirectConnect)
                 throw new ArgumentException("Must be direct-connect server");
 
+            if (Enabled && TargetServer == server)
+                return;
+            
             TargetServer = server;
             Enabled = true;
 
-            _log.Info("Enable direct connect mode");
+            _log.Info($"Enable direct connect mode (endPoint={TargetServer.EndPoint})");
         }
 
         public void Disable()
         {
+            if (!Enabled)
+                return;
+            
             TargetServer = null;
             Enabled = false;
-
+            
             _log.Info("Disable direct connect mode");
         }
 

@@ -35,7 +35,7 @@ namespace ServerBrowser.Core
             MultiplayerCoreVersion = ModCheck.MultiplayerCore.InstalledVersion;
             MultiplayerExtensionsVersion = ModCheck.MultiplayerExtensions.InstalledVersion;
 
-            _log.Info($"Checked related mods (multiplayerCoreVersion={MultiplayerCoreVersion}, " +
+            _log.Debug($"Checked related mods (multiplayerCoreVersion={MultiplayerCoreVersion}, " +
                       $"multiplayerExtensionsVersion={MultiplayerExtensionsVersion?.ToString() ?? "Not installed"})");
         }
 
@@ -86,7 +86,7 @@ namespace ServerBrowser.Core
                 return;
             }
 
-            _log.Info($"Loaded platform user info (platform={PlatformUserInfo.platform}, " +
+            _log.Debug($"Loaded platform user info (platform={PlatformUserInfo.platform}, " +
                       $"userName={PlatformUserInfo.userName}, platformUserId={PlatformUserInfo.platformUserId})");
 
             _dataCollector.Current.ReportingPlatformKey = PlatformKey;

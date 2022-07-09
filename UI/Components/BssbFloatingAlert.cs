@@ -123,7 +123,7 @@ namespace ServerBrowser.UI.Components
             _levelBar.SetImageSprite(notification.Sprite);
             _levelBar.SetText(notification.Title, notification.MessageText);
             
-            _log.Info($"Presenting notification ({notification.Title}, {notification.MessageText})");
+            _log.Debug($"Presenting notification ({notification.Title}, {notification.MessageText})");
 
             _isPresenting = true;
             _lastNotification = notification;

@@ -74,13 +74,13 @@ namespace ServerBrowser.Core
             }
 
             if (Current.IsBeatTogetherHost)
-                _log.Info("Detected a BeatTogether host");
+                _log.Debug("Detected a BeatTogether host");
             else if (Current.IsBeatUpServerHost)
-                _log.Info("Detected a BeatUpServer host");
+                _log.Debug("Detected a BeatUpServer host");
             else if (Current.IsBeatDediHost)
-                _log.Info("Detected a BeatDedi host");
+                _log.Debug("Detected a BeatDedi host");
             else if (Current.IsGameLiftHost)
-                _log.Info("Detected an Amazon GameLift host");
+                _log.Debug("Detected an Amazon GameLift host");
 
             Current.ServerTypeCode = DetermineServerType();
 
@@ -104,7 +104,7 @@ namespace ServerBrowser.Core
             if (ContainsPlayer(player.userId))
                 return;
 
-            _log.Info($"Player connected to session (sortIndex={player.sortIndex}, userId={player.userId}, "
+            _log.Info($"Player connected (sortIndex={player.sortIndex}, userId={player.userId}, "
                       + $"userName={player.userName}, isMe={player.isMe}, isConnectionOwner={player.isConnectionOwner}, "
                       + $"currentLatency={player.currentLatency})");
 
@@ -134,7 +134,7 @@ namespace ServerBrowser.Core
 
         private void HandlePlayerDisconnected(IConnectedPlayer player)
         {
-            _log.Info($"Player disconnected from session (userId={player.userId}, userName={player.userName})");
+            _log.Info($"Player disconnected (userId={player.userId}, userName={player.userName})");
 
             var playerToRemove = Current.Players.FirstOrDefault(p => p.UserId == player.userId);
 

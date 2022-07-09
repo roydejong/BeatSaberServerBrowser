@@ -29,7 +29,7 @@ namespace ServerBrowser.Core
             if (_dataCollector.Current.LobbyState == newState)
                 return;
 
-            _log.Info($"Lobby state changed to: {newState}");
+            _log.Debug($"Lobby state changed to: {newState}");
             
             _dataCollector.Current.LobbyState = newState;
             _dataCollector.TriggerDataChanged();

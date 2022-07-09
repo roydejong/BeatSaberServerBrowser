@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -48,7 +47,7 @@ namespace ServerBrowser.Core
             _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
             _httpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
 
-            _log.Info($"Initialized API client [{_config.ApiServerUrl}, {UserAgent}]");
+            _log.Debug($"Initialized API client [{_config.ApiServerUrl}, {UserAgent}]");
         }
 
         public async Task<AnnounceResponse?> Announce(BssbServer announceData)

@@ -147,7 +147,7 @@ namespace ServerBrowser.UI
             if (GetCurrentText() == text)
                 return;
 
-            _log.Info($"Extended join status: {text}");
+            _log.Debug($"Extended join status: {text}");
 
             _viewController
                 .GetField<LoadingControl, JoiningLobbyViewController>("_loadingControl")
