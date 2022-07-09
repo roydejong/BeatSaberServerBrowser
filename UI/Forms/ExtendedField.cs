@@ -8,11 +8,6 @@ namespace ServerBrowser.UI.Forms
         /// Toggles whether this field should be visible or not.
         /// </summary>
         public abstract bool Visible { get; set; }
-        
-        /// <summary>
-        /// Gets the field height for vertical layout calculations.
-        /// </summary>
-        public abstract float Height { get; }
     }
     
     public abstract class ExtendedField<TValue> : ExtendedField

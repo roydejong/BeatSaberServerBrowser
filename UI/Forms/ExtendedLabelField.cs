@@ -15,8 +15,6 @@ namespace ServerBrowser.UI.Forms
             set => _labelText.gameObject.SetActive(value);
         }
 
-        public override float Height => 9f;
-
         public string Label
         {
             get => _labelText.text;

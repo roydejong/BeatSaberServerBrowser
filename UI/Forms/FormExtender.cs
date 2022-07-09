@@ -4,64 +4,89 @@ using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Forms
 {
-    public class FormExtender
+    public class FormExtender : MonoBehaviour
     {
-        private readonly Transform _formView;
         private readonly List<ExtendedField> _fields;
+        private RectTransform _rectTransform;
+        private RectTransform _rectTransformParent;
+        private bool _innerLayoutDirty;
+        private bool _outerLayoutDirty;
 
-        public FormExtender(Transform formView)
+        public FormExtender()
         {
-            _formView = formView;
             _fields = new();
+            _rectTransform = GetComponent<RectTransform>();
+            _rectTransformParent = transform.parent.GetComponent<RectTransform>();
+            _innerLayoutDirty = true;
+            _outerLayoutDirty = true;
         }
 
-        public void RefreshVerticalLayout()
+        #region Layout update
+
+        public void Update()
         {
-            var formViewVerticalLayout = _formView.GetComponent<VerticalLayoutGroup>();
-            var parentVerticalLayout = _formView.parent.GetComponent<VerticalLayoutGroup>();
-            
-            // Disable vertical layout
-            parentVerticalLayout.enabled = false;
-            formViewVerticalLayout.enabled = false;
+            if (_innerLayoutDirty)
+            {
+                _innerLayoutDirty = false;
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
+                return;
+            }
 
-            // Calculate extra height and modify size delta
-            var extraHeight = 0f;
-            
-            foreach (var field in _fields)
-                if (field.Visible)
-                    extraHeight += field.Height;
-            
-            var rectTransform = (_formView as RectTransform)!;
-            rectTransform.offsetMax = new Vector2(rectTransform.offsetMax.x, 0.0f);
-            rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, extraHeight);
+            if (_outerLayoutDirty)
+            {
+                _outerLayoutDirty = false;
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransformParent);
+                return;
+            }
+        }
 
-            // Re-apply vertical layout with new height
-            formViewVerticalLayout.enabled = true;
-            parentVerticalLayout.enabled = true;
+        public void MarkDirty()
+        {
+            var formViewVerticalLayout = transform.GetComponent<VerticalLayoutGroup>();
+            var parentVerticalLayout = transform.parent.GetComponent<VerticalLayoutGroup>();
+            var contentSizeFitter = transform.GetComponent<ContentSizeFitter>();
+
+            if (formViewVerticalLayout != null && !formViewVerticalLayout.enabled)
+                formViewVerticalLayout.enabled = true;
+
+            if (contentSizeFitter != null && !contentSizeFitter.enabled)
+                contentSizeFitter.enabled = true;
+            
+            if (parentVerticalLayout != null && !parentVerticalLayout.enabled)
+                parentVerticalLayout.enabled = true;
+            
+            _innerLayoutDirty = true;
+            _outerLayoutDirty = true;
         }
         
+        #endregion
+
+        #region Fields API
+
         public ExtendedStringField CreateTextInput(string label, string? initialValue)
         {
-            var field = new ExtendedStringField(_formView, label, initialValue);
+            var field = new ExtendedStringField(transform, label, initialValue);
             _fields.Add(field);
-            RefreshVerticalLayout();
+            MarkDirty();
             return field;
         }
         
         public ExtendedToggleField CreateToggleInput(string label, bool initialValue)
         {
-            var field = new ExtendedToggleField(_formView, label, initialValue);
+            var field = new ExtendedToggleField(transform, label, initialValue);
             _fields.Add(field);
-            RefreshVerticalLayout();
+            MarkDirty();
             return field;
         }
         
         public ExtendedLabelField CreateLabel(string label)
         {
-            var field = new ExtendedLabelField(_formView, label);
+            var field = new ExtendedLabelField(transform, label);
             _fields.Add(field);
-            RefreshVerticalLayout();
+            MarkDirty();
             return field;
         }
+
+        #endregion
     }
 }

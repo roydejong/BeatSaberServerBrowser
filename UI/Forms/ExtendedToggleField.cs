@@ -1,11 +1,6 @@
 using System;
-using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Tags;
-using BeatSaberMarkupLanguage.Tags.Settings;
-using HMUI;
-using ServerBrowser.Assets;
-using TMPro;
 using UnityEngine;
 
 namespace ServerBrowser.UI.Forms
@@ -20,8 +15,6 @@ namespace ServerBrowser.UI.Forms
             get => _toggleSetting.gameObject.activeSelf;
             set => _toggleSetting.gameObject.SetActive(value);
         }
-
-        public override float Height => 7.5f;
 
         public string Label
         {

@@ -29,8 +29,24 @@ namespace ServerBrowser.UI
             _wrapper = _viewController.transform.Find("Wrapper");
             _formView = _wrapper.transform.Find("CreateServerFormView");
             
+            // Remove extra spacing
+            var spaceIdx = 0;
+            
+            foreach (RectTransform rect in _wrapper)
+            {
+                if (rect.gameObject.name != "Space")
+                    continue;
+
+                switch (spaceIdx++)
+                {
+                    case 1: // Bottom space
+                        rect.gameObject.SetActive(false);
+                        break;
+                }
+            }
+            
             // Extend form
-            _formExtender = new FormExtender(_formView);
+            _formExtender = _formView.gameObject.AddComponent<FormExtender>();
 
             _announcePartyField = _formExtender.CreateToggleInput("Add to Server Browser", _config.AnnounceParty);
             _announcePartyField.OnChange += HandleAnnouncePartyChange;
@@ -125,7 +141,7 @@ namespace ServerBrowser.UI
                 _masterServerText.Label = text;
             }
 
-            _formExtender?.RefreshVerticalLayout();
+            _formExtender?.MarkDirty();
         }
     }
 }
