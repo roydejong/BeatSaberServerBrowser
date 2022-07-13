@@ -212,6 +212,11 @@ namespace ServerBrowser.Models
         {
             get
             {
+                if (Difficulty != null && (int)Difficulty == -1)
+                {
+                    return "<color=#dbbb48>All</color>";
+                }
+                
                 return Difficulty switch
                 {
                     BeatmapDifficulty.Easy => "<color=#3cb371>Easy</color>",
