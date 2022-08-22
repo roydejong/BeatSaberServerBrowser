@@ -4,6 +4,7 @@ using System.Net;
 using IPA.Utilities;
 using MultiplayerCore.Players;
 using ServerBrowser.Models;
+using ServerBrowser.Models.Enums;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using Zenject;
@@ -213,11 +214,7 @@ namespace ServerBrowser.Core
             Current.EndPoint = remoteEndPoint;
             Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
             Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
-
-            if (selectionMask.difficulties != BeatmapDifficultyMask.All)
-                Current.Difficulty = selectionMask.difficulties.FromMask();
-            else
-                Current.Difficulty = null;
+            Current.Difficulty = selectionMask.difficulties.ToBssbLobbyDifficulty();
 
             FinishPreConnectHandling();
         }
@@ -260,11 +257,7 @@ namespace ServerBrowser.Core
             Current.MasterServerEndPoint = null;
             Current.MasterStatusUrl = _serverBrowserClient.MasterStatusUrl;
             Current.EndPoint = remoteEndPoint;
-
-            if (selectionMask.difficulties != BeatmapDifficultyMask.All)
-                Current.Difficulty = selectionMask.difficulties.FromMask();
-            else
-                Current.Difficulty = null;
+            Current.Difficulty = selectionMask.difficulties.ToBssbLobbyDifficulty();
 
             FinishPreConnectHandling();
         }
@@ -304,7 +297,9 @@ namespace ServerBrowser.Core
 
             Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap, gameplayModifiers,
                 beatmapCharacteristic.serializedName);
-            Current.Difficulty = Current.Level.Difficulty;
+
+            if (Current.Level.Difficulty.HasValue && Current.Difficulty != BssbLobbyDifficulty.All)
+                Current.Difficulty = Current.Level.Difficulty.Value.ToBssbLobbyDifficulty();
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
