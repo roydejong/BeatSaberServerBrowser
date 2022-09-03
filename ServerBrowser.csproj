@@ -233,7 +233,7 @@
     <Compile Include="Models\BssbServerDetail.cs" />
     <Compile Include="Models\BssbServerLevel.cs" />
     <Compile Include="Models\BssbServerPlayer.cs" />
-    <Compile Include="Models\Enums\BssbLobbyDifficulty.cs" />
+    <Compile Include="Models\Enums\BssbDifficulty.cs" />
     <Compile Include="Models\JsonConverters\HiveVersionJsonConverter.cs" />
     <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
     <Compile Include="Models\JsonConverters\DnsEndPointConverter.cs" />

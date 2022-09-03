@@ -214,7 +214,7 @@ namespace ServerBrowser.Core
             Current.EndPoint = remoteEndPoint;
             Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
             Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
-            Current.Difficulty = selectionMask.difficulties.ToBssbLobbyDifficulty();
+            Current.LobbyDifficulty = selectionMask.difficulties.ToBssbDifficulty();
 
             FinishPreConnectHandling();
         }
@@ -257,7 +257,7 @@ namespace ServerBrowser.Core
             Current.MasterServerEndPoint = null;
             Current.MasterStatusUrl = _serverBrowserClient.MasterStatusUrl;
             Current.EndPoint = remoteEndPoint;
-            Current.Difficulty = selectionMask.difficulties.ToBssbLobbyDifficulty();
+            Current.LobbyDifficulty = selectionMask.difficulties.ToBssbDifficulty();
 
             FinishPreConnectHandling();
         }
@@ -298,8 +298,10 @@ namespace ServerBrowser.Core
             Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap, gameplayModifiers,
                 beatmapCharacteristic.serializedName);
 
-            if (Current.Level.Difficulty.HasValue && Current.Difficulty != BssbLobbyDifficulty.All)
-                Current.Difficulty = Current.Level.Difficulty.Value.ToBssbLobbyDifficulty();
+            if (Current.Level.Difficulty.HasValue && Current.LobbyDifficulty != BssbDifficulty.All)
+                Current.LobbyDifficulty = Current.Level.Difficulty.Value.ToBssbDifficulty();
+            
+            Current.LevelDifficulty = beatmapDifficulty.ToBssbDifficulty();
 
             DataChanged?.Invoke(this, EventArgs.Empty);
         }

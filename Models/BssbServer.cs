@@ -90,7 +90,12 @@ namespace ServerBrowser.Models
         /// <summary>
         /// Lobby difficulty (for Quick Play), or last played level difficulty.
         /// </summary>
-        [JsonProperty("Difficulty")] public BssbLobbyDifficulty? Difficulty;
+        [JsonProperty("Difficulty")] public BssbDifficulty? LobbyDifficulty;
+        
+        /// <summary>
+        /// Current or last played level difficulty.
+        /// </summary>
+        [JsonProperty("LevelDifficulty")] public BssbDifficulty? LevelDifficulty;
 
         /// <summary>
         /// Identifies what type of server this is for announce messages.
@@ -199,26 +204,24 @@ namespace ServerBrowser.Models
         }
 
         [JsonIgnore]
-        public string BrowserDetailTextWithDifficulty => Difficulty is not null 
-            ? $"{DifficultyNameWithColor} : {BrowserDetailText}" 
-            : BrowserDetailText;
+        public string BrowserDetailTextWithDifficulty
+        {
+            get
+            {
+                if (LobbyDifficulty is null)
+                    return BrowserDetailText;
+
+                if (IsInLobby || LevelDifficulty is null)
+                    return $"{LobbyDifficulty.Value.ToFormattedText()} : {BrowserDetailText}";
+                else
+                    return $"{LevelDifficulty.Value.ToFormattedText()} : {BrowserDetailText}";
+            }
+        }
 
         [JsonIgnore]
         public string BrowserDetailText => (IsInGameplay && Level != null)
             ? $"Playing {Level.ListDescription}"
             : LobbyStateText;
-
-        [JsonIgnore]
-        public string DifficultyNameWithColor => Difficulty switch
-        {
-            BssbLobbyDifficulty.All => "<color=#dbbb48>All</color>",
-            BssbLobbyDifficulty.Easy => "<color=#3cb371>Easy</color>",
-            BssbLobbyDifficulty.Normal => "<color=#59b0f4>Normal</color>",
-            BssbLobbyDifficulty.Hard => "<color=#ff6347>Hard</color>",
-            BssbLobbyDifficulty.Expert => "<color=#bf2a42>Expert</color>",
-            BssbLobbyDifficulty.ExpertPlus => "<color=#8f48db>Expert+</color>",
-            _ => "<color=#bcbdc2>Unknown</color>"
-        };
 
         [JsonIgnore]
         public bool IsInLobby => LobbyState is MultiplayerLobbyState.None or MultiplayerLobbyState.Error
