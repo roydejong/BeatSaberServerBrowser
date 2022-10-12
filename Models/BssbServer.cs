@@ -204,6 +204,23 @@ namespace ServerBrowser.Models
         }
 
         [JsonIgnore]
+        public string DualDifficultyFormatted
+        {
+            get
+            {
+                if (LobbyDifficulty is null)
+                    return "New lobby";
+
+                if (LobbyDifficulty.HasValue && LevelDifficulty.HasValue && LevelDifficulty != LobbyDifficulty)
+                    // Have both lobby and level difficulty, but they diverge (happens with "All" difficulty lobbies)
+                    return $"{LobbyDifficulty.Value.ToFormattedText()} ({LevelDifficulty.Value.ToFormattedText()})";
+                
+                // Have only basic lobby difficulty
+                return $"{LobbyDifficulty.Value.ToFormattedText()}";
+            }
+        }
+
+        [JsonIgnore]
         public string BrowserDetailTextWithDifficulty
         {
             get
@@ -212,9 +229,9 @@ namespace ServerBrowser.Models
                     return BrowserDetailText;
 
                 if (IsInLobby || LevelDifficulty is null)
-                    return $"{LobbyDifficulty.Value.ToFormattedText()} : {BrowserDetailText}";
+                    return $"{DualDifficultyFormatted} : {BrowserDetailText}";
                 else
-                    return $"{LevelDifficulty.Value.ToFormattedText()} : {BrowserDetailText}";
+                    return $"{DualDifficultyFormatted} : {BrowserDetailText}";
             }
         }
 

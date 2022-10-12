@@ -11,7 +11,6 @@ using ModestTree;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
-using ServerBrowser.Models.Enums;
 using ServerBrowser.UI.Components;
 using ServerBrowser.UI.Utils;
 using ServerBrowser.Utils;
@@ -241,23 +240,7 @@ namespace ServerBrowser.UI.Views
             _txtUptime.SetText(serverDetail.LobbyLifetimeText);
             _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
 
-            if (serverDetail.LobbyDifficulty == null)
-            {
-                // Missing difficulty, should only happen for new non-quickplay lobbies
-                _txtDifficulty.SetText("New lobby");
-            }
-            else if (serverDetail.LobbyDifficulty.HasValue && serverDetail.LevelDifficulty.HasValue &&
-                     serverDetail.LevelDifficulty != serverDetail.LobbyDifficulty)
-            {
-                // Have both lobby and level difficulty, but they diverge (happens with "All" difficulty lobbies)
-                _txtDifficulty.SetText($"{serverDetail.LobbyDifficulty.Value.ToFormattedText()} " +
-                                       $"({serverDetail.LevelDifficulty.Value.ToFormattedText()})");
-            }
-            else
-            {
-                // Have only basic lobby difficulty
-                _txtDifficulty.SetText($"{serverDetail.LobbyDifficulty.Value.ToFormattedText()}");
-            }
+            _txtDifficulty.SetText(serverDetail.DualDifficultyFormatted);
 
             _txtGameVersion.SetText($"Beat Saber {serverDetail.GameVersion}");
             _txtGameVersion.color = (serverDetail.GameVersion?.Equals(IPA.Utilities.UnityGame.GameVersion) ?? false)
