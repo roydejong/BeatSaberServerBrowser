@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -224,7 +225,7 @@ namespace ServerBrowser.UI.Views
             _connectButton.interactable = _selectionValid;
         }
         
-        private void UpdateLoadingState()
+        private async void UpdateLoadingState()
         {
             if (!_bsmlReady)
                 return;
@@ -287,6 +288,9 @@ namespace ServerBrowser.UI.Views
                     _paginatorText.gameObject.SetActive(false);
                 }
             }
+            
+            await Task.Delay(100);
+            _scrollIndicator.RefreshHandle();
         }
 
         private void ResetSelection(bool hard = true)
