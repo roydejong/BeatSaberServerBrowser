@@ -281,7 +281,7 @@ namespace ServerBrowser.Core
         [AffinityPostfix]
         [AffinityPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel")]
         private void HandleStartMultiplayerLevel(ILevelGameplaySetupData gameplaySetupData,
-            IDifficultyBeatmap difficultyBeatmap, Action beforeSceneSwitchCallback)
+            IDifficultyBeatmap? difficultyBeatmap, Action beforeSceneSwitchCallback)
         {
             var previewBeatmapLevel = gameplaySetupData.beatmapLevel.beatmapLevel;
             var beatmapDifficulty = gameplaySetupData.beatmapLevel.beatmapDifficulty;
@@ -295,8 +295,8 @@ namespace ServerBrowser.Core
                       $"difficulty={beatmapDifficulty}, characteristic={beatmapCharacteristic}, " +
                       $"modifiers={gameplayModifiers})");
 
-            Current.Level = BssbServerLevel.FromDifficultyBeatmap(difficultyBeatmap, gameplayModifiers,
-                beatmapCharacteristic.serializedName);
+            Current.Level = BssbServerLevel.FromLevelStartData(previewBeatmapLevel, beatmapDifficulty, difficultyBeatmap, 
+                gameplayModifiers, beatmapCharacteristic.serializedName);
 
             if (Current.Level.Difficulty.HasValue && Current.LobbyDifficulty != BssbDifficulty.All)
                 Current.LobbyDifficulty = Current.Level.Difficulty.Value.ToBssbDifficulty();
