@@ -25,15 +25,18 @@
 
 You can also install the mod manually by following the instructions below.
 
-If you need help, you can ask in the [Beat Saber Modding Group](https://discord.com/invite/beatsabermods) Discord (#pc-help).
+If you need help, you can ask in the [Beat Saber Modding Group](https://discord.com/invite/beatsabermods) Discord (#pc-help) or [BeatTogether Discord](https://discord.com/invite/gezGrFG4tz) (#help).
 
 ### Requirements
-- Beat Saber 1.22+ on PC (Steam or Oculus)
+
+- Beat Saber 1.29+ on PC (Steam or Oculus)
 - With the latest version of the following mods:
   - Core mods (BSIPA and SongCore) 
   - SiraUtil 
   - BeatSaberMarkupLanguage
   - MultiplayerCore
+
+ℹ️ **Compatibility note:** Check the GitHub releases for up-to-date information on Beat Saber compatibility and older supported versions. The mod usually doesn't require updates after a new game version drops.  
 
 ### Download
 You can download the latest release directly from GitHub:
@@ -42,7 +45,7 @@ You can download the latest release directly from GitHub:
 
 Extract the downloaded ZIP file to your Beat Saber installation directory.
 
-If the mod is installed successfully, you will see `ServerBrowser.dll` in your Beat Saber `Plugins` directory.
+If the mod is installed successfully, you should see `ServerBrowser.dll` in your Beat Saber `Plugins` directory. It will only load if you also have the right dependencies like MultiplayerCore.
 
 ## How it works
 
