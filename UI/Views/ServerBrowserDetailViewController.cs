@@ -242,8 +242,11 @@ namespace ServerBrowser.UI.Views
 
             _txtDifficulty.SetText(serverDetail.DualDifficultyFormatted);
 
-            _txtGameVersion.SetText($"Beat Saber {serverDetail.GameVersion}");
-            _txtGameVersion.color = (serverDetail.GameVersion?.Equals(IPA.Utilities.UnityGame.GameVersion) ?? false)
+            var remoteGameVersion = serverDetail.GameVersion?.ToString() ?? "Unknown";
+            var localGameVersion = _bssbClient.GameVersionNoSuffix;
+            
+            _txtGameVersion.SetText($"Beat Saber {remoteGameVersion}");
+            _txtGameVersion.color = remoteGameVersion == localGameVersion
                 ? BssbColorScheme.Green
                 : BssbColorScheme.Gold;
 

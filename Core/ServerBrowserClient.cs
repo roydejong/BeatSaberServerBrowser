@@ -26,6 +26,22 @@ namespace ServerBrowser.Core
             await LoadPlatformUserInfo();
         }
 
+        #region Game Version
+
+        public string GameVersionRaw => IPA.Utilities.UnityGame.GameVersion.ToString();
+
+        public string GameVersionNoSuffix
+        {
+            get
+            {
+                var raw = GameVersionRaw;
+                var separatorIdx = raw.IndexOf('_');
+                return separatorIdx > 0 ? raw.Substring(0, separatorIdx) : raw;
+            }
+        }
+
+        #endregion
+        
         #region Mod Status
 
         public Version? MultiplayerCoreVersion { get; private set; } = null;
