@@ -17,8 +17,6 @@ namespace ServerBrowser.Installers
             Container.BindInterfacesAndSelfTo<BssbSessionNotifier>().AsSingle();
             Container.BindInterfacesAndSelfTo<ServerBrowserClient>().AsSingle();
             
-            Container.BindInterfacesAndSelfTo<DirectConnectionPatcher>().AsSingle();
-            
             Container.BindInterfacesAndSelfTo<BssbFloatingAlert>().FromNewComponentOnNewGameObject().AsSingle();
         }
     }

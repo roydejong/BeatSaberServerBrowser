@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using Newtonsoft.Json;
 using ServerBrowser.Models.Enums;
 using ServerBrowser.Models.JsonConverters;
@@ -103,10 +102,9 @@ namespace ServerBrowser.Models
         [JsonProperty("ServerType")] public string? ServerTypeCode;
 
         /// <summary>
-        /// The endpoint for the master server this lobby exists on.
+        /// The Graph API URL for the master server (1.29+).
         /// </summary>
-        [JsonProperty("MasterServerEp")] [JsonConverter(typeof(DnsEndPointConverter))]
-        public DnsEndPoint? MasterServerEndPoint;
+        [JsonProperty("MasterGraphUrl")] public string? MasterGraphUrl;
 
         /// <summary>
         /// The multiplayer status check URL associated with the master server.
@@ -116,8 +114,8 @@ namespace ServerBrowser.Models
         /// <summary>
         /// The endpoint for the dedicated server instance this lobby is hosted on.
         /// </summary>
-        [JsonProperty("Endpoint")] [JsonConverter(typeof(IPEndPointJsonConverter))]
-        public IPEndPoint? EndPoint;
+        [JsonProperty("Endpoint")] [JsonConverter(typeof(DnsEndPointConverter))]
+        public DnsEndPoint? EndPoint;
 
         /// <summary>
         /// The announcer's game version, or a server's compatible game version.
@@ -171,19 +169,16 @@ namespace ServerBrowser.Models
 
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
-        [JsonIgnore]
-        public bool IsOfficial => !IsBeatTogetherHost && !IsBeatUpServerHost && !IsBeatDediHost &&
-                                  (IsGameLiftHost || MasterServerEndPoint == null ||
-                                   MasterServerEndPoint.hostName.EndsWith(".beatsaber.com"));
+        [JsonIgnore] public bool IsOfficial => IsAwsGameLiftHost;
 
         [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
         [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId?.StartsWith("beatupserver:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
         [JsonIgnore] public bool IsBeatDediHost => RemoteUserId?.StartsWith("beatdedi:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
-        [JsonIgnore] public bool IsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
+        [JsonIgnore] public bool IsAwsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
 
-        [JsonIgnore] public bool IsDirectConnect => !IsOfficial && MasterServerEndPoint is null && EndPoint is not null;
+        [JsonIgnore] public bool IsDirectConnect => !IsOfficial && MasterGraphUrl is null && EndPoint is not null;
 
         [JsonIgnore]
         public string LobbyStateText

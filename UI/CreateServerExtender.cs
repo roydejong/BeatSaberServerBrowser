@@ -136,12 +136,13 @@ namespace ServerBrowser.UI
                 else if (_bssbClient.UsingBeatTogetherMaster)
                     text = $"<color=#4cd137>Creating lobby on BeatTogether (supports custom songs)";
                 else
-                    text = $"<color=#00a8ff>Creating lobby on custom master server: {_bssbClient.MasterServerHost}";
+                    text = $"<color=#00a8ff>Creating lobby on custom master server: {_bssbClient.MasterGraphHostname}";
 
                 _masterServerText.Label = text;
             }
 
-            _formExtender?.MarkDirty();
+            if (_formExtender != null)
+                _formExtender.MarkDirty();
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Net;
 using IPA.Utilities;
 using MultiplayerCore.Players;
 using ServerBrowser.Models;
@@ -25,7 +24,6 @@ namespace ServerBrowser.Core
         public bool SessionActive { get; private set; }
         public BssbServerDetail Current { get; private set; } = new();
         public MultiplayerResultsData? LastResults { get; private set; } = null;
-        public PreConnectInfo? PreConnectInfo { get; private set; } = null;
 
         public event EventHandler? DataChanged;
         public event EventHandler<BssbServerDetail>? SessionEstablished;
@@ -80,7 +78,7 @@ namespace ServerBrowser.Core
                 _log.Debug("Detected a BeatUpServer host");
             else if (Current.IsBeatDediHost)
                 _log.Debug("Detected a BeatDedi host");
-            else if (Current.IsGameLiftHost)
+            else if (Current.IsAwsGameLiftHost)
                 _log.Debug("Detected an Amazon GameLift host");
 
             Current.ServerTypeCode = DetermineServerType();
@@ -181,55 +179,16 @@ namespace ServerBrowser.Core
             _multiplayerSession.localPlayer.userId == Current.ManagerId;
 
         [AffinityPostfix]
-        [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
-        private void HandleMasterServerPreConnect(string remoteUserId, string remoteUserName, IPEndPoint remoteEndPoint,
-            string secret, string code, BeatmapLevelSelectionMask selectionMask,
-            GameplayServerConfiguration configuration, byte[] preMasterSecret, byte[] myRandom, byte[] remoteRandom,
-            bool isConnectionOwner, bool isDedicatedServer, string managerId)
-        {
-            // nb: HandleConnectToServerSuccess just means "the master server gave us the info to connect"
-            //  we are not yet successfully connected to a dedicated server instance
-
-            _log.Info($"Game will connect to server (remoteUserId={remoteUserId}, remoteUserName={remoteUserName}, "
-                      + $"remoteEndPoint={remoteEndPoint}, secret={secret}, code={code}, "
-                      + $"isDedicatedServer={isDedicatedServer}, managerId={managerId}, "
-                      + $"maxPlayerCount={configuration.maxPlayerCount}, "
-                      + $"discoveryPolicy={configuration.discoveryPolicy}, "
-                      + $"gameplayServerMode={configuration.gameplayServerMode}, "
-                      + $"songSelectionMode={configuration.songSelectionMode})");
-
-            PreConnectInfo = new PreConnectInfo(remoteUserId, remoteUserName, remoteEndPoint, secret, code,
-                selectionMask, configuration, preMasterSecret, myRandom, remoteRandom, isConnectionOwner,
-                isDedicatedServer, managerId);
-
-            Current.ServerCode = code;
-            Current.RemoteUserId = remoteUserId;
-            Current.RemoteUserName = remoteUserName;
-            Current.HostSecret = secret;
-            Current.ManagerId = managerId; // BeatTogether incorrectly sends this as a decoded Platform User ID
-            Current.PlayerLimit = configuration.maxPlayerCount;
-            Current.GameplayMode = configuration.gameplayServerMode;
-            Current.MasterServerEndPoint = _serverBrowserClient.MasterServerEndPoint;
-            Current.MasterStatusUrl = _serverBrowserClient.MasterStatusUrl;
-            Current.EndPoint = remoteEndPoint;
-            Current.MultiplayerCoreVersion = _serverBrowserClient.MultiplayerCoreVersion;
-            Current.MultiplayerExtensionsVersion = _serverBrowserClient.MultiplayerExtensionsVersion;
-            Current.LobbyDifficulty = selectionMask.difficulties.ToBssbDifficulty();
-
-            FinishPreConnectHandling();
-        }
-
-        [AffinityPostfix]
         [AffinityPatch(typeof(GameLiftConnectionManager), "HandleConnectToServerSuccess")]
-        private void HandleGameLiftPreConnect(string playerSessionId, IPEndPoint remoteEndPoint, string gameSessionId,
-            string secret, string code, BeatmapLevelSelectionMask selectionMask,
+        private void HandleGameLiftPreConnect(string playerSessionId, string hostName, int port, string gameSessionId,
+            string secret, string code, BeatmapLevelSelectionMask selectionMask, 
             GameplayServerConfiguration configuration)
         {
-            // nb: HandleConnectToServerSuccess just means "the GameLift API gave us the info to connect"
-            //   we are not yet successfully connected to the dedicated server instance
+            // nb: HandleConnectToServerSuccess means handshake is complete, and we are about to reconnect to the
+            //  dedicated server for the actual multiplayer session - we're not yet actually successfully connected.
 
             _log.Info($"Game will connect to GameLift session (playerSessionId={playerSessionId}, "
-                      + $"remoteEndPoint={remoteEndPoint}, gameSessionId={gameSessionId}, secret={secret}, code={code}, "
+                      + $"hostName={hostName}, port={port}, gameSessionId={gameSessionId}, secret={secret}, code={code}, "
                       + $"maxPlayerCount={configuration.maxPlayerCount}, "
                       + $"discoveryPolicy={configuration.discoveryPolicy}, "
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "
@@ -243,10 +202,6 @@ namespace ServerBrowser.Core
             // gameSessionId is an AWS identifier (ARN) starting with "arn:aws:gamelift:" and equals the dedi's user id
             //  A unique identifier for the game session that the player session is connected to.
 
-            PreConnectInfo = new PreConnectInfo(playerSessionId, gameSessionId, remoteEndPoint,
-                secret, code, selectionMask, configuration, null, null, null,
-                false, true, null);
-
             Current.ServerCode = code;
             Current.RemoteUserId = gameSessionId;
             Current.RemoteUserName = null;
@@ -254,16 +209,11 @@ namespace ServerBrowser.Core
             Current.ManagerId = null;
             Current.PlayerLimit = configuration.maxPlayerCount;
             Current.GameplayMode = configuration.gameplayServerMode;
-            Current.MasterServerEndPoint = null;
+            Current.MasterGraphUrl = _serverBrowserClient.MasterGraphUrl;
             Current.MasterStatusUrl = _serverBrowserClient.MasterStatusUrl;
-            Current.EndPoint = remoteEndPoint;
+            Current.EndPoint = new DnsEndPoint(hostName, port);
             Current.LobbyDifficulty = selectionMask.difficulties.ToBssbDifficulty();
 
-            FinishPreConnectHandling();
-        }
-
-        private void FinishPreConnectHandling()
-        {
             Current.Key = null;
             Current.Name = null;
             Current.LobbyState = null;

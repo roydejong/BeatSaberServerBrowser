@@ -1,8 +1,9 @@
+using System;
 using System.Threading.Tasks;
-using Hive.Versioning;
 using ServerBrowser.Utils;
 using SiraUtil.Logging;
 using Zenject;
+using Version = Hive.Versioning.Version;
 
 namespace ServerBrowser.Core
 {
@@ -43,14 +44,27 @@ namespace ServerBrowser.Core
 
         #region Master Server
 
-        public DnsEndPoint MasterServerEndPoint => _networkConfig.masterServerEndPoint;
-        public string MasterServerHost => MasterServerEndPoint.hostName;
+        public string MasterGraphUrl => _networkConfig.graphUrl;  
 
-        public bool UsingOfficialMaster =>
-            _networkConfig.forceGameLift || MasterServerHost.EndsWith(".beatsaber.com");
+        public string MasterGraphHostname
+        {
+            get
+            {
+                try
+                {
+                    var uri = new Uri(MasterGraphUrl);
+                    return uri.Host;
+                }
+                catch (UriFormatException)
+                {
+                    return MasterGraphUrl;
+                }
+            }
+        }
 
-        public bool UsingBeatTogetherMaster =>
-            !_networkConfig.forceGameLift && MasterServerHost.EndsWith(".beattogether.systems");
+        public bool UsingOfficialMaster => MasterGraphHostname.EndsWith(".oculus.com");
+
+        public bool UsingBeatTogetherMaster => MasterGraphHostname.EndsWith(".beattogether.systems");
 
         public string MasterStatusUrl => _networkConfig.multiplayerStatusUrl;
 

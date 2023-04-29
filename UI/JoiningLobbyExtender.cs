@@ -64,16 +64,6 @@ namespace ServerBrowser.UI
         #region Connection events
 
         [AffinityPrefix]
-        [AffinityPatch(typeof(MasterServerConnectionManager), "MasterServerConnectToServer")]
-        private void HandleMasterServerConnectToServer()
-        {
-            // Regular master server: connect
-            _starterText = "Connecting to master server...";
-
-            SetText(_starterText);
-        }
-
-        [AffinityPrefix]
         [AffinityPatch(typeof(GameLiftPlayerSessionProvider), "GetGameLiftPlayerSessionInfo")]
         private void HandleGetGameLiftPlayerSessionInfo(GameplayServerConfiguration gameplayServerConfiguration)
         {
@@ -96,28 +86,6 @@ namespace ServerBrowser.UI
 
             // GameLift master server connection starting
             SetText("Connecting to master server...");
-        }
-
-        [AffinityPrefix]
-        [AffinityPatch(typeof(MasterServerConnectionManager), "HandleConnectToServerSuccess")]
-        private void HandleMasterServerPreConnect()
-        {
-            if (!_weAreHandling)
-                return;
-
-            // Normal master server connected; gameplay server info received
-            SetText("Connecting to game server...");
-        }
-
-        [AffinityPrefix]
-        [AffinityPatch(typeof(GameLiftConnectionManager), "HandleConnectToServerSuccess")]
-        private void HandleGameLiftPreConnect()
-        {
-            if (!_weAreHandling)
-                return;
-
-            // GameLift master server connected; gameplay server info received
-            SetText("Connecting to game server...");
         }
 
         [AffinityPrefix]

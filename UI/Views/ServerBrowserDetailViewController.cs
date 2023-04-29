@@ -236,7 +236,7 @@ namespace ServerBrowser.UI.Views
         {
             _txtServerType.SetText(serverDetail.ServerTypeText ?? "Unknown");
             _txtMasterServer.SetText(serverDetail.MasterServerText ??
-                                     serverDetail.MasterServerEndPoint?.hostName ?? "Unknown");
+                                     serverDetail.MasterGraphUrl ?? "Unknown");
             _txtUptime.SetText(serverDetail.LobbyLifetimeText);
             _txtLobbyStatus.SetText(serverDetail.LobbyStateText);
 
