@@ -225,7 +225,7 @@ namespace ServerBrowser.UI.Views
             _connectButton.interactable = _selectionValid;
         }
         
-        private async void UpdateLoadingState()
+        private void UpdateLoadingState()
         {
             if (!_bsmlReady)
                 return;
@@ -288,9 +288,13 @@ namespace ServerBrowser.UI.Views
                     _paginatorText.gameObject.SetActive(false);
                 }
             }
-            
-            await Task.Delay(100);
-            _scrollIndicator.RefreshHandle();
+
+            // Fix scrollbar (requires a delay)
+            Task.Run(async () =>
+            {
+                await Task.Delay(100);
+                _scrollIndicator.RefreshHandle();
+            });
         }
 
         private void ResetSelection(bool hard = true)
