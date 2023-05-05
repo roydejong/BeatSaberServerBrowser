@@ -303,6 +303,11 @@ namespace ServerBrowser.UI.Views
             {
                 _serverList.tableView.ClearSelection();
                 _connectButton.interactable = false;
+                
+                // fix for CheckScrollInput (unity-beta nullrefs)
+                var scrollView = _serverList.gameObject.GetComponentInChildren<ScrollView>();
+                if (scrollView != null)
+                    _di.Inject(scrollView);
             }
 
             if (hard)
