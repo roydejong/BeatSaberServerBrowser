@@ -91,6 +91,9 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\mscorlib.dll</HintPath>
+    </Reference>
     <Reference Include="MultiplayerCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(BeatSaberDir)\Plugins\MultiplayerCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -129,6 +132,9 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.Data.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.Net.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Web">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\System.Web.dll</HintPath>
