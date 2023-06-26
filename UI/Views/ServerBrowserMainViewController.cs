@@ -293,7 +293,7 @@ namespace ServerBrowser.UI.Views
             Task.Run(async () =>
             {
                 await Task.Delay(100);
-                _scrollIndicator.RefreshHandle();
+                _scrollIndicator.InvokeMethod<object, VerticalScrollIndicator>("RefreshHandle");
             });
         }
 
