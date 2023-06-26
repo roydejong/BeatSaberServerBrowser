@@ -44,7 +44,6 @@ namespace ServerBrowser.UI.Forms
             // Base
             var stringTagObj = (new StringSettingTag()).CreateObject(parent);
             ((stringTagObj.transform as RectTransform)!).sizeDelta = new Vector2(90.0f, 7.0f);
-            
             _stringSetting = stringTagObj.GetComponent<StringSetting>();
 
             // Label
@@ -68,36 +67,13 @@ namespace ServerBrowser.UI.Forms
                 OnChange?.Invoke(this, newValue);
             });
 
-            // Make it look nice :-)
+            // Make the icon look not-wonky
             var valuePicker = _stringSetting.transform.Find("ValuePicker");
-
-            var buttonLeftSide = valuePicker.Find("DecButton") as RectTransform;
-            var buttonRightSide = valuePicker.Find("IncButton") as RectTransform;
-            var valueText = valuePicker.Find("ValueText") as RectTransform;
-
-            var leftSideWidth = 0.05f;
-
-            buttonLeftSide!.anchorMin = new Vector2(0.0f, 0.0f);
-            buttonLeftSide.anchorMax = new Vector2(leftSideWidth, 1.0f);
-            buttonLeftSide.offsetMin = new Vector2(0.0f, 0.0f);
-            buttonLeftSide.offsetMax = new Vector2(0.0f, 0.0f);
-            buttonLeftSide.sizeDelta = new Vector2(0.0f, 0.0f);
-
-            buttonRightSide!.anchorMin = new Vector2(leftSideWidth, 0.0f);
-            buttonRightSide.anchorMax = new Vector2(1.0f, 1.0f);
-            buttonRightSide.offsetMin = new Vector2(0.0f, 0.0f);
-            buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
-            buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
-
-            valueText!.anchorMin = new Vector2(0.0f, 0.0f);
-            valueText.anchorMax = new Vector2(1.0f, 1.0f);
-            valueText.offsetMin = new Vector2(0.0f, -0.33f);
-            valueText.offsetMax = new Vector2(0.0f, 0.0f);
-            valueText.sizeDelta = new Vector2(0.0f, 0.0f);
-
-            var editIcon = buttonRightSide.Find("EditIcon").GetComponent<ImageView>();
-            editIcon.sprite = Sprites.Pencil;
-            editIcon.transform.localScale = new Vector3(-1.0f, -1.0f, 1.0f);
+            var editButton = valuePicker.transform.Find("EditButton");
+            
+            var editButtonIcon = editButton.Find("EditIcon").GetComponent<ImageView>();
+            editButtonIcon.sprite = Sprites.Pencil;
+            editButtonIcon.transform.localScale = new Vector3(-1.0f, -1.0f, 1.0f);
         }
     }
 }
