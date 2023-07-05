@@ -18,12 +18,12 @@ namespace ServerBrowser.Models.Utils
         
         public static TBase FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<TBase>(json);
+            return JsonConvert.DeserializeObject<TBase>(json)!;
         }
         
         public static T FromJson<T>(string json) where T : TBase
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json)!;
         }
     }
 }

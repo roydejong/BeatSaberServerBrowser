@@ -17,6 +17,7 @@ namespace ServerBrowser.UI.Utils
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IHttpService _httpService = null!;
+        [Inject] private readonly MainThreadDispatcher _mainThreadDispatcher = null!;
 
         private readonly Dictionary<string, Sprite> _coverArtCache;
         private readonly Thread _loaderThread;
@@ -105,7 +106,7 @@ namespace ServerBrowser.UI.Utils
                             if (remoteCoverArtBytes != null)
                             {
                                 // Sprite creation has to happen on the main thread or Unity will crash
-                                HMMainThreadDispatcher.instance.Enqueue(() =>
+                                _mainThreadDispatcher.DispatchOnMainThread(() =>
                                 {
                                     if (request.CancellationToken.IsCancellationRequested)
                                         return;
@@ -130,7 +131,7 @@ namespace ServerBrowser.UI.Utils
                         }
 
                         // Request could not be dealt with
-                        HMMainThreadDispatcher.instance.Enqueue(() =>
+                        _mainThreadDispatcher.DispatchOnMainThread(() =>
                         {
                             request.Callback.Invoke(null);
                         });

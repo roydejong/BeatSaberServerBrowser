@@ -45,17 +45,6 @@ namespace ServerBrowser.UI
         #region Connection events
 
         [AffinityPrefix]
-        [AffinityPatch(typeof(GameLiftClientMessageHandler), "AuthenticateWithGameLiftServer")]
-        private void HandleAuthenticateWithGameLiftServer()
-        {
-            if (!_weAreHandling)
-                return;
-
-            // Key exchange / handshake with dedicated server
-            SetText("Performing handshake...");
-        }
-
-        [AffinityPrefix]
         [AffinityPatch(typeof(GameLiftConnectionManager), "HandleConnectToServerSuccess")]
         private void HandleConnectToServerSuccess()
         {
