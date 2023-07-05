@@ -186,7 +186,7 @@ namespace ServerBrowser.UI
             _log.Info($"Trying to connect to selected server (Key={server.Key}, Name={server.Name}, " +
                       $"GameplayMode={server.GameplayMode}, MasterGraphUrl={server.MasterGraphUrl}, " +
                       $"ServerCode={server.ServerCode}, HostSecret={server.HostSecret}, " +
-                      $"ServerTypeCode={server.ServerTypeCode})");
+                      $"ServerTypeCode={server.ServerTypeCode}, EncryptionMode={server.EncryptionMode})");
 
             // MultiplayerCore network patching
             SetMasterServerOverride(server);
@@ -218,7 +218,8 @@ namespace ServerBrowser.UI
         public void SetMasterServerOverride(BssbServer server)
         {
             if (server.MasterGraphUrl is not null && server is { IsOfficial: false, IsDirectConnect: false })
-                _mpCoreNetConfig.UseCustomApiServer(server.MasterGraphUrl, server.MasterStatusUrl ?? "", null, null);
+                _mpCoreNetConfig.UseCustomApiServer(server.MasterGraphUrl, server.MasterStatusUrl ?? "",
+                    null, null, !server.UseENetSSL);
             else
                 _mpCoreNetConfig.UseOfficialServer();
         }

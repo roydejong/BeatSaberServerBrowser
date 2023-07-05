@@ -31,7 +31,7 @@ namespace ServerBrowser.Core
             TargetServer = server;
             Enabled = true;
 
-            _networkConfigPatcher.DisableSsl = true;
+            _networkConfigPatcher.DisableSsl = !server.UseENetSSL;
 
             _log.Info($"Enable direct connect mode (endPoint={TargetServer.EndPoint})");
         }

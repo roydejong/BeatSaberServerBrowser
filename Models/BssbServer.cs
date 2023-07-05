@@ -167,6 +167,11 @@ namespace ServerBrowser.Models
         [JsonProperty("LastUpdate")]
         public DateTime? ReadOnlyLastSeen;
 
+        [JsonProperty("EncryptionMode")]
+        public string? EncryptionMode;
+        
+        #region Local
+
         [JsonIgnore] public bool IsQuickPlay => GameplayMode == GameplayServerMode.Countdown;
 
         [JsonIgnore] public bool IsOfficial => IsAwsGameLiftHost;
@@ -272,5 +277,13 @@ namespace ServerBrowser.Models
                 return SongSelectionMode.OwnerPicks;
             }
         }
+
+        /// <summary>
+        /// Gets whether ENet SSL (DTLS) should be used for this server.
+        /// </summary>
+        [JsonIgnore]
+        public bool UseENetSSL => EncryptionMode == "enet_dtls";
+
+        #endregion
     }
 }

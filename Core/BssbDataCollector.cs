@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using IgnoranceCore;
 using IPA.Utilities;
 using MultiplayerCore.Players;
 using ServerBrowser.Models;
@@ -254,6 +255,22 @@ namespace ServerBrowser.Core
             Current.LevelDifficulty = beatmapDifficulty.ToBssbDifficulty();
 
             DataChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        [AffinityPrefix]
+        [AffinityPatch(typeof(IgnoranceClient), "ThreadWorker")]
+        private void PrefixIgnoranceClientThread(IgnoranceClient __instance)
+        {
+            if (__instance.UseSsl)
+            {
+                _log.Info("Ignorance connection encryption enabled (enet_dtls)");
+                Current.EncryptionMode = "enet_dtls";
+            }
+            else
+            {
+                _log.Info("Ignorance connection encryption is disabled");
+                Current.EncryptionMode = "none";
+            }
         }
 
         [AffinityPostfix]
