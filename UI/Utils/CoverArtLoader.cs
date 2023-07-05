@@ -8,143 +8,26 @@ using SiraUtil.Logging;
 using SiraUtil.Web;
 using UnityEngine;
 using Zenject;
-using ThreadPriority = System.Threading.ThreadPriority;
 
 namespace ServerBrowser.UI.Utils
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class CoverArtLoader : MonoBehaviour, IInitializable, IDisposable
+    public class CoverArtLoader : MonoBehaviour, IDisposable
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly IHttpService _httpService = null!;
-        [Inject] private readonly MainThreadDispatcher _mainThreadDispatcher = null!;
 
         private readonly Dictionary<string, Sprite> _coverArtCache;
-        private readonly Thread _loaderThread;
-        private Queue<CoverArtRequest> _pendingRequests;
-        private bool _threadKeepAlive;
-        private object _threadSyncRoot;
 
         public CoverArtLoader()
         {
             _coverArtCache = new(10);
-            
-            _loaderThread = new Thread(__WorkerThread);
-            _loaderThread.Name = "BssbCoverArtLoader";
-            _loaderThread.Priority = ThreadPriority.BelowNormal;
-            
-            _pendingRequests = new();
-            _threadKeepAlive = false;
-            _threadSyncRoot = new();
-        }
-
-        #region Worker thread
-        public void Initialize()
-        {
-            _threadKeepAlive = true;
-            _loaderThread.Start();
         }
 
         public void Dispose()
         {
             UnloadCache();
-
-            _threadKeepAlive = false;
-            
-            lock (_threadSyncRoot)
-            {
-                Monitor.Pulse(_threadSyncRoot);                
-            }
         }
-
-        private async void __WorkerThread()
-        {
-            while (_threadKeepAlive)
-            {
-                lock (_threadSyncRoot)
-                {
-                    Monitor.Wait(_threadSyncRoot);
-                }
-                
-                while (_pendingRequests.Count > 0)
-                {
-                    try
-                    {
-                        var request = _pendingRequests.Dequeue();
-                        request.CancellationToken.ThrowIfCancellationRequested();
-
-                        if (request.LevelId == null)
-                        {
-                            request.Callback.Invoke(null);
-                            continue;
-                        }
-
-                        // Check if cover art is already in cache
-                        var fromCache = ResolveCache(request.LevelId, null);
-
-                        if (fromCache != null)
-                        {
-                            request.Callback.Invoke(fromCache);
-                            continue;
-                        }
-
-                        // Check if cover art is available locally
-                        var localCoverArt = await TryGetLocalCoverArtSprite(request.LevelId, request.CancellationToken);
-
-                        if (localCoverArt != null)
-                        {
-                            request.Callback.Invoke(localCoverArt);
-                            continue;
-                        }
-
-                        // If we have a URL, try to download cover art (BSSB mirror or BeatSaver CDN) 
-                        if (request.CoverArtUrl != null)
-                        {
-                            var remoteCoverArtBytes = await TryGetRemoteCoverArtBytes(request.LevelId,
-                                request.CoverArtUrl, request.CancellationToken);
-                        
-                            if (remoteCoverArtBytes != null)
-                            {
-                                // Sprite creation has to happen on the main thread or Unity will crash
-                                _mainThreadDispatcher.DispatchOnMainThread(() =>
-                                {
-                                    if (request.CancellationToken.IsCancellationRequested)
-                                        return;
-                                
-                                    var sprite = Sprites.LoadSpriteRaw(remoteCoverArtBytes,
-                                        spriteMeshType: SpriteMeshType.FullRect);
-
-                                    if (sprite != null)
-                                    {
-                                        sprite = ResolveCache(request.LevelId, sprite);    
-                                    }
-                                    else
-                                    {
-                                        _log.Warn($"Sprite load error for remote cover art " +
-                                                  $"(LevelId={request.LevelId}, CoverArtUrl={request.CoverArtUrl})");
-                                    }
-                                    
-                                    request.Callback.Invoke(sprite);
-                                });
-                                continue;
-                            }
-                        }
-
-                        // Request could not be dealt with
-                        _mainThreadDispatcher.DispatchOnMainThread(() =>
-                        {
-                            request.Callback.Invoke(null);
-                        });
-                    }
-                    catch (OperationCanceledException) { }
-                    catch (Exception ex)
-                    {
-                        _log.Error($"CoverArtLoader.__WorkerThread: {ex}");
-                    }
-                }
-            }
-        }
-        #endregion
         
         #region Cache / resource management
 
@@ -185,14 +68,57 @@ namespace ServerBrowser.UI.Utils
 
         #endregion
 
-        public void FetchCoverArtAsync(CoverArtRequest request)
+        public async Task<Sprite?> FetchCoverArtAsync(CoverArtRequest request)
         {
-            _pendingRequests.Enqueue(request);
-
-            lock (_threadSyncRoot)
+            try
             {
-                Monitor.Pulse(_threadSyncRoot);                
+                if (request.LevelId == null)
+                    return null;
+
+                // Check if cover art is already in cache
+                var fromCache = ResolveCache(request.LevelId, null);
+                if (fromCache != null)
+                    return fromCache;
+
+                // Check if cover art is available locally
+                var localCoverArt = await TryGetLocalCoverArtSprite(request.LevelId, request.CancellationToken);
+                if (localCoverArt != null)
+                    return localCoverArt;
+
+                // If we have a URL, try to download cover art (BSSB mirror or BeatSaver CDN) 
+                if (request.CoverArtUrl != null)
+                {
+                    var remoteCoverArtBytes = await TryGetRemoteCoverArtBytes(request.LevelId,
+                        request.CoverArtUrl, request.CancellationToken);
+
+                    if (remoteCoverArtBytes != null)
+                    {
+                        var sprite = Sprites.LoadSpriteRaw(remoteCoverArtBytes,
+                            spriteMeshType: SpriteMeshType.FullRect);
+
+                        if (sprite != null)
+                        {
+                            sprite = ResolveCache(request.LevelId, sprite);
+                        }
+                        else
+                        {
+                            _log.Warn($"Sprite load error for remote cover art " +
+                                      $"(LevelId={request.LevelId}, CoverArtUrl={request.CoverArtUrl})");
+                        }
+
+                        return sprite;
+                    }
+                }
             }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"CoverArtLoader failed with exception: {ex}");
+            }
+
+            return null;
         }
 
         private async Task<Sprite?> TryGetLocalCoverArtSprite(string levelId, CancellationToken token)
@@ -247,18 +173,16 @@ namespace ServerBrowser.UI.Utils
             public readonly string? LevelId;
             public readonly string? CoverArtUrl;
             public readonly CancellationToken CancellationToken;
-            public readonly Action<Sprite?> Callback;
 
-            public CoverArtRequest(BssbLevel? levelInfo, CancellationToken cancellationToken, Action<Sprite?> callback)
+            public CoverArtRequest(BssbLevel? levelInfo, CancellationToken cancellationToken)
             {
                 LevelId = levelInfo?.LevelId;
                 CoverArtUrl = levelInfo?.CoverArtUrl;
                 CancellationToken = cancellationToken;
-                Callback = callback;
             }
 
-            public CoverArtRequest(BssbServer serverInfo, CancellationToken cancellationToken, Action<Sprite?> callback)
-                : this(serverInfo.Level, cancellationToken, callback)
+            public CoverArtRequest(BssbServer serverInfo, CancellationToken cancellationToken)
+                : this(serverInfo.Level, cancellationToken)
             {
             }
         }

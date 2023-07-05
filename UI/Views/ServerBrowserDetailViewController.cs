@@ -186,10 +186,10 @@ namespace ServerBrowser.UI.Views
                 _loadRoot.gameObject.SetActive(false);
                 _mainRoot.gameObject.SetActive(true);
                 
-                SetHeaderData(serverDetail);
+                _ = SetHeaderData(serverDetail);
                 SetInfoTabData(serverDetail);
                 SetPlayerData(serverDetail.Players, soft);
-                SetLevelHistoryData(serverDetail.LevelHistory, soft);
+                _ = SetLevelHistoryData(serverDetail.LevelHistory, soft);
             }
             catch (Exception ex)
             {
@@ -198,7 +198,7 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void SetHeaderData(BssbServerDetail serverDetail)
+        private async Task SetHeaderData(BssbServerDetail serverDetail)
         {
             _levelBar.SetText(serverDetail.Name, serverDetail.BrowserDetailText);
 
@@ -223,12 +223,12 @@ namespace ServerBrowser.UI.Views
                 // In game, show cover art
                 _levelBar.SetImageSprite(Sprites.BeatSaverLogo);
 
-                _coverArtLoader.FetchCoverArtAsync(new CoverArtLoader.CoverArtRequest(serverDetail, _loadingCts!.Token,
-                    sprite =>
-                    {
-                        if (sprite != null)
-                            _levelBar.SetImageSprite(sprite);
-                    }));
+                var sprite = await _coverArtLoader.FetchCoverArtAsync(
+                    new CoverArtLoader.CoverArtRequest(serverDetail, _loadingCts!.Token)
+                );
+                
+                if (sprite != null && _levelBar != null)
+                    _levelBar.SetImageSprite(sprite);
             }
         }
 
@@ -294,7 +294,7 @@ namespace ServerBrowser.UI.Views
                 _playerListScrollable.ScrollTo(0, false);
         }
 
-        private void SetLevelHistoryData(IReadOnlyCollection<BssbServerLevel> levelHistory, bool soft)
+        private async Task SetLevelHistoryData(IReadOnlyCollection<BssbServerLevel> levelHistory, bool soft)
         {
             // Clear previous entries
             foreach (var childElement in _levelHistoryRoot.GetComponentsInChildren<BssbLevelBarClone>())
@@ -322,12 +322,13 @@ namespace ServerBrowser.UI.Views
                 levelBar.SetBackgroundStyle(BssbLevelBarClone.BackgroundStyle.GameDefault);
                 
                 levelBar.SetImageSprite(Sprites.BeatSaverLogo);
-                _coverArtLoader.FetchCoverArtAsync(new CoverArtLoader.CoverArtRequest(historyItem, _loadingCts!.Token,
-                    sprite =>
-                    {
-                        if (sprite != null)
-                            levelBar.SetImageSprite(sprite);
-                    }));
+
+                var sprite = await _coverArtLoader.FetchCoverArtAsync(
+                    new CoverArtLoader.CoverArtRequest(historyItem, _loadingCts!.Token)
+                );
+                
+                if (sprite != null && levelBar != null)
+                    levelBar.SetImageSprite(sprite);
             }
             
             ResetLevelHistoryScroll(soft);

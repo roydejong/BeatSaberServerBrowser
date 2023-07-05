@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Models;
@@ -125,7 +126,7 @@ namespace ServerBrowser.UI.Components
             }
         }
 
-        public void SetCoverArt(CancellationToken token)
+        public async Task SetCoverArt(CancellationToken token)
         {
             try
             {
@@ -141,12 +142,13 @@ namespace ServerBrowser.UI.Components
                 
                 // Playing level, show cover art
                 _coverImage.sprite = Sprites.BeatSaverLogo;
+
+                var sprite = await _coverArtLoader.FetchCoverArtAsync(
+                    new CoverArtLoader.CoverArtRequest(_server, token)
+                );
                 
-                _coverArtLoader.FetchCoverArtAsync(new CoverArtLoader.CoverArtRequest(_server, token, sprite =>
-                {
-                    if (sprite != null)
-                        _coverImage.sprite = sprite;
-                }));
+                if (sprite != null && _coverImage != null)
+                    _coverImage.sprite = sprite;
             }
             catch (Exception)
             {

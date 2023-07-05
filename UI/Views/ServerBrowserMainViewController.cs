@@ -214,7 +214,7 @@ namespace ServerBrowser.UI.Views
                 }
 
                 extensions.SetData(cell, cellInfo, cellInfo.Server);
-                extensions.SetCoverArt(_coverArtCts!.Token);
+                _ = extensions.SetCoverArt(_coverArtCts!.Token);
             }
 
             if (restoredSelection)
