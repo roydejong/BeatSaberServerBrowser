@@ -3,6 +3,7 @@ using HMUI;
 using IPA.Utilities;
 using MultiplayerCore.Patchers;
 using Polyglot;
+using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Utils;
 using SiraUtil.Affinity;
@@ -25,6 +26,7 @@ namespace ServerBrowser.UI
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
         [Inject] private readonly ServerBrowserFlowCoordinator _serverBrowserFlowCoordinator = null!;
         [Inject] private readonly NetworkConfigPatcher _mpCoreNetConfig = null!;
+        [Inject] private readonly DirectConnectionPatcher _directConnectPatcher = null!;
 
         private Button? _btnGameBrowser;
         private bool _statusCheckComplete;
@@ -98,7 +100,9 @@ namespace ServerBrowser.UI
                 LaunchServerBrowser();
                 return false;
             }
-
+            
+            // Other menu buttons: disable special patches only used during connect action
+            _directConnectPatcher.Disable();
             return true;
         }
 
@@ -183,19 +187,23 @@ namespace ServerBrowser.UI
                       $"GameplayMode={server.GameplayMode}, MasterGraphUrl={server.MasterGraphUrl}, " +
                       $"ServerCode={server.ServerCode}, HostSecret={server.HostSecret}, " +
                       $"ServerTypeCode={server.ServerTypeCode})");
-            
-            if (server.IsDirectConnect)
-            {
-                // TODO Restore direct connect functionality
-                _log.Error("Direct connections are not currently supported...");
-                return;
-            }
 
             // MultiplayerCore network patching
             SetMasterServerOverride(server);
 
             // Set up lobby destination via deeplink
-            _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
+            if (server.IsDirectConnect)
+            {
+                // Direct connect
+                _directConnectPatcher.Enable(server);
+                _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(NetworkUtility.GenerateId(), ""));
+            }
+            else
+            {
+                // Regular connect
+                _directConnectPatcher.Disable();
+                _flowCoordinator.Setup(new SelectMultiplayerLobbyDestination(server.HostSecret, server.ServerCode));
+            }
 
             // If we are already on mode selection, trigger deeplink now
             if (_statusCheckComplete)
