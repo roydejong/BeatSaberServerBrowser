@@ -37,7 +37,7 @@ namespace ServerBrowser.UI.Utils
                     break;
                     
                 case ConnectionFailedReason.ServerDoesNotExist: // CFR-5
-                    msg.AppendLine("The server code is invalid, or the lobby already ended.");
+                    msg.AppendLine("Invalid server code, lobby already ended, or failed to connect to game server.");
                     break;
                     
                 case ConnectionFailedReason.ServerAtCapacity: // CFR-6
