@@ -27,10 +27,11 @@ namespace ServerBrowser.Integrators
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
 
         private FlowCoordinator? _editAvatarFlowCoordinator = null;
+        private bool _isDisclaimerVisible = false;
         
         public const int PrivacyDisclaimerVersion = 1;
         public const string PrivacyDisclaimerText = "With the Server Browser installed, your multiplayer games and " +
-                                                    "activity will be shared with BSSB. You can view the BSSB privacy" +
+                                                    "activity will be shared with BSSB. You can view the BSSB privacy " +
                                                     "policy at https://bssb.app/privacy";
 
         /// <summary>
@@ -49,6 +50,8 @@ namespace ServerBrowser.Integrators
             if (menuButton != MainMenuViewController.MenuButton.Multiplayer)
                 // Ignore all other buttons
                 return true;
+
+            _isDisclaimerVisible = false;
             
             // If needed, show multiplayer / privacy disclaimer
             if (ShouldShowDisclaimer)
@@ -119,10 +122,12 @@ namespace ServerBrowser.Integrators
                         // Decline - dismiss prompt, returning to main menu
                         _log.Info("User declined multiplayer disclaimer, quitting to main menu..");
                         _mainFlowCoordinator.DismissViewController(_simpleDialogPromptViewController);
+                        _isDisclaimerVisible = false;
                     }
                 }
             );
             _mainFlowCoordinator.PresentViewController(_simpleDialogPromptViewController);
+            _isDisclaimerVisible = true;
         }
 
         /// <summary>
@@ -146,20 +151,29 @@ namespace ServerBrowser.Integrators
 
             if (hasAvatarSetup)
             {
-                _ = LaunchMultiplayer();
+                _ = LaunchMultiplayer(afterAvatarEdit: isCallback);
                 return;
             }
 
             _log.Info("User has not yet set up an avatar, redirecting to avatar creation.");
-                
             _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
             _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator, true,
                 replaceTopViewController: true);
+            _isDisclaimerVisible = false; // replaced by avatar creation
         }
 
-        public async Task LaunchMultiplayer()
+        public async Task LaunchMultiplayer(bool afterAvatarEdit = false)
         {
-            _mainFlowCoordinator.ReplaceChildFlowCoordinator(_browserFlowCoordinator);
+            if (afterAvatarEdit)
+            {
+                _mainFlowCoordinator.ReplaceChildFlowCoordinator(_browserFlowCoordinator);
+            }
+            else
+            {
+                _mainFlowCoordinator.PresentFlowCoordinator(_browserFlowCoordinator,
+                    replaceTopViewController: _isDisclaimerVisible);
+                _isDisclaimerVisible = false;
+            }
         }
     }
 }
