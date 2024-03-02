@@ -1,8 +1,6 @@
 ﻿using IPA;
 using IPA.Config.Stores;
-using ServerBrowser.Assets;
 using ServerBrowser.Installers;
-using ServerBrowser.UI.Lobby;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
@@ -14,7 +12,7 @@ namespace ServerBrowser
     public class Plugin
     {
         // ReSharper disable once MemberCanBePrivate.Global
-        internal static PluginConfig Config { get; private set; } = null!;
+        internal static BssbConfig Config { get; private set; } = null!;
         
         private IPALogger _log = null!;
 
@@ -23,7 +21,7 @@ namespace ServerBrowser
         {
             _log = logger;
             
-            Config = config.Generated<PluginConfig>();
+            Config = config.Generated<BssbConfig>();
 
             zenjector.UseMetadataBinder<Plugin>();
             zenjector.UseLogger(logger);
@@ -37,16 +35,11 @@ namespace ServerBrowser
         [OnEnable]
         public void OnEnable()
         {
-            if (!Sprites.IsInitialized)
-                Sprites.Initialize();
-            
-            LobbyConfigPanel.RegisterGameplayModifierTab();
         }
 
         [OnDisable]
         public void OnDisable()
         {
-            LobbyConfigPanel.RemoveGameplayModifierTab();
         }
     }
 }

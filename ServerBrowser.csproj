@@ -52,15 +52,56 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="BeatSaber.AvatarCore">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.AvatarCore.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarAdapter">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarAdapter.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarSDK">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarSDK.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BGLib.AppFlow">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.AppFlow.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BGLib.Polyglot">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.Polyglot.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="BGNet, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNet.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BGNetCore">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNetCore.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BGNetLogging">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNetLogging.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BSML, Version=1.4.5.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DataModels">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\DataModels.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="GameplayCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -80,9 +121,12 @@
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="Ignorance">
+      <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Ignorance.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="IPA.Loader, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -93,11 +137,15 @@
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="mscorlib">
+      <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\mscorlib.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="MultiplayerCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\MultiplayerCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -106,8 +154,10 @@
       <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Polyglot, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Polyglot.dll</HintPath>
+    <Reference Include="PlatformUserModel">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\PlatformUserModel.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="SiraUtil, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
@@ -226,73 +276,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Sprites.cs" />
-    <Compile Include="Core\BssbApiClient.cs" />
-    <Compile Include="Core\BssbBrowser.cs" />
-    <Compile Include="Core\BssbDataCollector.cs" />
-    <Compile Include="Core\BssbMenuDataCollector.cs" />
-    <Compile Include="Core\BssbServerAnnouncer.cs" />
-    <Compile Include="Core\BssbSessionNotifier.cs" />
-    <Compile Include="Core\DirectConnectionPatcher.cs" />
-    <Compile Include="Core\ServerBrowserClient.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />
-    <Compile Include="Models\BssbLevel.cs" />
-    <Compile Include="Models\BssbPlayer.cs" />
-    <Compile Include="Models\BssbServer.cs" />
-    <Compile Include="Models\BssbServerDetail.cs" />
-    <Compile Include="Models\BssbServerLevel.cs" />
-    <Compile Include="Models\BssbServerPlayer.cs" />
-    <Compile Include="Models\Enums\BssbDifficulty.cs" />
-    <Compile Include="Models\JsonConverters\HiveVersionJsonConverter.cs" />
-    <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
-    <Compile Include="Models\JsonConverters\DnsEndPointConverter.cs" />
-    <Compile Include="Models\Requests\AnnounceResultsData.cs" />
-    <Compile Include="Models\Requests\BrowseQueryParams.cs" />
-    <Compile Include="Models\Requests\UnAnnounceParams.cs" />
-    <Compile Include="Models\Responses\AnnounceResponse.cs" />
-    <Compile Include="Models\Responses\BrowseResponse.cs" />
-    <Compile Include="Models\Responses\UnAnnounceResponse.cs" />
-    <Compile Include="Models\Utils\JsonObject.cs" />
+    <Compile Include="Integrators\MainMenuIntegrator.cs" />
+    <Compile Include="Models\BssbConfig.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\Components\BssbFloatingAlert.cs" />
-    <Compile Include="UI\Components\BssbFloatingAlertMenuInit.cs" />
-    <Compile Include="UI\Components\BssbLevelBarClone.cs" />
-    <Compile Include="UI\Components\BssbLoadingControl.cs" />
-    <Compile Include="UI\Components\BssbPlayersTable.cs" />
-    <Compile Include="UI\Components\BssbPlayersTableRow.cs" />
-    <Compile Include="UI\Components\BssbServerCellExtensions.cs" />
-    <Compile Include="UI\Components\BssbServerCellInfo.cs" />
-    <Compile Include="UI\CreateServerExtender.cs" />
-    <Compile Include="UI\Forms\ExtendedField.cs" />
-    <Compile Include="UI\Forms\ExtendedLabelField.cs" />
-    <Compile Include="UI\Forms\ExtendedStringField.cs" />
-    <Compile Include="UI\Forms\ExtendedToggleField.cs" />
-    <Compile Include="UI\Forms\FormExtender.cs" />
-    <Compile Include="UI\JoiningLobbyExtender.cs" />
-    <Compile Include="UI\Lobby\LobbyConfigPanel.cs" />
-    <Compile Include="UI\ModeSelectionIntegrator.cs" />
-    <Compile Include="UI\ServerBrowserFlowCoordinator.cs" />
-    <Compile Include="UI\Utils\BeatSaberUIExtensions.cs" />
-    <Compile Include="UI\Utils\BssbColorScheme.cs" />
-    <Compile Include="UI\Utils\ConnectionErrorTextProvider.cs" />
-    <Compile Include="UI\Utils\CoverArtLoader.cs" />
-    <Compile Include="UI\Utils\FlowCoordinatorExtensions.cs" />
-    <Compile Include="UI\Views\ServerBrowserDetailViewController.cs" />
-    <Compile Include="UI\Views\ServerBrowserMainViewController.cs" />
-    <Compile Include="Utils\EnumExtensions.cs" />
-    <Compile Include="Utils\ModCheck.cs" />
-    <Compile Include="Utils\QueryString.cs" />
-    <Compile Include="Utils\TimeSpanExtensions.cs" />
+    <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\AnnouncePadded.png" />
-    <EmbeddedResource Include="Assets\Sprites\BSSB.png" />
     <EmbeddedResource Include="manifest.json" />
-    <EmbeddedResource Include="UI\Views\ServerBrowserDetailViewController.bsml" />
-    <EmbeddedResource Include="UI\Views\ServerBrowserMainViewController.bsml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
@@ -305,27 +298,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild">
+      <Version>0.4.1</Version>
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="description.md" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\Pencil.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\Person.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Sprites\Crown.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="UI\Lobby\LobbyConfigPanel.bsml" />
-    <EmbeddedResource Include="Assets\Sprites\Announce.png" />
-    <EmbeddedResource Include="Assets\Sprites\BeatSaver.png" />
-    <EmbeddedResource Include="Assets\Sprites\Portal.png" />
-    <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
-    <EmbeddedResource Include="Assets\Sprites\Robot.png" />
-    <Content Include="ATTRIBUTION.md" />
+    <EmbeddedResource Include="Assets\BSSB.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
