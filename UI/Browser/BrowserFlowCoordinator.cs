@@ -1,4 +1,5 @@
 using HMUI;
+using ServerBrowser.UI.Browser.Views;
 using Zenject;
 
 namespace ServerBrowser.UI.Browser
@@ -6,24 +7,19 @@ namespace ServerBrowser.UI.Browser
     public class BrowserFlowCoordinator : FlowCoordinator
     {
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
-        [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
+        [Inject] private readonly MainBrowserViewController _mainViewController = null!;
         
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             if (firstActivation)
             {
-                SetTitle("Server Browser");
+                SetTitle("Multiplayer");
                 showBackButton = true;
             }
-                
-            _simpleDialogPromptViewController.Init("Hello!", "Hi, how are you?", "Good", "Bad", (button) =>
-            {
-                ReturnToMainMenu();
-            });
 
             if (firstActivation)
             {
-                ProvideInitialViewControllers(_simpleDialogPromptViewController);
+                ProvideInitialViewControllers(_mainViewController);
             }
         }
 

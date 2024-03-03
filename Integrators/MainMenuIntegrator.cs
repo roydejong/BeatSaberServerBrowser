@@ -13,6 +13,7 @@ namespace ServerBrowser.Integrators
     // ReSharper disable once ClassNeverInstantiated.Global
     /// <summary>
     /// Hijacks the "Multiplayer" menu button to use our menu instead of vanilla mode selection.
+    /// Presents a privacy disclaimer if needed, then redirects to avatar creation if needed, then launches multiplayer.
     /// </summary>
     public class MainMenuIntegrator : IAffinity
     {
@@ -134,14 +135,14 @@ namespace ServerBrowser.Integrators
         /// UI: Launch multiplayer, redirecting to avatar creation first if needed.
         /// Will also be called after avatar editing completion (isCallback will be set).
         /// </summary>
-        public async Task CheckAvatarsAndLaunchMultiplayer(bool isCallback = false, bool dismiss = false)
+        public async Task CheckAvatarsAndLaunchMultiplayer(bool isCallback = false, bool canceled = false)
         {
             var hasAvatarSetup = await FlowCoordinatorAvatarsHelper.HasUserSelectedAvatarSystemWithCreatedAvatar(
                     _avatarSystemCollection, _playerDataModel);
 
-            if (isCallback && (!hasAvatarSetup || dismiss))
+            if (isCallback && !hasAvatarSetup)
             {
-                // Callback result: avatar setup failed or user manually cancelled
+                // Callback result: avatar setup failed or user manually cancelled before first setup
                 _log.Info("Avatar set up failed or cancelled by user, quitting to main menu.");
                 if (_editAvatarFlowCoordinator != null)
                     _mainFlowCoordinator.DismissFlowCoordinator(_editAvatarFlowCoordinator);

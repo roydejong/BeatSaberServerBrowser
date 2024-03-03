@@ -1,5 +1,6 @@
 ﻿using IPA;
 using IPA.Config.Stores;
+using ServerBrowser.Assets;
 using ServerBrowser.Installers;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;
@@ -14,12 +15,12 @@ namespace ServerBrowser
         // ReSharper disable once MemberCanBePrivate.Global
         internal static BssbConfig Config { get; private set; } = null!;
         
-        private IPALogger _log = null!;
+        internal static IPALogger Log = null!;
 
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config config)
         {
-            _log = logger;
+            Log = logger;
             
             Config = config.Generated<BssbConfig>();
 
@@ -35,6 +36,7 @@ namespace ServerBrowser
         [OnEnable]
         public void OnEnable()
         {
+            _ = Sprites.PreloadAsync();
         }
 
         [OnDisable]
