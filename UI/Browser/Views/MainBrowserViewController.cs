@@ -14,6 +14,21 @@ namespace ServerBrowser.UI.Browser.Views
         {
             BuildLayout(_layoutBuilder.Init(this));
         }
+        
+        private void HandleQuickPlayClick()
+        {
+            Plugin.Log.Error($"Quick Play");
+        }
+
+        private void HandleCreateServerClick()
+        {
+            Plugin.Log.Error($"Create Server");
+        }
+        
+        private void HandleJoinByCodeClick()
+        {
+            Plugin.Log.Error($"Join by Code");
+        }
 
         private void HandleEditAvatarClick()
         {

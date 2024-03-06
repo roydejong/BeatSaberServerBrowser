@@ -13,7 +13,7 @@ namespace ServerBrowser.UI.Browser
         {
             if (firstActivation)
             {
-                SetTitle("Multiplayer");
+                SetTitle("Online");
                 showBackButton = true;
             }
 

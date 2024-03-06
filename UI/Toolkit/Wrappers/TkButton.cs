@@ -22,6 +22,7 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
         private readonly HorizontalLayoutGroup _contentLayout;
 
         private ImageView? _icon;
+        private Color? _highlightColor;
 
         public TkButton(GameObject gameObject)
         {
@@ -59,17 +60,30 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
             // We have re-parented the text, which means we need to manually set the color on hover state
             _text.color =
                 state is NoTransitionsButton.SelectionState.Highlighted or NoTransitionsButton.SelectionState.Pressed
-                    ? BssbColors.White
+                    ? (_highlightColor ?? BssbColors.White)
                     : BssbColors.InactiveGray;
-            // And we can have the icon do the same!
-            if (_icon != null)
-            {
+            // And we can have the icon do the same! (unless we're doing a cool highlight thing)
+            if (_icon != null && _highlightColor == null)
                 _icon.color = _text.color;
-            }
         }
 
         public void SetText(string text)
             => _text.SetText(text);
+
+        public void SetHighlightColor(Color color)
+        {
+            _highlightColor = color;
+            if (_icon != null)
+            {
+                _icon.enabled = false;
+                _icon.color = BssbColors.White;
+                _icon.gradient = true;
+                _icon._gradientDirection = ImageView.GradientDirection.Horizontal;
+                _icon.color0 = BssbColors.BssbAccent;
+                _icon.color1 = _highlightColor.Value;
+                _icon.enabled = true;
+            }
+        }
 
         public void SetPadding(int padding)
             => _baseLayout.padding = new RectOffset(0, 0, 0, 0);
@@ -88,6 +102,16 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
 
         public void RemoveClickHandler(UnityAction action)
             => _button.onClick.RemoveListener(action);
+
+        public void DisableSkew()
+        {
+            foreach (var image in _button.gameObject.GetComponentsInChildren<ImageView>())
+            {
+                image.enabled = false;
+                image._skew = 0f;
+                image.enabled = true;
+            }
+        }
 
         public async Task SetIconAsync(string spriteName, float width, float height)
         {

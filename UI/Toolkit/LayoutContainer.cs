@@ -84,7 +84,7 @@ namespace ServerBrowser.UI.Toolkit
         public LayoutContainer AddLayoutGroup<T>(string name,
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
             ContentSizeFitter.FitMode verticalFit = ContentSizeFitter.FitMode.Unconstrained,
-            Vector2? pivotPoint = null, int padding = 0, TextAnchor childAlignment = TextAnchor.UpperLeft,
+            Vector2? pivotPoint = null, RectOffset? padding = null, TextAnchor childAlignment = TextAnchor.UpperLeft,
             bool expandChildWidth = false, bool expandChildHeight = false) where T : LayoutGroup
         {
             var gameObject = new GameObject(name)
@@ -96,7 +96,9 @@ namespace ServerBrowser.UI.Toolkit
             
             var layoutGroup = gameObject.AddComponent<T>();
             layoutGroup.childAlignment = childAlignment;
-            layoutGroup.padding = new RectOffset(padding, padding, padding, padding);
+            
+            padding ??= new RectOffset(0, 0, 0, 0);
+            layoutGroup.padding = padding;
 
             var layoutType = layoutGroup.GetType();
             
@@ -131,7 +133,7 @@ namespace ServerBrowser.UI.Toolkit
         public LayoutContainer AddVerticalLayoutGroup(string name,
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
             ContentSizeFitter.FitMode verticalFit = ContentSizeFitter.FitMode.Unconstrained,
-            Vector2? pivotPoint = null, int padding = 0, TextAnchor childAlignment = TextAnchor.UpperLeft,
+            Vector2? pivotPoint = null, RectOffset? padding = null, TextAnchor childAlignment = TextAnchor.UpperLeft,
             bool expandChildWidth = false, bool expandChildHeight = false)
             => AddLayoutGroup<VerticalLayoutGroup>(name, horizontalFit, verticalFit, pivotPoint, padding,
                 childAlignment, expandChildWidth, expandChildHeight);
@@ -139,34 +141,45 @@ namespace ServerBrowser.UI.Toolkit
         public LayoutContainer AddHorizontalLayoutGroup(string name,
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
             ContentSizeFitter.FitMode verticalFit = ContentSizeFitter.FitMode.Unconstrained,
-            Vector2? pivotPoint = null, int padding = 0, TextAnchor childAlignment = TextAnchor.UpperLeft,
+            Vector2? pivotPoint = null, RectOffset? padding = null, TextAnchor childAlignment = TextAnchor.UpperLeft,
             bool expandChildWidth = false, bool expandChildHeight = false)
             => AddLayoutGroup<HorizontalLayoutGroup>(name, horizontalFit, verticalFit, pivotPoint, padding,
                 childAlignment, expandChildWidth, expandChildHeight);
 
-        public void SetBackground(string backgroundType)
+        public void SetBackground(string backgroundType, bool noSkew = true)
         {
             var bg = GameObject.GetOrAddComponent<Backgroundable>();
             bg.ApplyBackground(backgroundType);
+            if (noSkew)
+            {
+                var imageView = bg.GetComponent<ImageView>();
+                imageView.enabled = false;
+                imageView._skew = 0f;
+                imageView.enabled = true;
+            }
         }
 
         public TkButton AddButton(string text, bool primary = false, int paddingHorizontal = 4, int paddingVertical = 2, 
             float preferredWidth = -1f, float preferredHeight = -1f, string? iconName = null, float iconSize = 10f,
-            UnityAction? clickAction = null)
+            UnityAction? clickAction = null, bool noSkew = false, Color? highlightColor = null)
         {
             var bsmlButton = primary ? new PrimaryButtonTag() : new ButtonTag();
             var gameObject = bsmlButton.CreateObject(Transform);
             
-            var wrapper = new TkButton(gameObject);
-            wrapper.SetText(text);
-            wrapper.SetPadding(paddingHorizontal, paddingVertical);
-            wrapper.SetWidth(preferredWidth);
-            wrapper.SetHeight(preferredHeight);
+            var button = new TkButton(gameObject);
+            button.SetText(text);
+            button.SetPadding(paddingHorizontal, paddingVertical);
+            button.SetWidth(preferredWidth);
+            button.SetHeight(preferredHeight);
             if (iconName != null)
-                _ = wrapper.SetIconAsync(iconName, iconSize, iconSize);
+                _ = button.SetIconAsync(iconName, iconSize, iconSize);
             if (clickAction != null)
-                wrapper.AddClickHandler(clickAction);
-            return wrapper;
+                button.AddClickHandler(clickAction);
+            if (noSkew)
+                button.DisableSkew();
+            if (highlightColor != null)
+                button.SetHighlightColor(highlightColor.Value);
+            return button;
         }
 
         public void AddHorizontalLine(float thickness = .25f, float width = -1f, Color? color = null)
