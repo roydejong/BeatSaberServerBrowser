@@ -1,6 +1,7 @@
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.UI.Toolkit;
+using ServerBrowser.UI.Toolkit.Components;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -9,6 +10,9 @@ namespace ServerBrowser.UI.Browser.Views
 {
     public partial class MainBrowserViewController : ViewController, IInitializable
     {
+        private TkSearchInputField? _searchInputField;
+        private TkFilterButton? _filterButton;
+        
         private void BuildLayout(LayoutContainer root)
         {
             root.InsertMargin(0f, 5f);
@@ -51,6 +55,13 @@ namespace ServerBrowser.UI.Browser.Views
 
             var topBar = mainContainer.AddHorizontalLayoutGroup("TopBar");
             topBar.PreferredHeight = 10f;
+            
+            _searchInputField = topBar.AddSearchInputField("Search lobbies");
+            _searchInputField.ChangeEvent += HandleSearchInputChanged;
+            
+            _filterButton = topBar.AddFilterButton("No Filters");
+            _filterButton.ClickEvent += HandleFilterButtonClicked;
+            _filterButton.ClearEvent += HandleFilterButtonCleared;
         }
     }
 }

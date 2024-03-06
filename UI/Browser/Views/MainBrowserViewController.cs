@@ -24,5 +24,21 @@ namespace ServerBrowser.UI.Browser.Views
                     _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator, true);
                 });
         }
+        
+        private void HandleSearchInputChanged(InputFieldView.SelectionState state, string value)
+        {
+            Plugin.Log.Error($"Search updated: {state}, \"{value}\"");
+        }
+        
+        private void HandleFilterButtonClicked()
+        {
+            Plugin.Log.Error($"Filters clicked");
+            _filterButton!.SetTextValue("ooh ya clicked me good");
+        }
+        
+        private void HandleFilterButtonCleared()
+        {
+            Plugin.Log.Error($"Filters cleared");
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace ServerBrowser.UI.Toolkit
     public class LayoutBuilder
     {
         [Inject] private readonly DiContainer _diContainer = null!;
-        
+
         public ViewController? ViewController { get; private set; }
         public LayoutContainer? Root { get; private set; }
         public LayoutContainer? Container { get; private set; }
@@ -19,5 +19,8 @@ namespace ServerBrowser.UI.Toolkit
             Container = Root.AddVerticalLayoutGroup("Container");
             return Container;
         }
+
+        internal T CreateComponent<T>() where T : LayoutComponent
+            => _diContainer.Instantiate<T>();
     }
 }

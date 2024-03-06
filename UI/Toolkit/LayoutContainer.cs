@@ -2,6 +2,7 @@ using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Tags;
 using HMUI;
+using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.UI.Toolkit.Wrappers;
 using ServerBrowser.Util;
 using UnityEngine;
@@ -186,6 +187,24 @@ namespace ServerBrowser.UI.Toolkit
             image.sprite = Utilities.ImageResources.WhitePixel;
             image.material = Utilities.ImageResources.NoGlowMat;
             image.color = color ?? BssbColors.VeryLightGray;
+        }
+        
+        public TkSearchInputField AddSearchInputField(string? placeholderText = "Search")
+        {
+            var searchInputField = Builder.CreateComponent<TkSearchInputField>();
+            searchInputField.AddToContainer(this);
+            if (placeholderText != null)
+                searchInputField.SetPlaceholderText(placeholderText);
+            return searchInputField;
+        }
+        
+        public TkFilterButton AddFilterButton(string? placeholderText = "No Filters")
+        {
+            var filterButton = Builder.CreateComponent<TkFilterButton>();
+            filterButton.AddToContainer(this);
+            if (placeholderText != null)
+                filterButton.SetPlaceholderText(placeholderText);
+            return filterButton;
         }
     }
 }

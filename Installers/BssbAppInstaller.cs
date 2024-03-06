@@ -1,4 +1,3 @@
-using ServerBrowser.UI.Toolkit;
 using Zenject;
 
 namespace ServerBrowser.Installers
@@ -8,8 +7,6 @@ namespace ServerBrowser.Installers
         public override void InstallBindings()
         {
             Container.Bind<BssbConfig>().FromInstance(Plugin.Config).AsSingle();
-            
-            Container.Bind<LayoutBuilder>().AsTransient();
         }
     }
 }
