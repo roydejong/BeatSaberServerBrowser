@@ -290,6 +290,7 @@
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
+    <Compile Include="UI\Toolkit\Components\TkLoadingControl.cs" />
     <Compile Include="UI\Toolkit\Components\TkSearchInputField.cs" />
     <Compile Include="UI\Toolkit\LayoutBuilder.cs" />
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />

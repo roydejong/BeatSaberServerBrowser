@@ -219,5 +219,12 @@ namespace ServerBrowser.UI.Toolkit
                 filterButton.SetPlaceholderText(placeholderText);
             return filterButton;
         }
+
+        public TkLoadingControl AddLoadingControl()
+        {
+            var loadingControl = Builder.CreateComponent<TkLoadingControl>();
+            loadingControl.AddToContainer(this);
+            return loadingControl;
+        }
     }
 }

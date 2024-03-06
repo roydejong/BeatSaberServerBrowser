@@ -18,7 +18,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         private InputFieldView? _inputFieldView;
         private CurvedTextMeshPro? _placeholderText;
 
-        public event Action<InputFieldView.SelectionState, string> ChangeEvent;
+        public event Action<InputFieldView.SelectionState, string> ChangedEvent;
 
         public override void AddToContainer(LayoutContainer container)
         {
@@ -41,11 +41,11 @@ namespace ServerBrowser.UI.Toolkit.Components
             _inputFieldView.onValueChanged.RemoveAllListeners();
             _inputFieldView.onValueChanged.AddListener((_) =>
             {
-                ChangeEvent?.Invoke(SelectionState, TextValue);
+                ChangedEvent?.Invoke(SelectionState, TextValue);
             });
             _inputFieldView.selectionStateDidChangeEvent += state =>
             {
-                ChangeEvent?.Invoke(state, TextValue);
+                ChangedEvent?.Invoke(state, TextValue);
             };
 
             ClearTextValue();

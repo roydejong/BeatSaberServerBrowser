@@ -20,8 +20,8 @@ namespace ServerBrowser.UI.Toolkit.Components
         private CurvedTextMeshPro? _valueText;
         private NoTransitionsButton? _clearButton;
 
-        public event Action ClickEvent;
-        public event Action ClearEvent;
+        public event Action ClickedEvent;
+        public event Action ClearedEvent;
         
         public override void AddToContainer(LayoutContainer container)
         {
@@ -40,7 +40,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _button.onClick.RemoveAllListeners();
             _button.onClick.AddListener(() =>
             {
-                ClickEvent?.Invoke();
+                ClickedEvent?.Invoke();
             });
 
             var tPlaceholderText = _gameObject.transform.Find("PlaceholderText");
@@ -58,7 +58,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _clearButton.onClick.AddListener(() =>
             {
                 SetTextValue("");
-                ClearEvent?.Invoke();
+                ClearedEvent?.Invoke();
             });
         }
         

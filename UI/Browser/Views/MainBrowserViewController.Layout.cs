@@ -13,6 +13,7 @@ namespace ServerBrowser.UI.Browser.Views
     {
         private TkSearchInputField? _searchInputField;
         private TkFilterButton? _filterButton;
+        private TkLoadingControl? _loadingControl;
         
         private void BuildLayout(LayoutContainer root)
         {
@@ -61,18 +62,27 @@ namespace ServerBrowser.UI.Browser.Views
         {
             var mainContainer = parent.AddVerticalLayoutGroup("BrowserMain",
                 verticalFit: ContentSizeFitter.FitMode.PreferredSize,
-                pivotPoint: new Vector2(0, 1f));
+                pivotPoint: new Vector2(0, 1f), childAlignment: TextAnchor.UpperLeft);
             mainContainer.PreferredWidth = 122.5f;
 
             var topBar = mainContainer.AddHorizontalLayoutGroup("TopBar");
             topBar.PreferredHeight = 10f;
             
             _searchInputField = topBar.AddSearchInputField("Search lobbies");
-            _searchInputField.ChangeEvent += HandleSearchInputChanged;
+            _searchInputField.ChangedEvent += HandleSearchInputChanged;
             
             _filterButton = topBar.AddFilterButton("No Filters");
-            _filterButton.ClickEvent += HandleFilterButtonClicked;
-            _filterButton.ClearEvent += HandleFilterButtonCleared;
+            _filterButton.ClickedEvent += HandleFilterButtonClicked;
+            _filterButton.ClearedEvent += HandleFilterButtonCleared;
+            
+            var content = mainContainer.AddHorizontalLayoutGroup("Content", expandChildWidth: true,
+                verticalFit: ContentSizeFitter.FitMode.PreferredSize, pivotPoint: new Vector2(0, 1f),
+                padding: new RectOffset(0, 0, 1, 1));
+            content.PreferredHeight = 65f;
+            content.SetBackground("panel-top");
+            
+            _loadingControl = content.AddLoadingControl();
+            _loadingControl.ShowLoading("Loading Servers");
         }
     }
 }
