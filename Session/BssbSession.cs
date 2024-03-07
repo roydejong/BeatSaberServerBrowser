@@ -14,6 +14,7 @@ namespace ServerBrowser.Session
     public class BssbSession : IInitializable, IDisposable, ITickable
     {
         [Inject] private readonly SiraLog _log = null!;
+        [Inject] private readonly BssbConfig _config = null!;
         [Inject] private readonly BssbApi _api = null!;
         [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
 
@@ -24,6 +25,9 @@ namespace ServerBrowser.Session
         private CancellationTokenSource _ctsUserInfo = new();
         private float? _nextLoginRetry = null;
         private int _loginAttempts = 0;
+        private bool _loginRequested = false;
+        private bool _isLoggingIn = false;
+        
         private PlatformAuthenticationTokenProvider? _tokenProvider = null;
         
         public event Action<UserInfo>? UserInfoChangedEvent;
@@ -44,7 +48,7 @@ namespace ServerBrowser.Session
         public void Tick()
         {
             if (_nextLoginRetry.HasValue && Time.realtimeSinceStartup >= _nextLoginRetry.Value)
-                _ = Login();
+                _ = EnsureLoggedIn();
         }
 
         private async Task LoadUserInfo()
@@ -55,12 +59,10 @@ namespace ServerBrowser.Session
 
                 if (UserInfo != null)
                 {
-                    _log.Info($"Loaded user info (platform={UserInfo.platform}" +
-                              $", platformUserId={UserInfo.platformUserId}" +
-                              $", userName={UserInfo.userName})");
-                    
                     UserInfoChangedEvent?.Invoke(UserInfo);
-                    _ = Login();
+                    
+                    if (_loginRequested)
+                        _ = EnsureLoggedIn();
                 }
             }
             catch (OperationCanceledException)
@@ -93,52 +95,83 @@ namespace ServerBrowser.Session
             }
         }
 
-        private async Task Login()
+        private async Task<bool> Login()
         {
+            if (_isLoggingIn)
+                // Try to prevent multiple login attempts at the same time
+                return false;
+            
+            if (!_config.AnyPrivacyDisclaimerAccepted)
+                // Refuse to login if the user has not accepted the privacy disclaimer
+                return false;
+            
             if (UserInfo == null)
-                return;
+                // Required info not loaded yet or not available
+                return false;
 
+            _isLoggingIn = true;
             _nextLoginRetry = null;
             _loginAttempts++;
+
+            try
+            {
+                var loginResponse = await _api.SendLoginRequest(new BssbLoginRequest()
+                {
+                    UserInfo = UserInfo,
+                    AuthenticationToken = await GetPlatformAuthToken()
+
+                });
+
+                if (loginResponse is not { Success: true })
+                {
+                    var logError = loginResponse?.ErrorMessage ?? "Unknown error";
+                    _log.Error($"Login failed: {logError}");
+                    IsLoggedIn = false;
+                    return false;
+                }
+
+                if (AvatarUrl != loginResponse.AvatarUrl)
+                {
+                    AvatarUrl = loginResponse.AvatarUrl;
+                    AvatarUrlChangedEvent?.Invoke(AvatarUrl);
+                }
+
+                if (!loginResponse.Authenticated)
+                {
+                    // Even though the login request was valid, the user has not authenticated themselves with the platform
+                    // This means that authentication with Steam/Oculus/etc. failed, so we are not fully logged in
+                    var logError = loginResponse?.ErrorMessage ?? "Unknown error";
+                    _log.Error($"Login authentication failed: {logError}");
+                    IsLoggedIn = false;
+                    return false;
+                }
+
+                IsLoggedIn = true;
+                _loginAttempts = 0;
+                _nextLoginRetry = null;
+                _log.Info($"Logged in succesfully");
+                LoggedInEvent?.Invoke(loginResponse);
+                return true;
+            }
+            finally
+            {
+                _isLoggingIn = false;
+                if (!IsLoggedIn)
+                    ScheduleLoginRetry();
+            }
+        }
+        
+        public async Task<bool> EnsureLoggedIn()
+        {
+            _loginRequested = true;
             
-            var loginResponse = await _api.SendLoginRequest(new BssbLoginRequest()
-            {
-                UserInfo = UserInfo,
-                AuthenticationToken = await GetPlatformAuthToken()
-                
-            });
-
-            if (loginResponse is not { Success: true })
-            {
-                var logError = loginResponse?.ErrorMessage ?? "Unknown error";
-                _log.Error($"Login failed: {logError}");
-                IsLoggedIn = false;
-                ScheduleLoginRetry();
-                return;
-            }
-
-            if (AvatarUrl != loginResponse.AvatarUrl)
-            {
-                AvatarUrl = loginResponse.AvatarUrl;
-                AvatarUrlChangedEvent?.Invoke(AvatarUrl);
-            }
-
-            if (!loginResponse.Authenticated)
-            {
-                // Even though the login request was valid, the user has not authenticated themselves with the platform
-                // This means that authentication with Steam/Oculus/etc. failed, so we are not fully logged in
-                var logError = loginResponse?.ErrorMessage ?? "Unknown error";
-                _log.Error($"Login authentication failed: {logError}");
-                IsLoggedIn = false;
-                ScheduleLoginRetry();
-                return;
-            }
-
-            IsLoggedIn = true;
-            _loginAttempts = 0;
-            _nextLoginRetry = null;
-            _log.Info($"Logged in succesfully");
-            LoggedInEvent?.Invoke(loginResponse);
+            if (IsLoggedIn)
+                return true;
+            
+            if (_isLoggingIn)
+                return false;
+            
+            return await Login();
         }
         
         private void ScheduleLoginRetry()

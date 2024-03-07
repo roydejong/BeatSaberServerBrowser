@@ -12,5 +12,7 @@
         /// Indicates whether the user has accepted the privacy disclaimer, and which version they accepted.
         /// </summary>
         public virtual uint AcceptedPrivacyDisclaimerVersion { get; set; } = 0;
+        
+        internal bool AnyPrivacyDisclaimerAccepted => AcceptedPrivacyDisclaimerVersion > 0;
     }
 }

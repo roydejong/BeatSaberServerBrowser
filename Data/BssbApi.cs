@@ -52,15 +52,12 @@ namespace ServerBrowser.Data
                 var requestJson = JsonConvert.SerializeObject(request);
                 var requestContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
                 
-                _log.Info($"(API) [Request] POST {path}");
-                
+                _log.Info($"[Request] POST {path}");
                 if (request is not BssbLoginRequest) // never log user auth tokens
                     _log.Debug(requestJson);
 
                 var response = await _httpClient.PostAsync(path, requestContent);
                 var responseBody = await response.Content.ReadAsStringAsync();
-                
-                _log.Info($"(API) [Response] POST {path}: {response.StatusCode}");
                 
                 response.EnsureSuccessStatusCode();
 
@@ -68,7 +65,7 @@ namespace ServerBrowser.Data
             }
             catch (Exception ex)
             {
-                _log.Error($"(API) Request failed: POST {path}");
+                _log.Error($"Request failed: POST {path}");
                 _log.Debug(ex);
                 return default;
             }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BeatSaber.AvatarCore;
 using BGLib.Polyglot;
 using HMUI;
+using ServerBrowser.Session;
 using ServerBrowser.UI.Browser;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
@@ -17,8 +18,10 @@ namespace ServerBrowser.Integrators
     /// </summary>
     public class MainMenuIntegrator : IAffinity
     {
-        [Inject] private readonly BssbConfig _bssbConfig = null!;
         [Inject] private readonly SiraLog _log = null!;
+        [Inject] private readonly BssbConfig _config = null!;
+        [Inject] private readonly BssbSession _session = null!;
+        
         [Inject] private readonly BrowserFlowCoordinator _browserFlowCoordinator = null!;
         
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
@@ -38,7 +41,7 @@ namespace ServerBrowser.Integrators
         /// <summary>
         /// Gets whether the privacy disclaimer should be shown prior to launching multiplayer.
         /// </summary>
-        public bool ShouldShowDisclaimer => _bssbConfig.AcceptedPrivacyDisclaimerVersion < PrivacyDisclaimerVersion ||
+        public bool ShouldShowDisclaimer => _config.AcceptedPrivacyDisclaimerVersion < PrivacyDisclaimerVersion ||
                                             !_playerDataModel.playerData.agreedToMultiplayerDisclaimer;
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace ServerBrowser.Integrators
                         // Accept - continue to avatar or multiplayer
                         _log.Info("User accepted multiplayer disclaimer.");
                         
-                        _bssbConfig.AcceptedPrivacyDisclaimerVersion = PrivacyDisclaimerVersion;
+                        _config.AcceptedPrivacyDisclaimerVersion = PrivacyDisclaimerVersion;
                         _playerDataModel.playerData.agreedToMultiplayerDisclaimer = true;
 
                         _ = CheckAvatarsAndLaunchMultiplayer(); // next step will replace our prompt view controller
@@ -167,6 +170,8 @@ namespace ServerBrowser.Integrators
 
         public async Task LaunchMultiplayer(bool afterAvatarEdit = false)
         {
+            _ = _session.EnsureLoggedIn(); // Session should now attempt login, if needed
+            
             if (afterAvatarEdit)
             {
                 if (_editAvatarFlowCoordinator != null &&
