@@ -24,14 +24,17 @@ namespace ServerBrowser.UI.Toolkit.Components
             _textMesh = _gameObject.AddComponent<CurvedTextMeshPro>();
             _textMesh.font = BeatSaberUI.MainTextFont;
             _textMesh.fontSharedMaterial = BeatSaberUI.MainUIFontMaterial;
-            _textMesh.text = "%TkText%";
+            _textMesh.text = "...";
             _textMesh.fontSize = 4;
             _textMesh.color = Color.white;
             _textMesh.overflowMode = TextOverflowModes.Ellipsis;
             _textMesh.horizontalAlignment = HorizontalAlignmentOptions.Left;
             _textMesh.verticalAlignment = VerticalAlignmentOptions.Middle;
+            _textMesh.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+            _textMesh.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
             
             _layoutElement = _gameObject.AddComponent<LayoutElement>();
+            
         }
 
         public void SetText(string text)

@@ -294,12 +294,15 @@
     <Compile Include="Installers\BssbMenuInstaller.cs" />
     <Compile Include="Integrators\MainMenuIntegrator.cs" />
     <Compile Include="Models\BssbConfig.cs" />
+    <Compile Include="Models\Requests\BssbLoginRequest.cs" />
+    <Compile Include="Models\Responses\BssbLoginResponse.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\BssbSession.cs" />
     <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
+    <Compile Include="UI\Data\AvatarStore.cs" />
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
     <Compile Include="UI\Toolkit\Components\TkAvatarImage.cs" />
     <Compile Include="UI\Toolkit\Components\TkLoadingControl.cs" />

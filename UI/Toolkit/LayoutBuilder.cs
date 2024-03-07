@@ -1,4 +1,5 @@
 using HMUI;
+using ServerBrowser.UI.Data;
 using Zenject;
 
 namespace ServerBrowser.UI.Toolkit
@@ -7,6 +8,7 @@ namespace ServerBrowser.UI.Toolkit
     public class LayoutBuilder
     {
         [Inject] private readonly DiContainer _diContainer = null!;
+        [field: Inject] public AvatarStore AvatarStore { get; } = null!;
 
         public ViewController? ViewController { get; private set; }
         public LayoutContainer? Root { get; private set; }

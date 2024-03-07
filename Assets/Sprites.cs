@@ -10,31 +10,31 @@ namespace ServerBrowser.Assets
     {
         private const string ResourcePrefix = "ServerBrowser.Assets.Sprites.";
 
-        public const string Avatar = "Avatar"; 
-        public const string ComboCrown = "ComboCrown";
-        public const string Crown = "Crown";
-        public const string Friends = "Friends";
-        public const string Ghost = "Ghost";
-        public const string Global = "Global";
-        public const string Lock = "Lock";
-        public const string PlaceholderAvatar = "PlaceholderAvatar";
-        public const string Player = "Player";
-        public const string Plus = "Plus";
-        public const string Random = "Random";
-        public const string SaberClash = "SaberClash";
-        public const string SaberUp = "SaberUp";
-        public const string Search = "Search";
-        public const string Spectator = "Spectator";
-        public const string SuperFast = "SuperFast";
+        internal const string Avatar = "Avatar"; 
+        internal const string ComboCrown = "ComboCrown";
+        internal const string Crown = "Crown";
+        internal const string Friends = "Friends";
+        internal const string Ghost = "Ghost";
+        internal const string Global = "Global";
+        internal const string Lock = "Lock";
+        internal const string PlaceholderAvatar = "PlaceholderAvatar";
+        internal const string Player = "Player";
+        internal const string Plus = "Plus";
+        internal const string Random = "Random";
+        internal const string SaberClash = "SaberClash";
+        internal const string SaberUp = "SaberUp";
+        internal const string Search = "Search";
+        internal const string Spectator = "Spectator";
+        internal const string SuperFast = "SuperFast";
 
         private static Dictionary<string, Sprite> _loadedSprites = new();
 
-        public static async Task PreloadAsync()
+        internal static async Task PreloadAsync()
         {
             // TODO LoadAsync any sprites we want to be in cache ahead of time
         }
 
-        public static async Task<Sprite?> LoadAsync(string spriteName)
+        internal static async Task<Sprite?> LoadAsync(string spriteName)
         {
             var spritePath = $"{ResourcePrefix}{spriteName}.png";
             
@@ -48,7 +48,7 @@ namespace ServerBrowser.Assets
             return sprite;
         }
 
-        public static async Task SetSpriteAsync(this Image image, string spriteName)
+        internal static async Task SetAssetSpriteAsync(this Image image, string spriteName)
         {
             var sprite = await LoadAsync(spriteName);
 

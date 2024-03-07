@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using HMUI;
 using ServerBrowser.Session;
 using ServerBrowser.UI.Toolkit;
@@ -20,14 +21,26 @@ namespace ServerBrowser.UI.Browser.Views
             BuildLayout(_layoutBuilder.Init(this));
             
             _session.UserInfoChangedEvent += HandleUserInfoUpdated;
+            _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
             
             if (_session.UserInfo != null)
                 HandleUserInfoUpdated(_session.UserInfo);
+            else
+                SetUserInfoNotLoggedIn();
         }
 
         public void Dispose()
         {
             _session.UserInfoChangedEvent -= HandleUserInfoUpdated;
+            _session.AvatarUrlChangedEvent -= HandleAvatarUrlChanged;
+        }
+
+        private void SetUserInfoNotLoggedIn()
+        {
+            _selfUsernameText!.SetText($"Offline");
+            _selfUsernameText.SetTextColor(BssbColors.InactiveGray);
+            
+            _ = _selfAvatarImage!.SetPlaceholderAvatar(CancellationToken.None);
         }
         
         private void HandleUserInfoUpdated(UserInfo userInfo)
@@ -36,6 +49,13 @@ namespace ServerBrowser.UI.Browser.Views
 
             var username = userInfo.userName.StripTags();
             _selfUsernameText!.SetText($"{username}");
+            _selfUsernameText.SetTextColor(BssbColors.White);
+        }
+        
+        private void HandleAvatarUrlChanged(string? avatarUrl)
+        {
+            Plugin.Log.Error($"Avatar URL updated: {avatarUrl}");
+            _ = _selfAvatarImage!.SetAvatarFromUrl(avatarUrl, CancellationToken.None);
         }
         
         private void HandleQuickPlayClicked()

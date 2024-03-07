@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BeatSaberMarkupLanguage;
 using HMUI;
 using ServerBrowser.Assets;
+using ServerBrowser.UI.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,12 +12,15 @@ namespace ServerBrowser.UI.Toolkit.Components
     // ReSharper disable once ClassNeverInstantiated.Global
     public class TkAvatarImage : LayoutComponent
     {
+        private AvatarStore? _avatarStore;
         private GameObject? _gameObject;
         private ImageView? _imageView;
         private LayoutElement? _layoutElement;
         
         public override void AddToContainer(LayoutContainer container)
         {
+            _avatarStore = container.Builder.AvatarStore;
+            
             _gameObject = new("TkAvatarImage")
             {
                 layer = LayoutContainer.UiLayer
@@ -28,15 +32,37 @@ namespace ServerBrowser.UI.Toolkit.Components
             
             _layoutElement = _gameObject.AddComponent<LayoutElement>();
             
-            _ = SetPlaceholderAvatar(null);
+            _ = SetPlaceholderAvatar(CancellationToken.None);
         }
 
-        public async Task SetPlaceholderAvatar(CancellationToken? cancellationToken)
+        public async Task SetPlaceholderAvatar(CancellationToken cancellationToken)
         {
             if (_imageView == null)
                 return;
 
-            await _imageView.SetSpriteAsync(Sprites.PlaceholderAvatar);
+            await _imageView.SetAssetSpriteAsync(Sprites.PlaceholderAvatar);
+        }
+        
+        public async Task SetAvatarFromUrl(string? url, CancellationToken cancellationToken)
+        {
+            if (_imageView == null || _avatarStore == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                await SetPlaceholderAvatar(cancellationToken);
+                return;
+            }
+            
+            var sprite = await _avatarStore.LoadAvatarAsync(url!);
+            
+            if (sprite == null)
+            {
+                await SetPlaceholderAvatar(cancellationToken);
+                return;
+            }
+            
+            _imageView.sprite = sprite;
         }
 
         public void SetPreferredSize(float? width, float? height)

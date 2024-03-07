@@ -11,11 +11,8 @@ namespace ServerBrowser.Installers
         public override void InstallBindings()
         {
             Container.Bind<LayoutBuilder>().AsTransient();
-            
             Container.BindInterfacesAndSelfTo<MainBrowserViewController>().FromNewComponentAsViewController().AsSingle();
-            
             Container.Bind<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
-            
             Container.BindInterfacesAndSelfTo<MainMenuIntegrator>().AsSingle();
         }
     }

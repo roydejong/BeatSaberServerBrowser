@@ -133,7 +133,7 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
                 iconLayout.preferredHeight = height;
             }
 
-            await _icon.SetSpriteAsync(spriteName);
+            await _icon.SetAssetSpriteAsync(spriteName);
         }
     }
 }
