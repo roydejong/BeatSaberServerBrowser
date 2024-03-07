@@ -51,7 +51,6 @@ namespace ServerBrowser.UI.Toolkit.Components
             Object.Destroy(tPlaceholderText.GetComponent<LocalizedTextMeshProUGUI>());
             
             _valueText = tText.GetComponent<CurvedTextMeshPro>();
-            SetTextValue("");
 
             _clearButton = tClear.GetComponent<NoTransitionsButton>();
             _clearButton.onClick.RemoveAllListeners();
@@ -60,6 +59,8 @@ namespace ServerBrowser.UI.Toolkit.Components
                 SetTextValue("");
                 ClearedEvent?.Invoke();
             });
+            
+            SetTextValue("");
         }
         
         public void SetPlaceholderText(string text)

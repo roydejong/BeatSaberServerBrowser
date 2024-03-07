@@ -226,5 +226,26 @@ namespace ServerBrowser.UI.Toolkit
             loadingControl.AddToContainer(this);
             return loadingControl;
         }
+        
+        public TkAvatarImage AddAvatarImage(float? width = null, float? height = null)
+        {
+            var avatarImage = Builder.CreateComponent<TkAvatarImage>();
+            avatarImage.AddToContainer(this);
+            avatarImage.SetPreferredSize(width, height);
+            return avatarImage;
+        }
+
+        public TkText AddText(string text, Color? color = null, float? fontSize = null, float? width = null, float? height = null)
+        {
+            var textComponent = Builder.CreateComponent<TkText>();
+            textComponent.AddToContainer(this);
+            textComponent.SetText(text);
+            if (color != null)
+                textComponent.SetTextColor(color.Value);
+            if (fontSize != null)
+                textComponent.SetFontSize(fontSize.Value);
+            textComponent.SetPreferredSize(width, height);
+            return textComponent;
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace ServerBrowser.Assets
         public const string Ghost = "Ghost";
         public const string Global = "Global";
         public const string Lock = "Lock";
+        public const string PlaceholderAvatar = "PlaceholderAvatar";
         public const string Player = "Player";
         public const string Plus = "Plus";
         public const string Random = "Random";

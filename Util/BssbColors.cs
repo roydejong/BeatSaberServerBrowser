@@ -6,7 +6,7 @@ namespace ServerBrowser.Util
     {
         public static readonly Color White = Color.white;
         public static readonly Color InactiveGray = MakeUnityColor(255, 255, 255, 0.749f);
-        public static readonly Color VeryLightGray = MakeUnityColor(255, 255, 255, .5f);
+        public static readonly Color VeryLightGray = MakeUnityColor(255, 255, 255, .25f);
         public static readonly Color HighlightBlue = MakeUnityColor(0, 192, 255);
         public static readonly Color BssbAccent = MakeUnityColor(207, 3, 137);
 
