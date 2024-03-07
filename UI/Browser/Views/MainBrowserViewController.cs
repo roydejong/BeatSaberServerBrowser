@@ -55,13 +55,8 @@ namespace ServerBrowser.UI.Browser.Views
 
         private void HandleEditAvatarClicked()
         {
-            // TODO: Can we make this transition smoother (without main menu becoming visible)?
-            _mainFlowCoordinator.DismissFlowCoordinator(_mainFlowCoordinator.childFlowCoordinator,
-                finishedCallback: () =>
-                {
-                    _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
-                    _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator, true);
-                });
+            _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
+            _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator.childFlowCoordinator, true);
         }
         
         private void HandleSearchInputChanged(InputFieldView.SelectionState state, string value)

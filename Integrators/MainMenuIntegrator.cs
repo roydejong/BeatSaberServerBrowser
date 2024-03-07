@@ -74,6 +74,8 @@ namespace ServerBrowser.Integrators
         public bool PrefixHandleEditAvatarFlowCoordinatorHelperDidFinish(FlowCoordinator flowCoordinator,
             EditAvatarFlowCoordinatorHelper.FinishAction finishAction)
         {
+            Plugin.Log.Error("PrefixHandleEditAvatarFlowCoordinatorHelperDidFinish");
+
             if (!_mainFlowCoordinator._goToMultiplayerAfterAvatarCreation)
                 // Our patch is not applicable, no multiplayer redirect is happening
                 return true;
@@ -167,7 +169,18 @@ namespace ServerBrowser.Integrators
         {
             if (afterAvatarEdit)
             {
-                _mainFlowCoordinator.ReplaceChildFlowCoordinator(_browserFlowCoordinator);
+                if (_editAvatarFlowCoordinator != null &&
+                    _browserFlowCoordinator.childFlowCoordinator == _editAvatarFlowCoordinator)
+                {
+                    // In case "edit avatar" was used from our flow, close it now
+                    _browserFlowCoordinator.DismissFlowCoordinator(_editAvatarFlowCoordinator);
+                    _editAvatarFlowCoordinator = null;
+                }
+                else
+                {
+                    // Normal entry via main menu after initial after creation
+                    _mainFlowCoordinator.ReplaceChildFlowCoordinator(_browserFlowCoordinator);
+                }
             }
             else
             {
