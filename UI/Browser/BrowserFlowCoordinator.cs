@@ -1,5 +1,6 @@
 using HMUI;
 using ServerBrowser.Data;
+using ServerBrowser.Session;
 using ServerBrowser.UI.Browser.Views;
 using SiraUtil.Logging;
 using Zenject;
@@ -10,6 +11,7 @@ namespace ServerBrowser.UI.Browser
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly ServerRepository _serverRepository = null!;
+        [Inject] private readonly BssbSession _session = null!;
         
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
@@ -33,6 +35,8 @@ namespace ServerBrowser.UI.Browser
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             _serverRepository.StopDiscovery();
+            
+            _session.StopLoginRetries();
         }
 
         // ReSharper disable once ParameterHidesMember

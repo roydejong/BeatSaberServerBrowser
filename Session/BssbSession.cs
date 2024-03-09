@@ -185,7 +185,7 @@ namespace ServerBrowser.Session
             finally
             {
                 _isLoggingIn = false;
-                if (!IsLoggedIn)
+                if (!IsLoggedIn && _loginRequested) 
                     ScheduleLoginRetry();
             }
         }
@@ -207,6 +207,13 @@ namespace ServerBrowser.Session
         {
             var retryDelay = Mathf.Clamp(Mathf.Pow(2f, _loginAttempts), 2f, 128f);
             _nextLoginRetry = Time.realtimeSinceStartup + retryDelay;
+        }
+        
+        public void StopLoginRetries()
+        {
+            _loginRequested = false;
+            _nextLoginRetry = null;
+            _loginAttempts = 0;
         }
         
         public const float CachedAuthTokenMaxAge = 60f;
