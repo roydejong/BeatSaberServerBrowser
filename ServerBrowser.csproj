@@ -317,6 +317,7 @@
     <Compile Include="UI\Toolkit\Components\TkScrollView.cs" />
     <Compile Include="UI\Toolkit\Components\TkSearchInputField.cs" />
     <Compile Include="UI\Toolkit\Components\TkText.cs" />
+    <Compile Include="UI\Toolkit\Components\TkVerticalLayoutScrollView.cs" />
     <Compile Include="UI\Toolkit\LayoutBuilder.cs" />
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />
     <Compile Include="UI\Toolkit\LayoutContainer.cs" />

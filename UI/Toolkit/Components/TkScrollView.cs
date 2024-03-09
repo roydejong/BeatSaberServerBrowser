@@ -1,5 +1,4 @@
 using HMUI;
-using ServerBrowser.UI.Toolkit.Scripts;
 using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,12 +11,12 @@ namespace ServerBrowser.UI.Toolkit.Components
     // ReSharper disable once ClassNeverInstantiated.Global
     public class TkScrollView : LayoutComponent
     {
-        [Inject] private readonly SiraLog _logger = null!;
-        [Inject] private readonly DiContainer _diContainer = null!;
-        [Inject] private readonly PrivacyPolicyDisplayViewController _policyViewController = null!;
+        [Inject] protected readonly SiraLog _logger = null!;
+        [Inject] protected readonly DiContainer _diContainer = null!;
+        [Inject] protected readonly PrivacyPolicyDisplayViewController _policyViewController = null!;
 
-        private GameObject? _gameObject;
-        private ScrollView? _scrollView;
+        protected GameObject? _gameObject;
+        protected ScrollView? _scrollView;
         
         public LayoutContainer? Content { get; private set; }
         
@@ -36,30 +35,33 @@ namespace ServerBrowser.UI.Toolkit.Components
             
             _scrollView = _gameObject.GetComponent<ScrollView>();
             _diContainer.Inject(_scrollView);
-            Plugin.Log.Error("ooop 1");
             
             var viewport = _gameObject.transform.Find("Viewport");
-            Plugin.Log.Error("ooop 2");
             
             // Remove text content from clone
             viewport.Find("Text").gameObject.SetActive(false);
             
             // Create and wrap our own content container
-            var viewportWrap = new LayoutContainer(container.Builder, viewport, false);
-            Content = viewportWrap.AddVerticalLayoutGroup("Content", expandChildWidth: true,
-                childAlignment: TextAnchor.UpperLeft, horizontalFit: ContentSizeFitter.FitMode.Unconstrained,
-                verticalFit: ContentSizeFitter.FitMode.PreferredSize, pivotPoint: new Vector2(0, 1f));
-            
-            // Auto resize on content rect change
-            var resizeListener = Content.GameObject.AddComponent<ScrollViewRectChangeListener>();
-            resizeListener.BindScrollView(_scrollView);
+            var contentGameObject = new GameObject("Content")
+            {
+                layer = LayoutContainer.UiLayer
+            };
+            contentGameObject.transform.SetParent(viewport, false);
+            contentGameObject.AddComponent<LayoutElement>();
+            Content = new LayoutContainer(container.Builder, contentGameObject.transform, false);
 
             // Make interactable
             _diContainer.InstantiateComponent<VRGraphicRaycaster>(viewport.gameObject);
             
             // Rebind content rect
             _scrollView._contentRectTransform = Content.RectTransform;
-            _scrollView._scrollType = ScrollView.ScrollType.PageSize;
+            
+            // Set content rect pivot
+            var rectTransform = (Content.GameObject.transform as RectTransform)!;
+            rectTransform.anchorMin = new Vector2(0, 0);
+            rectTransform.anchorMax = new Vector2(1, 1);
+            rectTransform.sizeDelta = new Vector2(0, 0);
+            rectTransform.pivot = new Vector2(0, 1f);
             
             // Enable
             _gameObject.SetActive(true);
@@ -69,6 +71,25 @@ namespace ServerBrowser.UI.Toolkit.Components
         {
             if (_gameObject != null)
                 _gameObject.SetActive(active);
+        }
+
+        public void SetContentHeight(float height)
+        {
+            if (_scrollView == null)
+                return;
+            
+            _scrollView.SetContentSize(height);
+            _scrollView.ScrollTo(0.0f, false);
+            _scrollView.RefreshButtons();
+        }
+
+        public void RefreshContentHeight()
+        {
+            if (_scrollView == null)
+                return;
+            
+            _scrollView.UpdateContentSize();
+            _scrollView.RefreshButtons();
         }
     }
 }

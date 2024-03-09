@@ -115,7 +115,6 @@ namespace ServerBrowser.UI.Toolkit
                 horizontalOrVerticalLayoutGroup.childForceExpandHeight = expandChildHeight;
             }
 
-
             var contentSizeFitter = gameObject.AddComponent<ContentSizeFitter>();
             contentSizeFitter.verticalFit = verticalFit;
             contentSizeFitter.horizontalFit = horizontalFit;
@@ -124,10 +123,9 @@ namespace ServerBrowser.UI.Toolkit
             rectTransform.anchorMin = new Vector2(0, 0);
             rectTransform.anchorMax = new Vector2(1, 1);
             rectTransform.sizeDelta = new Vector2(0, 0);
+            rectTransform.pivot = pivotPoint ?? new Vector2(0.5f, 0.5f);
 
-            var asContainer = new LayoutContainer(Builder, gameObject.transform, isLayoutElement);
-            asContainer.RectTransform.pivot = pivotPoint ?? new Vector2(0.5f, 0.5f);
-            return asContainer;
+            return new LayoutContainer(Builder, gameObject.transform, isLayoutElement);
         }
 
         public LayoutContainer AddVerticalLayoutGroup(string name,
@@ -249,10 +247,17 @@ namespace ServerBrowser.UI.Toolkit
             textComponent.SetPreferredSize(width, height);
             return textComponent;
         }
-
+        
         public TkScrollView AddScrollView()
         {
             var scrollView = Builder.CreateComponent<TkScrollView>();
+            scrollView.AddToContainer(this);
+            return scrollView;
+        }
+
+        public TkVerticalLayoutScrollView AddVerticalLayoutScrollView()
+        {
+            var scrollView = Builder.CreateComponent<TkVerticalLayoutScrollView>();
             scrollView.AddToContainer(this);
             return scrollView;
         }

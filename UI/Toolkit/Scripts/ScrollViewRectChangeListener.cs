@@ -37,7 +37,7 @@ namespace ServerBrowser.UI.Toolkit.Scripts
             _isDirty = false;
         }
 
-        public int CurrentHeight => (int)(transform as RectTransform)!.rect.height;
+        public int CurrentHeight => Mathf.CeilToInt((transform as RectTransform)!.rect.height);
 
         public void BindScrollView(ScrollView scrollView)
         {

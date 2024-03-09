@@ -9,6 +9,7 @@ using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Wrappers;
 using ServerBrowser.Util;
 using SiraUtil.Logging;
+using UnityEngine;
 using Zenject;
 
 namespace ServerBrowser.UI.Browser.Views
@@ -25,6 +26,7 @@ namespace ServerBrowser.UI.Browser.Views
         
         private List<TkButton> _serverCells = new();
         private bool _completedFullRefresh = false;
+        private int _lastContentHeight = 0;
 
         #region Init / Deinit
         
@@ -44,7 +46,8 @@ namespace ServerBrowser.UI.Browser.Views
             else
                 SetLocalUserInfoEmpty();
             
-            HandleLoginStatusChanged(_session.IsLoggedIn);
+            if (_session.IsLoggedIn)
+                HandleLoginStatusChanged(true);
             
             RefreshLoadingState();
         }
@@ -122,17 +125,41 @@ namespace ServerBrowser.UI.Browser.Views
         private void HandleServersUpdated(IReadOnlyCollection<ServerRepository.ServerInfo> servers)
         {
             _log.Info($"Servers updated: have {servers.Count}");
+
+            var container = _scrollView!.Content!;
+            var containerWidth = container.RectTransform.rect.width;
+
+            const int cellsPerRow = 3;
+            var cellWidth = containerWidth / cellsPerRow;
+            const float cellHeight = 20f;
             
+            var targetCellCount = servers.Count;
             var currentCellCount = _serverCells.Count;
             var extraCellsNeeded = servers.Count - currentCellCount;
             var excessCells = currentCellCount - servers.Count;
+            
+            var columnCount = Mathf.FloorToInt(containerWidth / cellWidth);
+            var rowCount = Mathf.CeilToInt((float)targetCellCount / (float)columnCount);
             
             // Initialize new cells
             for (var i = 0; i < extraCellsNeeded; i++)
             {
                 // TODO Not a button but a real UI component
-                var cell = _scrollView!.Content!.AddButton("ServerCell", preferredHeight: 10f);
+                
+                var cell = container.AddButton("ServerCell");
+                cell.SetHeight(cellHeight);
+                cell.SetWidth(cellWidth);
+                cell.DisableSkew();
                 _serverCells.Add(cell);
+                
+                var column = i % columnCount;
+                var row = i / columnCount;
+
+                var cellRect = (cell.GameObject.transform as RectTransform)!;
+                cellRect.anchorMin = new Vector2(0f, 1f);
+                cellRect.anchorMax = new Vector2(0f, 1f);
+                cellRect.pivot = new Vector2(0f, 1f);
+                cellRect.anchoredPosition = new Vector2((float)column * cellWidth, (float)row * -cellHeight);
             }
             
             // Sync cell contents based on server list
@@ -151,7 +178,19 @@ namespace ServerBrowser.UI.Browser.Views
                 cell.GameObject.SetActive(false);
             }
 
+            // Toggle loader
             RefreshLoadingState();
+            
+            // Manual scroll view content height
+            const float viewportHeight = 57f;
+            var newContentHeight = Mathf.CeilToInt(rowCount * cellHeight);
+            if (newContentHeight < viewportHeight)
+                newContentHeight = (int)viewportHeight;
+            if (newContentHeight != _lastContentHeight)
+            {
+                _scrollView!.SetContentHeight(newContentHeight - viewportHeight); // will adjust our content's delta size
+                _lastContentHeight = newContentHeight;
+            }
         }
         
         private void HandleServersRefreshFinished()
