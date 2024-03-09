@@ -68,5 +68,11 @@ namespace ServerBrowser.UI.Toolkit.Components
             if (height.HasValue)
                 _layoutElement.preferredHeight = height.Value;
         }
+
+        public override void SetActive(bool active)
+        {
+            if (_gameObject != null)
+                _gameObject.SetActive(active);
+        }
     }
 }

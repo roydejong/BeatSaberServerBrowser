@@ -97,8 +97,9 @@ namespace ServerBrowser.UI.Browser.Views
             // content.SetBackground("panel-top");
 
             _scrollView = content.AddScrollView();
+            var svContent = _scrollView.Content!;
             
-            _loadingControl = _scrollView.Content!.AddLoadingControl(57f);
+            _loadingControl = svContent.AddLoadingControl(57f);
             _loadingControl.RefreshClickedEvent += HandleRefreshClicked;
             _loadingControl.Hide();
         }

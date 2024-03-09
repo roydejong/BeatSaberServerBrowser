@@ -17,16 +17,17 @@ namespace ServerBrowser.Data
         [Inject] private readonly DiContainer _container = null!;
         
         private readonly ConcurrentDictionary<string, ServerInfo> _servers = new();
+        private IReadOnlyList<ServerInfo> _filteredServers = Array.Empty<ServerInfo>();
+        
+        public bool NoResults => _filteredServers.Count == 0;
         
         private bool _discoveryEnabled = false;
         private List<ServerDiscovery> _discoveryMethods = new();
         private float? _nextDiscoveryTime;
         private bool _serverListDirty;
         
-        public event Action? ServersUpdatedEvent; 
+        public event Action<IReadOnlyCollection<ServerInfo>>? ServersUpdatedEvent; 
         public event Action? RefreshFinishedEvent;
-        
-        public IReadOnlyCollection<ServerInfo> Servers => _servers.Values.ToList();
 
         public void Initialize()
         {
@@ -65,7 +66,7 @@ namespace ServerBrowser.Data
                 if (_serverListDirty)
                 {
                     _serverListDirty = false;
-                    ServersUpdatedEvent?.Invoke();
+                    RaiseServersUpdated();
                 }
             }
 
@@ -101,6 +102,66 @@ namespace ServerBrowser.Data
 
             if (Time.realtimeSinceStartup >= _nextDiscoveryTime)
                 _ = RefreshDiscovery();
+        }
+        
+        public string? FilterText { get; set; } = null;
+        
+        public void SetFilterText(string? filterText)
+        {
+            if (FilterText == filterText)
+                return;
+            
+            FilterText = filterText;
+            RaiseServersUpdated();
+        }
+
+        private IReadOnlyList<ServerInfo> GetFilteredServers()
+        {
+            var servers = _servers.Values.ToList();
+            
+            if (!string.IsNullOrEmpty(FilterText))
+            {
+                var filterChars = FilterText.Split(Array.Empty<char>(),
+                    StringSplitOptions.RemoveEmptyEntries);
+                var matchedResults = new List<ValueTuple<int, ServerInfo>>();
+                
+                foreach (var server in servers)
+                {
+                    var matchScore = GetTextMatchScore(server.ServerName, filterChars);
+                    if (matchScore > 0)
+                        matchedResults.Add((matchScore, server));
+                }
+                
+                servers = matchedResults
+                    .OrderByDescending(x => x.Item1)
+                    .Select(x => x.Item2)
+                    .ToList();
+            }
+
+            return servers;
+        }
+
+        private static int GetTextMatchScore(string input, string[] searchTerms)
+        {
+            var totalScore = 0;
+            
+            foreach (var searchTerm in searchTerms)
+            {
+                var matchIdx = input.IndexOf(searchTerm, StringComparison.CurrentCultureIgnoreCase);
+                
+                if (matchIdx < 0)
+                    continue;
+                
+                totalScore += (matchIdx == 0 || char.IsWhiteSpace(input[matchIdx - 1]) ? 1 : 0) + 50 * searchTerm.Length;
+            }
+            
+            return totalScore;
+        }
+        
+        private void RaiseServersUpdated()
+        {
+            _filteredServers = GetFilteredServers();
+            ServersUpdatedEvent?.Invoke(_filteredServers);
         }
 
         public abstract class ServerDiscovery

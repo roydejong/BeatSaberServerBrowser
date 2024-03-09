@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using HMUI;
 using ServerBrowser.Data;
 using ServerBrowser.Session;
 using ServerBrowser.UI.Toolkit;
+using ServerBrowser.UI.Toolkit.Wrappers;
 using ServerBrowser.Util;
 using SiraUtil.Logging;
 using Zenject;
@@ -20,12 +22,15 @@ namespace ServerBrowser.UI.Browser.Views
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
+        
+        private List<TkButton> _serverCells = new();
+        private bool _completedFullRefresh = false;
 
+        #region Init / Deinit
+        
         public void Initialize()
         {
             BuildLayout(_layoutBuilder.Init(this));
-            
-            _loadingControl!.ShowLoading("Loading Servers");
             
             _session.LocalUserInfoChangedEvent += HandleLocalUserInfoUpdated;
             _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
@@ -40,19 +45,15 @@ namespace ServerBrowser.UI.Browser.Views
                 SetLocalUserInfoEmpty();
             
             HandleLoginStatusChanged(_session.IsLoggedIn);
+            
+            RefreshLoadingState();
         }
 
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            
-            _scrollView!.Refresh(true);
-            Task.Run(async () =>
-            {
-                // TODO Figure out why this is needed and get rid of it
-                await Task.Delay(100);
-                _scrollView!.Refresh(true);
-            });
+
+            _completedFullRefresh = false;
         }
 
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
@@ -69,6 +70,10 @@ namespace ServerBrowser.UI.Browser.Views
             _serverRepository.ServersUpdatedEvent -= HandleServersUpdated;
             _serverRepository.RefreshFinishedEvent -= HandleServersRefreshFinished;
         }
+
+        #endregion
+
+        #region Session
 
         private void SetLocalUserInfoEmpty()
         {
@@ -110,34 +115,80 @@ namespace ServerBrowser.UI.Browser.Views
             }
         }
         
-        private void HandleServersUpdated()
-        {
-            _log.Info($"Servers updated");
-            
-            // TODO Create / update cells for servers
+        #endregion
 
-            if (_serverRepository.Servers.Count == 0)
+        #region Server List
+        
+        private void HandleServersUpdated(IReadOnlyCollection<ServerRepository.ServerInfo> servers)
+        {
+            _log.Info($"Servers updated: have {servers.Count}");
+            
+            var currentCellCount = _serverCells.Count;
+            var extraCellsNeeded = servers.Count - currentCellCount;
+            var excessCells = currentCellCount - servers.Count;
+            
+            // Initialize new cells
+            for (var i = 0; i < extraCellsNeeded; i++)
             {
-                _loadingControl!.ShowLoading("Loading Servers");
-                _scrollView!.Refresh(true);
+                // TODO Not a button but a real UI component
+                var cell = _scrollView!.Content!.AddButton("ServerCell", preferredHeight: 10f);
+                _serverCells.Add(cell);
             }
-            else
+            
+            // Sync cell contents based on server list
+            for (var i = 0; i < servers.Count; i++)
             {
-                _loadingControl!.Hide();
-                _scrollView!.Refresh(false);
+                var server = servers.ElementAt(i);
+                var cell = _serverCells[i];
+                cell.SetText(server.ServerName);
+                cell.GameObject.SetActive(true);
             }
+            
+            // Disable (but do not remove) excess cells
+            for (var i = 0; i < excessCells; i++)
+            {
+                var cell = _serverCells[currentCellCount - i - 1];
+                cell.GameObject.SetActive(false);
+            }
+
+            RefreshLoadingState();
         }
         
         private void HandleServersRefreshFinished()
         {
-            _log.Info($"Servers refresh finished");
+            _completedFullRefresh = true; 
+            RefreshLoadingState();
+        }
+        
+        private void HandleRefreshClicked()
+        {
+            _completedFullRefresh = false;
+            RefreshLoadingState();
+            // So yeah this button basically does nothing, but it'll definitely spin 'til next full refresh :)
+        }
 
-            if (_serverRepository.Servers.Count == 0)
+        private void RefreshLoadingState()
+        {
+            if (_serverRepository.NoResults)
             {
-                _loadingControl!.ShowText("No servers found", true);
-                _scrollView!.Refresh(true);
+                if (_completedFullRefresh)
+                {
+                    _loadingControl!.ShowText("No servers found", true);
+                }
+                else
+                {
+                    _loadingControl!.ShowLoading("Loading Servers");
+                }
+            }
+            else
+            {
+                _loadingControl!.Hide();
             }
         }
+        
+        #endregion
+
+        #region Mode Selection
         
         private void HandleQuickPlayClicked()
         {
@@ -160,28 +211,29 @@ namespace ServerBrowser.UI.Browser.Views
             _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator.childFlowCoordinator, true);
         }
         
+        #endregion
+
+        #region Search & Filter
+        
         private void HandleSearchInputChanged(InputFieldView.SelectionState state, string value)
         {
-            _log.Info($"Search updated: {state}, \"{value}\"");
+            if (_serverRepository.FilterText == value)
+                return;
+            
+            _serverRepository.SetFilterText(value);
         }
         
         private void HandleFilterButtonClicked()
         {
-            _log.Info($"Filters clicked");
+            // TODO Filter params impl
             _filterButton!.SetTextValue("ooh ya clicked me good");
         }
         
         private void HandleFilterButtonCleared()
         {
-            _log.Info($"Filters cleared");
+            // TODO Filter params impl
         }
         
-        private void HandleRefreshClicked()
-        {
-            _log.Info($"Refresh clicked");
-            _loadingControl!.ShowLoading("Loading Servers");
-            _serverRepository.StartDiscovery();
-            // So yeah this button basically does nothing, but it'll definitely spin 'til next auto refresh :)
-        }
+        #endregion
     }
 }

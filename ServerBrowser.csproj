@@ -307,6 +307,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\BssbSession.cs" />
     <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
+    <Compile Include="UI\Browser\Components\ServerCell.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
     <Compile Include="UI\Data\AvatarStore.cs" />
@@ -319,6 +320,7 @@
     <Compile Include="UI\Toolkit\LayoutBuilder.cs" />
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />
     <Compile Include="UI\Toolkit\LayoutContainer.cs" />
+    <Compile Include="UI\Toolkit\Scripts\ScrollViewRectChangeListener.cs" />
     <Compile Include="UI\Toolkit\Wrappers\TkButton.cs" />
     <Compile Include="UI\Util\MaterialAccessor.cs" />
     <Compile Include="Util\BssbColors.cs" />

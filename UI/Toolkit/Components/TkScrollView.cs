@@ -1,4 +1,5 @@
 using HMUI;
+using ServerBrowser.UI.Toolkit.Scripts;
 using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,6 +49,10 @@ namespace ServerBrowser.UI.Toolkit.Components
             Content = viewportWrap.AddVerticalLayoutGroup("Content", expandChildWidth: true,
                 childAlignment: TextAnchor.UpperLeft, horizontalFit: ContentSizeFitter.FitMode.Unconstrained,
                 verticalFit: ContentSizeFitter.FitMode.PreferredSize, pivotPoint: new Vector2(0, 1f));
+            
+            // Auto resize on content rect change
+            var resizeListener = Content.GameObject.AddComponent<ScrollViewRectChangeListener>();
+            resizeListener.BindScrollView(_scrollView);
 
             // Make interactable
             _diContainer.InstantiateComponent<VRGraphicRaycaster>(viewport.gameObject);
@@ -58,27 +63,12 @@ namespace ServerBrowser.UI.Toolkit.Components
             
             // Enable
             _gameObject.SetActive(true);
-            Refresh(true);
         }
 
-        public void Refresh(bool resetPosition)
+        public override void SetActive(bool active)
         {
-            if (_scrollView == null || Content == null)
-                return;
-
-            var contentSize = Content.RectTransform.rect.height;
-            
-            if (resetPosition)
-            {
-                _scrollView.UpdateContentSize();
-            }
-            else
-            {
-                _scrollView.SetContentSize(contentSize);
-            }
-            
-            _scrollView.UpdateVerticalScrollIndicator(contentSize);
-            _scrollView.RefreshButtons();
+            if (_gameObject != null)
+                _gameObject.SetActive(active);
         }
     }
 }
