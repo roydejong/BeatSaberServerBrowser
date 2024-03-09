@@ -1,0 +1,38 @@
+using System.Threading.Tasks;
+using Zenject;
+
+namespace ServerBrowser.Data.Discovery
+{
+    public class BssbApiServerDiscovery : ServerRepository.ServerDiscovery
+    {
+        [Inject] private readonly BssbApi _api = null!;
+        
+        public override async Task Refresh(ServerRepository repository)
+        {
+            var browseResponse = await _api.SendBrowseRequest();
+            
+            if (browseResponse != null)
+            {
+                foreach (var server in browseResponse.Lobbies)
+                {
+                    // TODO Rework this pretty much completely, just temporarily here to test the API
+                    repository.DiscoverServer(new ServerRepository.ServerInfo()
+                    {
+                        Key = server.Key!,
+                        ImageUrl = null,
+                        ServerName = server.Name!,
+                        GameMode = "BSSB Test",
+                        PlayerCount = server.ReadOnlyPlayerCount ?? 0,
+                        PlayerLimit = server.PlayerLimit ?? 5,
+                        ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,
+                        InGameplay = server.LobbyState is MultiplayerLobbyState.GameRunning
+                            or MultiplayerLobbyState.GameStarting,
+                        ServerCode = server.ServerCode,
+                        ServerSecret = server.HostSecret,
+                        RemoteAddress = server.MasterGraphUrl
+                    });
+                }
+            }
+        }
+    }
+}

@@ -290,11 +290,18 @@
   <ItemGroup>
     <Compile Include="Assets\Sprites.cs" />
     <Compile Include="Data\BssbApi.cs" />
+    <Compile Include="Data\Discovery\BssbApiServerDiscovery.cs" />
+    <Compile Include="Data\Discovery\LocalNetworkServerDiscovery.cs" />
+    <Compile Include="Data\Discovery\PublicServerDiscovery.cs" />
+    <Compile Include="Data\ServerRepository.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />
     <Compile Include="Integrators\MainMenuIntegrator.cs" />
     <Compile Include="Models\BssbConfig.cs" />
+    <Compile Include="Models\BssbLobby.cs" />
+    <Compile Include="Models\Requests\BssbEmptyRequest.cs" />
     <Compile Include="Models\Requests\BssbLoginRequest.cs" />
+    <Compile Include="Models\Responses\BssbBrowseResponse.cs" />
     <Compile Include="Models\Responses\BssbLoginResponse.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -306,12 +313,14 @@
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
     <Compile Include="UI\Toolkit\Components\TkAvatarImage.cs" />
     <Compile Include="UI\Toolkit\Components\TkLoadingControl.cs" />
+    <Compile Include="UI\Toolkit\Components\TkScrollView.cs" />
     <Compile Include="UI\Toolkit\Components\TkSearchInputField.cs" />
     <Compile Include="UI\Toolkit\Components\TkText.cs" />
     <Compile Include="UI\Toolkit\LayoutBuilder.cs" />
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />
     <Compile Include="UI\Toolkit\LayoutContainer.cs" />
     <Compile Include="UI\Toolkit\Wrappers\TkButton.cs" />
+    <Compile Include="UI\Util\MaterialAccessor.cs" />
     <Compile Include="Util\BssbColors.cs" />
     <Compile Include="Util\GameObjectExtensions.cs" />
     <Compile Include="Util\StringUtils.cs" />

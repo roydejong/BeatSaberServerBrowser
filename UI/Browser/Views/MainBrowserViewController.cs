@@ -1,16 +1,21 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using HMUI;
+using ServerBrowser.Data;
 using ServerBrowser.Session;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.Util;
+using SiraUtil.Logging;
 using Zenject;
 
 namespace ServerBrowser.UI.Browser.Views
 {
     public partial class MainBrowserViewController : ViewController, IInitializable, IDisposable
     {
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbSession _session = null!;
+        [Inject] private readonly ServerRepository _serverRepository = null!;
         
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
 
@@ -20,32 +25,62 @@ namespace ServerBrowser.UI.Browser.Views
         {
             BuildLayout(_layoutBuilder.Init(this));
             
-            _session.UserInfoChangedEvent += HandleUserInfoUpdated;
-            _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
+            _loadingControl!.ShowLoading("Loading Servers");
             
-            if (_session.UserInfo != null)
-                HandleUserInfoUpdated(_session.UserInfo);
+            _session.LocalUserInfoChangedEvent += HandleLocalUserInfoUpdated;
+            _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
+            _session.LoginStatusChangedEvent += HandleLoginStatusChanged;
+            
+            _serverRepository.ServersUpdatedEvent += HandleServersUpdated;
+            _serverRepository.RefreshFinishedEvent += HandleServersRefreshFinished;
+            
+            if (_session.LocalUserInfo != null)
+                HandleLocalUserInfoUpdated(_session.LocalUserInfo);
             else
-                SetUserInfoNotLoggedIn();
+                SetLocalUserInfoEmpty();
+            
+            HandleLoginStatusChanged(_session.IsLoggedIn);
+        }
+
+        public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+            
+            _scrollView!.Refresh(true);
+            Task.Run(async () =>
+            {
+                // TODO Figure out why this is needed and get rid of it
+                await Task.Delay(100);
+                _scrollView!.Refresh(true);
+            });
+        }
+
+        public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+        {
+            base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
         }
 
         public void Dispose()
         {
-            _session.UserInfoChangedEvent -= HandleUserInfoUpdated;
+            _session.LocalUserInfoChangedEvent -= HandleLocalUserInfoUpdated;
             _session.AvatarUrlChangedEvent -= HandleAvatarUrlChanged;
+            _session.LoginStatusChangedEvent -= HandleLoginStatusChanged;
+            
+            _serverRepository.ServersUpdatedEvent -= HandleServersUpdated;
+            _serverRepository.RefreshFinishedEvent -= HandleServersRefreshFinished;
         }
 
-        private void SetUserInfoNotLoggedIn()
+        private void SetLocalUserInfoEmpty()
         {
-            _selfUsernameText!.SetText($"Offline");
+            _selfUsernameText!.SetText($"No user info");
             _selfUsernameText.SetTextColor(BssbColors.InactiveGray);
             
             _ = _selfAvatarImage!.SetPlaceholderAvatar(CancellationToken.None);
         }
         
-        private void HandleUserInfoUpdated(UserInfo userInfo)
+        private void HandleLocalUserInfoUpdated(UserInfo userInfo)
         {
-            Plugin.Log.Error($"User info updated: {userInfo}");
+            _log.Info($"User info updated: {userInfo}");
 
             var username = userInfo.userName.StripTags();
             _selfUsernameText!.SetText($"{username}");
@@ -54,23 +89,69 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleAvatarUrlChanged(string? avatarUrl)
         {
-            Plugin.Log.Error($"Avatar URL updated: {avatarUrl}");
+            _log.Info($"Avatar URL updated: {avatarUrl}");
             _ = _selfAvatarImage!.SetAvatarFromUrl(avatarUrl, CancellationToken.None);
+        }
+
+        private void HandleLoginStatusChanged(bool loggedIn)
+        {
+            _log.Info($"Login status changed: {loggedIn}");
+
+            if (!loggedIn)
+            {
+                // BSSB login failed
+                _selfUsernameText!.SetText("Login failed");
+                _selfUsernameText.SetTextColor(BssbColors.Orange);
+            }
+            else if (_session.LocalUserInfo != null)
+            {
+                // BSSB login success; just presenting local user info for now
+                HandleLocalUserInfoUpdated(_session.LocalUserInfo);
+            }
+        }
+        
+        private void HandleServersUpdated()
+        {
+            _log.Info($"Servers updated");
+            
+            // TODO Create / update cells for servers
+
+            if (_serverRepository.Servers.Count == 0)
+            {
+                _loadingControl!.ShowLoading("Loading Servers");
+                _scrollView!.Refresh(true);
+            }
+            else
+            {
+                _loadingControl!.Hide();
+                _scrollView!.Refresh(false);
+            }
+        }
+        
+        private void HandleServersRefreshFinished()
+        {
+            _log.Info($"Servers refresh finished");
+
+            if (_serverRepository.Servers.Count == 0)
+            {
+                _loadingControl!.ShowText("No servers found", true);
+                _scrollView!.Refresh(true);
+            }
         }
         
         private void HandleQuickPlayClicked()
         {
-            Plugin.Log.Error($"Quick Play");
+            _log.Info($"Quick Play");
         }
 
         private void HandleCreateServerClicked()
         {
-            Plugin.Log.Error($"Create Server");
+            _log.Info($"Create Server");
         }
         
         private void HandleJoinByCodeClicked()
         {
-            Plugin.Log.Error($"Join by Code");
+            _log.Info($"Join by Code");
         }
 
         private void HandleEditAvatarClicked()
@@ -81,18 +162,26 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleSearchInputChanged(InputFieldView.SelectionState state, string value)
         {
-            Plugin.Log.Error($"Search updated: {state}, \"{value}\"");
+            _log.Info($"Search updated: {state}, \"{value}\"");
         }
         
         private void HandleFilterButtonClicked()
         {
-            Plugin.Log.Error($"Filters clicked");
+            _log.Info($"Filters clicked");
             _filterButton!.SetTextValue("ooh ya clicked me good");
         }
         
         private void HandleFilterButtonCleared()
         {
-            Plugin.Log.Error($"Filters cleared");
+            _log.Info($"Filters cleared");
+        }
+        
+        private void HandleRefreshClicked()
+        {
+            _log.Info($"Refresh clicked");
+            _loadingControl!.ShowLoading("Loading Servers");
+            _serverRepository.StartDiscovery();
+            // So yeah this button basically does nothing, but it'll definitely spin 'til next auto refresh :)
         }
     }
 }

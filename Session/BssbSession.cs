@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ServerBrowser.Data;
 using ServerBrowser.Requests;
-using ServerBrowser.Responses;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -18,7 +17,7 @@ namespace ServerBrowser.Session
         [Inject] private readonly BssbApi _api = null!;
         [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
 
-        public UserInfo? UserInfo { get; private set; }
+        public UserInfo? LocalUserInfo { get; private set; }
         public bool IsLoggedIn { get; private set; }
         public string? AvatarUrl { get; private set; }
 
@@ -30,13 +29,15 @@ namespace ServerBrowser.Session
         
         private PlatformAuthenticationTokenProvider? _tokenProvider = null;
         
-        public event Action<UserInfo>? UserInfoChangedEvent;
+        public bool AttemptingLogin => _isLoggingIn || (!IsLoggedIn && _loginRequested); 
+        
+        public event Action<UserInfo>? LocalUserInfoChangedEvent;
         public event Action<string?>? AvatarUrlChangedEvent;
-        public event Action<BssbLoginResponse>? LoggedInEvent;
+        public event Action<bool>? LoginStatusChangedEvent;
 
         public void Initialize()
         {
-            _ = LoadUserInfo();
+            _ = LoadLocalUserInfo();
         }
 
         public void Dispose()
@@ -47,19 +48,22 @@ namespace ServerBrowser.Session
 
         public void Tick()
         {
+            if (!_loginRequested || IsLoggedIn)
+                return;
+            
             if (_nextLoginRetry.HasValue && Time.realtimeSinceStartup >= _nextLoginRetry.Value)
                 _ = EnsureLoggedIn();
         }
 
-        private async Task LoadUserInfo()
+        private async Task LoadLocalUserInfo()
         {
             try
             {
-                UserInfo = await _platformUserModel.GetUserInfo(_ctsUserInfo.Token);
+                LocalUserInfo = await _platformUserModel.GetUserInfo(_ctsUserInfo.Token);
 
-                if (UserInfo != null)
+                if (LocalUserInfo != null)
                 {
-                    UserInfoChangedEvent?.Invoke(UserInfo);
+                    LocalUserInfoChangedEvent?.Invoke(LocalUserInfo);
                     
                     if (_loginRequested)
                         _ = EnsureLoggedIn();
@@ -70,19 +74,19 @@ namespace ServerBrowser.Session
             }
             catch (Exception e)
             {
-                _log.Error($"Error loading user info: {e}");
+                _log.Error($"Error loading local user info: {e}");
             }
         }
 
         private async Task<string?> GetPlatformAuthToken()
         {
-            if (UserInfo == null)
+            if (LocalUserInfo == null)
                 return null;
 
             try
             {
-                _tokenProvider ??= new PlatformAuthenticationTokenProvider(_platformUserModel, UserInfo);
-                return UserInfo.platform switch
+                _tokenProvider ??= new PlatformAuthenticationTokenProvider(_platformUserModel, LocalUserInfo);
+                return LocalUserInfo.platform switch
                 {
                     UserInfo.Platform.Steam => (await _tokenProvider.GetAuthenticationToken()).sessionToken,
                     _ => (await _tokenProvider.GetXPlatformAccessToken(CancellationToken.None)).token,
@@ -105,7 +109,7 @@ namespace ServerBrowser.Session
                 // Refuse to login if the user has not accepted the privacy disclaimer
                 return false;
             
-            if (UserInfo == null)
+            if (LocalUserInfo == null)
                 // Required info not loaded yet or not available
                 return false;
 
@@ -117,16 +121,26 @@ namespace ServerBrowser.Session
             {
                 var loginResponse = await _api.SendLoginRequest(new BssbLoginRequest()
                 {
-                    UserInfo = UserInfo,
+                    UserInfo = LocalUserInfo,
                     AuthenticationToken = await GetPlatformAuthToken()
 
                 });
 
-                if (loginResponse is not { Success: true })
+                if (loginResponse == null)
                 {
-                    var logError = loginResponse?.ErrorMessage ?? "Unknown error";
-                    _log.Error($"Login failed: {logError}");
+                    _log.Error($"Login failed: Network error or server unavailable");
                     IsLoggedIn = false;
+                    LoginStatusChangedEvent?.Invoke(false);
+                    return false;
+                }
+                
+                if (!loginResponse.Success)
+                {
+                    // Our player profile does not exist on BSSB (and we were not able to authenticate to auto-register)
+                    var logError = loginResponse?.ErrorMessage ?? "Unknown error";
+                    _log.Error($"Profile login failed: {logError}");
+                    IsLoggedIn = false;
+                    LoginStatusChangedEvent?.Invoke(false);
                     return false;
                 }
 
@@ -143,6 +157,7 @@ namespace ServerBrowser.Session
                     var logError = loginResponse?.ErrorMessage ?? "Unknown error";
                     _log.Error($"Login authentication failed: {logError}");
                     IsLoggedIn = false;
+                    LoginStatusChangedEvent?.Invoke(false);
                     return false;
                 }
 
@@ -150,7 +165,7 @@ namespace ServerBrowser.Session
                 _loginAttempts = 0;
                 _nextLoginRetry = null;
                 _log.Info($"Logged in succesfully");
-                LoggedInEvent?.Invoke(loginResponse);
+                LoginStatusChangedEvent?.Invoke(true);
                 return true;
             }
             finally
@@ -177,6 +192,7 @@ namespace ServerBrowser.Session
         private void ScheduleLoginRetry()
         {
             var retryDelay = Mathf.Clamp(Mathf.Pow(2f, _loginAttempts), 2f, 128f);
+            Plugin.Log.Error($"Login retry delay: {retryDelay} (attempt {_loginAttempts})");
             _nextLoginRetry = Time.realtimeSinceStartup + retryDelay;
         }
     }

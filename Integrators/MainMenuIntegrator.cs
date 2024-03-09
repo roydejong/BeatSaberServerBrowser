@@ -77,8 +77,6 @@ namespace ServerBrowser.Integrators
         public bool PrefixHandleEditAvatarFlowCoordinatorHelperDidFinish(FlowCoordinator flowCoordinator,
             EditAvatarFlowCoordinatorHelper.FinishAction finishAction)
         {
-            Plugin.Log.Error("PrefixHandleEditAvatarFlowCoordinatorHelperDidFinish");
-
             if (!_mainFlowCoordinator._goToMultiplayerAfterAvatarCreation)
                 // Our patch is not applicable, no multiplayer redirect is happening
                 return true;

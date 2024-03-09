@@ -22,9 +22,6 @@ namespace ServerBrowser.UI.Util
                         _uiNoGlowRoundEdge = new Material(imageView.material);
                 }
                 
-                if (_uiNoGlowRoundEdge == null)
-                    Plugin.Log.Error("NOPE STILL A NO");
-                
                 return _uiNoGlowRoundEdge;
             }
         }

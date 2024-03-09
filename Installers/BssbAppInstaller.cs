@@ -12,7 +12,8 @@ namespace ServerBrowser.Installers
             Container.Bind<BssbConfig>().FromInstance(Plugin.Config).AsSingle();
             Container.BindInterfacesAndSelfTo<BssbApi>().AsSingle();
             Container.BindInterfacesAndSelfTo<BssbSession>().AsSingle();
-            Container.Bind<AvatarStore>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ServerRepository>().AsSingle();
+            Container.BindInterfacesAndSelfTo<AvatarStore>().AsSingle();
         }
     }
 }

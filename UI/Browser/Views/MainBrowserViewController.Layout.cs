@@ -13,9 +13,10 @@ namespace ServerBrowser.UI.Browser.Views
     {
         private TkSearchInputField? _searchInputField;
         private TkFilterButton? _filterButton;
-        private TkLoadingControl? _loadingControl;
         private TkAvatarImage? _selfAvatarImage;
         private TkText? _selfUsernameText;
+        private TkScrollView? _scrollView;
+        private TkLoadingControl? _loadingControl;
         
         private void BuildLayout(LayoutContainer root)
         {
@@ -94,9 +95,12 @@ namespace ServerBrowser.UI.Browser.Views
                 padding: new RectOffset(0, 0, 1, 1));
             content.PreferredHeight = 65f;
             // content.SetBackground("panel-top");
+
+            _scrollView = content.AddScrollView();
             
-            _loadingControl = content.AddLoadingControl();
-            _loadingControl.ShowLoading("Loading Servers");
+            _loadingControl = _scrollView.Content!.AddLoadingControl(57f);
+            _loadingControl.RefreshClickedEvent += HandleRefreshClicked;
+            _loadingControl.Hide();
         }
     }
 }

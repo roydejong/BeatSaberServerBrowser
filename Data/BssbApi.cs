@@ -65,13 +65,16 @@ namespace ServerBrowser.Data
             }
             catch (Exception ex)
             {
-                _log.Error($"Request failed: POST {path}");
-                _log.Debug(ex);
+                _log.Error($"Request failed: POST {path}: {ex.Message}");
+                _log.Debug(ex.StackTrace);
                 return default;
             }
         }
         
         public async Task<BssbLoginResponse?> SendLoginRequest(BssbLoginRequest request)
             => await Post<BssbLoginRequest, BssbLoginResponse>("/api/v2/login", request);
+        
+        public async Task<BssbBrowseResponse?> SendBrowseRequest()
+            => await Post<BssbEmptyRequest, BssbBrowseResponse>("/api/v2/browse", new BssbEmptyRequest());
     }
 }

@@ -68,10 +68,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         public void SetPlaceholderText(string placeholderText)
         {
             if (_placeholderText != null)
-            {
                 _placeholderText.SetText(placeholderText);
-                Plugin.Log.Error(placeholderText);
-            }
         }
     }
 }

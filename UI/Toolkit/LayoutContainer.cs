@@ -85,7 +85,7 @@ namespace ServerBrowser.UI.Toolkit
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
             ContentSizeFitter.FitMode verticalFit = ContentSizeFitter.FitMode.Unconstrained,
             Vector2? pivotPoint = null, RectOffset? padding = null, TextAnchor childAlignment = TextAnchor.UpperLeft,
-            bool expandChildWidth = false, bool expandChildHeight = false) where T : LayoutGroup
+            bool expandChildWidth = false, bool expandChildHeight = false, bool isLayoutElement = true) where T : LayoutGroup
         {
             var gameObject = new GameObject(name)
             {
@@ -125,7 +125,7 @@ namespace ServerBrowser.UI.Toolkit
             rectTransform.anchorMax = new Vector2(1, 1);
             rectTransform.sizeDelta = new Vector2(0, 0);
 
-            var asContainer = new LayoutContainer(Builder, gameObject.transform);
+            var asContainer = new LayoutContainer(Builder, gameObject.transform, isLayoutElement);
             asContainer.RectTransform.pivot = pivotPoint ?? new Vector2(0.5f, 0.5f);
             return asContainer;
         }
@@ -134,17 +134,17 @@ namespace ServerBrowser.UI.Toolkit
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
             ContentSizeFitter.FitMode verticalFit = ContentSizeFitter.FitMode.Unconstrained,
             Vector2? pivotPoint = null, RectOffset? padding = null, TextAnchor childAlignment = TextAnchor.UpperLeft,
-            bool expandChildWidth = false, bool expandChildHeight = false)
+            bool expandChildWidth = false, bool expandChildHeight = false, bool isLayoutElement = true)
             => AddLayoutGroup<VerticalLayoutGroup>(name, horizontalFit, verticalFit, pivotPoint, padding,
-                childAlignment, expandChildWidth, expandChildHeight);
+                childAlignment, expandChildWidth, expandChildHeight, isLayoutElement);
 
         public LayoutContainer AddHorizontalLayoutGroup(string name,
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
             ContentSizeFitter.FitMode verticalFit = ContentSizeFitter.FitMode.Unconstrained,
             Vector2? pivotPoint = null, RectOffset? padding = null, TextAnchor childAlignment = TextAnchor.UpperLeft,
-            bool expandChildWidth = false, bool expandChildHeight = false)
+            bool expandChildWidth = false, bool expandChildHeight = false, bool isLayoutElement = true)
             => AddLayoutGroup<HorizontalLayoutGroup>(name, horizontalFit, verticalFit, pivotPoint, padding,
-                childAlignment, expandChildWidth, expandChildHeight);
+                childAlignment, expandChildWidth, expandChildHeight, isLayoutElement);
 
         public void SetBackground(string backgroundType, bool noSkew = true)
         {
@@ -220,10 +220,12 @@ namespace ServerBrowser.UI.Toolkit
             return filterButton;
         }
 
-        public TkLoadingControl AddLoadingControl()
+        public TkLoadingControl AddLoadingControl(float? preferredHeight = null)
         {
             var loadingControl = Builder.CreateComponent<TkLoadingControl>();
             loadingControl.AddToContainer(this);
+            if (preferredHeight != null)
+                loadingControl.SetPreferredHeight(preferredHeight.Value);
             return loadingControl;
         }
         
@@ -246,6 +248,13 @@ namespace ServerBrowser.UI.Toolkit
                 textComponent.SetFontSize(fontSize.Value);
             textComponent.SetPreferredSize(width, height);
             return textComponent;
+        }
+
+        public TkScrollView AddScrollView()
+        {
+            var scrollView = Builder.CreateComponent<TkScrollView>();
+            scrollView.AddToContainer(this);
+            return scrollView;
         }
     }
 }

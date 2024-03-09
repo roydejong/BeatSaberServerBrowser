@@ -1,6 +1,8 @@
 using System;
+using ServerBrowser.Util;
 using SiraUtil.Logging;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 using Object = UnityEngine.Object;
 
@@ -14,6 +16,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         
         private GameObject? _gameObject;
         private LoadingControl? _loadingControl;
+        private LayoutElement? _layoutElement;
         
         public event Action RefreshClickedEvent;
         
@@ -34,6 +37,8 @@ namespace ServerBrowser.UI.Toolkit.Components
             _loadingControl.gameObject.SetActive(true);
             _loadingControl.Hide();
             
+            _layoutElement = _loadingControl.gameObject.GetOrAddComponent<LayoutElement>();
+            
             _loadingControl.didPressRefreshButtonEvent += () => RefreshClickedEvent?.Invoke();
         }
 
@@ -47,6 +52,12 @@ namespace ServerBrowser.UI.Toolkit.Components
         {
             if (_loadingControl != null)
                 _loadingControl.ShowText(text, showRefresh);
+        }
+        
+        public void SetPreferredHeight(float height)
+        {
+            if (_layoutElement != null)
+                _layoutElement.preferredHeight = height;
         }
 
         public void Hide()
