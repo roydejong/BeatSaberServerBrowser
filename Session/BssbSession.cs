@@ -26,6 +26,8 @@ namespace ServerBrowser.Session
         private int _loginAttempts = 0;
         private bool _loginRequested = false;
         private bool _isLoggingIn = false;
+        private string? _cachedAuthToken = null;
+        private float? _cachedAuthTokenTime = null;
         
         private PlatformAuthenticationTokenProvider? _tokenProvider = null;
         
@@ -78,19 +80,31 @@ namespace ServerBrowser.Session
             }
         }
 
-        private async Task<string?> GetPlatformAuthToken()
+        private async Task<string?> GetPlatformAuthToken(bool allowCached = true)
         {
             if (LocalUserInfo == null)
                 return null;
 
+            if (allowCached && _cachedAuthToken != null && _cachedAuthTokenTime.HasValue &&
+                Time.realtimeSinceStartup - _cachedAuthTokenTime.Value < CachedAuthTokenMaxAge)
+            {
+                return _cachedAuthToken;
+            }
+
             try
             {
                 _tokenProvider ??= new PlatformAuthenticationTokenProvider(_platformUserModel, LocalUserInfo);
-                return LocalUserInfo.platform switch
+                
+                var result = LocalUserInfo.platform switch
                 {
                     UserInfo.Platform.Steam => (await _tokenProvider.GetAuthenticationToken()).sessionToken,
                     _ => (await _tokenProvider.GetXPlatformAccessToken(CancellationToken.None)).token,
                 };
+                
+                _cachedAuthToken = result;
+                _cachedAuthTokenTime = Time.realtimeSinceStartup;
+                
+                return result;
             }
             catch (Exception ex)
             {
@@ -192,8 +206,9 @@ namespace ServerBrowser.Session
         private void ScheduleLoginRetry()
         {
             var retryDelay = Mathf.Clamp(Mathf.Pow(2f, _loginAttempts), 2f, 128f);
-            Plugin.Log.Error($"Login retry delay: {retryDelay} (attempt {_loginAttempts})");
             _nextLoginRetry = Time.realtimeSinceStartup + retryDelay;
         }
+        
+        public const float CachedAuthTokenMaxAge = 60f;
     }
 }
