@@ -35,7 +35,7 @@ namespace ServerBrowser.UI.Data
             {
                 downloadHandler = handler
             };
-            request.SendWebRequest().completed += (asyncOperation) =>
+            request.SendWebRequest().completed += (_) =>
             {
                 if (request.result != UnityWebRequest.Result.Success)
                 {

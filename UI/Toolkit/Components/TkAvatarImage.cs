@@ -1,17 +1,20 @@
 using System.Threading;
 using System.Threading.Tasks;
-using BeatSaberMarkupLanguage;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.UI.Data;
+using ServerBrowser.UI.Util;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class TkAvatarImage : LayoutComponent
     {
+        [Inject] private readonly MaterialAccessor _materialAccessor = null!;
+        
         private AvatarStore? _avatarStore;
         private GameObject? _gameObject;
         private ImageView? _imageView;
@@ -28,7 +31,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _gameObject.transform.SetParent(container.Transform, false);
             
             _imageView = _gameObject.AddComponent<ImageView>();
-            _imageView.material = Utilities.ImageResources.NoGlowMat;
+            _imageView.material = _materialAccessor.UINoGlowRoundEdge;
             
             _layoutElement = _gameObject.AddComponent<LayoutElement>();
             
