@@ -70,11 +70,5 @@ namespace ServerBrowser.UI.Toolkit.Components
             if (_placeholderText != null)
                 _placeholderText.SetText(placeholderText);
         }
-
-        public override void SetActive(bool active)
-        {
-            if (_gameObject != null)
-                _gameObject.SetActive(active);
-        }
     }
 }

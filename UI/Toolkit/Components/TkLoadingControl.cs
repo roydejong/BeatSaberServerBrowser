@@ -65,11 +65,5 @@ namespace ServerBrowser.UI.Toolkit.Components
             if (_loadingControl != null)
                 _loadingControl.Hide();
         }
-
-        public override void SetActive(bool active)
-        {
-            if (_gameObject != null)
-                _gameObject.SetActive(active);
-        }
     }
 }

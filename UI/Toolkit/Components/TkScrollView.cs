@@ -67,12 +67,6 @@ namespace ServerBrowser.UI.Toolkit.Components
             _gameObject.SetActive(true);
         }
 
-        public override void SetActive(bool active)
-        {
-            if (_gameObject != null)
-                _gameObject.SetActive(active);
-        }
-
         public void SetContentHeight(float height)
         {
             if (_scrollView == null)
@@ -90,6 +84,23 @@ namespace ServerBrowser.UI.Toolkit.Components
             
             _scrollView.UpdateContentSize();
             _scrollView.RefreshButtons();
+        }
+        
+        public void ScrollToTop(bool animated)
+        {
+            if (_scrollView == null)
+                return;
+            
+            _scrollView.ScrollTo(0.0f, animated);
+        }
+
+        public void SetScrollPerCellHeight(float cellHeight)
+        {
+            if (_scrollView == null)
+                return;
+
+            _scrollView._fixedCellSize = cellHeight;
+            _scrollView._scrollType = ScrollView.ScrollType.FixedCellSize;
         }
     }
 }

@@ -23,11 +23,5 @@ namespace ServerBrowser.UI.Toolkit.Components
             var resizeListener = Content.GameObject.AddComponent<ScrollViewRectChangeListener>();
             resizeListener.BindScrollView(_scrollView!);
         }
-
-        public override void SetActive(bool active)
-        {
-            if (_gameObject != null)
-                _gameObject.SetActive(active);
-        }
     }
 }

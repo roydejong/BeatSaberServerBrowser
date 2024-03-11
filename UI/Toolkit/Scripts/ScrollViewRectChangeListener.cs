@@ -9,7 +9,6 @@ namespace ServerBrowser.UI.Toolkit.Scripts
         private ScrollView? _scrollView = null;
         private bool _isDirty = false;
         private int _lastHeight = 0;
-        private int _lastHeightPost = 0;
         
         protected override void OnRectTransformDimensionsChange()
         {
@@ -22,16 +21,14 @@ namespace ServerBrowser.UI.Toolkit.Scripts
                 return;
             
             var curHeight = CurrentHeight;
-            var shouldUpdate = curHeight != _lastHeight;
-
-            if (shouldUpdate)
+            if (curHeight != _lastHeight)
             {
                 _scrollView.UpdateContentSize();
                 _scrollView.RefreshButtons();
             }
             
-            // NOTE: Size might change, and OnRectTransformDimensionsChange() will fire again after we update scrollView
-            // I don't know why, but that's why we record and compare against the last height from before our update
+            // NOTE: Size might change and OnRectTransformDimensionsChange() will fire again after we update scrollView
+            // I don't know why, but that's why we record and compare against the height from before our update
 
             _lastHeight = curHeight;
             _isDirty = false;

@@ -182,6 +182,8 @@ namespace ServerBrowser.Data
             public string? ServerCode;
             public string? ServerSecret;
             public string? RemoteAddress;
+            
+            public bool IsFull => PlayerCount >= PlayerLimit;
         }
 
         public enum ConnectionMethod

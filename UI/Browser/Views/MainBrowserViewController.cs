@@ -6,7 +6,7 @@ using HMUI;
 using ServerBrowser.Data;
 using ServerBrowser.Session;
 using ServerBrowser.UI.Toolkit;
-using ServerBrowser.UI.Toolkit.Wrappers;
+using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.Util;
 using SiraUtil.Logging;
 using UnityEngine;
@@ -24,7 +24,7 @@ namespace ServerBrowser.UI.Browser.Views
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         
-        private List<TkButton> _serverCells = new();
+        private List<TkServerCell> _serverCells = new();
         private bool _completedFullRefresh = false;
         private int _lastContentHeight = 0;
 
@@ -122,6 +122,9 @@ namespace ServerBrowser.UI.Browser.Views
 
         #region Server List
         
+        public const float CellHeight = 20.333333f;
+        public const int CellsPerRow = 2;
+        
         private void HandleServersUpdated(IReadOnlyCollection<ServerRepository.ServerInfo> servers)
         {
             _log.Info($"Servers updated: have {servers.Count}");
@@ -129,9 +132,7 @@ namespace ServerBrowser.UI.Browser.Views
             var container = _scrollView!.Content!;
             var containerWidth = container.RectTransform.rect.width;
 
-            const int cellsPerRow = 3;
-            var cellWidth = containerWidth / cellsPerRow;
-            const float cellHeight = 20f;
+            var cellWidth = containerWidth / CellsPerRow;
             
             var targetCellCount = servers.Count;
             var currentCellCount = _serverCells.Count;
@@ -144,22 +145,13 @@ namespace ServerBrowser.UI.Browser.Views
             // Initialize new cells
             for (var i = 0; i < extraCellsNeeded; i++)
             {
-                // TODO Not a button but a real UI component
-                
-                var cell = container.AddButton("ServerCell");
-                cell.SetHeight(cellHeight);
-                cell.SetWidth(cellWidth);
-                cell.DisableSkew();
-                _serverCells.Add(cell);
-                
                 var column = i % columnCount;
                 var row = i / columnCount;
-
-                var cellRect = (cell.GameObject.transform as RectTransform)!;
-                cellRect.anchorMin = new Vector2(0f, 1f);
-                cellRect.anchorMax = new Vector2(0f, 1f);
-                cellRect.pivot = new Vector2(0f, 1f);
-                cellRect.anchoredPosition = new Vector2((float)column * cellWidth, (float)row * -cellHeight);
+                
+                var cell = container.AddServerCell();
+                cell.SetSize(cellWidth, CellHeight);
+                cell.SetPosition((float)column * cellWidth, (float)row * -CellHeight);
+                _serverCells.Add(cell);
             }
             
             // Sync cell contents based on server list
@@ -167,23 +159,23 @@ namespace ServerBrowser.UI.Browser.Views
             {
                 var server = servers.ElementAt(i);
                 var cell = _serverCells[i];
-                cell.SetText(server.ServerName);
-                cell.GameObject.SetActive(true);
+                cell.SetData(server);
+                cell.SetActive(true);
             }
             
             // Disable (but do not remove) excess cells
             for (var i = 0; i < excessCells; i++)
             {
                 var cell = _serverCells[currentCellCount - i - 1];
-                cell.GameObject.SetActive(false);
+                cell.SetActive(false);
             }
 
             // Toggle loader
             RefreshLoadingState();
             
             // Manual scroll view content height
-            const float viewportHeight = 57f;
-            var newContentHeight = Mathf.CeilToInt(rowCount * cellHeight);
+            const float viewportHeight = 61f;
+            var newContentHeight = Mathf.CeilToInt(rowCount * CellHeight);
             if (newContentHeight < viewportHeight)
                 newContentHeight = (int)viewportHeight;
             if (newContentHeight != _lastContentHeight)

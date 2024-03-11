@@ -1,3 +1,4 @@
+using System.Threading;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Tags;
@@ -144,17 +145,18 @@ namespace ServerBrowser.UI.Toolkit
             => AddLayoutGroup<HorizontalLayoutGroup>(name, horizontalFit, verticalFit, pivotPoint, padding,
                 childAlignment, expandChildWidth, expandChildHeight, isLayoutElement);
 
-        public void SetBackground(string backgroundType, bool noSkew = true)
+        public ImageView SetBackground(string backgroundType, bool noSkew = true)
         {
             var bg = GameObject.GetOrAddComponent<Backgroundable>();
             bg.ApplyBackground(backgroundType);
+            var imageView = bg.GetComponent<ImageView>();
             if (noSkew)
             {
-                var imageView = bg.GetComponent<ImageView>();
                 imageView.enabled = false;
                 imageView._skew = 0f;
                 imageView.enabled = true;
             }
+            return imageView;
         }
 
         public TkButton AddButton(string text, bool primary = false, int paddingHorizontal = 4, int paddingVertical = 2, 
@@ -226,6 +228,16 @@ namespace ServerBrowser.UI.Toolkit
                 loadingControl.SetPreferredHeight(preferredHeight.Value);
             return loadingControl;
         }
+
+        public TkIcon AddIcon(string? spriteName, float? width = null, float? height = null)
+        {
+            var icon = Builder.CreateComponent<TkIcon>();
+            icon.AddToContainer(this);
+            if (spriteName != null)
+                _ = icon.SetSprite(spriteName, CancellationToken.None);
+            icon.SetPreferredSize(width, height);
+            return icon;
+        }
         
         public TkAvatarImage AddAvatarImage(float? width = null, float? height = null)
         {
@@ -260,6 +272,13 @@ namespace ServerBrowser.UI.Toolkit
             var scrollView = Builder.CreateComponent<TkVerticalLayoutScrollView>();
             scrollView.AddToContainer(this);
             return scrollView;
+        }
+
+        public TkServerCell AddServerCell()
+        {
+            var serverCell = Builder.CreateComponent<TkServerCell>();
+            serverCell.AddToContainer(this);
+            return serverCell;
         }
     }
 }

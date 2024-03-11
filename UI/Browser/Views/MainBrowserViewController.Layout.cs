@@ -93,10 +93,11 @@ namespace ServerBrowser.UI.Browser.Views
             var content = mainContainer.AddHorizontalLayoutGroup("Content", expandChildWidth: true,
                 verticalFit: ContentSizeFitter.FitMode.PreferredSize, pivotPoint: new Vector2(0, 1f),
                 padding: new RectOffset(0, 0, 1, 1));
-            content.PreferredHeight = 65f;
+            content.PreferredHeight = 69f;
             // content.SetBackground("panel-top");
 
             _scrollView = content.AddScrollView();
+            _scrollView.SetScrollPerCellHeight(CellHeight);
             var svContent = _scrollView.Content!;
             
             _loadingControl = svContent.AddLoadingControl(57f);

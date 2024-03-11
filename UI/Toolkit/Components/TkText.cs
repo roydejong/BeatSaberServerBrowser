@@ -27,6 +27,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _textMesh.text = "...";
             _textMesh.fontSize = 4;
             _textMesh.color = Color.white;
+            _textMesh.fontStyle = FontStyles.Italic;
             _textMesh.overflowMode = TextOverflowModes.Ellipsis;
             _textMesh.horizontalAlignment = HorizontalAlignmentOptions.Left;
             _textMesh.verticalAlignment = VerticalAlignmentOptions.Middle;
@@ -58,21 +59,26 @@ namespace ServerBrowser.UI.Toolkit.Components
                 _textMesh.fontSize = size;
         }
 
+        public void SetFontStyle(FontStyles fontStyle)
+        {
+            if (_textMesh != null)
+                _textMesh.fontStyle = fontStyle;
+        }
+
         public void SetPreferredSize(float? width, float? height)
         {
             if (_layoutElement == null)
                 return;
 
             if (width.HasValue)
+            {
                 _layoutElement.preferredWidth = width.Value;
-            if (height.HasValue)
-                _layoutElement.preferredHeight = height.Value;
-        }
+            }
 
-        public override void SetActive(bool active)
-        {
-            if (_gameObject != null)
-                _gameObject.SetActive(active);
+            if (height.HasValue)
+            {
+                _layoutElement.preferredHeight = height.Value;
+            }
         }
     }
 }

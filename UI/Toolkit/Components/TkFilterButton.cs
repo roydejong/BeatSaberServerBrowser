@@ -85,11 +85,5 @@ namespace ServerBrowser.UI.Toolkit.Components
             _valueText.SetText(text);
             _valueText.gameObject.SetActive(hasValue);
         }
-
-        public override void SetActive(bool active)
-        {
-            if (_gameObject != null)
-                _gameObject.SetActive(active);
-        }
     }
 }
