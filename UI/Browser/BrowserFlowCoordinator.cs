@@ -1,6 +1,9 @@
+using System.Threading.Tasks;
+using BeatSaber.AvatarCore;
 using HMUI;
 using ServerBrowser.Data;
 using ServerBrowser.Session;
+using ServerBrowser.Silly;
 using ServerBrowser.UI.Browser.Views;
 using SiraUtil.Logging;
 using Zenject;
@@ -15,9 +18,27 @@ namespace ServerBrowser.UI.Browser
         
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
+
+        [Inject] private readonly DiContainer _diContainer = null!;
+        [Inject] private readonly GameServerLobbyFlowCoordinator _gameServerLobbyFlowCoordinator = null!;
+        [Inject] private readonly IUnifiedNetworkPlayerModel _unifiedNetworkPlayerModel = null!;
+        [Inject] private readonly LobbyDataModelsManager _lobbyDataModelsManager = null!;
+        [Inject] private readonly FadeInOutController _fadeInOutController = null!;
+        [Inject] private readonly MultiplayerLobbyConnectionController _multiplayerLobbyConnectionController = null!;
+        [Inject] private readonly PlayerDataModel _playerDataModel = null!;
+        [Inject] private readonly ILobbyGameStateController _lobbyGameStateController = null!;
+        [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
+        [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
+        [Inject] private readonly IMultiplayerSessionManager _multiplayerSessionManager = null!;
+
+        private MultiplayerAvatarsData? _multiplayerAvatarsData = null;
+        private SillyAvatar? _sillyAvatar = null;
         
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
+            _mainViewController.ModeSelectedEvent += HandleModeSelected;
+            _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent += HandleCpmCreated;
+            
             if (firstActivation)
             {
                 SetTitle("Online");
@@ -30,13 +51,24 @@ namespace ServerBrowser.UI.Browser
             }
             
             _serverRepository.StartDiscovery();
+            
+            _ = LoadAvatar();
+            
+            if (_sillyAvatar != null)
+                _sillyAvatar.SetActive(true);
         }
 
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
+            _mainViewController.ModeSelectedEvent -= HandleModeSelected;
+            _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent -= HandleCpmCreated;
+            
             _serverRepository.StopDiscovery();
             
             _session.StopLoginRetries();
+            
+            if (_sillyAvatar != null)
+                _sillyAvatar.SetActive(false);
         }
 
         // ReSharper disable once ParameterHidesMember
@@ -48,6 +80,38 @@ namespace ServerBrowser.UI.Browser
         public void ReturnToMainMenu()
         {
             _mainFlowCoordinator.DismissFlowCoordinator(this);
+        }
+
+        private void HandleModeSelected(MainBrowserViewController.ModeSelectionTarget target)
+        {
+            ReturnToMainMenu();
+        }
+
+        private async Task LoadAvatar()
+        {
+            _multiplayerAvatarsData = await _avatarSystemCollection.GetMultiplayerAvatarsData(_playerDataModel.playerData
+                .selectedAvatarSystemTypeId);
+            
+            _log.Info("Local player avatar data loaded");
+            
+            _unifiedNetworkPlayerModel.connectedPlayerManager?.SetLocalPlayerAvatar(_multiplayerAvatarsData.Value);
+
+            if (_sillyAvatar == null)
+                _sillyAvatar = SillyAvatar.TryCreate(_diContainer);
+            
+            if (_sillyAvatar != null)
+            {
+                _sillyAvatar.SetAvatarData(_multiplayerAvatarsData.Value);
+                _sillyAvatar.SetActive(true);
+            }
+        }   
+
+        private void HandleCpmCreated(INetworkPlayerModel networkPlayerModel)
+        {
+            _log.Info("Connected player manager created");
+            
+            if (_multiplayerAvatarsData != null)
+                networkPlayerModel.connectedPlayerManager.SetLocalPlayerAvatar(_multiplayerAvatarsData.Value);
         }
     }
 }

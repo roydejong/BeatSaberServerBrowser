@@ -221,19 +221,28 @@ namespace ServerBrowser.UI.Browser.Views
 
         #region Mode Selection
         
+        public event Action<ModeSelectionTarget>? ModeSelectedEvent;
+
+        public enum ModeSelectionTarget
+        {
+            QuickPlay = 0,
+            CreateServer = 1,
+            JoinByCode = 2,
+        }
+        
         private void HandleQuickPlayClicked()
         {
-            _log.Info($"Quick Play");
+            ModeSelectedEvent?.Invoke(ModeSelectionTarget.QuickPlay);
         }
 
         private void HandleCreateServerClicked()
         {
-            _log.Info($"Create Server");
+            ModeSelectedEvent?.Invoke(ModeSelectionTarget.CreateServer);
         }
         
         private void HandleJoinByCodeClicked()
         {
-            _log.Info($"Join by Code");
+            ModeSelectedEvent?.Invoke(ModeSelectionTarget.JoinByCode);
         }
 
         private void HandleEditAvatarClicked()

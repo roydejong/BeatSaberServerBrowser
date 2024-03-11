@@ -61,11 +61,13 @@
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarAdapter.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="BeatSaber.BeatAvatarSDK">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarSDK.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="BGLib.AppFlow">
       <Private>False</Private>
@@ -306,6 +308,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\BssbSession.cs" />
+    <Compile Include="Silly\SillyAvatar.cs" />
     <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
@@ -373,6 +376,9 @@
     <EmbeddedResource Include="Assets\Sprites\Spectator.png" />
     <EmbeddedResource Include="Assets\Sprites\PlaceholderAvatar.png" />
     <Content Include="v2.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Multiplayer\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
