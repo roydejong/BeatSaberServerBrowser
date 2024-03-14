@@ -21,8 +21,8 @@ namespace ServerBrowser.UI.Toolkit.Components
         private CurvedTextMeshPro? _valueText;
         private NoTransitionsButton? _clearButton;
 
-        public event Action ClickedEvent;
-        public event Action ClearedEvent;
+        public event Action? ClickedEvent;
+        public event Action? ClearedEvent;
         
         public override void AddToContainer(LayoutContainer container)
         {

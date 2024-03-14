@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using ServerBrowser.Util;
 using SiraUtil.Logging;
 using UnityEngine;
@@ -8,6 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
+    [UsedImplicitly]
     public class TkLoadingControl : LayoutComponent
     {
         [Inject] private readonly SiraLog _logger = null!;
@@ -18,7 +20,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         private LoadingControl? _loadingControl;
         private LayoutElement? _layoutElement;
         
-        public event Action RefreshClickedEvent;
+        public event Action? RefreshClickedEvent;
         
         public override void AddToContainer(LayoutContainer container)
         {

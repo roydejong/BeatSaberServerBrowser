@@ -6,5 +6,8 @@ namespace ServerBrowser.Util
     {
         internal static string StripTags(this string input)
             => Regex.Replace(input, "<.*?>", string.Empty);
+        
+        internal static string AddSpacesToCamelCase(this string input)
+            => Regex.Replace(input, "(\\B[A-Z])", " $1");
     }
 }

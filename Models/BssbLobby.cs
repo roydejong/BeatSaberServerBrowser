@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using ServerBrowser.Util;
 using ServerBrowser.Util.Serialization;
 
 namespace ServerBrowser.Models
@@ -149,5 +150,18 @@ namespace ServerBrowser.Models
         [JsonProperty("LastUpdate")] public DateTime? ReadOnlyLastSeen;
 
         [JsonProperty("EncryptionMode")] public string? EncryptionMode;
+
+        [JsonIgnore]
+        public string GameModeDescription
+        {
+            get
+            {
+                if (GameplayMode is GameplayServerMode.Managed)
+                    return "Custom Game";
+
+                var difficultyText = DifficultyMask != null ? DifficultyMask.ToString().AddSpacesToCamelCase() : "All";
+                return $"Quick Play ({difficultyText})";
+            }
+        }
     }
 }

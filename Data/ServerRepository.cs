@@ -120,7 +120,9 @@ namespace ServerBrowser.Data
 
         private IReadOnlyList<ServerInfo> GetFilteredServers()
         {
-            var servers = _servers.Values.ToList();
+            var servers = _servers.Values.ToList()
+                .OrderByDescending(x => x.SortPriority)
+                .ToList();
             
             if (!string.IsNullOrEmpty(FilterText))
             {
@@ -186,6 +188,27 @@ namespace ServerBrowser.Data
             public string? ServerSecret;
             
             public bool IsFull => PlayerCount >= PlayerLimit;
+
+            public int SortPriority
+            {
+                get
+                {
+                    var sortPoints = 0;
+                    if (PlayerCount >= PlayerLimit)
+                        // Drop: server is full
+                        sortPoints -= 10;
+                    if (PlayerCount == 1)
+                        // Boost: lonely player
+                        sortPoints++;
+                    if (PlayerLimit > 2)
+                        // Boost: bigger lobby
+                        sortPoints++;
+                    if (!InGameplay)
+                        // Boost: In lobby
+                        sortPoints++;
+                    return sortPoints;
+                }
+            }
         }
 
         public enum ConnectionMethod

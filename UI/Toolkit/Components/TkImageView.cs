@@ -44,8 +44,8 @@ namespace ServerBrowser.UI.Toolkit.Components
 
             if (string.IsNullOrWhiteSpace(url))
                 return;
-            
-            if (_currentUrlValue == url)
+
+            if (_currentUrlValue == url && _imageView.sprite != null)
                 return;
 
             var sprite = await _remoteImageStore.LoadImageAsync(url!);
@@ -57,6 +57,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             }
 
             _imageView.sprite = sprite;
+            _currentUrlValue = url;
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.UI.Toolkit;
@@ -18,8 +17,6 @@ namespace ServerBrowser.UI.Browser.Views
         private TkText? _selfUsernameText;
         private TkScrollView? _scrollView;
         private TkLoadingControl? _loadingControl;
-
-        public event Action<bool>? AvatarButtonHoveredEvent;
         
         private void BuildLayout(LayoutContainer root)
         {
@@ -98,7 +95,6 @@ namespace ServerBrowser.UI.Browser.Views
                 verticalFit: ContentSizeFitter.FitMode.PreferredSize, pivotPoint: new Vector2(0, 1f),
                 padding: new RectOffset(0, 0, 1, 1));
             content.PreferredHeight = 69f;
-            // content.SetBackground("panel-top");
 
             _scrollView = content.AddScrollView();
             _scrollView.SetScrollPerCellHeight(CellHeight);

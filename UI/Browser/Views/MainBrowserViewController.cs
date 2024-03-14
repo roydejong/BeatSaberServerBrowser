@@ -7,7 +7,6 @@ using ServerBrowser.Session;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.Util;
-using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 
@@ -15,15 +14,12 @@ namespace ServerBrowser.UI.Browser.Views
 {
     public partial class MainBrowserViewController : ViewController, IInitializable, IDisposable
     {
-        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbSession _session = null!;
         [Inject] private readonly ServerRepository _serverRepository = null!;
         
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
-
-        [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         
-        private List<TkServerCell> _serverCells = new();
+        private readonly List<TkServerCell> _serverCells = new();
         private bool _completedFullRefresh = false;
         private int _lastContentHeight = 0;
 
@@ -32,6 +28,11 @@ namespace ServerBrowser.UI.Browser.Views
         public void Initialize()
         {
             BuildLayout(_layoutBuilder.Init(this));
+        }
+
+        public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
             
             _session.LocalUserInfoChangedEvent += HandleLocalUserInfoUpdated;
             _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
@@ -45,15 +46,12 @@ namespace ServerBrowser.UI.Browser.Views
             else
                 SetLocalUserInfoEmpty();
             
-            if (_session.IsLoggedIn)
+            if (_session.IsLoggedIn) 
                 HandleLoginStatusChanged(true);
             
+            HandleAvatarUrlChanged(_session.AvatarUrl);
+            
             RefreshLoadingState();
-        }
-
-        public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-        {
-            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
 
             _completedFullRefresh = false;
         }
@@ -61,16 +59,17 @@ namespace ServerBrowser.UI.Browser.Views
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-        }
-
-        public void Dispose()
-        {
+            
             _session.LocalUserInfoChangedEvent -= HandleLocalUserInfoUpdated;
             _session.AvatarUrlChangedEvent -= HandleAvatarUrlChanged;
             _session.LoginStatusChangedEvent -= HandleLoginStatusChanged;
             
             _serverRepository.ServersUpdatedEvent -= HandleServersUpdated;
             _serverRepository.RefreshFinishedEvent -= HandleServersRefreshFinished;
+        }
+
+        public void Dispose()
+        {
         }
 
         #endregion
@@ -94,6 +93,7 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleAvatarUrlChanged(string? avatarUrl)
         {
+            Plugin.Log.Info($"HandleAvatarUrlChanged: {avatarUrl}");
             _ = string.IsNullOrWhiteSpace(avatarUrl)
                 ? _selfAvatarImage!.SetPlaceholderAvatar()
                 : _selfAvatarImage!.SetRemoteImage(avatarUrl);
@@ -119,31 +119,35 @@ namespace ServerBrowser.UI.Browser.Views
         #region Server List
         
         public const float CellHeight = 20.333333f;
-        public const float CellWidth = 53.32f; // half of the viewport, but that doesn't always work during runtime
+        public const float CellsPerRow = 2;
+
+        private float _lastCellWidth = 0;
         
         private void HandleServersUpdated(IReadOnlyCollection<ServerRepository.ServerInfo> servers)
         {
             var container = _scrollView!.Content!;
             var containerWidth = container.RectTransform.rect.width;
             
+            var cellWidth = containerWidth / CellsPerRow;
+            
             var targetCellCount = servers.Count;
             var currentCellCount = _serverCells.Count;
             var extraCellsNeeded = servers.Count - currentCellCount;
             var excessCells = currentCellCount - servers.Count;
             
-            var columnCount = Mathf.FloorToInt(containerWidth / CellWidth);
+            var columnCount = Mathf.FloorToInt(containerWidth / cellWidth);
             var rowCount = Mathf.CeilToInt((float)targetCellCount / (float)columnCount);
+            
+            // Unfortunately, sometimes the rect isn't fully sized out yet when we do this, so we may need to resize
+            var shouldResizeCells = Mathf.Approximately(cellWidth, _lastCellWidth);
+            _lastCellWidth = cellWidth;
             
             // Initialize new cells
             for (var i = 0; i < extraCellsNeeded; i++)
             {
-                var column = i % columnCount;
-                var row = i / columnCount;
-                
                 var cell = container.AddServerCell();
-                cell.SetSize(CellWidth, CellHeight);
-                cell.SetPosition(column * CellWidth, row * -CellHeight);
                 _serverCells.Add(cell);
+                shouldResizeCells = true;
             }
             
             // Sync cell contents based on server list
@@ -151,6 +155,13 @@ namespace ServerBrowser.UI.Browser.Views
             {
                 var server = servers.ElementAt(i);
                 var cell = _serverCells[i];
+                if (shouldResizeCells || i >= currentCellCount)
+                {
+                    var column = i % columnCount;
+                    var row = i / columnCount;
+                    cell.SetSize(cellWidth, CellHeight);
+                    cell.SetPosition(column * cellWidth, row * -CellHeight);
+                }
                 cell.SetData(server);
                 cell.SetActive(true);
             }

@@ -1,21 +1,19 @@
 using HMUI;
+using JetBrains.Annotations;
 using ServerBrowser.Assets;
 using ServerBrowser.Data;
 using ServerBrowser.UI.Browser.Views;
 using ServerBrowser.Util;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
-    // ReSharper disable once UnusedType.Global
+    [UsedImplicitly]
     public class TkServerCell : LayoutComponent
     {
         public const int CellSpacing = 1;
         public const int CellPadding = 2;
-
-        [Inject] private readonly MaterialAccessor _materialAccessor = null!;
 
         private GameObject? _rootGameObject = null;
         private StackLayoutGroup? _rootLayoutGroup = null;
@@ -41,7 +39,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _rootRectTransform = _rootGameObject.transform as RectTransform;
 
             _rootLayoutGroup = _rootGameObject.AddComponent<StackLayoutGroup>();
-            _rootLayoutGroup.padding = new RectOffset(0, CellSpacing, 0, CellSpacing);
+            _rootLayoutGroup.padding = new RectOffset(CellSpacing, 0, 0, CellSpacing);
             _rootLayoutGroup.childForceExpandHeight = true;
             _rootLayoutGroup.childForceExpandWidth = true;
             _rootLayoutGroup.childAlignment = TextAnchor.MiddleCenter;
@@ -122,7 +120,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _gameModeText.SetTextColor(BssbColors.InactiveGray);
             _gameModeText.SetPreferredSize(100f, 4.875f);
             _gameModeText.SetText("Game mode");
-            _gameModeText.SetFontSize(3.4f);
+            _gameModeText.SetFontSize(3.2f);
         }
 
         private void BuildBottomContentComponents(LayoutContainer container)
@@ -209,6 +207,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         public void SetData(ServerRepository.ServerInfo serverInfo)
         {
             _serverNameText?.SetText(serverInfo.ServerName);
+            _gameModeText?.SetText(serverInfo.GameMode);
             _playerCountText?.SetText($"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}");
             _playerCountText?.SetTextColor(serverInfo.IsFull ? BssbColors.InactiveGray : BssbColors.HighlightBlue);
 

@@ -21,7 +21,7 @@ namespace ServerBrowser.Data.Discovery
                         Key = server.Key!,
                         ImageUrl = server.Level?.CoverArtUrl,
                         ServerName = server.Name!,
-                        GameMode = "BSSB Test",
+                        GameMode = server.GameModeDescription,
                         PlayerCount = server.ReadOnlyPlayerCount ?? 0,
                         PlayerLimit = server.PlayerLimit ?? 5,
                         ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,
