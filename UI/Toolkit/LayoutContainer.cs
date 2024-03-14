@@ -239,9 +239,9 @@ namespace ServerBrowser.UI.Toolkit
             return icon;
         }
         
-        public TkAvatarImage AddAvatarImage(float? width = null, float? height = null)
+        public TkImageView AddAvatarImage(float? width = null, float? height = null)
         {
-            var avatarImage = Builder.CreateComponent<TkAvatarImage>();
+            var avatarImage = Builder.CreateComponent<TkImageView>();
             avatarImage.AddToContainer(this);
             avatarImage.SetPreferredSize(width, height);
             return avatarImage;

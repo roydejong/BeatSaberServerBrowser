@@ -1,6 +1,7 @@
 using ServerBrowser.Data;
+using ServerBrowser.Models;
 using ServerBrowser.Session;
-using ServerBrowser.UI.Data;
+using ServerBrowser.UI.Toolkit;
 using Zenject;
 
 namespace ServerBrowser.Installers
@@ -13,7 +14,7 @@ namespace ServerBrowser.Installers
             Container.BindInterfacesAndSelfTo<BssbApi>().AsSingle();
             Container.BindInterfacesAndSelfTo<BssbSession>().AsSingle();
             Container.BindInterfacesAndSelfTo<ServerRepository>().AsSingle();
-            Container.BindInterfacesAndSelfTo<AvatarStore>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RemoteImageStore>().AsSingle();
         }
     }
 }

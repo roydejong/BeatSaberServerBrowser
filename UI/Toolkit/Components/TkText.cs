@@ -1,12 +1,13 @@
 using BeatSaberMarkupLanguage;
 using HMUI;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class TkText : LayoutComponent
     {
         private GameObject? _gameObject;

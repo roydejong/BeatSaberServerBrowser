@@ -1,9 +1,7 @@
-using System.Threading;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Data;
 using ServerBrowser.UI.Browser.Views;
-using ServerBrowser.UI.Util;
 using ServerBrowser.Util;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,7 +23,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         private RectTransform? _rootRectTransform = null;
         private ImageView? _contentBackground = null;
 
-        private TkAvatarImage? _serverImage = null;
+        private TkImageView? _serverImage = null;
         private TkText? _serverNameText = null;
         private TkText? _gameModeText = null;
         private TkText? _playerCountText = null;
@@ -96,7 +94,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         {
             // Image
             _serverImage = container.AddAvatarImage(9.75f, 9.75f);
-            _ = _serverImage.SetPlaceholderAvatar(CancellationToken.None);
+            _ = _serverImage.SetPlaceholderAvatar();
 
             // Content text vertical
             var textGameObject = new GameObject("Text")
@@ -213,6 +211,10 @@ namespace ServerBrowser.UI.Toolkit.Components
             _serverNameText?.SetText(serverInfo.ServerName);
             _playerCountText?.SetText($"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}");
             _playerCountText?.SetTextColor(serverInfo.IsFull ? BssbColors.InactiveGray : BssbColors.HighlightBlue);
+
+            _ = string.IsNullOrWhiteSpace(serverInfo.ImageUrl)
+                ? _serverImage?.SetPlaceholderSabers()
+                : _serverImage?.SetRemoteImage(serverInfo.ImageUrl);
         }
 
         public void SetActive(bool active)

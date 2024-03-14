@@ -1,15 +1,15 @@
 using System.Threading;
 using System.Threading.Tasks;
 using HMUI;
+using JetBrains.Annotations;
 using ServerBrowser.Assets;
-using ServerBrowser.UI.Util;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class TkIcon : LayoutComponent
     {
         [Inject] protected readonly MaterialAccessor _materialAccessor = null!;

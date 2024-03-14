@@ -1,7 +1,8 @@
 ﻿using IPA;
 using IPA.Config.Stores;
-using ServerBrowser.Assets;
+using JetBrains.Annotations;
 using ServerBrowser.Installers;
+using ServerBrowser.Models;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
@@ -9,19 +10,16 @@ using IPALogger = IPA.Logging.Logger;
 namespace ServerBrowser
 {
     [Plugin(RuntimeOptions.DynamicInit)]
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class Plugin
     {
-        // ReSharper disable once MemberCanBePrivate.Global
-        internal static BssbConfig Config { get; private set; } = null!;
-        
         internal static IPALogger Log = null!;
+        internal static BssbConfig Config = null!;
 
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config config)
         {
             Log = logger;
-            
             Config = config.Generated<BssbConfig>();
 
             zenjector.UseMetadataBinder<Plugin>();
@@ -36,7 +34,6 @@ namespace ServerBrowser
         [OnEnable]
         public void OnEnable()
         {
-            _ = Sprites.PreloadAsync();
         }
 
         [OnDisable]

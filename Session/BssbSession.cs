@@ -1,7 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using ServerBrowser.Data;
+using ServerBrowser.Models;
 using ServerBrowser.Requests;
 using SiraUtil.Logging;
 using UnityEngine;
@@ -9,7 +11,7 @@ using Zenject;
 
 namespace ServerBrowser.Session
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class BssbSession : IInitializable, IDisposable, ITickable
     {
         [Inject] private readonly SiraLog _log = null!;

@@ -1,6 +1,7 @@
 using System;
 using BGLib.Polyglot;
 using HMUI;
+using JetBrains.Annotations;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -8,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class TkSearchInputField : LayoutComponent
     {
         [Inject] private readonly SiraLog _logger = null!;

@@ -1,6 +1,8 @@
-﻿namespace ServerBrowser
+﻿using JetBrains.Annotations;
+
+namespace ServerBrowser.Models
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class BssbConfig
     {
         /// <summary>

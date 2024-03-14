@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using BeatSaber.AvatarCore;
 using BGLib.Polyglot;
 using HMUI;
+using JetBrains.Annotations;
+using ServerBrowser.Models;
 using ServerBrowser.Session;
 using ServerBrowser.UI.Browser;
 using SiraUtil.Affinity;
@@ -11,11 +13,11 @@ using Zenject;
 
 namespace ServerBrowser.Integrators
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     /// <summary>
     /// Hijacks the "Multiplayer" menu button to use our menu instead of vanilla mode selection.
     /// Presents a privacy disclaimer if needed, then redirects to avatar creation if needed, then launches multiplayer.
     /// </summary>
+    [UsedImplicitly]
     public class MainMenuIntegrator : IAffinity
     {
         [Inject] private readonly SiraLog _log = null!;

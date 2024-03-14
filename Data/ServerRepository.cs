@@ -3,13 +3,16 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using ServerBrowser.Data.Discovery;
+using ServerBrowser.Models;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 
 namespace ServerBrowser.Data
 {
+    [UsedImplicitly]
     public class ServerRepository : IInitializable, ITickable
     {
         [Inject] private readonly SiraLog _log = null!;
@@ -181,7 +184,6 @@ namespace ServerBrowser.Data
             public ConnectionMethod ConnectionMethod;
             public string? ServerCode;
             public string? ServerSecret;
-            public string? RemoteAddress;
             
             public bool IsFull => PlayerCount >= PlayerLimit;
         }

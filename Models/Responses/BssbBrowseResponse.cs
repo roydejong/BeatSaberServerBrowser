@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ServerBrowser.Models;
 
 namespace ServerBrowser.Responses
 {

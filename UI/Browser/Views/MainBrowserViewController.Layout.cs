@@ -1,3 +1,4 @@
+using System;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.UI.Toolkit;
@@ -13,10 +14,12 @@ namespace ServerBrowser.UI.Browser.Views
     {
         private TkSearchInputField? _searchInputField;
         private TkFilterButton? _filterButton;
-        private TkAvatarImage? _selfAvatarImage;
+        private TkImageView? _selfAvatarImage;
         private TkText? _selfUsernameText;
         private TkScrollView? _scrollView;
         private TkLoadingControl? _loadingControl;
+
+        public event Action<bool>? AvatarButtonHoveredEvent;
         
         private void BuildLayout(LayoutContainer root)
         {
@@ -44,6 +47,7 @@ namespace ServerBrowser.UI.Browser.Views
             userPane.PreferredWidth = 41f;
             
             _selfAvatarImage = userPane.AddAvatarImage(10f, 10f);
+            _ = _selfAvatarImage.SetPlaceholderAvatar();
             userPane.InsertMargin(2f, -1f);
             _selfUsernameText = userPane.AddText("Username", width: 41f - 10f - 2f - 1f - 1f, height: 10f);
             

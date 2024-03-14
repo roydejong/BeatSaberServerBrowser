@@ -18,6 +18,7 @@ namespace ServerBrowser.Assets
         internal const string Global = "Global";
         internal const string Lock = "Lock";
         internal const string PlaceholderAvatar = "PlaceholderAvatar";
+        internal const string PlaceholderSabers = "PlaceholderSabers";
         internal const string Player = "Player";
         internal const string Plus = "Plus";
         internal const string Random = "Random";
@@ -27,12 +28,7 @@ namespace ServerBrowser.Assets
         internal const string Spectator = "Spectator";
         internal const string SuperFast = "SuperFast";
 
-        private static Dictionary<string, Sprite> _loadedSprites = new();
-
-        internal static async Task PreloadAsync()
-        {
-            // TODO LoadAsync any sprites we want to be in cache ahead of time
-        }
+        private static readonly Dictionary<string, Sprite> _loadedSprites = new();
 
         internal static async Task<Sprite?> LoadAsync(string spriteName)
         {

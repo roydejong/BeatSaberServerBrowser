@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using HMUI;
 using ServerBrowser.Data;
 using ServerBrowser.Session;
@@ -83,13 +82,11 @@ namespace ServerBrowser.UI.Browser.Views
             _selfUsernameText!.SetText($"No user info");
             _selfUsernameText.SetTextColor(BssbColors.InactiveGray);
             
-            _ = _selfAvatarImage!.SetPlaceholderAvatar(CancellationToken.None);
+            _ = _selfAvatarImage!.SetPlaceholderAvatar();
         }
         
         private void HandleLocalUserInfoUpdated(UserInfo userInfo)
         {
-            _log.Info($"User info updated: {userInfo}");
-
             var username = userInfo.userName.StripTags();
             _selfUsernameText!.SetText($"{username}");
             _selfUsernameText.SetTextColor(BssbColors.White);
@@ -97,14 +94,13 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleAvatarUrlChanged(string? avatarUrl)
         {
-            _log.Info($"Avatar URL updated: {avatarUrl}");
-            _ = _selfAvatarImage!.SetAvatarFromUrl(avatarUrl, CancellationToken.None);
+            _ = string.IsNullOrWhiteSpace(avatarUrl)
+                ? _selfAvatarImage!.SetPlaceholderAvatar()
+                : _selfAvatarImage!.SetRemoteImage(avatarUrl);
         }
 
         private void HandleLoginStatusChanged(bool loggedIn)
         {
-            _log.Info($"Login status changed: {loggedIn}");
-
             if (!loggedIn)
             {
                 // BSSB login failed
@@ -123,23 +119,19 @@ namespace ServerBrowser.UI.Browser.Views
         #region Server List
         
         public const float CellHeight = 20.333333f;
-        public const int CellsPerRow = 2;
+        public const float CellWidth = 53.32f; // half of the viewport, but that doesn't always work during runtime
         
         private void HandleServersUpdated(IReadOnlyCollection<ServerRepository.ServerInfo> servers)
         {
-            _log.Info($"Servers updated: have {servers.Count}");
-
             var container = _scrollView!.Content!;
             var containerWidth = container.RectTransform.rect.width;
-
-            var cellWidth = containerWidth / CellsPerRow;
             
             var targetCellCount = servers.Count;
             var currentCellCount = _serverCells.Count;
             var extraCellsNeeded = servers.Count - currentCellCount;
             var excessCells = currentCellCount - servers.Count;
             
-            var columnCount = Mathf.FloorToInt(containerWidth / cellWidth);
+            var columnCount = Mathf.FloorToInt(containerWidth / CellWidth);
             var rowCount = Mathf.CeilToInt((float)targetCellCount / (float)columnCount);
             
             // Initialize new cells
@@ -149,8 +141,8 @@ namespace ServerBrowser.UI.Browser.Views
                 var row = i / columnCount;
                 
                 var cell = container.AddServerCell();
-                cell.SetSize(cellWidth, CellHeight);
-                cell.SetPosition((float)column * cellWidth, (float)row * -CellHeight);
+                cell.SetSize(CellWidth, CellHeight);
+                cell.SetPosition(column * CellWidth, row * -CellHeight);
                 _serverCells.Add(cell);
             }
             
@@ -228,6 +220,7 @@ namespace ServerBrowser.UI.Browser.Views
             QuickPlay = 0,
             CreateServer = 1,
             JoinByCode = 2,
+            EditAvatar = 3
         }
         
         private void HandleQuickPlayClicked()
@@ -247,8 +240,7 @@ namespace ServerBrowser.UI.Browser.Views
 
         private void HandleEditAvatarClicked()
         {
-            _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
-            _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator.childFlowCoordinator, true);
+            ModeSelectedEvent?.Invoke(ModeSelectionTarget.EditAvatar);
         }
         
         #endregion

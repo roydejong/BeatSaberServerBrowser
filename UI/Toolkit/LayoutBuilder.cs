@@ -1,14 +1,14 @@
 using HMUI;
-using ServerBrowser.UI.Data;
+using JetBrains.Annotations;
 using Zenject;
 
 namespace ServerBrowser.UI.Toolkit
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class LayoutBuilder
     {
         [Inject] private readonly DiContainer _diContainer = null!;
-        [field: Inject] public AvatarStore AvatarStore { get; } = null!;
+        [Inject] public readonly RemoteImageStore RemoteImageStore = null!;
 
         public ViewController? ViewController { get; private set; }
         public LayoutContainer? Root { get; private set; }

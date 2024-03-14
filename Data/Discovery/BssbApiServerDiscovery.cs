@@ -19,7 +19,7 @@ namespace ServerBrowser.Data.Discovery
                     repository.DiscoverServer(new ServerRepository.ServerInfo()
                     {
                         Key = server.Key!,
-                        ImageUrl = null,
+                        ImageUrl = server.Level?.CoverArtUrl,
                         ServerName = server.Name!,
                         GameMode = "BSSB Test",
                         PlayerCount = server.ReadOnlyPlayerCount ?? 0,
@@ -28,8 +28,7 @@ namespace ServerBrowser.Data.Discovery
                         InGameplay = server.LobbyState is MultiplayerLobbyState.GameRunning
                             or MultiplayerLobbyState.GameStarting,
                         ServerCode = server.ServerCode,
-                        ServerSecret = server.HostSecret,
-                        RemoteAddress = server.MasterGraphUrl
+                        ServerSecret = server.HostSecret
                     });
                 }
             }

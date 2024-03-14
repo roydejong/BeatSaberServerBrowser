@@ -3,7 +3,9 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
+using ServerBrowser.Models;
 using ServerBrowser.Requests;
 using ServerBrowser.Responses;
 using SiraUtil.Logging;
@@ -11,6 +13,7 @@ using Zenject;
 
 namespace ServerBrowser.Data
 {
+    [UsedImplicitly]
     public class BssbApi : IInitializable
     {
         [Inject] private readonly SiraLog _log = null!;

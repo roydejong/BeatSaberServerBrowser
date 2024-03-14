@@ -2,7 +2,6 @@ using ServerBrowser.Integrators;
 using ServerBrowser.UI.Browser;
 using ServerBrowser.UI.Browser.Views;
 using ServerBrowser.UI.Toolkit;
-using ServerBrowser.UI.Util;
 using Zenject;
 
 namespace ServerBrowser.Installers

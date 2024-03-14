@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using BeatSaberMarkupLanguage;
 using HMUI;
@@ -23,6 +24,8 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
 
         private ImageView? _icon;
         private Color? _highlightColor;
+
+        public event Action<NoTransitionsButton.SelectionState>? ButtonStateChangedEvent;
 
         public TkButton(GameObject gameObject)
         {
@@ -65,6 +68,8 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
             // And we can have the icon do the same! (unless we're doing a cool highlight thing)
             if (_icon != null && _highlightColor == null)
                 _icon.color = _text.color;
+            // Event
+            ButtonStateChangedEvent?.Invoke(state);
         }
 
         public void SetText(string text)

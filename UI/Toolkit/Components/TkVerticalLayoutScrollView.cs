@@ -1,10 +1,11 @@
+using JetBrains.Annotations;
 using ServerBrowser.UI.Toolkit.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class TkVerticalLayoutScrollView : TkScrollView
     {
         public override void AddToContainer(LayoutContainer container)

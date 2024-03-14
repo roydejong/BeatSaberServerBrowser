@@ -1,4 +1,5 @@
 using HMUI;
+using JetBrains.Annotations;
 using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace ServerBrowser.UI.Toolkit.Components
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    [UsedImplicitly]
     public class TkScrollView : LayoutComponent
     {
         [Inject] protected readonly SiraLog _logger = null!;
