@@ -6,6 +6,7 @@ using HMUI;
 using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.UI.Toolkit.Wrappers;
 using ServerBrowser.Util;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -145,17 +146,19 @@ namespace ServerBrowser.UI.Toolkit
             => AddLayoutGroup<HorizontalLayoutGroup>(name, horizontalFit, verticalFit, pivotPoint, padding,
                 childAlignment, expandChildWidth, expandChildHeight, isLayoutElement);
 
-        public ImageView SetBackground(string backgroundType, bool noSkew = true)
+        public ImageView SetBackground(string backgroundType, bool noSkew = true, bool raycastTarget = true)
         {
             var bg = GameObject.GetOrAddComponent<Backgroundable>();
             bg.ApplyBackground(backgroundType);
             var imageView = bg.GetComponent<ImageView>();
+            imageView.raycastTarget = raycastTarget;
             if (noSkew)
             {
                 imageView.enabled = false;
                 imageView._skew = 0f;
                 imageView.enabled = true;
             }
+
             return imageView;
         }
 
@@ -247,7 +250,8 @@ namespace ServerBrowser.UI.Toolkit
             return avatarImage;
         }
 
-        public TkText AddText(string text, Color? color = null, float? fontSize = null, float? width = null, float? height = null)
+        public TkText AddText(string text, Color? color = null, float? fontSize = null, float? width = null,
+            float? height = null, TextAlignmentOptions? textAlignment = null)
         {
             var textComponent = Builder.CreateComponent<TkText>();
             textComponent.AddToContainer(this);
@@ -257,6 +261,8 @@ namespace ServerBrowser.UI.Toolkit
             if (fontSize != null)
                 textComponent.SetFontSize(fontSize.Value);
             textComponent.SetPreferredSize(width, height);
+            if (textAlignment != null)
+                textComponent.SetTextAlignment(textAlignment.Value);
             return textComponent;
         }
         

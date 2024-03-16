@@ -4,7 +4,6 @@ using HMUI;
 using ServerBrowser.Data;
 using ServerBrowser.Session;
 using ServerBrowser.UI.Browser.Views;
-using ServerBrowser.UI.Toolkit;
 using SiraUtil.Logging;
 using Zenject;
 
@@ -18,7 +17,6 @@ namespace ServerBrowser.UI.Browser
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
-        [Inject] private readonly RemoteImageStore _remoteImageStore = null!;
 
         [Inject] private readonly DiContainer _diContainer = null!;
         [Inject] private readonly GameServerLobbyFlowCoordinator _gameServerLobbyFlowCoordinator = null!;
@@ -63,9 +61,6 @@ namespace ServerBrowser.UI.Browser
             _serverRepository.StopDiscovery();
 
             _session.StopLoginRetries();
-            
-            if (removedFromHierarchy)
-                _remoteImageStore.ClearCache();
         }
 
         // ReSharper disable once ParameterHidesMember

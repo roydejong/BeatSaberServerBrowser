@@ -4,8 +4,10 @@ using System.Linq;
 using HMUI;
 using ServerBrowser.Data;
 using ServerBrowser.Session;
+using ServerBrowser.UI.Browser.Modals;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Components;
+using ServerBrowser.UI.Toolkit.Modals;
 using ServerBrowser.Util;
 using UnityEngine;
 using Zenject;
@@ -14,9 +16,9 @@ namespace ServerBrowser.UI.Browser.Views
 {
     public partial class MainBrowserViewController : ViewController, IInitializable, IDisposable
     {
+        [Inject] private readonly DiContainer _diContainer = null!;
         [Inject] private readonly BssbSession _session = null!;
         [Inject] private readonly ServerRepository _serverRepository = null!;
-        
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
         
         private readonly List<TkServerCell> _serverCells = new();
@@ -66,6 +68,8 @@ namespace ServerBrowser.UI.Browser.Views
             
             _serverRepository.ServersUpdatedEvent -= HandleServersUpdated;
             _serverRepository.RefreshFinishedEvent -= HandleServersRefreshFinished;
+            
+            TkModalHost.CloseAnyModal(this);
         }
 
         public void Dispose()
@@ -146,6 +150,7 @@ namespace ServerBrowser.UI.Browser.Views
             for (var i = 0; i < extraCellsNeeded; i++)
             {
                 var cell = container.AddServerCell();
+                cell.ClickedEvent += HandleServerClickedEvent;
                 _serverCells.Add(cell);
                 shouldResizeCells = true;
             }
@@ -187,7 +192,12 @@ namespace ServerBrowser.UI.Browser.Views
                 _lastContentHeight = newContentHeight;
             }
         }
-        
+
+        private void HandleServerClickedEvent(ServerRepository.ServerInfo server)
+        {
+            TkModalHost.ShowModal<TestModalView>(this, _diContainer);
+        }
+
         private void HandleServersRefreshFinished()
         {
             _completedFullRefresh = true; 

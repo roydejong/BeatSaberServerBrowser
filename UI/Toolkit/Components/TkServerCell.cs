@@ -1,3 +1,4 @@
+using System;
 using HMUI;
 using JetBrains.Annotations;
 using ServerBrowser.Assets;
@@ -21,10 +22,14 @@ namespace ServerBrowser.UI.Toolkit.Components
         private RectTransform? _rootRectTransform = null;
         private ImageView? _contentBackground = null;
 
+        private ServerRepository.ServerInfo? _serverInfo = null;
         private TkImageView? _serverImage = null;
         private TkText? _serverNameText = null;
         private TkText? _gameModeText = null;
         private TkText? _playerCountText = null;
+        private TkText? _stateText = null;
+
+        public Action<ServerRepository.ServerInfo>? ClickedEvent;
 
         public override void AddToContainer(LayoutContainer container)
         {
@@ -152,8 +157,12 @@ namespace ServerBrowser.UI.Toolkit.Components
             _playerCountText = playerCountContainer.AddText("?/?", width: 5.75f, height: 4.25f);
             _playerCountText.SetFontSize(2.9f);
             
-            // Temp fill
-            container.InsertMargin(50f, 4.25f);
+            // Spacer
+            container.InsertMargin(CellPadding, 4.25f);
+            
+            // State text
+            _stateText = container.AddText("Game state", fontSize: 2.9f, width: 50f, height: 4.25f);
+            _stateText.SetTextColor(BssbColors.InactiveGray);
         }
 
         private void HandleSelectionStateChanged(NoTransitionsButton.SelectionState state)
@@ -164,7 +173,11 @@ namespace ServerBrowser.UI.Toolkit.Components
             switch (state)
             {
                 case NoTransitionsButton.SelectionState.Pressed:
-                    TriggerButtonClickEffect();
+                    if (_serverInfo != null)
+                    {
+                        TriggerButtonClickEffect();
+                        ClickedEvent?.Invoke(_serverInfo);
+                    }
                     break;
                 case NoTransitionsButton.SelectionState.Highlighted:
                     _contentBackground.color = BssbColors.ButtonBaseBgHover;
@@ -206,10 +219,22 @@ namespace ServerBrowser.UI.Toolkit.Components
 
         public void SetData(ServerRepository.ServerInfo serverInfo)
         {
+            _serverInfo = serverInfo;
+            
             _serverNameText?.SetText(serverInfo.ServerName);
             _gameModeText?.SetText(serverInfo.GameMode);
+            
             _playerCountText?.SetText($"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}");
-            _playerCountText?.SetTextColor(serverInfo.IsFull ? BssbColors.InactiveGray : BssbColors.HighlightBlue);
+            _playerCountText?.SetTextColor(serverInfo.IsFull ? BssbColors.InactiveGray : BssbColors.White);
+
+            var playerStateText = serverInfo.InGameplay ? "Playing level" : "In lobby";
+            if (serverInfo.IsFull)
+                playerStateText += " (Full)";
+            var playerStateColor = (serverInfo.InGameplay || serverInfo.IsFull)
+                ? BssbColors.HotPink
+                : BssbColors.HighlightBlue;
+            _stateText?.SetText(playerStateText);
+            _stateText?.SetTextColor(playerStateColor);
 
             _ = string.IsNullOrWhiteSpace(serverInfo.ImageUrl)
                 ? _serverImage?.SetPlaceholderSabers()

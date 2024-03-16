@@ -13,6 +13,12 @@ namespace ServerBrowser.Util
         public static readonly Color HoverGradientEnd = MakeUnityColor(255, 255, 255, 0.5f);
         public static readonly Color ButtonBaseBg = MakeUnityColor(0, 0, 0, 0.5f);
         public static readonly Color ButtonBaseBgHover = MakeUnityColor(255, 255, 255, 0.3f);
+        
+        public static readonly Color HotPink = MakeUnityColor(223, 21, 111);
+        public static readonly Color DarkBlue = MakeUnityColor(12, 120, 242);
+        
+        
+        // 0C78F2 in rgb is 
 
         internal static Color MakeUnityColor(int r, int g, int b, float alpha = 1f)
             => new Color(r / 255f, g / 255f, b / 255f, alpha);

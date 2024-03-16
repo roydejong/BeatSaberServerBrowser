@@ -81,5 +81,11 @@ namespace ServerBrowser.UI.Toolkit.Components
                 _layoutElement.preferredHeight = height.Value;
             }
         }
+
+        public void SetTextAlignment(TextAlignmentOptions textAlignment)
+        {
+            if (_textMesh != null)
+                _textMesh.alignment = textAlignment;
+        }
     }
 }

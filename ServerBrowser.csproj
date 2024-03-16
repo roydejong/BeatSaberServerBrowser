@@ -315,6 +315,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\BssbSession.cs" />
     <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
+    <Compile Include="UI\Browser\Modals\TestModalView.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
@@ -330,6 +331,8 @@
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />
     <Compile Include="UI\Toolkit\LayoutContainer.cs" />
     <Compile Include="UI\Toolkit\MaterialAccessor.cs" />
+    <Compile Include="UI\Toolkit\Modals\TkModalHost.cs" />
+    <Compile Include="UI\Toolkit\Modals\TkModalView.cs" />
     <Compile Include="UI\Toolkit\RemoteImageStore.cs" />
     <Compile Include="UI\Toolkit\Scripts\ScrollViewRectChangeListener.cs" />
     <Compile Include="UI\Toolkit\Wrappers\TkButton.cs" />
