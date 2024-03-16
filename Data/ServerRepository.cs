@@ -182,12 +182,15 @@ namespace ServerBrowser.Data
             public string GameMode;
             public int PlayerCount;
             public int PlayerLimit;
-            public bool InGameplay;
+            public MultiplayerLobbyState LobbyState;
             public ConnectionMethod ConnectionMethod;
             public string? ServerCode;
             public string? ServerSecret;
             
             public bool IsFull => PlayerCount >= PlayerLimit;
+
+            public bool InGameplay =>
+                LobbyState is MultiplayerLobbyState.GameRunning or MultiplayerLobbyState.GameStarting;
 
             public int SortPriority
             {
@@ -207,6 +210,23 @@ namespace ServerBrowser.Data
                         // Boost: In lobby
                         sortPoints++;
                     return sortPoints;
+                }
+            }
+
+            public string LobbyStateText
+            {
+                get
+                {
+                    return LobbyState switch
+                    {
+                        MultiplayerLobbyState.LobbySetup => "In lobby (setup)",
+                        MultiplayerLobbyState.LobbyCountdown => "In lobby (countdown)",
+                        MultiplayerLobbyState.GameStarting => "Game starting",
+                        MultiplayerLobbyState.GameRunning => "Game running",
+                        MultiplayerLobbyState.Error => "Error",
+                        _ => "Unknown"
+                    };
+                
                 }
             }
         }

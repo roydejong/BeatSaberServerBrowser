@@ -18,7 +18,7 @@ namespace ServerBrowser.UI.Toolkit.Modals
         private GameObject? _modalRoot = null;
         private GameObject? _blocker = null;
 
-        public void ShowModal<T>() where T : TkModalView
+        public T ShowModal<T>() where T : TkModalView
         {
             if (_modalView != null)
                 CloseModal();
@@ -32,6 +32,7 @@ namespace ServerBrowser.UI.Toolkit.Modals
                 };
                 _modalRoot.transform.SetParent(transform, false);
             }
+            _modalRoot.transform.SetAsLastSibling();
             
             var parentScreen = gameObject.GetComponentInParent<Screen>();
             var parentRect = (parentScreen.transform as RectTransform)!.rect;
@@ -42,7 +43,7 @@ namespace ServerBrowser.UI.Toolkit.Modals
             var rootRect = _modalRoot.GetOrAddComponent<RectTransform>();
             rootRect.sizeDelta = new Vector2(parentRect.width, parentRect.height);
             
-            // Blocker button: blocks input to the base view, closes the modal when clicked
+            // Blocker button: covers entire screen, blocks input to the base view, closes the modal when clicked
             if (_blocker == null)
             {
                 _blocker = new GameObject("Blocker")
@@ -83,9 +84,11 @@ namespace ServerBrowser.UI.Toolkit.Modals
             
             _modalView.Initialize();
             
-            // TODO: Open animation
+            // modalGo.GetOrAddComponent<PanelAnimation>().StartAnimation(canvasGroup, _canvasGroup, 1f, AnimationCurve.EaseInOut(), this._scaleYAnimationCurve, this._alphaAnimationCurve, this._parentAlphaAnimationCurve, finishedCallback);
 
             FadeOutBaseView();
+
+            return (T)_modalView;
         }
 
         public void CloseModal()
@@ -156,14 +159,14 @@ namespace ServerBrowser.UI.Toolkit.Modals
 
         #region Static API
         
-        public static void ShowModal<T>(ViewController host, DiContainer diContainer) where T : TkModalView
+        public static T ShowModal<T>(ViewController host, DiContainer diContainer) where T : TkModalView
         {
             var modalHost = host.gameObject.GetComponent<TkModalHost>();
 
             if (modalHost == null)
                 modalHost = diContainer.InstantiateComponent<TkModalHost>(host.gameObject);
             
-            modalHost.ShowModal<T>();
+            return modalHost.ShowModal<T>();
         }
 
         public static void CloseAnyModal(ViewController host)

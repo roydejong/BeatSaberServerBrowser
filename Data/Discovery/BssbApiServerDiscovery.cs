@@ -25,8 +25,7 @@ namespace ServerBrowser.Data.Discovery
                         PlayerCount = server.ReadOnlyPlayerCount ?? 0,
                         PlayerLimit = server.PlayerLimit ?? 5,
                         ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,
-                        InGameplay = server.LobbyState is MultiplayerLobbyState.GameRunning
-                            or MultiplayerLobbyState.GameStarting,
+                        LobbyState = server.LobbyState ?? MultiplayerLobbyState.LobbySetup,
                         ServerCode = server.ServerCode,
                         ServerSecret = server.HostSecret
                     });

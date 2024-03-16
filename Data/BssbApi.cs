@@ -19,6 +19,8 @@ namespace ServerBrowser.Data
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbConfig _config = null!;
         
+        public const int TimeoutSeconds = 10;
+        
         public static string UserAgent
         {
             get
@@ -44,6 +46,7 @@ namespace ServerBrowser.Data
             _httpClient.BaseAddress = new Uri(_config.ApiServerUrl);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
             _httpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
+            _httpClient.Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
 
             _log.Debug($"Initialized API client [{_config.ApiServerUrl}, {UserAgent}]");
         }

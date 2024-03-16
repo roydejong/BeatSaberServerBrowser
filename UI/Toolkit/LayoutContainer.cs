@@ -1,5 +1,4 @@
 using System.Threading;
-using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Tags;
 using HMUI;
@@ -185,24 +184,14 @@ namespace ServerBrowser.UI.Toolkit
             return button;
         }
 
-        public void AddHorizontalLine(float thickness = .25f, float width = -1f, Color? color = null)
+        public TkHorizontalSeparator AddHorizontalLine(float thickness = .25f, float width = -1f)
         {
-            var gameObject = new GameObject("HorizontalLine")
-            {
-                layer = UiLayer
-            };
-            gameObject.transform.SetParent(Transform, false);
-            
-            var layoutElement = gameObject.AddComponent<LayoutElement>();
-            layoutElement.preferredWidth = width;
-            layoutElement.minHeight = thickness;
-            layoutElement.preferredHeight = 0;
-            layoutElement.flexibleHeight = 0;
-
-            var image = gameObject.AddComponent<ImageView>();
-            image.sprite = Utilities.ImageResources.WhitePixel;
-            image.material = Utilities.ImageResources.NoGlowMat;
-            image.color = color ?? BssbColors.VeryLightGray;
+            var line = Builder.CreateComponent<TkHorizontalSeparator>();
+            line.AddToContainer(this);
+            line.SetThickness(thickness);
+            if (width > 0)
+                line.SetPreferredWidth(width);
+            return line;
         }
         
         public TkSearchInputField AddSearchInputField(string? placeholderText = "Search")
@@ -251,7 +240,7 @@ namespace ServerBrowser.UI.Toolkit
         }
 
         public TkText AddText(string text, Color? color = null, float? fontSize = null, float? width = null,
-            float? height = null, TextAlignmentOptions? textAlignment = null)
+            float? height = null, TextAlignmentOptions? textAlignment = null, FontStyles? fontStyle = null)
         {
             var textComponent = Builder.CreateComponent<TkText>();
             textComponent.AddToContainer(this);
@@ -263,6 +252,8 @@ namespace ServerBrowser.UI.Toolkit
             textComponent.SetPreferredSize(width, height);
             if (textAlignment != null)
                 textComponent.SetTextAlignment(textAlignment.Value);
+            if (fontStyle != null)
+                textComponent.SetFontStyle(fontStyle.Value);
             return textComponent;
         }
         
@@ -285,6 +276,13 @@ namespace ServerBrowser.UI.Toolkit
             var serverCell = Builder.CreateComponent<TkServerCell>();
             serverCell.AddToContainer(this);
             return serverCell;
+        }
+        
+        public TkTableView AddTableView()
+        {
+            var tableView = Builder.CreateComponent<TkTableView>();
+            tableView.AddToContainer(this);
+            return tableView;
         }
     }
 }

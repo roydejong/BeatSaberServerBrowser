@@ -150,7 +150,7 @@ namespace ServerBrowser.UI.Browser.Views
             for (var i = 0; i < extraCellsNeeded; i++)
             {
                 var cell = container.AddServerCell();
-                cell.ClickedEvent += HandleServerClickedEvent;
+                cell.ClickedEvent += HandleServerCellClicked;
                 _serverCells.Add(cell);
                 shouldResizeCells = true;
             }
@@ -193,9 +193,17 @@ namespace ServerBrowser.UI.Browser.Views
             }
         }
 
-        private void HandleServerClickedEvent(ServerRepository.ServerInfo server)
+        private void HandleServerCellClicked(ServerRepository.ServerInfo serverInfo)
         {
-            TkModalHost.ShowModal<TestModalView>(this, _diContainer);
+            var modal = TkModalHost.ShowModal<ServerModalView>(this, _diContainer);
+            modal.SetData(serverInfo);
+            modal.ConnectClickedEvent += HandleServerConnectClicked;
+        }
+
+        private void HandleServerConnectClicked(ServerRepository.ServerInfo serverInfo)
+        {
+            TkModalHost.CloseAnyModal(this);
+            Plugin.Log.Error("Connect clicked: " + serverInfo.Key);
         }
 
         private void HandleServersRefreshFinished()
