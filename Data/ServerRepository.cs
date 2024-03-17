@@ -38,8 +38,6 @@ namespace ServerBrowser.Data
             _discoveryMethods.Add(new BssbApiServerDiscovery());          
             if (_config.EnableLocalNetworkDiscovery)
                 _discoveryMethods.Add(new LocalNetworkServerDiscovery());
-            if (_config.EnablePublicServerDiscovery)
-                _discoveryMethods.Add(new PublicServerDiscovery());
             
             foreach (var discoveryMethod in _discoveryMethods)
                 _container.Inject(discoveryMethod);
@@ -84,11 +82,15 @@ namespace ServerBrowser.Data
 
             _discoveryEnabled = false;
             _log.Info("Stopping server discovery");
+            
+            foreach (var discoveryMethod in _discoveryMethods)
+                _ = discoveryMethod.Stop();
         }
         
         public void DiscoverServer(ServerInfo serverInfo)
         {
-            _servers.AddOrUpdate(serverInfo.Key, serverInfo, (_, _) => serverInfo);
+            var entry = _servers.AddOrUpdate(serverInfo.Key, serverInfo, (_, _) => serverInfo);
+            entry.LastDiscovered = DateTime.Now;
             _serverListDirty = true;
         }
         
@@ -165,6 +167,12 @@ namespace ServerBrowser.Data
         
         private void RaiseServersUpdated()
         {
+            // Remove servers past the staleness threshold
+            var staleThreshold = DateTime.Now - ServerRepository.StaleServerThreshold;
+            foreach (var server in _servers.Values.Where(x => x.LastDiscovered < staleThreshold).ToList())
+                _servers.TryRemove(server.Key, out _);
+            
+            // Update filtered set and raise event
             _filteredServers = GetFilteredServers();
             ServersUpdatedEvent?.Invoke(_filteredServers);
         }
@@ -172,6 +180,8 @@ namespace ServerBrowser.Data
         public abstract class ServerDiscovery
         {
             public abstract Task Refresh(ServerRepository repository);
+
+            public abstract Task Stop();
         }
 
         public class ServerInfo
@@ -186,6 +196,8 @@ namespace ServerBrowser.Data
             public ConnectionMethod ConnectionMethod;
             public string? ServerCode;
             public string? ServerSecret;
+            public bool WasLocallyDiscovered;
+            public DateTime LastDiscovered;
             
             public bool IsFull => PlayerCount >= PlayerLimit;
 
@@ -197,6 +209,9 @@ namespace ServerBrowser.Data
                 get
                 {
                     var sortPoints = 0;
+                    if (WasLocallyDiscovered)
+                        // Boost: LAN server - always show these first
+                        sortPoints += 100;
                     if (PlayerCount >= PlayerLimit)
                         // Drop: server is full
                         sortPoints -= 10;
@@ -251,6 +266,7 @@ namespace ServerBrowser.Data
             DirectConnect = 4
         }
         
-        public const float DiscoveryInterval = 10f;
+        public const float DiscoveryInterval = 5f;
+        public static readonly TimeSpan StaleServerThreshold = TimeSpan.FromSeconds(15);
     }
 }

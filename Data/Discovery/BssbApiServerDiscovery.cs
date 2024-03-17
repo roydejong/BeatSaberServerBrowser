@@ -32,5 +32,10 @@ namespace ServerBrowser.Data.Discovery
                 }
             }
         }
+
+        public override Task Stop()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

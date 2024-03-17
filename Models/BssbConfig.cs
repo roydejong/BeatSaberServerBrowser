@@ -16,7 +16,6 @@ namespace ServerBrowser.Models
         public virtual uint AcceptedPrivacyDisclaimerVersion { get; set; } = 0;
         
         public virtual bool EnableLocalNetworkDiscovery { get; set; } = true;
-        public virtual bool EnablePublicServerDiscovery { get; set; } = true;
         
         internal bool AnyPrivacyDisclaimerAccepted => AcceptedPrivacyDisclaimerVersion > 0;
     }
