@@ -24,6 +24,8 @@ namespace ServerBrowser.UI.Browser.Views
         private readonly List<TkServerCell> _serverCells = new();
         private bool _completedFullRefresh = false;
         private int _lastContentHeight = 0;
+        
+        public event Action<ServerRepository.ServerInfo>? ServerJoinRequestedEvent;
 
         #region Init / Deinit
         
@@ -53,8 +55,8 @@ namespace ServerBrowser.UI.Browser.Views
             
             HandleAvatarUrlChanged(_session.AvatarUrl);
             
+            _serverRepository.StartDiscovery(); // ensure we restart, in case we came back from lobby / connection error
             RefreshLoadingState();
-
             _completedFullRefresh = false;
         }
 
@@ -204,6 +206,7 @@ namespace ServerBrowser.UI.Browser.Views
         {
             TkModalHost.CloseAnyModal(this);
             Plugin.Log.Error("Connect clicked: " + serverInfo.Key);
+            ServerJoinRequestedEvent?.Invoke(serverInfo);
         }
 
         private void HandleServersRefreshFinished()

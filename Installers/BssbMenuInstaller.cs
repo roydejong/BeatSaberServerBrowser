@@ -14,7 +14,7 @@ namespace ServerBrowser.Installers
             Container.Bind<MaterialAccessor>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<MainBrowserViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.Bind<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
+            Container.BindInterfacesAndSelfTo<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             
             Container.BindInterfacesAndSelfTo<MainMenuIntegrator>().AsSingle();
         }

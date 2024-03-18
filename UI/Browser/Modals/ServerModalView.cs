@@ -61,7 +61,7 @@ namespace ServerBrowser.UI.Browser.Modals
             
             _titleText.SetText(serverInfo.ServerName);
             
-            _rowGameMode.Value = serverInfo.GameMode;
+            _rowGameMode.Value = serverInfo.GameModeName;
             _rowPlayerCount.Value = $"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}";
             _rowLobbyStatus.Value = serverInfo.InGameplay ? "Playing level" : "In lobby";
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using ServerBrowser.Data.Discovery;
@@ -186,18 +187,79 @@ namespace ServerBrowser.Data
 
         public class ServerInfo
         {
-            public string Key;
-            public string? ImageUrl;
-            public string ServerName;
-            public string GameMode;
-            public int PlayerCount;
-            public int PlayerLimit;
-            public MultiplayerLobbyState LobbyState;
-            public ConnectionMethod ConnectionMethod;
-            public string? ServerCode;
-            public string? ServerSecret;
-            public bool WasLocallyDiscovered;
-            public DateTime LastDiscovered;
+            /// <summary>
+            /// Globally unique key. Identifies a single server within the repository. 
+            /// </summary>
+            public string Key { get; init; }
+            /// <summary>
+            /// Remote image URL for the lobby. Usually the covert art URL.
+            /// </summary>
+            public string? ImageUrl { get; init; }
+            /// <summary>
+            /// Public server name.
+            /// </summary>
+            public string ServerName { get; init; } = "";
+            /// <summary>
+            /// Description of the server's current game mode (e.g. "Quick Play", "Battle Royale", etc).
+            /// </summary>
+            public string GameModeName { get; init; } = "";
+            /// <summary>
+            /// Current player count.
+            /// </summary>
+            public int PlayerCount { get; init; }
+            /// <summary>
+            /// Maximum player limit / capacity.
+            /// </summary>
+            public int PlayerLimit { get; init; }
+            /// <summary>
+            /// Current lobby state.
+            /// </summary>
+            public MultiplayerLobbyState LobbyState { get; init; }
+            /// <summary>
+            /// Connection method the Server Browser should use to connect to this server.
+            /// </summary>
+            public ConnectionMethod ConnectionMethod { get; init; }
+            /// <summary>
+            /// Dedicated server endpoint.
+            /// Required for direct connections.
+            /// </summary>
+            public IPEndPoint? ServerEndPoint { get; init; }
+            /// <summary>
+            /// Server code. Required for public games that connect via GameLift / modded master servers.
+            /// May be null in case of direct connections and password-protected servers. 
+            /// </summary>
+            public string? ServerCode { get; init; }
+            /// <summary>
+            /// Server secret. Also known as "gameSessionId" in GameLift context.
+            /// Required for public games that connect via GameLift / modded master servers.
+            /// May be null in case of direct connections and password-protected servers.
+            /// </summary>
+            public string? ServerSecret { get; init; }
+            /// <summary>
+            /// User ID of the host player (if any).
+            /// Required for direct connections.
+            /// </summary>
+            public string? ServerUserId { get; init; }
+            /// <summary>
+            /// Flags whether the server was discovered on the local network.
+            /// If set, the server will be boosted in the server list and highlighted.
+            /// </summary>
+            public bool WasLocallyDiscovered { get; init; }
+            /// <summary>
+            /// Beatmap level selection mask.
+            /// Should be set for direct connections to ensure the client shows the appropriate UI.
+            /// </summary>
+            public BeatmapLevelSelectionMask? BeatmapLevelSelectionMask { get; init; }
+            /// <summary>
+            /// Gameplay server configuration.
+            /// Should be set for direct connections to ensure the client shows the appropriate UI.
+            /// </summary>
+            public GameplayServerConfiguration? GameplayServerConfiguration { get; init; }
+            /// <summary>
+            /// Timestamp of the last discovery event.
+            /// Set automatically by the repository upon discovery call.
+            /// </summary>
+            public DateTime LastDiscovered { get; set; }
             
             public bool IsFull => PlayerCount >= PlayerLimit;
 

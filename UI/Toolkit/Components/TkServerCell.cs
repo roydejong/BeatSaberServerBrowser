@@ -224,7 +224,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _serverNameText?.SetText(serverInfo.ServerName);
             _serverNameText?.SetTextColor(serverInfo.WasLocallyDiscovered ? BssbColors.HighlightBlue : BssbColors.White);
             
-            _gameModeText?.SetText(serverInfo.GameMode);
+            _gameModeText?.SetText(serverInfo.GameModeName);
             
             _playerCountText?.SetText($"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}");
             _playerCountText?.SetTextColor(serverInfo.IsFull ? BssbColors.InactiveGray : BssbColors.White);

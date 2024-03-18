@@ -8,26 +8,36 @@ namespace ServerBrowser.Data.Discovery
     {
         [Inject] private readonly DiscoveryClient _discoveryClient = null!;
         
-        public override Task Refresh(ServerRepository repository)
+        public override async Task Refresh(ServerRepository repository)
         {
-            if (!_discoveryClient.IsActive)
+            var isStarting = !_discoveryClient.IsActive;
+
+            if (isStarting)
+            {
                 _discoveryClient.StartBroadcast();
-            
+                await Task.Delay(1); // wait briefly for any initial discovery responses so we can show them quickly
+            }
+
             while (_discoveryClient.ReceivedResponses.Count > 0)
             {
                 var response = _discoveryClient.ReceivedResponses.Dequeue();
                 repository.DiscoverServer(new ServerRepository.ServerInfo()
                 {
                     Key = response.ServerEndPoint.ToString(),
+                    ImageUrl = null,
                     ServerName = response.ServerName,
-                    GameMode = response.GameModeName,
+                    GameModeName = response.GameModeName,
                     PlayerCount = response.PlayerCount,
-                    PlayerLimit = response.PlayerLimit,
+                    PlayerLimit = response.GameplayServerConfiguration.maxPlayerCount,
+                    LobbyState = MultiplayerLobbyState.None,
+                    ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,
+                    ServerEndPoint = response.ServerEndPoint,
+                    ServerCode = null,
+                    ServerSecret = null,
+                    ServerUserId = response.ServerUserId,
                     WasLocallyDiscovered = true
                 });
             }
-            
-            return Task.CompletedTask;
         }
 
         public override Task Stop()

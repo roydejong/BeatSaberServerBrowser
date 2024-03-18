@@ -8,11 +8,14 @@ namespace ServerBrowser.Network.Discovery
     {
         public string Prefix;
         public int ProtocolVersion;
+        
         public IPEndPoint ServerEndPoint;
-        public int PlayerCount;
-        public int PlayerLimit;
         public string ServerName;
+        public string ServerUserId;
         public string GameModeName;
+        public int PlayerCount;
+        public BeatmapLevelSelectionMask BeatmapLevelSelectionMask;
+        public GameplayServerConfiguration GameplayServerConfiguration;
         
         public void Serialize(NetDataWriter writer)
         {
@@ -23,11 +26,14 @@ namespace ServerBrowser.Network.Discovery
         {
             Prefix = reader.GetString();
             ProtocolVersion = reader.GetInt();
+            
             ServerEndPoint = reader.GetNetEndPoint();
-            PlayerCount = reader.GetInt();
-            PlayerLimit = reader.GetInt();
             ServerName = reader.GetString();
+            ServerUserId = reader.GetString();
             GameModeName = reader.GetString();
+            PlayerCount = reader.GetInt();
+            BeatmapLevelSelectionMask = BeatmapLevelSelectionMask.Deserialize(reader);
+            GameplayServerConfiguration = GameplayServerConfiguration.Deserialize(reader);
         }
     }
 }
