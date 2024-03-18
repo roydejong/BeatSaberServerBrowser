@@ -63,9 +63,6 @@ namespace ServerBrowser.UI.Browser
             _serverRepository.StartDiscovery();
 
             _ = LoadAvatar();
-
-            _serverInfo = null;
-            _connectionFailedReason = null;
         }
 
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
@@ -326,7 +323,13 @@ namespace ServerBrowser.UI.Browser
                 _gameServerLobbyFlowCoordinator.willFinishEvent += HandleGameServerLobbyFlowCoordinatorWillFinish;
                 
                 PresentFlowCoordinator(_gameServerLobbyFlowCoordinator, immediately: true,
-                    replaceTopViewController: true);
+                    replaceTopViewController: false);
+                
+                // Hack needed to setup UI properly because we're not replacing the top view controller
+                // TODO: Can we do better?
+                _gameServerLobbyFlowCoordinator.TopViewControllerWillChange(_joiningLobbyViewController,
+                    _gameServerLobbyFlowCoordinator._lobbySetupViewController, 
+                    ViewController.AnimationType.In);
             });
         }
 
@@ -335,6 +338,7 @@ namespace ServerBrowser.UI.Browser
             _log.Info("Lobby flow coordinator: did finish");
             
             _gameServerLobbyFlowCoordinator.didFinishEvent -= HandleGameServerLobbyFlowCoordinatorDidFinish;
+            DismissFlowCoordinator(_gameServerLobbyFlowCoordinator, immediately: true);
             DisconnectFromServer();
             _lobbyDataModelsManager.Deactivate();
             _fadeInOutController.FadeIn();
@@ -346,6 +350,10 @@ namespace ServerBrowser.UI.Browser
             
             _gameServerLobbyFlowCoordinator.willFinishEvent -= HandleGameServerLobbyFlowCoordinatorWillFinish;
             _lobbyDataModelsManager.Deactivate();
+
+            if (_connectionFailedReason == null)
+                // If no specific reason was received (yet), assume user left the lobby by choice
+                _connectionFailedReason = ConnectionFailedReason.ConnectionCanceled;
         }
 
         private void HandleSessionConnectionFailed(ConnectionFailedReason reason)
