@@ -43,7 +43,9 @@ namespace ServerBrowser.Data.Discovery
                     ServerCode = null,
                     ServerSecret = null,
                     ServerUserId = response.ServerUserId,
-                    WasLocallyDiscovered = true
+                    WasLocallyDiscovered = true,
+                    BeatmapLevelSelectionMask = response.BeatmapLevelSelectionMask,
+                    GameplayServerConfiguration = response.GameplayServerConfiguration
                 });
             }
             

@@ -365,6 +365,7 @@ namespace ServerBrowser.UI.Browser
 
         [AffinityPrefix]
         [AffinityPatch(typeof(IgnoranceClient), "Start")]
+        // ReSharper disable once InconsistentNaming
         private void PrefixIgnoranceClientStart(IgnoranceClient __instance)
         {
             if (_serverInfo == null)
@@ -380,6 +381,7 @@ namespace ServerBrowser.UI.Browser
         
         [AffinityPrefix]
         [AffinityPatch(typeof(GameLiftConnectionManager), nameof(GameLiftConnectionManager.GameLiftConnectToServer))]
+        // ReSharper disable once InconsistentNaming
         private bool PrefixGameLiftConnectToServer(string secret, string code, GameLiftConnectionManager __instance)
         {
             if (_serverInfo is not { ConnectionMethod: ServerRepository.ConnectionMethod.DirectConnect })
@@ -395,8 +397,8 @@ namespace ServerBrowser.UI.Browser
                 gameSessionId: _serverInfo.ServerUserId,
                 secret: secret,
                 code: code,
-                selectionMask: DefaultLevelSelectionMask,
-                configuration: DefaultGameplayServerConfiguration
+                selectionMask: _serverInfo.BeatmapLevelSelectionMask ?? DefaultLevelSelectionMask,
+                configuration: _serverInfo.GameplayServerConfiguration ?? DefaultGameplayServerConfiguration
             );
             return false;
         }
