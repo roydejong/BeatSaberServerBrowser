@@ -308,7 +308,6 @@
     <Compile Include="Data\ServerRepository.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />
-    <Compile Include="Integrators\MainMenuIntegrator.cs" />
     <Compile Include="Models\BssbConfig.cs" />
     <Compile Include="Models\BssbLevel.cs" />
     <Compile Include="Models\BssbLobby.cs" />
@@ -327,6 +326,7 @@
     <Compile Include="UI\Browser\Modals\ServerModalView.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
+    <Compile Include="UI\MainMenuIntegrator.cs" />
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
     <Compile Include="UI\Toolkit\Components\TkHorizontalSeparator.cs" />
     <Compile Include="UI\Toolkit\Components\TkImageView.cs" />

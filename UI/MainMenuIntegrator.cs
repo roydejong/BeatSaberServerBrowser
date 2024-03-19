@@ -11,7 +11,7 @@ using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using Zenject;
 
-namespace ServerBrowser.Integrators
+namespace ServerBrowser.UI
 {
     /// <summary>
     /// Hijacks the "Multiplayer" menu button to use our menu instead of vanilla mode selection.

@@ -369,7 +369,7 @@ namespace ServerBrowser.UI.Browser
         private void PrefixIgnoranceClientStart(IgnoranceClient __instance)
         {
             if (_serverInfo == null)
-                // We are not managing this connection
+                // We are not managing this connection - patch does not apply
                 return;
 
             var enableDtls = _serverInfo.ConnectionMethod is ServerRepository.ConnectionMethod.GameLiftOfficial or
@@ -385,7 +385,7 @@ namespace ServerBrowser.UI.Browser
         private bool PrefixGameLiftConnectToServer(string secret, string code, GameLiftConnectionManager __instance)
         {
             if (_serverInfo is not { ConnectionMethod: ServerRepository.ConnectionMethod.DirectConnect })
-                // Patch does not apply to this connection
+                // We are not managing this connection, or it is a regular GameLift connection - patch does not apply
                 return true;
 
             // We will skip the entire GameLift API and move to immediate connection
@@ -400,6 +400,18 @@ namespace ServerBrowser.UI.Browser
                 selectionMask: _serverInfo.BeatmapLevelSelectionMask ?? DefaultLevelSelectionMask,
                 configuration: _serverInfo.GameplayServerConfiguration ?? DefaultGameplayServerConfiguration
             );
+            return false;
+        }
+        
+        [AffinityPrefix]
+        [AffinityPatch(typeof(GameServerLobbyFlowCoordinator), nameof(GameServerLobbyFlowCoordinator.GetLocalizedTitle))]
+        private bool PrefixGameServerLobbyFlowCoordinatorGetLocalizedTitle(ref string __result)
+        {
+            if (_serverInfo == null)
+                // We are not managing this connection - patch does not apply
+                return true;
+            
+            __result = _serverInfo.ServerName;
             return false;
         }
 
