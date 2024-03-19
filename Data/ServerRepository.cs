@@ -72,7 +72,7 @@ namespace ServerBrowser.Data
                 }
             }
 
-            _nextDiscoveryTime = Time.realtimeSinceStartup + DiscoveryInterval;
+            _nextDiscoveryTime = Time.realtimeSinceStartup + DiscoveryTickInterval;
             RefreshFinishedEvent?.Invoke();
         }
 
@@ -328,7 +328,7 @@ namespace ServerBrowser.Data
             DirectConnect = 4
         }
         
-        public const float DiscoveryInterval = 5f;
+        public const float DiscoveryTickInterval = 1f;
         public static readonly TimeSpan StaleServerThreshold = TimeSpan.FromSeconds(15);
     }
 }

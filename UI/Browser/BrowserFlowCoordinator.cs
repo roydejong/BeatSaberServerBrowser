@@ -352,7 +352,7 @@ namespace ServerBrowser.UI.Browser
             _lobbyDataModelsManager.Deactivate();
 
             if (_connectionFailedReason == null)
-                // If no specific reason was received (yet), assume user left the lobby by choice
+                // Default: return to main browser view. Lobby flow coordinator will have shown its own errors.
                 _connectionFailedReason = ConnectionFailedReason.ConnectionCanceled;
         }
 

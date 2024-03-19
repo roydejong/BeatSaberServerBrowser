@@ -103,12 +103,7 @@ namespace ServerBrowser.Network.Discovery
         private void HandleResponse(DiscoveryResponsePacket packet)
         {
             if (packet.Prefix != DiscoveryConsts.PacketPrefix)
-            {
-                _log.Warn($"Received invalid discovery response from {packet.ServerEndPoint.Address}: bad prefix");
                 return;
-            }
-            
-            _log.Info($"Received discovery response from {packet.ServerEndPoint.Address}: {packet.ServerName}");
             
             ReceivedResponses.Enqueue(packet);
         }
@@ -120,8 +115,6 @@ namespace ServerBrowser.Network.Discovery
             
             _udpClient!.Send(_netDataWriter.Data, _netDataWriter.Length, BroadcastEndpoint);
             _lastBroadcastTime = Time.time;
-            
-            _log.Info("Sent discovery broadcast");
         }
         
         public const float DiscoveryInterval = 5f;

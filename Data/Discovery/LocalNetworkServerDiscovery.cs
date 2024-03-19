@@ -1,26 +1,34 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ServerBrowser.Network.Discovery;
+using SiraUtil.Logging;
 using Zenject;
 
 namespace ServerBrowser.Data.Discovery
 {
     public class LocalNetworkServerDiscovery : ServerRepository.ServerDiscovery
     {
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly DiscoveryClient _discoveryClient = null!;
         
-        public override async Task Refresh(ServerRepository repository)
+        private readonly List<string> _endpointsSeen = new();
+        
+        public override Task Refresh(ServerRepository repository)
         {
-            var isStarting = !_discoveryClient.IsActive;
-
-            if (isStarting)
-            {
+            if (!_discoveryClient.IsActive)
                 _discoveryClient.StartBroadcast();
-                await Task.Delay(1); // wait briefly for any initial discovery responses so we can show them quickly
-            }
 
             while (_discoveryClient.ReceivedResponses.Count > 0)
             {
                 var response = _discoveryClient.ReceivedResponses.Dequeue();
+
+                var endPointStr = response.ServerEndPoint.ToString();
+                if (!_endpointsSeen.Contains(endPointStr))
+                {
+                    _log.Info($"Discovered local network server: {endPointStr}, {response.ServerName}");
+                    _endpointsSeen.Add(endPointStr);
+                }
+                
                 repository.DiscoverServer(new ServerRepository.ServerInfo()
                 {
                     Key = response.ServerEndPoint.ToString(),
@@ -38,12 +46,16 @@ namespace ServerBrowser.Data.Discovery
                     WasLocallyDiscovered = true
                 });
             }
+            
+            return Task.CompletedTask;
         }
 
         public override Task Stop()
         {
             if (_discoveryClient.IsActive)
                 _discoveryClient.StopBroadcast();
+            
+            _endpointsSeen.Clear();
             
             return Task.CompletedTask;
         }

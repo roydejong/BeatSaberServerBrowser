@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 namespace ServerBrowser.Data.Discovery
@@ -7,9 +8,16 @@ namespace ServerBrowser.Data.Discovery
     {
         [Inject] private readonly BssbApi _api = null!;
         
+        private float? _lastRefreshTime = null;
+        public const float RefreshInterval = 5f;
+        
         public override async Task Refresh(ServerRepository repository)
         {
+            if (_lastRefreshTime.HasValue && (Time.time - _lastRefreshTime.Value) < RefreshInterval)
+                return;
+            
             var browseResponse = await _api.SendBrowseRequest();
+            _lastRefreshTime = Time.time;
             
             if (browseResponse != null)
             {
@@ -35,6 +43,7 @@ namespace ServerBrowser.Data.Discovery
 
         public override Task Stop()
         {
+            _lastRefreshTime = null;
             return Task.CompletedTask;
         }
     }
