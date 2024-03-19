@@ -186,9 +186,6 @@ namespace ServerBrowser.UI.Browser
         {
             _joiningLobbyCancellationTokenSource?.Cancel();
             
-            if (_joiningLobbyViewController.isActivated)
-                _joiningLobbyViewController.HideLoading();
-            
             _unifiedNetworkPlayerModel.DestroyPartyConnection();
             
             if (showError)
@@ -312,7 +309,6 @@ namespace ServerBrowser.UI.Browser
             
             _log.Info("Fading out and transitioning to lobby flow coordinator!");
             
-            _joiningLobbyViewController.HideLoading();
             _serverRepository.StopDiscovery();
 
             _fadeInOutController.FadeOut(() =>
@@ -339,6 +335,7 @@ namespace ServerBrowser.UI.Browser
             
             _gameServerLobbyFlowCoordinator.didFinishEvent -= HandleGameServerLobbyFlowCoordinatorDidFinish;
             DismissFlowCoordinator(_gameServerLobbyFlowCoordinator, immediately: true);
+            _joiningLobbyViewController.HideLoading();
             DisconnectFromServer();
             _lobbyDataModelsManager.Deactivate();
             _fadeInOutController.FadeIn();
