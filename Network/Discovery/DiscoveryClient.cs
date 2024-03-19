@@ -37,7 +37,7 @@ namespace ServerBrowser.Network.Discovery
             
             ReceivedResponses.Clear();
             
-            _log.Info("Started local network discovery");
+            _log.Debug("Started local network discovery");
         }
 
         public void StopBroadcast()
@@ -50,7 +50,7 @@ namespace ServerBrowser.Network.Discovery
             
             ReceivedResponses.Clear();
             
-            _log.Info("Stopped local network discovery");
+            _log.Debug("Stopped local network discovery");
         }
 
         public void OnDisable()

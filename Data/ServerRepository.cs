@@ -53,7 +53,7 @@ namespace ServerBrowser.Data
                 return;
             
             _discoveryEnabled = true;
-            _log.Info("Starting server discovery");
+            _log.Debug("Starting server discovery");
             _ = RefreshDiscovery();
         }
 
@@ -82,7 +82,7 @@ namespace ServerBrowser.Data
                 return;
 
             _discoveryEnabled = false;
-            _log.Info("Stopping server discovery");
+            _log.Debug("Stopping server discovery");
             
             foreach (var discoveryMethod in _discoveryMethods)
                 _ = discoveryMethod.Stop();

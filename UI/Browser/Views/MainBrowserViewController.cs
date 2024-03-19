@@ -99,7 +99,6 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleAvatarUrlChanged(string? avatarUrl)
         {
-            Plugin.Log.Info($"HandleAvatarUrlChanged: {avatarUrl}");
             _ = string.IsNullOrWhiteSpace(avatarUrl)
                 ? _selfAvatarImage!.SetPlaceholderAvatar()
                 : _selfAvatarImage!.SetRemoteImage(avatarUrl);
@@ -205,7 +204,6 @@ namespace ServerBrowser.UI.Browser.Views
         private void HandleServerConnectClicked(ServerRepository.ServerInfo serverInfo)
         {
             TkModalHost.CloseAnyModal(this);
-            Plugin.Log.Error("Connect clicked: " + serverInfo.Key);
             ServerJoinRequestedEvent?.Invoke(serverInfo);
         }
 

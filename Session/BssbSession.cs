@@ -180,7 +180,7 @@ namespace ServerBrowser.Session
                 IsLoggedIn = true;
                 _loginAttempts = 0;
                 _nextLoginRetry = null;
-                _log.Info($"Logged in succesfully");
+                _log.Info($"Logged in successfully as {LocalUserInfo.userName} ({LocalUserInfo.platform})");
                 LoginStatusChangedEvent?.Invoke(true);
                 return true;
             }

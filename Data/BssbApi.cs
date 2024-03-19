@@ -58,7 +58,7 @@ namespace ServerBrowser.Data
                 var requestJson = JsonConvert.SerializeObject(request);
                 var requestContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
                 
-                _log.Info($"[Request] POST {path}");
+                _log.Debug($"[Request] POST {path}");
                 if (request is not BssbLoginRequest) // never log user auth tokens
                     _log.Debug(requestJson);
 

@@ -119,7 +119,7 @@ namespace ServerBrowser.UI.Browser
         
         private void HandleJoinCanceled()
         {
-            _log.Info("User canceled join");
+            _log.Info("User canceled server join");
             _connectionFailedReason = ConnectionFailedReason.ConnectionCanceled;
             DisconnectFromServer();
         }
@@ -276,8 +276,6 @@ namespace ServerBrowser.UI.Browser
 
         private void HandleCpmCreated(INetworkPlayerModel networkPlayerModel)
         {
-            _log.Info("Connected player manager created");
-
             if (_multiplayerAvatarsData != null)
                 networkPlayerModel.connectedPlayerManager.SetLocalPlayerAvatar(_multiplayerAvatarsData.Value);
             
@@ -287,13 +285,11 @@ namespace ServerBrowser.UI.Browser
 
         private void HandleCpmDestroyed(INetworkPlayerModel obj)
         {
-            // Raised after the party connection is destroyed, so post-DisconnectFromServer()
-            _log.Info("Connected player manager destroyed");
         }
 
         private void HandleSessionConnected()
         {
-            _log.Info("Multiplayer session is connected");
+            _log.Info("Multiplayer session connected");
             
             _lobbyDataModelsManager.Activate();
 
@@ -302,12 +298,10 @@ namespace ServerBrowser.UI.Browser
 
         private async Task StartLobbyFlowCoordinator()
         {
-            _log.Info("Waiting for game state and configuration...");
-            
             await _lobbyGameStateController.GetGameStateAndConfigurationAsync(
                 _joiningLobbyCancellationTokenSource!.Token);
             
-            _log.Info("Fading out and transitioning to lobby flow coordinator!");
+            _log.Info("Lobby join successful");
             
             _serverRepository.StopDiscovery();
 
@@ -331,7 +325,7 @@ namespace ServerBrowser.UI.Browser
 
         private void HandleGameServerLobbyFlowCoordinatorDidFinish()
         {
-            _log.Info("Lobby flow coordinator: did finish");
+            _log.Info("Lobby has ended, returning to menu");
             
             _gameServerLobbyFlowCoordinator.didFinishEvent -= HandleGameServerLobbyFlowCoordinatorDidFinish;
             DismissFlowCoordinator(_gameServerLobbyFlowCoordinator, immediately: true);
@@ -343,8 +337,6 @@ namespace ServerBrowser.UI.Browser
 
         private void HandleGameServerLobbyFlowCoordinatorWillFinish()
         {
-            _log.Info("Lobby flow coordinator: will finish");
-            
             _gameServerLobbyFlowCoordinator.willFinishEvent -= HandleGameServerLobbyFlowCoordinatorWillFinish;
             _lobbyDataModelsManager.Deactivate();
 
