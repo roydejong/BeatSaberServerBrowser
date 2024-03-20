@@ -414,6 +414,24 @@ namespace ServerBrowser.UI.Browser
             __result = _serverInfo.ServerName;
             return false;
         }
+        
+        [AffinityPrefix]
+        [AffinityPatch(typeof(MultiplayerLevelSelectionFlowCoordinator), "enableCustomLevels", AffinityMethodType.Getter)]
+        [AffinityAfter("com.goobwabber.multiplayercore.affinity")]
+        [AffinityPriority(1)]
+        // ReSharper disable twice InconsistentNaming
+        private bool PrefixCustomLevelsEnabled(ref bool __result, SongPackMask ____songPackMask)
+        {
+            // MultiplayerCore requires an override API server to be set for custom songs to be enabled
+            // We have to take over that job here if direct connecting
+
+            if (_serverInfo is not { ConnectionMethod: ServerRepository.ConnectionMethod.DirectConnect })
+                // We are not managing this connection, or it is a regular GameLift connection - patch does not apply
+                return true;
+
+            __result = ____songPackMask.Contains(new SongPackMask("custom_levelpack_CustomLevels"));;
+            return false;
+        }
 
         #endregion
     }
