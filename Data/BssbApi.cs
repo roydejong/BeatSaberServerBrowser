@@ -59,7 +59,7 @@ namespace ServerBrowser.Data
                 var requestContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
                 
                 _log.Debug($"[Request] POST {path}");
-                if (request is not BssbLoginRequest) // never log user auth tokens
+                if (request is not BssbLoginRequest or BssbEmptyRequest) // never log user auth / empties
                     _log.Debug(requestJson);
 
                 var response = await _httpClient.PostAsync(path, requestContent);

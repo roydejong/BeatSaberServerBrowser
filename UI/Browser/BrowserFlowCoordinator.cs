@@ -155,8 +155,8 @@ namespace ServerBrowser.UI.Browser
                 return;
             }
             
-            _log.Info($"Connect to server: {serverInfo.ServerName}, {serverInfo.ServerEndPoint}, " +
-                      $"{serverInfo.ConnectionMethod}");
+            _log.Info($"Connecting to server (serverName={serverInfo.ServerName}, " +
+                      $"endPoint={serverInfo.ServerEndPoint}, connectionMethod={serverInfo.ConnectionMethod}");
 
             _serverInfo = serverInfo;
 
@@ -272,7 +272,7 @@ namespace ServerBrowser.UI.Browser
                         errMsg += "<br>You were kicked by the server";
                         break;
                     case DisconnectedReason.ServerTerminated:
-                        errMsg += "<br>The server was shutting down";
+                        errMsg += "<br>The server is shutting down";
                         break;
                     default:
                         errMsg += "<br>Check your internet connection and try again";
@@ -418,7 +418,7 @@ namespace ServerBrowser.UI.Browser
         {
             // Read internal session updates to get actually useful error messages
             
-            _log.Info($"Connection state changed: updateReason={updateReason}," +
+            _log.Debug($"Connection state changed: updateReason={updateReason}," +
                       $" disconnectedReason={disconnectedReason}, connectionFailedReason={connectionFailedReason}");
             
             if (updateReason == UpdateConnectionStateReason.Connected && !_wasEverConnected)
@@ -427,10 +427,17 @@ namespace ServerBrowser.UI.Browser
                 _log.Info("Connected to server");
             }
 
-            if (disconnectedReason != DisconnectedReason.Unknown && _realDisconnectReason != disconnectedReason)
+            if (disconnectedReason is not DisconnectedReason.Unknown and not DisconnectedReason.UserInitiated
+                && _realDisconnectReason != disconnectedReason)
             {
                 _realDisconnectReason = disconnectedReason;
-                _log.Info($"Disconnect reason: {disconnectedReason}");
+                _log.Info($"Disconnect reason: {disconnectedReason} ({connectionFailedReason})");
+            }
+
+            if (connectionFailedReason == ConnectionFailedReason.ServerIsTerminating)
+            {
+                // Base game message is completely useless ("server does not exist"), so push our disconnect reason instead
+                _realDisconnectReason = DisconnectedReason.ServerTerminated;
             }
         }
 
