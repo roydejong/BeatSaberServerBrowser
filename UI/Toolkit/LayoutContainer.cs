@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace ServerBrowser.UI.Toolkit
 {
-    public class LayoutContainer
+    public class LayoutContainer : LayoutObject
     {
         public const int UiLayer = 5;
 
@@ -161,6 +161,13 @@ namespace ServerBrowser.UI.Toolkit
             return imageView;
         }
 
+        public void MakeButton(UnityAction clickAction)
+        {
+            var button = GameObject.GetOrAddComponent<Button>();
+            button.transition = Selectable.Transition.ColorTint;
+            button.onClick.AddListener(clickAction);
+        }
+
         public TkButton AddButton(string text, bool primary = false, int paddingHorizontal = 4, int paddingVertical = 2, 
             float preferredWidth = -1f, float preferredHeight = -1f, string? iconName = null, float iconSize = 10f,
             UnityAction? clickAction = null, bool noSkew = false, Color? highlightColor = null)
@@ -283,6 +290,13 @@ namespace ServerBrowser.UI.Toolkit
             var tableView = Builder.CreateComponent<TkTableView>();
             tableView.AddToContainer(this);
             return tableView;
+        }
+        
+        public TkAccountTile AddAccountTile()
+        {
+            var accountTile = Builder.CreateComponent<TkAccountTile>();
+            accountTile.AddToContainer(this);
+            return accountTile;
         }
     }
 }

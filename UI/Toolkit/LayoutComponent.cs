@@ -8,20 +8,20 @@ namespace ServerBrowser.UI.Toolkit
     {
         [Inject] protected readonly MenuShockwave _shockwaveEffect = null!;
         
-        protected BasicUIAudioManager? _basicUIAudioManager;
+        protected static BasicUIAudioManager? BasicUIAudioManager;
         
         public abstract void AddToContainer(LayoutContainer container);
 
         protected void TriggerButtonClickEffect()
         {
-            if (_basicUIAudioManager == null)
+            if (BasicUIAudioManager == null)
             {
                 // Unfortunately this is not in the DI container and no one holds a reference to it
-                _basicUIAudioManager = Resources.FindObjectsOfTypeAll<BasicUIAudioManager>().FirstOrDefault();
+                BasicUIAudioManager = Resources.FindObjectsOfTypeAll<BasicUIAudioManager>().FirstOrDefault();
             }
             
-            if (_basicUIAudioManager != null)
-                _basicUIAudioManager.HandleButtonClickEvent();
+            if (BasicUIAudioManager != null)
+                BasicUIAudioManager.HandleButtonClickEvent();
             
             _shockwaveEffect.HandleButtonClickEvent();
         }

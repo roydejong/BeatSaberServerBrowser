@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using HMUI;
 using ServerBrowser.Data;
-using ServerBrowser.Session;
 using ServerBrowser.UI.Browser.Modals;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.UI.Toolkit.Modals;
-using ServerBrowser.Util;
 using UnityEngine;
 using Zenject;
 
@@ -45,15 +43,7 @@ namespace ServerBrowser.UI.Browser.Views
             _serverRepository.ServersUpdatedEvent += HandleServersUpdated;
             _serverRepository.RefreshFinishedEvent += HandleServersRefreshFinished;
             
-            if (_session.LocalUserInfo != null)
-                HandleLocalUserInfoUpdated(_session.LocalUserInfo);
-            else
-                SetLocalUserInfoEmpty();
-            
-            if (_session.IsLoggedIn) 
-                HandleLoginStatusChanged(true);
-            
-            HandleAvatarUrlChanged(_session.AvatarUrl);
+            RefreshAccountStatus();
             
             _serverRepository.StartDiscovery(); // ensure we restart, in case we came back from lobby / connection error
             RefreshLoadingState();
@@ -81,42 +71,40 @@ namespace ServerBrowser.UI.Browser.Views
         #endregion
 
         #region Session
-
-        private void SetLocalUserInfoEmpty()
-        {
-            _selfUsernameText!.SetText($"No user info");
-            _selfUsernameText.SetTextColor(BssbColors.InactiveGray);
-            
-            _ = _selfAvatarImage!.SetPlaceholderAvatar();
-        }
         
         private void HandleLocalUserInfoUpdated(UserInfo userInfo)
         {
-            var username = userInfo.userName.StripTags();
-            _selfUsernameText!.SetText($"{username}");
-            _selfUsernameText.SetTextColor(BssbColors.White);
+            RefreshAccountStatus();
         }
         
         private void HandleAvatarUrlChanged(string? avatarUrl)
         {
-            _ = string.IsNullOrWhiteSpace(avatarUrl)
-                ? _selfAvatarImage!.SetPlaceholderAvatar()
-                : _selfAvatarImage!.SetRemoteImage(avatarUrl);
+            RefreshAccountStatus();
         }
 
         private void HandleLoginStatusChanged(bool loggedIn)
         {
-            if (!loggedIn)
+            RefreshAccountStatus();
+        }
+
+        private void RefreshAccountStatus()
+        {
+            if (_session.LocalUserInfo == null)
             {
-                // BSSB login failed
-                _selfUsernameText!.SetText("Login failed");
-                _selfUsernameText.SetTextColor(BssbColors.Orange);
+                _accountTile.SetNoLocalUserInfo();
+                return;
             }
-            else if (_session.LocalUserInfo != null)
+
+            if (!_session.IsLoggedIn)
             {
-                // BSSB login success; just presenting local user info for now
-                HandleLocalUserInfoUpdated(_session.LocalUserInfo);
+                if (_session.AttemptingLogin)
+                    _accountTile.SetLoggingIn(_session.LocalUserInfo.userName);
+                else
+                    _accountTile.SetLoginFailed(_session.LocalUserInfo.userName);
+                return;
             }
+
+            _accountTile.SetLoggedIn(_session.LocalUserInfo.userName, _session.AvatarUrl);
         }
         
         #endregion

@@ -29,7 +29,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         private TkText? _playerCountText = null;
         private TkText? _stateText = null;
 
-        public Action<ServerRepository.ServerInfo>? ClickedEvent;
+        public event Action<ServerRepository.ServerInfo>? ClickedEvent;
 
         public override void AddToContainer(LayoutContainer container)
         {

@@ -6,7 +6,6 @@ using BGLib.Polyglot;
 using HMUI;
 using IgnoranceCore;
 using ServerBrowser.Data;
-using ServerBrowser.Session;
 using ServerBrowser.UI.Browser.Views;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;

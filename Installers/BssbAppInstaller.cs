@@ -1,7 +1,6 @@
 using ServerBrowser.Data;
 using ServerBrowser.Models;
 using ServerBrowser.Network.Discovery;
-using ServerBrowser.Session;
 using ServerBrowser.UI.Toolkit;
 using Zenject;
 

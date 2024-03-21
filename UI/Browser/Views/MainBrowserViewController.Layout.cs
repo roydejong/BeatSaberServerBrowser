@@ -11,12 +11,11 @@ namespace ServerBrowser.UI.Browser.Views
 {
     public partial class MainBrowserViewController : ViewController, IInitializable
     {
-        private TkSearchInputField? _searchInputField;
-        private TkFilterButton? _filterButton;
-        private TkImageView? _selfAvatarImage;
-        private TkText? _selfUsernameText;
-        private TkScrollView? _scrollView;
-        private TkLoadingControl? _loadingControl;
+        private TkSearchInputField _searchInputField = null!;
+        private TkFilterButton _filterButton = null!;
+        private TkScrollView _scrollView = null!;
+        private TkLoadingControl _loadingControl = null!;
+        private TkAccountTile _accountTile = null!;
         
         private void BuildLayout(LayoutContainer root)
         {
@@ -36,17 +35,8 @@ namespace ServerBrowser.UI.Browser.Views
                 verticalFit: ContentSizeFitter.FitMode.PreferredSize, pivotPoint: new Vector2(0, 1f),
                 padding: new RectOffset(0, 0, 1, 0));
             leftContainer.PreferredWidth = 42.5f;
-            
-            var userPane = leftContainer.AddHorizontalLayoutGroup("UserPane", expandChildHeight: true,
-                horizontalFit: ContentSizeFitter.FitMode.PreferredSize,
-                padding: new RectOffset(1, 0, 1, 1));
-            userPane.SetBackground("round-rect-panel");
-            userPane.PreferredWidth = 41f;
-            
-            _selfAvatarImage = userPane.AddAvatarImage(10f, 10f);
-            _ = _selfAvatarImage.SetPlaceholderAvatar();
-            userPane.InsertMargin(2f, -1f);
-            _selfUsernameText = userPane.AddText("Username", width: 41f - 10f - 2f - 1f - 1f, height: 10f);
+
+            _accountTile = leftContainer.AddAccountTile();
             
             leftContainer.InsertMargin(-1f, 2f);
             

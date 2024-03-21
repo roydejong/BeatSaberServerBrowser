@@ -17,6 +17,13 @@ namespace ServerBrowser.Util
         
         public static readonly Color HotPink = MakeUnityColor(223, 21, 111);
         public static readonly Color DarkBlue = MakeUnityColor(12, 120, 242);
+        
+        
+        /// <summary>
+        /// Hover effect color for search input, filter input in base game.
+        /// </summary>
+        public static readonly Color SuperPink = MakeUnityColor(253, 37, 225);
+        
 
         internal static Color MakeUnityColor(int r, int g, int b, float alpha = 1f)
             => new Color(r / 255f, g / 255f, b / 255f, alpha);
