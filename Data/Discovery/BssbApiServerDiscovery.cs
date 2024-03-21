@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -33,6 +34,7 @@ namespace ServerBrowser.Data.Discovery
                         PlayerCount = server.ReadOnlyPlayerCount ?? 0,
                         PlayerLimit = server.PlayerLimit ?? 5,
                         ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,
+                        ServerEndPoint = new IPEndPoint(IPAddress.Parse("1.2.3.4"), 1234),
                         LobbyState = server.LobbyState ?? MultiplayerLobbyState.LobbySetup,
                         ServerCode = server.ServerCode,
                         ServerSecret = server.HostSecret

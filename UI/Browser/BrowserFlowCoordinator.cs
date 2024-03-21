@@ -37,6 +37,9 @@ namespace ServerBrowser.UI.Browser
         private CancellationTokenSource? _joiningLobbyCancellationTokenSource;
         private MultiplayerAvatarsData? _multiplayerAvatarsData;
         private ServerRepository.ServerInfo? _serverInfo;
+        
+        private bool _wasEverConnected;
+        private DisconnectedReason? _realDisconnectReason;
         private ConnectionFailedReason? _connectionFailedReason;
 
         #region Setup / Flow coordinator
@@ -156,6 +159,9 @@ namespace ServerBrowser.UI.Browser
                       $"{serverInfo.ConnectionMethod}");
 
             _serverInfo = serverInfo;
+
+            _wasEverConnected = false;
+            _realDisconnectReason = null;
             _connectionFailedReason = null;
             
             // We are doing the "connect by server code" flow, providing secret/code as available
@@ -228,7 +234,8 @@ namespace ServerBrowser.UI.Browser
             if (topViewController == _simpleDialogPromptViewController)
                 return;
 
-            if (_connectionFailedReason == ConnectionFailedReason.ConnectionCanceled)
+            if (_connectionFailedReason == ConnectionFailedReason.ConnectionCanceled
+                || _realDisconnectReason is DisconnectedReason.UserInitiated or DisconnectedReason.ClientConnectionClosed)
             {
                 // User canceled: return to main view
                 ShowMainView();
@@ -244,7 +251,41 @@ namespace ServerBrowser.UI.Browser
             var btnOk = Localization.Get("BUTTON_OK");
             var btnRetry = Localization.Get("BUTTON_RETRY");
             
-            _log.Error($"Multiplayer connection error: {errCode} ({errKey}): \"{errMsg}\"");
+            // If the connection failed due to a disconnect, we can provide more useful error messages than the game can  
+            if (_wasEverConnected && _realDisconnectReason != null)
+            {
+                errKey = _realDisconnectReason.Value.LocalizedKey();
+                errCode = _realDisconnectReason.Value.ErrorCode();
+                
+                // Won't use base game localized messages here because they're not helpful
+                errMsg = "Connection failed (disconnected)";
+                switch (_realDisconnectReason)
+                {
+                    case DisconnectedReason.Timeout:
+                        errMsg += "<br>The connection timed out";
+                        break;
+                    case DisconnectedReason.ServerAtCapacity:
+                        errMsg += "<br>The server is full";
+                        break;
+                    case DisconnectedReason.Kicked:
+                    case DisconnectedReason.ServerConnectionClosed: // base game would say: "Server was shut down" ???
+                        errMsg += "<br>You were kicked by the server";
+                        break;
+                    case DisconnectedReason.ServerTerminated:
+                        errMsg += "<br>The server was shutting down";
+                        break;
+                    default:
+                        errMsg += "<br>Check your internet connection and try again";
+                        break;
+                }
+                errMsg += $" ({errCode})";
+                
+                _log.Error($"Multiplayer connection failed with disconnect error: {errCode} ({errKey}): \"{errMsg}\"");
+            }
+            else
+            {
+                _log.Error($"Multiplayer connection failed error: {errCode} ({errKey}): \"{errMsg}\"");
+            }
 
             _simpleDialogPromptViewController.Init(errTitle, errMsg, btnOk, btnRetry,
                 (int btnId) =>
@@ -369,9 +410,32 @@ namespace ServerBrowser.UI.Browser
         #endregion
 
         #region Multiplayer Connection - Patches
+        
+        [AffinityPrefix]
+        [AffinityPatch(typeof(MultiplayerSessionManager), nameof(MultiplayerSessionManager.UpdateConnectionState))]
+        private void PrefixUpdateConnectionState(UpdateConnectionStateReason updateReason,
+            DisconnectedReason disconnectedReason, ConnectionFailedReason connectionFailedReason)
+        {
+            // Read internal session updates to get actually useful error messages
+            
+            _log.Info($"Connection state changed: updateReason={updateReason}," +
+                      $" disconnectedReason={disconnectedReason}, connectionFailedReason={connectionFailedReason}");
+            
+            if (updateReason == UpdateConnectionStateReason.Connected && !_wasEverConnected)
+            {
+                _wasEverConnected = true;
+                _log.Info("Connected to server");
+            }
+
+            if (disconnectedReason != DisconnectedReason.Unknown && _realDisconnectReason != disconnectedReason)
+            {
+                _realDisconnectReason = disconnectedReason;
+                _log.Info($"Disconnect reason: {disconnectedReason}");
+            }
+        }
 
         [AffinityPrefix]
-        [AffinityPatch(typeof(IgnoranceClient), "Start")]
+        [AffinityPatch(typeof(IgnoranceClient), nameof(IgnoranceClient.Start))]
         // ReSharper disable once InconsistentNaming
         private void PrefixIgnoranceClientStart(IgnoranceClient __instance)
         {
@@ -409,9 +473,11 @@ namespace ServerBrowser.UI.Browser
             );
             return false;
         }
-        
+
         [AffinityPrefix]
-        [AffinityPatch(typeof(GameServerLobbyFlowCoordinator), nameof(GameServerLobbyFlowCoordinator.GetLocalizedTitle))]
+        [AffinityPatch(typeof(GameServerLobbyFlowCoordinator),
+            nameof(GameServerLobbyFlowCoordinator.GetLocalizedTitle))]
+        // ReSharper disable once InconsistentNaming
         private bool PrefixGameServerLobbyFlowCoordinatorGetLocalizedTitle(ref string __result)
         {
             if (_serverInfo == null)
@@ -421,9 +487,10 @@ namespace ServerBrowser.UI.Browser
             __result = _serverInfo.ServerName;
             return false;
         }
-        
+
         [AffinityPrefix]
-        [AffinityPatch(typeof(MultiplayerLevelSelectionFlowCoordinator), "enableCustomLevels", AffinityMethodType.Getter)]
+        [AffinityPatch(typeof(MultiplayerLevelSelectionFlowCoordinator),
+            nameof(MultiplayerLevelSelectionFlowCoordinator.enableCustomLevels), AffinityMethodType.Getter)]
         [AffinityAfter("com.goobwabber.multiplayercore.affinity")]
         [AffinityPriority(1)]
         // ReSharper disable twice InconsistentNaming
@@ -436,7 +503,7 @@ namespace ServerBrowser.UI.Browser
                 // We are not managing this connection, or it is a regular GameLift connection - patch does not apply
                 return true;
 
-            __result = ____songPackMask.Contains(new SongPackMask("custom_levelpack_CustomLevels"));;
+            __result = ____songPackMask.Contains(new SongPackMask("custom_levelpack_CustomLevels"));
             return false;
         }
 
