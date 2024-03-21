@@ -188,7 +188,7 @@ namespace ServerBrowser.UI.Browser
             _unifiedNetworkPlayerModel.DestroyPartyConnection();
             
             if (showError)
-                ShowConnectionError();
+                _ = ShowConnectionError();
         }
         
         #endregion
@@ -217,11 +217,17 @@ namespace ServerBrowser.UI.Browser
             SetTitle("Online");
         }
 
-        private void ShowConnectionError()
+        private async Task ShowConnectionError()
         {
+            while (_joiningLobbyViewController.isInTransition)
+            {
+                // Prevent showing the error dialog while the join view is still transitioning
+                await Task.Delay(10);
+            }
+            
             if (topViewController == _simpleDialogPromptViewController)
                 return;
-            
+
             if (_connectionFailedReason == ConnectionFailedReason.ConnectionCanceled)
             {
                 // User canceled: return to main view
@@ -237,6 +243,8 @@ namespace ServerBrowser.UI.Browser
             var errMsg = $"{Localization.Get(errKey)} ({errCode})";
             var btnOk = Localization.Get("BUTTON_OK");
             var btnRetry = Localization.Get("BUTTON_RETRY");
+            
+            _log.Error($"Multiplayer connection error: {errCode} ({errKey}): \"{errMsg}\"");
 
             _simpleDialogPromptViewController.Init(errTitle, errMsg, btnOk, btnRetry,
                 (int btnId) =>
