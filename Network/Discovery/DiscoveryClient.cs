@@ -117,14 +117,17 @@ namespace ServerBrowser.Network.Discovery
             _lastBroadcastTime = Time.time;
         }
         
-        public const float DiscoveryInterval = 5f;
+        private const float DiscoveryInterval = 5f;
 
-        public static readonly IPEndPoint BroadcastEndpoint = new(IPAddress.Broadcast, DiscoveryConsts.BroadcastPort);
+        private static readonly IPEndPoint BroadcastEndpoint = new(IPAddress.Broadcast, DiscoveryConsts.BroadcastPort);
+        
+        private static readonly string GameVersionNoSuffix = Application.version.Split('_')[0];
 
-        public static readonly DiscoveryQueryPacket QueryPacket = new()
+        private static readonly DiscoveryQueryPacket QueryPacket = new()
         {
             Prefix = DiscoveryConsts.PacketPrefix,
-            ProtocolVersion = DiscoveryConsts.ProtocolVersion
+            ProtocolVersion = DiscoveryConsts.ProtocolVersion,
+            GameVersion = GameVersionNoSuffix
         };
     }
 }
