@@ -7,8 +7,10 @@ using HMUI;
 using IgnoranceCore;
 using ServerBrowser.Data;
 using ServerBrowser.UI.Browser.Views;
+using ServerBrowser.Util;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
+using UnityEngine;
 using Zenject;
 
 namespace ServerBrowser.UI.Browser
@@ -33,6 +35,7 @@ namespace ServerBrowser.UI.Browser
         [Inject] private readonly ILobbyGameStateController _lobbyGameStateController = null!;
         [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
         [Inject] private readonly IMultiplayerSessionManager _multiplayerSessionManager = null!;
+        [Inject] private readonly MenuLightsManager _menuLightsManager = null!;
         
         private CancellationTokenSource? _joiningLobbyCancellationTokenSource;
         private MultiplayerAvatarsData? _multiplayerAvatarsData;
@@ -211,6 +214,7 @@ namespace ServerBrowser.UI.Browser
                 animationType: ViewController.AnimationType.Out,
                 animationDirection: ViewController.AnimationDirection.Vertical);
             SetTitle("Online");
+            ResetMenuLights();
         }
 
         private void ShowJoiningLobby(ServerRepository.ServerInfo serverInfo)
@@ -221,6 +225,7 @@ namespace ServerBrowser.UI.Browser
             ReplaceTopViewController(_joiningLobbyViewController,
                 animationDirection: ViewController.AnimationDirection.Vertical);
             SetTitle("Online");
+            SetMenuLights(MenuLightsConnectPreset);
         }
 
         private async Task ShowConnectionError()
@@ -307,6 +312,7 @@ namespace ServerBrowser.UI.Browser
                 animationType: ViewController.AnimationType.In,
                 animationDirection: ViewController.AnimationDirection.Vertical);
             SetTitle("");
+            SetMenuLights(MenuLightsErrorPreset);
         }
 
         #endregion
@@ -513,6 +519,53 @@ namespace ServerBrowser.UI.Browser
             __result = ____songPackMask.Contains(new SongPackMask("custom_levelpack_CustomLevels"));
             return false;
         }
+
+        #endregion
+
+        #region Menu Lights
+
+        private MenuLightsPresetSO BakeMenuLightsPreset(Color color)
+        {
+            var colorSo = ScriptableObject.CreateInstance<SimpleColorSO>();
+            colorSo.SetColor(color);
+            
+            var presetSo = Instantiate(_menuLightsManager._defaultPreset);
+            presetSo._playersPlaceNeonsColor = colorSo;
+            foreach (var pair in presetSo._lightIdColorPairs)
+            {
+                pair.baseColor = colorSo;
+                pair.intensity = 1f;
+            }
+            return presetSo;
+        }
+
+        private MenuLightsPresetSO? _menuLightsErrorPresetCached = null;
+        private MenuLightsPresetSO MenuLightsErrorPreset
+        {
+            get
+            {
+                if (_menuLightsErrorPresetCached == null)
+                    _menuLightsErrorPresetCached = BakeMenuLightsPreset(BssbColors.FailureRed);
+                return _menuLightsErrorPresetCached;
+            }
+        }
+
+        private MenuLightsPresetSO? _menuLightsConnectPresetCached = null;
+        private MenuLightsPresetSO MenuLightsConnectPreset
+        {
+            get
+            {
+                if (_menuLightsConnectPresetCached == null)
+                    _menuLightsConnectPresetCached = BakeMenuLightsPreset(BssbColors.GoingToAnotherDimension);
+                return _menuLightsConnectPresetCached;
+            }
+        }
+
+        private void SetMenuLights(MenuLightsPresetSO preset, bool animated = true) =>
+            _menuLightsManager.SetColorPreset(preset, animated);
+
+        private void ResetMenuLights(bool animated = true) =>
+            SetMenuLights(_menuLightsManager._defaultPreset, animated);
 
         #endregion
     }

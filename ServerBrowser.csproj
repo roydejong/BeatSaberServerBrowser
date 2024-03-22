@@ -79,9 +79,9 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.Polyglot.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BGNet, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BGLib.UnityExtension">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNet.dll</HintPath>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.UnityExtension.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BGNetCore">
@@ -98,6 +98,12 @@
     <Reference Include="BSML, Version=1.4.5.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
+    </Reference>
+    <Reference Include="Colors">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Colors.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
       <Publicize>True</Publicize>
     </Reference>
@@ -400,6 +406,9 @@
     <EmbeddedResource Include="Assets\Sprites\Spectator.png" />
     <EmbeddedResource Include="Assets\Sprites\PlaceholderAvatar.png" />
     <EmbeddedResource Include="Assets\Sprites\PlaceholderSabers.png" />
+    <EmbeddedResource Include="Assets\Sprites\Checkmark.png" />
+    <EmbeddedResource Include="Assets\Sprites\EnergyBolt.png" />
+    <EmbeddedResource Include="Assets\Sprites\CircleDot.png" />
     <Content Include="v2.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
