@@ -2,6 +2,7 @@ using System;
 using BGLib.Polyglot;
 using HMUI;
 using JetBrains.Annotations;
+using ServerBrowser.Assets;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -10,16 +11,18 @@ using Object = UnityEngine.Object;
 namespace ServerBrowser.UI.Toolkit.Components
 {
     [UsedImplicitly]
-    public class TkSearchInputField : LayoutComponent
+    public class TkTextInputField : LayoutComponent
     {
         [Inject] private readonly SiraLog _logger = null!;
         [Inject] private readonly LevelSearchViewController _levelSearchViewController = null!;
 
-        private GameObject? _gameObject;
-        private InputFieldView? _inputFieldView;
-        private CurvedTextMeshPro? _placeholderText;
-
-        public event Action<InputFieldView.SelectionState, string> ChangedEvent;
+        private GameObject _gameObject = null!;
+        private InputFieldView _inputFieldView = null!;
+        private CurvedTextMeshPro _placeholderText = null!;
+        private ImageView _iconView = null!;
+        
+        public event Action<InputFieldView.SelectionState, string>? ChangedEvent;
+        public event Action<string>? KeyboardOkPressedEvent;
 
         public override void AddToContainer(LayoutContainer container)
         {
@@ -31,13 +34,15 @@ namespace ServerBrowser.UI.Toolkit.Components
             }
 
             _gameObject = Object.Instantiate(searchInputField.gameObject, container.Transform, false);
-            _gameObject.name = "TkSearchInputField";
+            _gameObject.name = "TkTextInputField";
             _gameObject.SetActive(true);
 
             _inputFieldView = _gameObject.GetComponent<InputFieldView>();
             
             _placeholderText = _inputFieldView._placeholderText.GetComponent<CurvedTextMeshPro>();
             Object.Destroy(_inputFieldView._placeholderText.GetComponent<LocalizedTextMeshProUGUI>());
+
+            _iconView = _gameObject.transform.Find("Icon").GetComponent<ImageView>();
 
             _inputFieldView.onValueChanged.RemoveAllListeners();
             _inputFieldView.onValueChanged.AddListener((_) =>
@@ -49,27 +54,31 @@ namespace ServerBrowser.UI.Toolkit.Components
                 ChangedEvent?.Invoke(state, TextValue);
             };
 
+            var keyboardManager = GetUIKeyboardManager();
+            keyboardManager.keyboard.okButtonWasPressedEvent += () => KeyboardOkPressedEvent?.Invoke(TextValue);
+
             ClearTextValue();
         }
 
         public InputFieldView.SelectionState SelectionState => _inputFieldView != null
             ? _inputFieldView.selectionState
             : InputFieldView.SelectionState.Normal;
-
         public string TextValue => _inputFieldView != null ? _inputFieldView.text : "";
-
-        public void SetTextValue(string textValue)
-        {
-            if (_inputFieldView != null)
-                _inputFieldView.SetText(textValue);
-        }
-
+        
+        public void SetTextValue(string textValue) => _inputFieldView.SetText(textValue);
         public void ClearTextValue() => SetTextValue("");
-
-        public void SetPlaceholderText(string placeholderText)
+        public void SetPlaceholderText(string placeholderText) => _placeholderText.SetText(placeholderText);
+        public void SetIconSprite(string spriteName) => _ = _iconView.SetAssetSpriteAsync(spriteName);
+        public void OpenKeyboard() => GetUIKeyboardManager().OpenKeyboardFor(_inputFieldView);
+        public void SetKeyboardOffset(Vector3 offset) => _inputFieldView._keyboardPositionOffset = offset;
+        
+        
+        private static UIKeyboardManager? UIKeyboardManager = null;
+        private static UIKeyboardManager GetUIKeyboardManager()
         {
-            if (_placeholderText != null)
-                _placeholderText.SetText(placeholderText);
+            if (UIKeyboardManager == null)
+                UIKeyboardManager = Object.FindObjectOfType<UIKeyboardManager>();
+            return UIKeyboardManager;
         }
     }
 }

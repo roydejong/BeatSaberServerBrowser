@@ -87,5 +87,11 @@ namespace ServerBrowser.UI.Toolkit.Components
             if (_textMesh != null)
                 _textMesh.alignment = textAlignment;
         }
+
+        public void SetActive(bool active)
+        {
+            if (_gameObject != null)
+                _gameObject.SetActive(active);
+        }
     }
 }

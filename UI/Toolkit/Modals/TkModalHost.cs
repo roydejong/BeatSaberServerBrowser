@@ -80,6 +80,7 @@ namespace ServerBrowser.UI.Toolkit.Modals
             modalGo.transform.SetParent(_modalRoot.transform, false);
             
             _modalView = _diContainer.InstantiateComponent<T>(modalGo);
+            _modalView.ModalHost = this;
 
             var modalRect = modalGo.GetOrAddComponent<RectTransform>();
             modalRect.sizeDelta = new Vector2(_modalView.ModalWidth, _modalView.ModalHeight);

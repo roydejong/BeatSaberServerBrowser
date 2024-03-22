@@ -33,6 +33,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _imageView.sprite = Utilities.ImageResources.WhitePixel;
             _imageView.material = Utilities.ImageResources.NoGlowMat;
             _imageView.color = BssbColors.VeryLightGray;
+            _imageView.raycastTarget = false;
         }
 
         public void SetThickness(float thickness)

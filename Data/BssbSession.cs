@@ -138,7 +138,6 @@ namespace ServerBrowser.Data
                 {
                     UserInfo = LocalUserInfo,
                     AuthenticationToken = await GetPlatformAuthToken()
-
                 });
 
                 if (loginResponse == null)

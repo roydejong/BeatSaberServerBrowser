@@ -168,8 +168,8 @@ namespace ServerBrowser.UI.Toolkit
             button.onClick.AddListener(clickAction);
         }
 
-        public TkButton AddButton(string text, bool primary = false, int paddingHorizontal = 4, int paddingVertical = 2, 
-            float preferredWidth = -1f, float preferredHeight = -1f, string? iconName = null, float iconSize = 10f,
+        public TkButton AddButton(string text, bool primary = false, float preferredWidth = -1f,
+            float preferredHeight = -1f, string? iconName = null, float iconSize = 10f,
             UnityAction? clickAction = null, bool noSkew = false, Color? highlightColor = null)
         {
             var bsmlButton = primary ? new PrimaryButtonTag() : new ButtonTag();
@@ -177,7 +177,8 @@ namespace ServerBrowser.UI.Toolkit
             
             var button = new TkButton(gameObject);
             button.SetText(text);
-            button.SetPadding(paddingHorizontal, paddingVertical);
+            button.SetOuterPadding(4, 2);
+            button.SetInternalPadding(3, 3, 0, 0);
             button.SetWidth(preferredWidth);
             button.SetHeight(preferredHeight);
             if (iconName != null)
@@ -201,12 +202,14 @@ namespace ServerBrowser.UI.Toolkit
             return line;
         }
         
-        public TkSearchInputField AddSearchInputField(string? placeholderText = "Search")
+        public TkTextInputField AddTextInputField(string? placeholderText = "Search", string? iconSprite = null)
         {
-            var searchInputField = Builder.CreateComponent<TkSearchInputField>();
+            var searchInputField = Builder.CreateComponent<TkTextInputField>();
             searchInputField.AddToContainer(this);
             if (placeholderText != null)
                 searchInputField.SetPlaceholderText(placeholderText);
+            if (iconSprite != null)
+                searchInputField.SetIconSprite(iconSprite);
             return searchInputField;
         }
         

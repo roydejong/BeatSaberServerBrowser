@@ -103,7 +103,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             _usernameText.SetText("Logged out");
             _usernameText.SetTextColor(BssbColors.White);
             
-            _subText.SetText("You are not logged in");
+            _subText.SetText("No local profile available");
             _subText.SetTextColor(BssbColors.InactiveGray);
         }
 
@@ -128,8 +128,8 @@ namespace ServerBrowser.UI.Toolkit.Components
             _usernameText.SetText(username.StripTags());
             _usernameText.SetTextColor(BssbColors.White);
             
-            _subText.SetText("Logged in");
-            _subText.SetTextColor(BssbColors.HotPink);
+            _subText.SetText("Online");
+            _subText.SetTextColor(BssbColors.InactiveGray);
         }
 
         public void SetLoginFailed(string username)
@@ -139,8 +139,8 @@ namespace ServerBrowser.UI.Toolkit.Components
             _usernameText.SetText(username.StripTags());
             _usernameText.SetTextColor(BssbColors.White);
             
-            _subText.SetText("Login failed");
-            _subText.SetTextColor(BssbColors.Orange);
+            _subText.SetText("Login failed"); 
+            _subText.SetTextColor(BssbColors.FailureRed);
         }
     }
 }

@@ -303,7 +303,6 @@ namespace ServerBrowser.Data
                         MultiplayerLobbyState.Error => "Error",
                         _ => "Unknown"
                     };
-                
                 }
             }
         }

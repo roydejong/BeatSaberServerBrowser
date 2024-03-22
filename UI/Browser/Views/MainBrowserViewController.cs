@@ -22,8 +22,11 @@ namespace ServerBrowser.UI.Browser.Views
         private readonly List<TkServerCell> _serverCells = new();
         private bool _completedFullRefresh = false;
         private int _lastContentHeight = 0;
+        private AccountModalView? _accountModalView = null;
         
         public event Action<ServerRepository.ServerInfo>? ServerJoinRequestedEvent;
+        public event Action<string>? ServerCodeJoinRequestedEvent;
+        public event Action? AvatarEditRequestedEvent;
 
         #region Init / Deinit
         
@@ -70,7 +73,7 @@ namespace ServerBrowser.UI.Browser.Views
 
         #endregion
 
-        #region Session
+        #region Session / Account
         
         private void HandleLocalUserInfoUpdated(UserInfo userInfo)
         {
@@ -89,6 +92,9 @@ namespace ServerBrowser.UI.Browser.Views
 
         private void RefreshAccountStatus()
         {
+            if (_accountModalView != null)
+                _accountModalView.SetData(_session.LocalUserInfo, _session.IsLoggedIn);
+            
             if (_session.LocalUserInfo == null)
             {
                 _accountTile.SetNoLocalUserInfo();
@@ -105,6 +111,12 @@ namespace ServerBrowser.UI.Browser.Views
             }
 
             _accountTile.SetLoggedIn(_session.LocalUserInfo.userName, _session.AvatarUrl);
+        }
+
+        private void HandleAccountTileClicked()
+        {
+            _accountModalView = TkModalHost.ShowModal<AccountModalView>(this, _diContainer);
+            RefreshAccountStatus();
         }
         
         #endregion
@@ -230,42 +242,36 @@ namespace ServerBrowser.UI.Browser.Views
         #endregion
 
         #region Mode Selection
-        
-        public event Action<ModeSelectionTarget>? ModeSelectedEvent;
 
-        public enum ModeSelectionTarget
-        {
-            QuickPlay = 0,
-            CreateServer = 1,
-            JoinByCode = 2,
-            EditAvatar = 3
-        }
         
         private void HandleQuickPlayClicked()
         {
-            ModeSelectedEvent?.Invoke(ModeSelectionTarget.QuickPlay);
         }
 
         private void HandleCreateServerClicked()
         {
-            ModeSelectedEvent?.Invoke(ModeSelectionTarget.CreateServer);
         }
         
         private void HandleJoinByCodeClicked()
         {
-            ModeSelectedEvent?.Invoke(ModeSelectionTarget.JoinByCode);
+            var modal = TkModalHost.ShowModal<ServerCodeModalView>(this, _diContainer);
+            modal.FinishedEvent += (string? value) =>
+            {
+                if (!string.IsNullOrEmpty(value))
+                    ServerCodeJoinRequestedEvent?.Invoke(value);
+            };
         }
 
         private void HandleEditAvatarClicked()
         {
-            ModeSelectedEvent?.Invoke(ModeSelectionTarget.EditAvatar);
+            AvatarEditRequestedEvent?.Invoke();
         }
         
         #endregion
 
         #region Search & Filter
         
-        private void HandleSearchInputChanged(InputFieldView.SelectionState state, string value)
+        private void HandleTextInputChanged(InputFieldView.SelectionState state, string value)
         {
             if (_serverRepository.FilterText == value)
                 return;

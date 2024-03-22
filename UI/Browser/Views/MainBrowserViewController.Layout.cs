@@ -11,7 +11,7 @@ namespace ServerBrowser.UI.Browser.Views
 {
     public partial class MainBrowserViewController : ViewController, IInitializable
     {
-        private TkSearchInputField _searchInputField = null!;
+        private TkTextInputField _textInputField = null!;
         private TkFilterButton _filterButton = null!;
         private TkScrollView _scrollView = null!;
         private TkLoadingControl _loadingControl = null!;
@@ -37,6 +37,7 @@ namespace ServerBrowser.UI.Browser.Views
             leftContainer.PreferredWidth = 42.5f;
 
             _accountTile = leftContainer.AddAccountTile();
+            _accountTile.ClickedEvent += HandleAccountTileClicked;
             
             leftContainer.InsertMargin(-1f, 2f);
             
@@ -74,8 +75,8 @@ namespace ServerBrowser.UI.Browser.Views
             var topBar = mainContainer.AddHorizontalLayoutGroup("TopBar");
             topBar.PreferredHeight = 10f;
             
-            _searchInputField = topBar.AddSearchInputField("Search Lobbies");
-            _searchInputField.ChangedEvent += HandleSearchInputChanged;
+            _textInputField = topBar.AddTextInputField("Search Lobbies");
+            _textInputField.ChangedEvent += HandleTextInputChanged;
             
             _filterButton = topBar.AddFilterButton("No Filters");
             _filterButton.ClickedEvent += HandleFilterButtonClicked;

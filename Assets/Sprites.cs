@@ -11,8 +11,11 @@ namespace ServerBrowser.Assets
         private const string ResourcePrefix = "ServerBrowser.Assets.Sprites.";
 
         internal const string Avatar = "Avatar"; 
+        internal const string Checkmark = "Checkmark";
+        internal const string CircleDot = "CircleDot";
         internal const string ComboCrown = "ComboCrown";
         internal const string Crown = "Crown";
+        internal const string EnergyBolt = "EnergyBolt";
         internal const string Friends = "Friends";
         internal const string Ghost = "Ghost";
         internal const string Global = "Global";

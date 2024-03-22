@@ -20,7 +20,7 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
         private readonly StackLayoutGroup _baseLayout;
         private readonly Transform _contentTransform;
         private readonly LayoutElement _layoutElement;
-        private readonly HorizontalLayoutGroup _contentLayout;
+        private readonly StackLayoutGroup _contentLayout;
 
         private ImageView? _icon;
         private Color? _highlightColor;
@@ -36,6 +36,7 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
             _baseLayout = gameObject.GetComponent<StackLayoutGroup>();
             _contentTransform = gameObject.transform.Find("Content");
             _layoutElement = gameObject.GetOrAddComponent<LayoutElement>();
+            _contentLayout = _contentTransform.GetComponent<StackLayoutGroup>();
 
             // Add a sub horizontal layout group so we can have icons positioned to the left of the text
             var innerGameObject = new GameObject("ContentInner")
@@ -90,11 +91,14 @@ namespace ServerBrowser.UI.Toolkit.Wrappers
             }
         }
 
-        public void SetPadding(int padding)
-            => _baseLayout.padding = new RectOffset(0, 0, 0, 0);
+        public void SetOuterPadding(int left, int right, int top, int bottom)
+            => _baseLayout.padding = new RectOffset(left, right, top, bottom);
 
-        public void SetPadding(int horizontal, int vertical)
+        public void SetOuterPadding(int horizontal, int vertical)
             => _baseLayout.padding = new RectOffset(horizontal, horizontal, vertical, vertical);
+
+        public void SetInternalPadding(int left, int right, int top, int bottom)
+            => _contentLayout.padding = new(left, right, top, bottom); 
 
         public void SetWidth(float width)
             => _layoutElement.preferredWidth = width;

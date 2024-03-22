@@ -1,9 +1,9 @@
-using System;
-using ServerBrowser.Data;
+using ServerBrowser.Assets;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.UI.Toolkit.Modals;
 using ServerBrowser.UI.Toolkit.Wrappers;
+using ServerBrowser.Util;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -17,53 +17,50 @@ namespace ServerBrowser.UI.Browser.Modals
         public override float ModalWidth => 65f;
         public override float ModalHeight => 50f;
 
-        private ServerRepository.ServerInfo? _serverInfo = null;
-
         private LayoutContainer _container = null!;
         private TkText _titleText = null!;
-        private TkButton _connectButton = null!;
-        
-        private TkTableView.TableRow _rowGameMode = null!; 
-        private TkTableView.TableRow _rowPlayerCount = null!; 
-        private TkTableView.TableRow _rowLobbyStatus = null!;
-
-        public event Action<ServerRepository.ServerInfo>? ConnectClickedEvent;
+        private TkText _statusText = null!;
+        private TkButton _button = null!;
 
         public override void Initialize()
         {
             var wrap = new LayoutContainer(_layoutBuilder, transform, false);
-            
+
             _container = wrap.AddVerticalLayoutGroup("Content",
                 padding: new RectOffset(4, 4, 4, 4),
                 expandChildWidth: true, expandChildHeight: false);
             _container.SetBackground("round-rect-panel");
-            
-            _titleText = _container.AddText("Server", textAlignment: TextAlignmentOptions.Center);
+
+            _titleText = _container.AddText("Username", textAlignment: TextAlignmentOptions.Center);
+            _statusText = _container.AddText("Status", textAlignment: TextAlignmentOptions.Center, fontSize: 2.8f);
             
             _container.InsertMargin(-1f, 4f);
-
-            var tableView = _container.AddTableView();
-            _rowGameMode = tableView.AddRow("Game mode");
-            _rowPlayerCount = tableView.AddRow("Player count");
-            _rowLobbyStatus = tableView.AddRow("Lobby status");
-
-            _connectButton = _container.AddButton("Connect", primary: true,
-                paddingVertical: 3, paddingHorizontal: 6, clickAction: () =>
-                {
-                    if (_serverInfo != null)
-                        ConnectClickedEvent?.Invoke(_serverInfo);
-                });
+            _container.AddHorizontalLine();
+            
+            _button = _container.AddButton("View profile in browser", iconName: Sprites.Spectator, iconSize: 3.2f);
         }
 
-        public void SetData(ServerRepository.ServerInfo serverInfo)
+        public void SetData(UserInfo? userInfo, bool loggedIn)
         {
-            _serverInfo = serverInfo;
-            
-            _titleText.SetText(serverInfo.ServerName);
-            
-            _rowGameMode.Value = serverInfo.GameModeName;
-            _rowPlayerCount.Value = $"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}";
-            _rowLobbyStatus.Value = serverInfo.InGameplay ? "Playing level" : "In lobby";
+            if (userInfo == null)
+            {
+                _titleText.SetText("Not logged in");
+                _titleText.SetTextColor(BssbColors.InactiveGray);
+
+                _statusText.SetText("No local profile is available. Are you logged out or offline on Steam / Oculus?");
+                _statusText.SetTextColor(BssbColors.White);
+                _statusText.SetActive(true);
+
+                _button.GameObject.SetActive(false);
+                return;
+            }
+
+            _titleText.SetText(userInfo.userName);
+            _titleText.SetTextColor(BssbColors.White);
+
+            _statusText.SetText(loggedIn ? $"Logged in ({userInfo.platform.ToString()})" : "Logging in...");
+
+            _button.GameObject.SetActive(true);
         }
     }
 }

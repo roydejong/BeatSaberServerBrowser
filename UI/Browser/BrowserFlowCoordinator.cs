@@ -49,8 +49,9 @@ namespace ServerBrowser.UI.Browser
         
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
-            _mainViewController.ModeSelectedEvent += HandleModeSelected;
             _mainViewController.ServerJoinRequestedEvent += HandleServerJoinRequested;
+            _mainViewController.ServerCodeJoinRequestedEvent += HandleServerJoinByCodeRequested;
+            _mainViewController.AvatarEditRequestedEvent += HandleAvatarEditRequested;
             _joiningLobbyViewController.didCancelEvent += HandleJoinCanceled;
             
             _multiplayerSessionManager.connectedEvent += HandleSessionConnected;
@@ -72,8 +73,9 @@ namespace ServerBrowser.UI.Browser
 
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
-            _mainViewController.ModeSelectedEvent -= HandleModeSelected;
             _mainViewController.ServerJoinRequestedEvent -= HandleServerJoinRequested;
+            _mainViewController.ServerCodeJoinRequestedEvent -= HandleServerJoinByCodeRequested;
+            _mainViewController.AvatarEditRequestedEvent -= HandleAvatarEditRequested;
             _joiningLobbyViewController.didCancelEvent -= HandleJoinCanceled;
             
             _multiplayerSessionManager.connectedEvent -= HandleSessionConnected;
@@ -104,22 +106,25 @@ namespace ServerBrowser.UI.Browser
 
         #region UI Events
         
-        private void HandleModeSelected(MainBrowserViewController.ModeSelectionTarget target)
+        private void HandleAvatarEditRequested()
         {
-            switch (target)
-            {
-                case MainBrowserViewController.ModeSelectionTarget.EditAvatar:
-                {
-                    _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
-                    _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator.childFlowCoordinator, true);
-                    break;
-                }
-            }
+            _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
+            _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator.childFlowCoordinator, true);
         }
 
         private void HandleServerJoinRequested(ServerRepository.ServerInfo server)
         {
             ConnectToServer(server);
+        }
+        
+        private void HandleServerJoinByCodeRequested(string serverCode)
+        {
+            ConnectToServer(new ServerRepository.ServerInfo()
+            {
+                ServerName = "Lobby",
+                ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial,
+                ServerCode = serverCode
+            });
         }
         
         private void HandleJoinCanceled()

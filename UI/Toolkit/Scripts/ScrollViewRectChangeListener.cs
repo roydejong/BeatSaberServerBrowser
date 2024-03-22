@@ -10,7 +10,7 @@ namespace ServerBrowser.UI.Toolkit.Scripts
         private bool _isDirty = false;
         private int _lastHeight = 0;
         
-        protected override void OnRectTransformDimensionsChange()
+        public override void OnRectTransformDimensionsChange()
         {
             _isDirty = true;
         }

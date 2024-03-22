@@ -1,4 +1,5 @@
 using System;
+using ServerBrowser.Assets;
 using ServerBrowser.Data;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Components;
@@ -14,7 +15,7 @@ namespace ServerBrowser.UI.Browser.Modals
     {
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
 
-        public override float ModalWidth => 65f;
+        public override float ModalWidth => 55f;
         public override float ModalHeight => 50f;
 
         private ServerRepository.ServerInfo? _serverInfo = null;
@@ -38,21 +39,25 @@ namespace ServerBrowser.UI.Browser.Modals
                 expandChildWidth: true, expandChildHeight: false);
             _container.SetBackground("round-rect-panel");
             
-            _titleText = _container.AddText("Server", textAlignment: TextAlignmentOptions.Center);
+            _titleText = _container.AddText("Server", textAlignment: TextAlignmentOptions.Center, fontSize: 4f);
             
-            _container.InsertMargin(-1f, 4f);
+            _container.InsertMargin(-1f, 2f);
 
             var tableView = _container.AddTableView();
             _rowGameMode = tableView.AddRow("Game mode");
             _rowPlayerCount = tableView.AddRow("Player count");
             _rowLobbyStatus = tableView.AddRow("Lobby status");
+            
+            _container.InsertMargin(-1f, 2f);
 
             _connectButton = _container.AddButton("Connect", primary: true,
-                paddingVertical: 3, paddingHorizontal: 6, clickAction: () =>
+                iconName: Sprites.Checkmark, iconSize: 4f,
+                preferredHeight: 8f, preferredWidth: 24f, clickAction: () =>
                 {
                     if (_serverInfo != null)
                         ConnectClickedEvent?.Invoke(_serverInfo);
                 });
+            _connectButton.SetOuterPadding(0, 0);
         }
 
         public void SetData(ServerRepository.ServerInfo serverInfo)
