@@ -1,44 +1,22 @@
-using ServerBrowser.Core;
 using ServerBrowser.UI;
-using ServerBrowser.UI.Components;
-using ServerBrowser.UI.Lobby;
-using ServerBrowser.UI.Utils;
-using ServerBrowser.UI.Views;
+using ServerBrowser.UI.Browser;
+using ServerBrowser.UI.Browser.Views;
+using ServerBrowser.UI.Toolkit;
 using Zenject;
 
 namespace ServerBrowser.Installers
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class BssbMenuInstaller : Installer
+    public class BssbMenuInstaller : MonoInstaller
     {
         public override void InstallBindings()
         {
-            // BSSB Core
-            Container.BindInterfacesAndSelfTo<BssbBrowser>().AsSingle();
-            Container.BindInterfacesAndSelfTo<BssbMenuDataCollector>().AsSingle();
+            Container.Bind<LayoutBuilder>().AsTransient();
+            Container.Bind<MaterialAccessor>().AsSingle();
             
-            // UI Core
-            Container.BindInterfacesAndSelfTo<ModeSelectionIntegrator>().AsSingle();
-            Container.BindInterfacesAndSelfTo<CreateServerExtender>().AsSingle();
-            Container.BindInterfacesAndSelfTo<CoverArtLoader>().FromNewComponentOnNewGameObject().AsSingle();
-
-            // UI Views
-            Container.Bind<ServerBrowserMainViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.Bind<ServerBrowserDetailViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.Bind<ServerBrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
+            Container.BindInterfacesAndSelfTo<MainBrowserViewController>().FromNewComponentAsViewController().AsSingle();
+            Container.BindInterfacesAndSelfTo<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             
-            // Helpers
-            Container.BindInterfacesAndSelfTo<BssbFloatingAlertMenuInit>().AsSingle();
-            
-            // Inject LobbyConfigPanel dependencies
-            Container.Inject(LobbyConfigPanel.instance);
-            LobbyConfigPanel.instance.Initialize();
-            
-            // UI Extras
-            if (Plugin.Config.EnableJoiningLobbyExtender)
-            {
-                Container.BindInterfacesAndSelfTo<JoiningLobbyExtender>().AsSingle();
-            }
+            Container.BindInterfacesAndSelfTo<MainMenuIntegrator>().AsSingle();
         }
     }
 }
