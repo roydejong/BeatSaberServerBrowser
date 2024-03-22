@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using HMUI;
 using ServerBrowser.Util;
@@ -12,6 +13,7 @@ namespace ServerBrowser.UI.Toolkit.Modals
     {
         [Inject] private readonly DiContainer _diContainer = null!;
         [Inject] private readonly MaterialAccessor _materialAccessor = null!;
+        [Inject] private readonly GameplaySetupViewController _gameplaySetupViewController = null!;
         
         private CanvasGroup _canvasGroup = null!;
         private TkModalView? _modalView = null;
@@ -84,8 +86,8 @@ namespace ServerBrowser.UI.Toolkit.Modals
             
             _modalView.Initialize();
             
-            // modalGo.GetOrAddComponent<PanelAnimation>().StartAnimation(canvasGroup, _canvasGroup, 1f, AnimationCurve.EaseInOut(), this._scaleYAnimationCurve, this._alphaAnimationCurve, this._parentAlphaAnimationCurve, finishedCallback);
-
+            RunOpenPanelAnimation(_modalView.gameObject);
+            
             FadeOutBaseView();
 
             return (T)_modalView;
@@ -98,14 +100,38 @@ namespace ServerBrowser.UI.Toolkit.Modals
             
             if (_modalView == null)
                 return;
+
+            var closeGo = _modalView.gameObject;
+            RunClosePanelAnimation(closeGo, () =>
+            {
+                Destroy(closeGo);
+            });
             
-            // TODO: Close animation
-            
-            Destroy(_modalView.gameObject);
+            _modalView.InvokeModalClosed();
             _modalView = null;
 
             FadeInBaseView();
         }
+
+        #region Panel Animation
+
+        public void RunOpenPanelAnimation(GameObject panelGo, Action? finishCallback = null)
+        {
+            var presentAnim = _gameplaySetupViewController._colorsOverrideSettingsPanelController
+                ._presentPanelAnimation;
+            
+            panelGo.SetActive(true);
+            presentAnim.ExecuteAnimation(panelGo, finishCallback);
+        }
+
+        public void RunClosePanelAnimation(GameObject panelGo, Action? finishCallback = null)
+        {
+            var closeAnim = _gameplaySetupViewController._colorsOverrideSettingsPanelController
+                ._dismissPanelAnimation;    
+            closeAnim.ExecuteAnimation(panelGo, finishCallback);
+        }
+
+        #endregion
         
         #region Base View Fade
 
