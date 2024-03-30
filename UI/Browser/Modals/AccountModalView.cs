@@ -35,7 +35,9 @@ namespace ServerBrowser.UI.Browser.Modals
             _statusText = _container.AddText("Status", textAlignment: TextAlignmentOptions.Center, fontSize: 2.8f);
             
             _container.InsertMargin(-1f, 4f);
-            _container.AddHorizontalLine();
+
+            _container.AddToggle();
+            _container.AddDropdown();
             
             _button = _container.AddButton("View profile in browser", iconName: Sprites.Spectator, iconSize: 3.2f);
         }

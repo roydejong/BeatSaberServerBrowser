@@ -255,10 +255,10 @@ namespace ServerBrowser.UI.Browser.Views
         private void HandleJoinByCodeClicked()
         {
             var modal = TkModalHost.ShowModal<ServerCodeModalView>(this, _diContainer);
-            modal.FinishedEvent += (string? value) =>
+            modal.FinishedEvent += (value) =>
             {
                 if (!string.IsNullOrEmpty(value))
-                    ServerCodeJoinRequestedEvent?.Invoke(value);
+                    ServerCodeJoinRequestedEvent?.Invoke(value!);
             };
         }
 

@@ -162,9 +162,17 @@ namespace ServerBrowser.UI.Browser
                 _log.Warn("Already connecting or connected, ignoring join request");
                 return;
             }
-            
-            _log.Info($"Connecting to server (serverName={serverInfo.ServerName}, " +
-                      $"endPoint={serverInfo.ServerEndPoint}, connectionMethod={serverInfo.ConnectionMethod}");
+
+            if (serverInfo.ConnectionMethod == ServerRepository.ConnectionMethod.DirectConnect)
+            {
+                _log.Info($"Connecting to dedicated server (serverName={serverInfo.ServerName}, " +
+                          $"endPoint={serverInfo.ServerEndPoint}, connectionMethod={serverInfo.ConnectionMethod}");
+            }
+            else
+            {
+                _log.Info($"Connecting to lobby via master server (serverName={serverInfo.ServerName}, " +
+                          $"serverCode={serverInfo.ServerCode}, connectionMethod={serverInfo.ConnectionMethod}");
+            }
 
             _serverInfo = serverInfo;
 
@@ -173,7 +181,7 @@ namespace ServerBrowser.UI.Browser
             _connectionFailedReason = null;
             
             // We are doing the "connect by server code" flow, providing secret/code as available
-            // We'll set default selection mask / configuration but the master server will override it
+            // We'll set selection mask and configuration, but a master server may override it
             // In case of direct connect, our GameLift patch will handle the rest
             var partyConfig = new UnifiedNetworkPlayerModel.JoinMatchmakingPartyConfig()
             {
@@ -187,7 +195,7 @@ namespace ServerBrowser.UI.Browser
             
             if (!_unifiedNetworkPlayerModel.CreatePartyConnection(partyConfig))
             {
-                // CFR-1: Failed to create party connection
+                // CFR-1: Failed to create party connection - should never happen
                 HandleSessionConnectionFailed(ConnectionFailedReason.Unknown);
                 return;
             }

@@ -301,5 +301,19 @@ namespace ServerBrowser.UI.Toolkit
             accountTile.AddToContainer(this);
             return accountTile;
         }
+        
+        public TkToggle AddToggle()
+        {
+            var toggle = Builder.CreateComponent<TkToggle>();
+            toggle.AddToContainer(this);
+            return toggle;
+        }
+        
+        public TkDropdown AddDropdown()
+        {
+            var dropdown = Builder.CreateComponent<TkDropdown>();
+            dropdown.AddToContainer(this);
+            return dropdown;
+        }
     }
 }

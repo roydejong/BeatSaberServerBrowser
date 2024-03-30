@@ -291,6 +291,11 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.VRModule.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="Menu.CommonLib.dll">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Menu.CommonLib.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="VRUI, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\VRUI.dll</HintPath>
@@ -336,7 +341,9 @@
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
     <Compile Include="UI\MainMenuIntegrator.cs" />
+    <Compile Include="UI\Toolkit\CloneHelper.cs" />
     <Compile Include="UI\Toolkit\Components\TkAccountTile.cs" />
+    <Compile Include="UI\Toolkit\Components\TkDropdown.cs" />
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
     <Compile Include="UI\Toolkit\Components\TkHorizontalSeparator.cs" />
     <Compile Include="UI\Toolkit\Components\TkImageView.cs" />
@@ -347,6 +354,7 @@
     <Compile Include="UI\Toolkit\Components\TkServerCell.cs" />
     <Compile Include="UI\Toolkit\Components\TkTableView.cs" />
     <Compile Include="UI\Toolkit\Components\TkText.cs" />
+    <Compile Include="UI\Toolkit\Components\TkToggle.cs" />
     <Compile Include="UI\Toolkit\Components\TkVerticalLayoutScrollView.cs" />
     <Compile Include="UI\Toolkit\LayoutBuilder.cs" />
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />

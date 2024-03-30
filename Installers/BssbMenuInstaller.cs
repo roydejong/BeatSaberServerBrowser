@@ -11,7 +11,9 @@ namespace ServerBrowser.Installers
         public override void InstallBindings()
         {
             Container.Bind<LayoutBuilder>().AsTransient();
+            
             Container.Bind<MaterialAccessor>().AsSingle();
+            Container.Bind<CloneHelper>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<MainBrowserViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
