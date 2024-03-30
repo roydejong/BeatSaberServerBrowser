@@ -25,7 +25,7 @@ namespace ServerBrowser.UI.Browser.Views
         private AccountModalView? _accountModalView = null;
         
         public event Action<ServerRepository.ServerInfo>? ServerJoinRequestedEvent;
-        public event Action<string>? ServerCodeJoinRequestedEvent;
+        public event Action<MultiplayerModeSelectionViewController.MenuButton>? ModeSelectedEvent;
         public event Action? AvatarEditRequestedEvent;
 
         #region Init / Deinit
@@ -246,20 +246,17 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleQuickPlayClicked()
         {
+            ModeSelectedEvent?.Invoke(MultiplayerModeSelectionViewController.MenuButton.QuickPlay);
         }
 
         private void HandleCreateServerClicked()
         {
+            ModeSelectedEvent?.Invoke(MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
         
         private void HandleJoinByCodeClicked()
         {
-            var modal = TkModalHost.ShowModal<ServerCodeModalView>(this, _diContainer);
-            modal.FinishedEvent += (value) =>
-            {
-                if (!string.IsNullOrEmpty(value))
-                    ServerCodeJoinRequestedEvent?.Invoke(value!);
-            };
+            ModeSelectedEvent?.Invoke(MultiplayerModeSelectionViewController.MenuButton.JoinWithCode);
         }
 
         private void HandleEditAvatarClicked()

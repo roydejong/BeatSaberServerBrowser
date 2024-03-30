@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BeatSaber.AvatarCore;
@@ -23,20 +22,26 @@ namespace ServerBrowser.UI.Browser
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
+        
         [Inject] private readonly JoiningLobbyViewController _joiningLobbyViewController = null!;
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
-
-        [Inject] private readonly DiContainer _diContainer = null!;
+        [Inject] private readonly CreateServerViewController _createServerViewController = null!;
+        [Inject] private readonly JoinQuickPlayViewController _joinQuickPlayViewController = null!;
+        [Inject] private readonly ServerCodeEntryViewController _serverCodeEntryViewController = null!;
         [Inject] private readonly GameServerLobbyFlowCoordinator _gameServerLobbyFlowCoordinator = null!;
-        [Inject] private readonly IUnifiedNetworkPlayerModel _unifiedNetworkPlayerModel = null!;
-        [Inject] private readonly LobbyDataModelsManager _lobbyDataModelsManager = null!;
-        [Inject] private readonly FadeInOutController _fadeInOutController = null!;
-        [Inject] private readonly PlayerDataModel _playerDataModel = null!;
-        [Inject] private readonly ILobbyGameStateController _lobbyGameStateController = null!;
-        [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
+        
         [Inject] private readonly IMultiplayerSessionManager _multiplayerSessionManager = null!;
+        [Inject] private readonly IUnifiedNetworkPlayerModel _unifiedNetworkPlayerModel = null!;
+        [Inject] private readonly ILobbyGameStateController _lobbyGameStateController = null!;
+        
+        [Inject] private readonly FadeInOutController _fadeInOutController = null!;
         [Inject] private readonly MenuLightsManager _menuLightsManager = null!;
         
+        [Inject] private readonly PlayerDataModel _playerDataModel = null!;
+        [Inject] private readonly LobbyDataModelsManager _lobbyDataModelsManager = null!;
+        [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
+        [Inject] private readonly SongPackMasksModel _songPackMasksModel = null!;
+         
         private CancellationTokenSource? _joiningLobbyCancellationTokenSource;
         private MultiplayerAvatarsData? _multiplayerAvatarsData;
         private ServerRepository.ServerInfo? _serverInfo;
@@ -50,9 +55,14 @@ namespace ServerBrowser.UI.Browser
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             _mainViewController.ServerJoinRequestedEvent += HandleServerJoinRequested;
-            _mainViewController.ServerCodeJoinRequestedEvent += HandleServerJoinByCodeRequested;
+            _mainViewController.ModeSelectedEvent += HandleModeSelected;
             _mainViewController.AvatarEditRequestedEvent += HandleAvatarEditRequested;
+            
             _joiningLobbyViewController.didCancelEvent += HandleJoinCanceled;
+            
+            _joinQuickPlayViewController.didFinishEvent += HandleQuickPlayViewFinished;
+            _createServerViewController.didFinishEvent += HandleCreateServerViewFinished;
+            _serverCodeEntryViewController.didFinishEvent += HandleServerCodeViewFinished;
             
             _multiplayerSessionManager.connectedEvent += HandleSessionConnected;
             _multiplayerSessionManager.connectionFailedEvent += HandleSessionConnectionFailed;
@@ -73,14 +83,22 @@ namespace ServerBrowser.UI.Browser
 
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
-            _mainViewController.ServerJoinRequestedEvent -= HandleServerJoinRequested;
-            _mainViewController.ServerCodeJoinRequestedEvent -= HandleServerJoinByCodeRequested;
-            _mainViewController.AvatarEditRequestedEvent -= HandleAvatarEditRequested;
-            _joiningLobbyViewController.didCancelEvent -= HandleJoinCanceled;
+            if (removedFromHierarchy)
+            {
+                _mainViewController.ServerJoinRequestedEvent -= HandleServerJoinRequested;
+                _mainViewController.ModeSelectedEvent -= HandleModeSelected;
+                _mainViewController.AvatarEditRequestedEvent -= HandleAvatarEditRequested;
+
+                _joiningLobbyViewController.didCancelEvent -= HandleJoinCanceled;
             
-            _multiplayerSessionManager.connectedEvent -= HandleSessionConnected;
-            _multiplayerSessionManager.connectionFailedEvent -= HandleSessionConnectionFailed;
-            _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent -= HandleCpmCreated;
+                _joinQuickPlayViewController.didFinishEvent -= HandleQuickPlayViewFinished;
+                _createServerViewController.didFinishEvent -= HandleCreateServerViewFinished;
+                _serverCodeEntryViewController.didFinishEvent -= HandleServerCodeViewFinished;
+
+                _multiplayerSessionManager.connectedEvent -= HandleSessionConnected;
+                _multiplayerSessionManager.connectionFailedEvent -= HandleSessionConnectionFailed;
+                _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent -= HandleCpmCreated;
+            }
 
             _serverRepository.StopDiscovery();
 
@@ -90,11 +108,27 @@ namespace ServerBrowser.UI.Browser
         // ReSharper disable once ParameterHidesMember
         public override void BackButtonWasPressed(ViewController topViewController)
         {
-            if (_multiplayerSessionManager.isConnectingOrConnected)
+            if (_multiplayerSessionManager.isConnectingOrConnected || topViewController == _joiningLobbyViewController)
+            {
                 // Failsafe: Back button should not be visible right now
                 return;
-            
-            ReturnToMainMenu();
+            }
+
+            if (topViewController == _joinQuickPlayViewController ||
+                topViewController == _createServerViewController ||
+                topViewController == _serverCodeEntryViewController)
+            {
+                // Sub view is active, dismiss to return to top view
+                ShowMainView();
+                return;
+            }
+
+            if (topViewController == _mainViewController)
+            {
+                // Main view is active, exit to main menu
+                ReturnToMainMenu();
+                return;
+            }
         }
 
         public void ReturnToMainMenu()
@@ -138,21 +172,72 @@ namespace ServerBrowser.UI.Browser
 
         #region Connect / Disconnect API
 
+        public void JoinQuickPlay(BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask,
+            bool allowSongSelection = true)
+        {
+            // TODO Master server select
+
+            var selectionMask = new BeatmapLevelSelectionMask(beatmapDifficultyMask, GameplayModifierMask.NoFail,
+                songPackMask);
+
+            var serverConfig = new GameplayServerConfiguration(
+                5,
+                DiscoveryPolicy.Public,
+                InvitePolicy.NobodyCanInvite,
+                allowSongSelection ? GameplayServerMode.Countdown : GameplayServerMode.QuickStartOneSong,
+                allowSongSelection ? SongSelectionMode.Vote : SongSelectionMode.Random,
+                GameplayServerControlSettings.None
+            );
+            
+            // Note: QuickStartOneSong / allowSongSelection=false is not currently used in the base game
+            
+            var serverInfo = new ServerRepository.ServerInfo()
+            {
+                Key = "quickplay",
+                ServerName = "Quick Play",
+                GameModeName = "Quick Play",
+                PlayerCount = 0,
+                PlayerLimit = serverConfig.maxPlayerCount,
+                ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial, // TODO Custom form value
+                BeatmapLevelSelectionMask = selectionMask,
+                GameplayServerConfiguration = serverConfig,
+            };
+            
+            ConnectToServer(serverInfo);
+        }
+
         public void CreateServer(CreateServerFormData formData)
         {
-            if (_multiplayerSessionManager.isConnectingOrConnected)
+            var randomSecret = NetworkUtility.GenerateId();
+            
+            // TODO Master server select
+
+            var selectionMask = new BeatmapLevelSelectionMask(formData.difficulties, formData.modifiers,
+                formData.songPacks);
+
+            var serverConfig = new GameplayServerConfiguration(
+                formData.maxPlayers,
+                formData.netDiscoverable ? DiscoveryPolicy.Public : DiscoveryPolicy.WithCode,
+                formData.allowInviteOthers ? InvitePolicy.AnyoneCanInvite : InvitePolicy.OnlyConnectionOwnerCanInvite,
+                formData.gameplayServerMode,
+                formData.songSelectionMode,
+                formData.gameplayServerControlSettings
+            );
+            
+            var serverInfo = new ServerRepository.ServerInfo()
             {
-                _log.Warn("Already connecting or connected, ignoring create server request");
-                return;
-            }
+                Key = "create",
+                ServerName = "New Lobby", // TODO Custom form value
+                GameModeName = "Custom",  // TODO Custom form value
+                PlayerCount = 0,
+                PlayerLimit = formData.maxPlayers,
+                ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial, // TODO Custom form value
+                ServerSecret = randomSecret,
+                BeatmapLevelSelectionMask = selectionMask,
+                GameplayServerConfiguration = serverConfig
+            };
             
-            throw new NotImplementedException("TODO");
-            
-            // MLCC:
-            //  1. Create _partyConfig with a generated secret
-            //   secret = NetworkUtility.GenerateId()
-            //  2. CreatePartyConnection(), check success
-            //  3. _multiplayerSessionManager.SetMaxPlayerCount
+            ConnectToServer(serverInfo);
         }
         
         public void ConnectToServer(ServerRepository.ServerInfo serverInfo)
@@ -162,7 +247,7 @@ namespace ServerBrowser.UI.Browser
                 _log.Warn("Already connecting or connected, ignoring join request");
                 return;
             }
-
+            
             if (serverInfo.ConnectionMethod == ServerRepository.ConnectionMethod.DirectConnect)
             {
                 _log.Info($"Connecting to dedicated server (serverName={serverInfo.ServerName}, " +
@@ -171,7 +256,8 @@ namespace ServerBrowser.UI.Browser
             else
             {
                 _log.Info($"Connecting to lobby via master server (serverName={serverInfo.ServerName}, " +
-                          $"serverCode={serverInfo.ServerCode}, connectionMethod={serverInfo.ConnectionMethod}");
+                          $"serverCode={serverInfo.ServerCode}, serverSecret={serverInfo.ServerSecret}, " +
+                          $"connectionMethod={serverInfo.ConnectionMethod}");
             }
 
             _serverInfo = serverInfo;
@@ -215,7 +301,102 @@ namespace ServerBrowser.UI.Browser
         
         #endregion
 
-        #region UI Show Views
+        #region Mode Selection Sub-views
+        
+        private void HandleModeSelected(MultiplayerModeSelectionViewController.MenuButton mode)
+        {
+            if (topViewController != _mainViewController)
+                // Can only transition from main view
+                return;
+
+            var multiplayerModeSettings = _playerDataModel.playerData.multiplayerModeSettings;
+            
+            ViewController? nextViewController = null;
+            switch (mode)
+            {
+                case MultiplayerModeSelectionViewController.MenuButton.QuickPlay:
+                {
+                    _joinQuickPlayViewController.Setup(new QuickPlaySetupData(), multiplayerModeSettings);
+                    nextViewController = _joinQuickPlayViewController;
+                    break;
+                }
+                case MultiplayerModeSelectionViewController.MenuButton.CreateServer:
+                {
+                    _createServerViewController.Setup(multiplayerModeSettings);
+                    nextViewController = _createServerViewController;
+                    break;
+                }
+                case MultiplayerModeSelectionViewController.MenuButton.JoinWithCode:
+                {
+                    nextViewController = _serverCodeEntryViewController;
+                    break;
+                }
+            }
+            
+            if (nextViewController == null)
+                return;
+            
+            ReplaceTopViewController(nextViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+        }
+
+        private void HandleQuickPlayViewFinished(bool success)
+        {
+            if (topViewController != _joinQuickPlayViewController)
+                return;
+            
+            if (!success)
+            {
+                ShowMainView();
+                return;
+            }
+
+            var modeSettings = _joinQuickPlayViewController.multiplayerModeSettings;
+            
+            var difficultyMask = modeSettings.quickPlayBeatmapDifficulty;
+            var songPackMask = _songPackMasksModel.ToSongPackMask(modeSettings.quickPlaySongPackMaskSerializedName);
+            var allowSongSelection = modeSettings.quickPlayEnableLevelSelection;
+            
+            var logMode = allowSongSelection ? "Countdown" : "QuickStartOneSong";
+            _log.Info($"Quick play join requested: {difficultyMask}, {songPackMask}, {logMode}");
+            
+            JoinQuickPlay(difficultyMask, songPackMask, allowSongSelection);
+        }
+
+        private void HandleCreateServerViewFinished(bool success, CreateServerFormData formData)
+        {
+            if (topViewController != _createServerViewController)
+                return;
+            
+            if (!success)
+            {
+                ShowMainView();
+                return;
+            }
+            
+            _log.Info($"Create server requested: {formData.maxPlayers} players");
+            
+            CreateServer(formData);
+        }
+        
+        private void HandleServerCodeViewFinished(bool success, string code)
+        {
+            if (topViewController != _serverCodeEntryViewController)
+                return;
+            
+            if (!success)
+            {
+                ShowMainView();
+                return;
+            }
+            
+            _log.Info($"Join by code requested: {code}");
+            
+            HandleServerJoinByCodeRequested(code);
+        }
+        
+        #endregion
+        
+        #region Connection UI
         
         private void ShowMainView()
         {

@@ -336,7 +336,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
     <Compile Include="UI\Browser\Modals\AccountModalView.cs" />
-    <Compile Include="UI\Browser\Modals\ServerCodeModalView.cs" />
     <Compile Include="UI\Browser\Modals\ServerModalView.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />

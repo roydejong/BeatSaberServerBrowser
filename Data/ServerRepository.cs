@@ -206,19 +206,19 @@ namespace ServerBrowser.Data
             /// <summary>
             /// Current player count.
             /// </summary>
-            public int PlayerCount { get; init; }
+            public int PlayerCount { get; init; } = 0;
             /// <summary>
             /// Maximum player limit / capacity.
             /// </summary>
-            public int PlayerLimit { get; init; }
+            public int PlayerLimit { get; init; } = 5;
             /// <summary>
             /// Current lobby state.
             /// </summary>
-            public MultiplayerLobbyState LobbyState { get; init; }
+            public MultiplayerLobbyState LobbyState { get; init; } = MultiplayerLobbyState.None;
             /// <summary>
             /// Connection method the Server Browser should use to connect to this server.
             /// </summary>
-            public ConnectionMethod ConnectionMethod { get; init; }
+            public ConnectionMethod ConnectionMethod { get; init; } = ConnectionMethod.GameLiftOfficial;
             /// <summary>
             /// Dedicated server endpoint.
             /// Required for direct connections.
