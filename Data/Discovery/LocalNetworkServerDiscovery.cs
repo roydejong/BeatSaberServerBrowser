@@ -35,6 +35,7 @@ namespace ServerBrowser.Data.Discovery
                     ImageUrl = null,
                     ServerName = response.ServerName,
                     GameModeName = response.GameModeName,
+                    ServerTypeName = response.ServerTypeName ?? "LAN Server",
                     PlayerCount = response.PlayerCount,
                     PlayerLimit = response.GameplayServerConfiguration.maxPlayerCount,
                     LobbyState = MultiplayerLobbyState.None,

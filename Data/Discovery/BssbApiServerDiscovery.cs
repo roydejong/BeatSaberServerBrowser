@@ -31,6 +31,7 @@ namespace ServerBrowser.Data.Discovery
                         ImageUrl = server.Level?.CoverArtUrl,
                         ServerName = server.Name!,
                         GameModeName = server.GameModeDescription,
+                        ServerTypeName = server.ServerTypeText,
                         PlayerCount = server.ReadOnlyPlayerCount ?? 0,
                         PlayerLimit = server.PlayerLimit ?? 5,
                         ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,

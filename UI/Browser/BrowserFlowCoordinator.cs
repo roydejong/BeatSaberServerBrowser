@@ -653,11 +653,8 @@ namespace ServerBrowser.UI.Browser
                 // We are not managing this connection - patch does not apply
                 return;
 
-            var enableDtls = _serverInfo.ConnectionMethod is ServerRepository.ConnectionMethod.GameLiftOfficial or
-                ServerRepository.ConnectionMethod.GameLiftEncrypted;
-            
-            __instance.UseSsl = enableDtls;
-            __instance.ValidateCertificate = enableDtls;
+            __instance.UseSsl = _serverInfo.UseDtlsEncryption;
+            __instance.ValidateCertificate = _serverInfo.UseDtlsEncryption;
         }
         
         [AffinityPrefix]
@@ -677,7 +674,7 @@ namespace ServerBrowser.UI.Browser
                 port: _serverInfo.ServerEndPoint.Port,
                 gameSessionId: _serverInfo.ServerUserId,
                 secret: secret,
-                code: code,
+                code: "DIRECT",
                 selectionMask: _serverInfo.BeatmapLevelSelectionMask ?? DefaultLevelSelectionMask,
                 configuration: _serverInfo.GameplayServerConfiguration ?? DefaultGameplayServerConfiguration
             );

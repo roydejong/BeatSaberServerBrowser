@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using LiteNetLib.Utils;
 
@@ -15,13 +14,24 @@ namespace ServerBrowser.Network.Discovery
         public string ServerName;
         public string ServerUserId;
         public string GameModeName;
+        public string ServerTypeName;
         public int PlayerCount;
         public BeatmapLevelSelectionMask BeatmapLevelSelectionMask;
         public GameplayServerConfiguration GameplayServerConfiguration;
         
         public void Serialize(NetDataWriter writer)
         {
-            throw new NotImplementedException("Client does not send discovery responses");
+            writer.Put(Prefix);
+            writer.Put(ProtocolVersion);
+            
+            writer.Put(ServerEndPoint);
+            writer.Put(ServerName);
+            writer.Put(ServerUserId);
+            writer.Put(GameModeName);
+            writer.Put(ServerTypeName);
+            writer.Put(PlayerCount);
+            BeatmapLevelSelectionMask.Serialize(writer);
+            GameplayServerConfiguration.Serialize(writer);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -33,6 +43,7 @@ namespace ServerBrowser.Network.Discovery
             ServerName = reader.GetString();
             ServerUserId = reader.GetString();
             GameModeName = reader.GetString();
+            ServerTypeName = reader.GetString();
             PlayerCount = reader.GetInt();
             BeatmapLevelSelectionMask = BeatmapLevelSelectionMask.Deserialize(reader);
             GameplayServerConfiguration = GameplayServerConfiguration.Deserialize(reader);

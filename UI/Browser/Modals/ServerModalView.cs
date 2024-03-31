@@ -24,6 +24,7 @@ namespace ServerBrowser.UI.Browser.Modals
         private TkText _titleText = null!;
         private TkButton _connectButton = null!;
         
+        private TkTableView.TableRow _rowServerType = null!; 
         private TkTableView.TableRow _rowGameMode = null!; 
         private TkTableView.TableRow _rowPlayerCount = null!; 
         private TkTableView.TableRow _rowLobbyStatus = null!;
@@ -44,6 +45,7 @@ namespace ServerBrowser.UI.Browser.Modals
             _container.InsertMargin(-1f, 2f);
 
             var tableView = _container.AddTableView();
+            _rowServerType = tableView.AddRow("Server type");
             _rowGameMode = tableView.AddRow("Game mode");
             _rowPlayerCount = tableView.AddRow("Player count");
             _rowLobbyStatus = tableView.AddRow("Lobby status");
@@ -66,9 +68,10 @@ namespace ServerBrowser.UI.Browser.Modals
             
             _titleText.SetText(serverInfo.ServerName);
             
+            _rowServerType.Value = serverInfo.ServerTypeName ?? "Unknown";
             _rowGameMode.Value = serverInfo.GameModeName;
             _rowPlayerCount.Value = $"{serverInfo.PlayerCount}/{serverInfo.PlayerLimit}";
-            _rowLobbyStatus.Value = serverInfo.InGameplay ? "Playing level" : "In lobby";
+            _rowLobbyStatus.Value = serverInfo.LobbyStateText;
         }
     }
 }

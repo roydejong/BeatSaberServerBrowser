@@ -204,6 +204,10 @@ namespace ServerBrowser.Data
             /// </summary>
             public string GameModeName { get; init; } = "";
             /// <summary>
+            /// Description of the server type (e.g. "Official", "BeatTogether", etc.)
+            /// </summary>
+            public string? ServerTypeName { get; init; }
+            /// <summary>
             /// Current player count.
             /// </summary>
             public int PlayerCount { get; init; } = 0;
@@ -305,6 +309,9 @@ namespace ServerBrowser.Data
                     };
                 }
             }
+
+            public bool UseDtlsEncryption =>
+                ConnectionMethod is ConnectionMethod.GameLiftOfficial or ConnectionMethod.GameLiftEncrypted;
         }
 
         public enum ConnectionMethod
