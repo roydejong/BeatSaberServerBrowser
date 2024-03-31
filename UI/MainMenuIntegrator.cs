@@ -27,18 +27,17 @@ namespace ServerBrowser.UI
         [Inject] private readonly BrowserFlowCoordinator _browserFlowCoordinator = null!;
         
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
-        [Inject] private readonly MainMenuViewController _mainMenuViewController = null!;
         [Inject] private readonly PlayerDataModel _playerDataModel = null!;
         [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
 
-        private FlowCoordinator? _editAvatarFlowCoordinator = null;
-        private bool _isDisclaimerVisible = false;
-        
-        public const int PrivacyDisclaimerVersion = 1;
-        public const string PrivacyDisclaimerText = "With the Server Browser installed, your multiplayer games and " +
-                                                    "activity will be shared with BSSB. You can view the BSSB privacy " +
-                                                    "policy at https://bssb.app/privacy";
+        private FlowCoordinator? _editAvatarFlowCoordinator;
+        private bool _isDisclaimerVisible;
+
+        private const int PrivacyDisclaimerVersion = 1;
+        private const string PrivacyDisclaimerText = "With the Server Browser installed, your multiplayer games and " +
+                                                     "activity will be shared with BSSB. You can view the BSSB privacy " +
+                                                     "policy at https://bssb.app/privacy";
 
         /// <summary>
         /// Gets whether the privacy disclaimer should be shown prior to launching multiplayer.
@@ -62,7 +61,7 @@ namespace ServerBrowser.UI
             // If needed, show multiplayer / privacy disclaimer
             if (ShouldShowDisclaimer)
             {
-                _ = ShowDisclaimer();
+                ShowDisclaimer();
                 return false;
             }
 
@@ -73,6 +72,7 @@ namespace ServerBrowser.UI
         
         /// <summary>
         /// Patch: Intercept the avatar editor finish (in case of initial avatar setup) which would launch normal flow.
+        /// Will also get called when returning from "Edit avatar" in the main browser UI.
         /// </summary>
         [AffinityPatch(typeof(MainFlowCoordinator), nameof(MainFlowCoordinator.HandleEditAvatarFlowCoordinatorHelperDidFinish))]
         [AffinityPrefix]
@@ -84,11 +84,18 @@ namespace ServerBrowser.UI
                 return true;
 
             _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = false;
-            
             _editAvatarFlowCoordinator = flowCoordinator;
             
+            var isInBrowser = _editAvatarFlowCoordinator._parentFlowCoordinator == _browserFlowCoordinator;
+            if (isInBrowser)
+            {
+                // Browser flow: close the edit avatar flow and return to browser
+                _browserFlowCoordinator.DismissFlowCoordinator(_editAvatarFlowCoordinator);
+                return false;
+            }
+            
             var dismiss = finishAction == EditAvatarFlowCoordinatorHelper.FinishAction.Back;
-            _ = CheckAvatarsAndLaunchMultiplayer(true, dismiss);
+            _ = CheckAvatarsAndLaunchMultiplayer(true);
             
             return false;
         }
@@ -96,7 +103,7 @@ namespace ServerBrowser.UI
         /// <summary>
         /// UI: Show the privacy disclaimer (simple dialog prompt).
         /// </summary>
-        public async Task ShowDisclaimer()
+        private void ShowDisclaimer()
         {
             _log.Info($"Showing multiplayer / privacy disclaimer (disclaimer version {PrivacyDisclaimerVersion}).");
 
@@ -111,7 +118,7 @@ namespace ServerBrowser.UI
                 message: Localization.Get("MULTIPLAYER_DISCLAIMER") + "\r\n\r\n" + bssbDisclaimer,
                 firstButtonText: Localization.Get("BUTTON_AGREE"),
                 secondButtonText: Localization.Get("BUTTON_DO_NOT_AGREE_AND_QUIT"),
-                didFinishAction: (int buttonNumber) =>
+                didFinishAction: buttonNumber =>
                 {
                     if (buttonNumber == 0)
                     {
@@ -140,7 +147,7 @@ namespace ServerBrowser.UI
         /// UI: Launch multiplayer, redirecting to avatar creation first if needed.
         /// Will also be called after avatar editing completion (isCallback will be set).
         /// </summary>
-        public async Task CheckAvatarsAndLaunchMultiplayer(bool isCallback = false, bool canceled = false)
+        private async Task CheckAvatarsAndLaunchMultiplayer(bool isCallback = false)
         {
             var hasAvatarSetup = await FlowCoordinatorAvatarsHelper.HasUserSelectedAvatarSystemWithCreatedAvatar(
                     _avatarSystemCollection, _playerDataModel);
@@ -157,7 +164,7 @@ namespace ServerBrowser.UI
 
             if (hasAvatarSetup)
             {
-                _ = LaunchMultiplayer(afterAvatarEdit: isCallback);
+                LaunchMultiplayer(afterAvatarEdit: isCallback);
                 return;
             }
 
@@ -168,7 +175,7 @@ namespace ServerBrowser.UI
             _isDisclaimerVisible = false; // replaced by avatar creation
         }
 
-        public async Task LaunchMultiplayer(bool afterAvatarEdit = false)
+        private void LaunchMultiplayer(bool afterAvatarEdit = false)
         {
             _ = _session.EnsureLoggedIn(); // Session should now attempt login, if needed
             

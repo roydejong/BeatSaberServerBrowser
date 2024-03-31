@@ -54,20 +54,23 @@ namespace ServerBrowser.UI.Browser
         
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
-            _mainViewController.ServerJoinRequestedEvent += HandleServerJoinRequested;
-            _mainViewController.ModeSelectedEvent += HandleModeSelected;
-            _mainViewController.AvatarEditRequestedEvent += HandleAvatarEditRequested;
-            
-            _joiningLobbyViewController.didCancelEvent += HandleJoinCanceled;
-            
-            _joinQuickPlayViewController.didFinishEvent += HandleQuickPlayViewFinished;
-            _createServerViewController.didFinishEvent += HandleCreateServerViewFinished;
-            _serverCodeEntryViewController.didFinishEvent += HandleServerCodeViewFinished;
-            
-            _multiplayerSessionManager.connectedEvent += HandleSessionConnected;
-            _multiplayerSessionManager.connectionFailedEvent += HandleSessionConnectionFailed;
-            _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent += HandleCpmCreated;
-            _unifiedNetworkPlayerModel.connectedPlayerManagerDestroyedEvent += HandleCpmDestroyed;
+            if (addedToHierarchy)
+            {
+                _mainViewController.ServerJoinRequestedEvent += HandleServerJoinRequested;
+                _mainViewController.ModeSelectedEvent += HandleModeSelected;
+                _mainViewController.AvatarEditRequestedEvent += HandleAvatarEditRequested;
+
+                _joiningLobbyViewController.didCancelEvent += HandleJoinCanceled;
+
+                _joinQuickPlayViewController.didFinishEvent += HandleQuickPlayViewFinished;
+                _createServerViewController.didFinishEvent += HandleCreateServerViewFinished;
+                _serverCodeEntryViewController.didFinishEvent += HandleServerCodeViewFinished;
+
+                _multiplayerSessionManager.connectedEvent += HandleSessionConnected;
+                _multiplayerSessionManager.connectionFailedEvent += HandleSessionConnectionFailed;
+                _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent += HandleCpmCreated;
+                _unifiedNetworkPlayerModel.connectedPlayerManagerDestroyedEvent += HandleCpmDestroyed;
+            }
 
             if (firstActivation)
             {
@@ -142,8 +145,8 @@ namespace ServerBrowser.UI.Browser
         
         private void HandleAvatarEditRequested()
         {
-            _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true;
-            _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(_mainFlowCoordinator.childFlowCoordinator, true);
+            _mainFlowCoordinator._goToMultiplayerAfterAvatarCreation = true; // will trigger patch in MainMenuIntegrator
+            _mainFlowCoordinator._editAvatarFlowCoordinatorHelper.Show(this, true);
         }
 
         private void HandleServerJoinRequested(ServerRepository.ServerInfo server)
