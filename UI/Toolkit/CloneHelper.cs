@@ -31,6 +31,13 @@ namespace ServerBrowser.UI.Toolkit
             return component;
         }
 
+        public GameObject CloneTemplate(GameObject template, Transform parent, string name)
+        {
+            var cloneObject = UnityEngine.Object.Instantiate(template.gameObject, parent, false);
+            cloneObject.name = name;
+            return cloneObject;
+        }
+
         #region Settings controls
 
         private T GetSettingsViewController<T>() where T : ViewController
@@ -48,16 +55,21 @@ namespace ServerBrowser.UI.Toolkit
         private OtherSettingsViewController GetOtherSettingsViewController() =>
             GetSettingsViewController<OtherSettingsViewController>();
 
-        public ToggleWithCallbacks GetToggleTemplate() =>
-            (GetOtherSettingsViewController()._hideExplicitToggle as ToggleWithCallbacks) ??
-            throw new InvalidOperationException(
-                $"Could not resolve Toggle template - Mod may need to be updated");
+        public GameObject GetToggleTemplate()
+        {
+            var target = GetOtherSettingsViewController().transform.Find("Content/HideExplicit");
+            if (target == null)
+                throw new InvalidOperationException($"Could not resolve Toggle template - Mod may need to be updated");
+            return target.gameObject;
+        }
 
-        public SimpleTextDropdown GetDropdownTemplate() =>
-            GetOtherSettingsViewController().transform.Find("Content/LanguageDropdown/SimpleTextDropDown")
-                ?.GetComponent<SimpleTextDropdown>() ??
-            throw new InvalidOperationException(
-                $"Could not resolve Dropdown template - Mod may need to be updated");
+        public GameObject GetDropdownTemplate()
+        {
+            var target = GetOtherSettingsViewController().transform.Find("Content/LanguageDropdown");
+            if (target == null)
+                throw new InvalidOperationException($"Could not resolve Dropdown template - Mod may need to be updated");
+            return target.gameObject;
+        }
 
         #endregion
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HMUI;
 using ServerBrowser.Data;
+using ServerBrowser.Models;
 using ServerBrowser.UI.Browser.Modals;
 using ServerBrowser.UI.Toolkit;
 using ServerBrowser.UI.Toolkit.Components;
@@ -27,6 +28,8 @@ namespace ServerBrowser.UI.Browser.Views
         public event Action<ServerRepository.ServerInfo>? ServerJoinRequestedEvent;
         public event Action<MultiplayerModeSelectionViewController.MenuButton>? ModeSelectedEvent;
         public event Action? AvatarEditRequestedEvent;
+        public event Action? FiltersClickedEvent;
+        public event Action? FiltersClearedEvent;
 
         #region Init / Deinit
         
@@ -38,17 +41,22 @@ namespace ServerBrowser.UI.Browser.Views
         public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            
-            _session.LocalUserInfoChangedEvent += HandleLocalUserInfoUpdated;
-            _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
-            _session.LoginStatusChangedEvent += HandleLoginStatusChanged;
-            
-            _serverRepository.ServersUpdatedEvent += HandleServersUpdated;
-            _serverRepository.RefreshFinishedEvent += HandleServersRefreshFinished;
-            
+
+            if (addedToHierarchy)
+            {
+                _session.LocalUserInfoChangedEvent += HandleLocalUserInfoUpdated;
+                _session.AvatarUrlChangedEvent += HandleAvatarUrlChanged;
+                _session.LoginStatusChangedEvent += HandleLoginStatusChanged;
+
+                _serverRepository.ServersUpdatedEvent += HandleServersUpdated;
+                _serverRepository.RefreshFinishedEvent += HandleServersRefreshFinished;
+            }
+
             RefreshAccountStatus();
             
             _serverRepository.StartDiscovery(); // ensure we restart, in case we came back from lobby / connection error
+            HandleServersUpdated(_serverRepository.FilteredServers);
+            
             RefreshLoadingState();
             _completedFullRefresh = false;
         }
@@ -56,14 +64,17 @@ namespace ServerBrowser.UI.Browser.Views
         public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            
-            _session.LocalUserInfoChangedEvent -= HandleLocalUserInfoUpdated;
-            _session.AvatarUrlChangedEvent -= HandleAvatarUrlChanged;
-            _session.LoginStatusChangedEvent -= HandleLoginStatusChanged;
-            
-            _serverRepository.ServersUpdatedEvent -= HandleServersUpdated;
-            _serverRepository.RefreshFinishedEvent -= HandleServersRefreshFinished;
-            
+
+            if (removedFromHierarchy)
+            {
+                _session.LocalUserInfoChangedEvent -= HandleLocalUserInfoUpdated;
+                _session.AvatarUrlChangedEvent -= HandleAvatarUrlChanged;
+                _session.LoginStatusChangedEvent -= HandleLoginStatusChanged;
+
+                _serverRepository.ServersUpdatedEvent -= HandleServersUpdated;
+                _serverRepository.RefreshFinishedEvent -= HandleServersRefreshFinished;
+            }
+
             TkModalHost.CloseAnyModal(this);
         }
 
@@ -268,6 +279,11 @@ namespace ServerBrowser.UI.Browser.Views
 
         #region Search & Filter
         
+        public void UpdateFiltersValue(ServerFilterParams filterParams)
+        {
+            _filterButton!.SetTextValue(filterParams.Describe());
+        }
+        
         private void HandleTextInputChanged(InputFieldView.SelectionState state, string value)
         {
             if (_serverRepository.FilterText == value)
@@ -278,13 +294,12 @@ namespace ServerBrowser.UI.Browser.Views
         
         private void HandleFilterButtonClicked()
         {
-            // TODO Filter params impl
-            _filterButton!.SetTextValue("ooh ya clicked me good");
+            FiltersClickedEvent?.Invoke();
         }
         
         private void HandleFilterButtonCleared()
         {
-            // TODO Filter params impl
+            FiltersClearedEvent?.Invoke();
         }
         
         #endregion

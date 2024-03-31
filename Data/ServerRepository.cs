@@ -21,9 +21,10 @@ namespace ServerBrowser.Data
         [Inject] private readonly DiContainer _container = null!;
         
         private readonly ConcurrentDictionary<string, ServerInfo> _servers = new();
-        private IReadOnlyList<ServerInfo> _filteredServers = Array.Empty<ServerInfo>();
         
-        public bool NoResults => _filteredServers.Count == 0;
+        public IReadOnlyList<ServerInfo> FilteredServers = Array.Empty<ServerInfo>();
+        
+        public bool NoResults => FilteredServers.Count == 0;
         
         private bool _discoveryEnabled = false;
         private List<ServerDiscovery> _discoveryMethods = new();
@@ -111,6 +112,7 @@ namespace ServerBrowser.Data
         }
         
         public string? FilterText { get; set; } = null;
+        public ServerFilterParams? FilterParams { get; set; } = null;
         
         public void SetFilterText(string? filterText)
         {
@@ -121,11 +123,17 @@ namespace ServerBrowser.Data
             RaiseServersUpdated();
         }
 
+        public void SetFilterParams(ServerFilterParams? filterParams)
+        {
+            FilterParams = filterParams;
+            RaiseServersUpdated();
+        }
+
         private IReadOnlyList<ServerInfo> GetFilteredServers()
         {
             var servers = _servers.Values.ToList()
                 .OrderByDescending(x => x.SortPriority)
-                .ToList();
+                .Select(x => x);
             
             if (!string.IsNullOrEmpty(FilterText))
             {
@@ -139,14 +147,27 @@ namespace ServerBrowser.Data
                     if (matchScore > 0)
                         matchedResults.Add((matchScore, server));
                 }
-                
+
                 servers = matchedResults
                     .OrderByDescending(x => x.Item1)
-                    .Select(x => x.Item2)
-                    .ToList();
+                    .Select(x => x.Item2);
             }
 
-            return servers;
+            if (FilterParams != null)
+            {
+                if (FilterParams.GetValue(ServerFilterParams.HidePlayingLevel))
+                    servers = servers.Where(x => !x.InGameplay);
+                if (FilterParams.GetValue(ServerFilterParams.HideFull))
+                    servers = servers.Where(x => !x.IsFull);
+                if (FilterParams.GetValue(ServerFilterParams.HideEmpty))
+                    servers = servers.Where(x => x.PlayerCount > 0);
+                if (FilterParams.GetValue(ServerFilterParams.HideOfficial))
+                    servers = servers.Where(x => x.ConnectionMethod != ConnectionMethod.GameLiftOfficial);
+                if (FilterParams.GetValue(ServerFilterParams.HideQuickPlay))
+                    servers = servers.Where(x => !x.GameModeName.Contains("Quick Play"));
+            }
+
+            return servers.ToList();
         }
 
         private static int GetTextMatchScore(string input, string[] searchTerms)
@@ -174,8 +195,8 @@ namespace ServerBrowser.Data
                 _servers.TryRemove(server.Key, out _);
             
             // Update filtered set and raise event
-            _filteredServers = GetFilteredServers();
-            ServersUpdatedEvent?.Invoke(_filteredServers);
+            FilteredServers = GetFilteredServers();
+            ServersUpdatedEvent?.Invoke(FilteredServers);
         }
 
         public abstract class ServerDiscovery

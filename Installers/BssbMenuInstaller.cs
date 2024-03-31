@@ -15,6 +15,7 @@ namespace ServerBrowser.Installers
             Container.Bind<MaterialAccessor>().AsSingle();
             Container.Bind<CloneHelper>().AsSingle();
             
+            Container.BindInterfacesAndSelfTo<BrowserFilterViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<MainBrowserViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             

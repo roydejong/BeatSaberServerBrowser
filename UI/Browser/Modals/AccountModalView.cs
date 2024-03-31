@@ -36,8 +36,10 @@ namespace ServerBrowser.UI.Browser.Modals
             
             _container.InsertMargin(-1f, 4f);
 
-            _container.AddToggle();
-            _container.AddDropdown();
+            _container.AddToggleControl();
+            _container.AddToggleControl();
+            _container.AddToggleControl();
+            // _container.AddDropdownControl();
             
             _button = _container.AddButton("View profile in browser", iconName: Sprites.Spectator, iconSize: 3.2f);
         }

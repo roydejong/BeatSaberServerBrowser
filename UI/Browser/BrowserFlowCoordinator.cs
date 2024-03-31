@@ -5,6 +5,7 @@ using BGLib.Polyglot;
 using HMUI;
 using IgnoranceCore;
 using ServerBrowser.Data;
+using ServerBrowser.Models;
 using ServerBrowser.UI.Browser.Views;
 using ServerBrowser.Util;
 using SiraUtil.Affinity;
@@ -22,6 +23,7 @@ namespace ServerBrowser.UI.Browser
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
+        [Inject] private readonly BrowserFilterViewController _filterViewController = null!;
         
         [Inject] private readonly JoiningLobbyViewController _joiningLobbyViewController = null!;
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
@@ -41,7 +43,8 @@ namespace ServerBrowser.UI.Browser
         [Inject] private readonly LobbyDataModelsManager _lobbyDataModelsManager = null!;
         [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
         [Inject] private readonly SongPackMasksModel _songPackMasksModel = null!;
-         
+
+        private ServerFilterParams _filterParams = new();
         private CancellationTokenSource? _joiningLobbyCancellationTokenSource;
         private MultiplayerAvatarsData? _multiplayerAvatarsData;
         private ServerRepository.ServerInfo? _serverInfo;
@@ -59,6 +62,10 @@ namespace ServerBrowser.UI.Browser
                 _mainViewController.ServerJoinRequestedEvent += HandleServerJoinRequested;
                 _mainViewController.ModeSelectedEvent += HandleModeSelected;
                 _mainViewController.AvatarEditRequestedEvent += HandleAvatarEditRequested;
+                _mainViewController.FiltersClickedEvent += HandleFiltersClicked;
+                _mainViewController.FiltersClearedEvent += HandleFiltersCleared;
+                
+                _filterViewController.FinishedEvent += HandleFiltersViewFinished;
 
                 _joiningLobbyViewController.didCancelEvent += HandleJoinCanceled;
 
@@ -91,6 +98,10 @@ namespace ServerBrowser.UI.Browser
                 _mainViewController.ServerJoinRequestedEvent -= HandleServerJoinRequested;
                 _mainViewController.ModeSelectedEvent -= HandleModeSelected;
                 _mainViewController.AvatarEditRequestedEvent -= HandleAvatarEditRequested;
+                _mainViewController.FiltersClickedEvent -= HandleFiltersClicked;
+                _mainViewController.FiltersClearedEvent -= HandleFiltersCleared;
+                
+                _filterViewController.FinishedEvent -= HandleFiltersViewFinished;
 
                 _joiningLobbyViewController.didCancelEvent -= HandleJoinCanceled;
             
@@ -119,7 +130,8 @@ namespace ServerBrowser.UI.Browser
 
             if (topViewController == _joinQuickPlayViewController ||
                 topViewController == _createServerViewController ||
-                topViewController == _serverCodeEntryViewController)
+                topViewController == _serverCodeEntryViewController ||
+                topViewController == _filterViewController)
             {
                 // Sub view is active, dismiss to return to top view
                 ShowMainView();
@@ -169,6 +181,34 @@ namespace ServerBrowser.UI.Browser
             _log.Info("User canceled server join");
             _connectionFailedReason = ConnectionFailedReason.ConnectionCanceled;
             DisconnectFromServer();
+        }
+
+        private void HandleFiltersClicked()
+        {
+            _filterViewController.Init(_filterParams);
+            
+            showBackButton = false;
+            ReplaceTopViewController(_filterViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+            SetTitle("Server Filters");
+        }
+
+        private void HandleFiltersCleared()
+        {
+            _filterParams.Clear();
+            
+            _mainViewController.UpdateFiltersValue(_filterParams);
+            _serverRepository.SetFilterParams(_filterParams);
+        }
+
+        private void HandleFiltersViewFinished(ServerFilterParams? obj)
+        {
+            if (obj != null)
+                _filterParams = obj;
+            
+            _mainViewController.UpdateFiltersValue(_filterParams);
+            _serverRepository.SetFilterParams(_filterParams);
+            
+            ShowMainView();
         }
         
         #endregion

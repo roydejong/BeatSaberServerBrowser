@@ -328,6 +328,7 @@
     <Compile Include="Models\Requests\BssbLoginRequest.cs" />
     <Compile Include="Models\Responses\BssbBrowseResponse.cs" />
     <Compile Include="Models\Responses\BssbLoginResponse.cs" />
+    <Compile Include="Models\ServerFilterParams.cs" />
     <Compile Include="Network\Discovery\DiscoveryClient.cs" />
     <Compile Include="Network\Discovery\DiscoveryConsts.cs" />
     <Compile Include="Network\Discovery\DiscoveryQueryPacket.cs" />
@@ -337,12 +338,13 @@
     <Compile Include="UI\Browser\BrowserFlowCoordinator.cs" />
     <Compile Include="UI\Browser\Modals\AccountModalView.cs" />
     <Compile Include="UI\Browser\Modals\ServerModalView.cs" />
+    <Compile Include="UI\Browser\Views\BrowserFilterViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
     <Compile Include="UI\MainMenuIntegrator.cs" />
     <Compile Include="UI\Toolkit\CloneHelper.cs" />
     <Compile Include="UI\Toolkit\Components\TkAccountTile.cs" />
-    <Compile Include="UI\Toolkit\Components\TkDropdown.cs" />
+    <Compile Include="UI\Toolkit\Components\TkDropdownControl.cs" />
     <Compile Include="UI\Toolkit\Components\TkFilterButton.cs" />
     <Compile Include="UI\Toolkit\Components\TkHorizontalSeparator.cs" />
     <Compile Include="UI\Toolkit\Components\TkImageView.cs" />
@@ -353,7 +355,7 @@
     <Compile Include="UI\Toolkit\Components\TkServerCell.cs" />
     <Compile Include="UI\Toolkit\Components\TkTableView.cs" />
     <Compile Include="UI\Toolkit\Components\TkText.cs" />
-    <Compile Include="UI\Toolkit\Components\TkToggle.cs" />
+    <Compile Include="UI\Toolkit\Components\TkToggleControl.cs" />
     <Compile Include="UI\Toolkit\Components\TkVerticalLayoutScrollView.cs" />
     <Compile Include="UI\Toolkit\LayoutBuilder.cs" />
     <Compile Include="UI\Toolkit\LayoutComponent.cs" />

@@ -302,16 +302,16 @@ namespace ServerBrowser.UI.Toolkit
             return accountTile;
         }
         
-        public TkToggle AddToggle()
+        public TkToggleControl AddToggleControl()
         {
-            var toggle = Builder.CreateComponent<TkToggle>();
+            var toggle = Builder.CreateComponent<TkToggleControl>();
             toggle.AddToContainer(this);
             return toggle;
         }
         
-        public TkDropdown AddDropdown()
+        public TkDropdownControl AddDropdownControl()
         {
-            var dropdown = Builder.CreateComponent<TkDropdown>();
+            var dropdown = Builder.CreateComponent<TkDropdownControl>();
             dropdown.AddToContainer(this);
             return dropdown;
         }
