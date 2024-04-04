@@ -355,31 +355,37 @@ namespace ServerBrowser.UI.Browser
             var multiplayerModeSettings = _playerDataModel.playerData.multiplayerModeSettings;
             
             ViewController? nextViewController = null;
+            string? nextTitle = null;
             switch (mode)
             {
                 case MultiplayerModeSelectionViewController.MenuButton.QuickPlay:
                 {
                     _joinQuickPlayViewController.Setup(new QuickPlaySetupData(), multiplayerModeSettings);
                     nextViewController = _joinQuickPlayViewController;
+                    nextTitle = "Quick Play";
                     break;
                 }
                 case MultiplayerModeSelectionViewController.MenuButton.CreateServer:
                 {
                     _createServerViewController.Setup(multiplayerModeSettings);
                     nextViewController = _createServerViewController;
+                    nextTitle = "Create Server";
                     break;
                 }
                 case MultiplayerModeSelectionViewController.MenuButton.JoinWithCode:
                 {
                     nextViewController = _serverCodeEntryViewController;
+                    nextTitle = "Join by Code";
                     break;
                 }
             }
             
             if (nextViewController == null)
                 return;
-            
+
+            showBackButton = true;
             ReplaceTopViewController(nextViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+            SetTitle(nextTitle ?? "Online");
         }
 
         private void HandleQuickPlayViewFinished(bool success)
