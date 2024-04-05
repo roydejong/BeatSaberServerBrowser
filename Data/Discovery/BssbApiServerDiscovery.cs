@@ -1,5 +1,7 @@
 using System.Net;
 using System.Threading.Tasks;
+using BGNet.Core;
+using ServerBrowser.UI.Browser;
 using UnityEngine;
 using Zenject;
 
@@ -24,7 +26,36 @@ namespace ServerBrowser.Data.Discovery
             {
                 foreach (var server in browseResponse.Lobbies)
                 {
-                    // TODO Rework this pretty much completely, just temporarily here to test the API
+                    var connectionMethod = ServerRepository.ConnectionMethod.GameLiftModded;
+                    IPEndPoint? dedicatedEndPoint = null;
+                    BeatmapLevelSelectionMask? beatmapLevelSelectionMask = null;
+                    GameplayServerConfiguration? gameplayServerConfiguration = null;
+
+                    if (server.IsDirectConnect)
+                    {
+                        connectionMethod = ServerRepository.ConnectionMethod.DirectConnect;
+                        dedicatedEndPoint = await server.EndPoint!.GetEndPointAsync(DefaultTaskUtility.instance);
+                        beatmapLevelSelectionMask = BrowserFlowCoordinator.DefaultLevelSelectionMask;
+                        gameplayServerConfiguration = new GameplayServerConfiguration(
+                            server.PlayerLimit ?? 5,
+                            DiscoveryPolicy.Public,
+                            InvitePolicy.AnyoneCanInvite,
+                            server.GameplayMode ?? GameplayServerMode.Managed,
+                            server.SongSelectionMode,
+                            GameplayServerControlSettings.All
+                        );
+                    }
+                    else if (server.IsOfficial)
+                    {
+                        connectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial;
+                        dedicatedEndPoint = null;
+                    }
+                    else if (server.MasterGraphUrl == null)
+                    {
+                        // Invalid server: not direct connect, not official, but also no master server? shouldn't happen
+                        continue;
+                    }
+                    
                     repository.DiscoverServer(new ServerRepository.ServerInfo()
                     {
                         Key = server.Key!,
@@ -34,11 +65,16 @@ namespace ServerBrowser.Data.Discovery
                         ServerTypeName = server.ServerTypeText,
                         PlayerCount = server.ReadOnlyPlayerCount ?? 0,
                         PlayerLimit = server.PlayerLimit ?? 5,
-                        ConnectionMethod = ServerRepository.ConnectionMethod.DirectConnect,
-                        ServerEndPoint = new IPEndPoint(IPAddress.Parse("1.2.3.4"), 1234),
                         LobbyState = server.LobbyState ?? MultiplayerLobbyState.LobbySetup,
+                        ConnectionMethod = connectionMethod,
+                        ServerEndPoint = dedicatedEndPoint,
+                        MasterServerGraphUrl = server.MasterGraphUrl,
+                        MasterServerStatusUrl = server.MasterStatusUrl,
                         ServerCode = server.ServerCode,
-                        ServerSecret = server.HostSecret
+                        ServerSecret = server.HostSecret,
+                        ServerUserId = server.RemoteUserId,
+                        BeatmapLevelSelectionMask = beatmapLevelSelectionMask,
+                        GameplayServerConfiguration = gameplayServerConfiguration
                     });
                 }
             }

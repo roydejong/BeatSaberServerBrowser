@@ -319,6 +319,7 @@
     <Compile Include="Data\Discovery\BssbApiServerDiscovery.cs" />
     <Compile Include="Data\Discovery\LocalNetworkServerDiscovery.cs" />
     <Compile Include="Data\ServerRepository.cs" />
+    <Compile Include="Data\MultiplayerConfigManager.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
     <Compile Include="Installers\BssbMenuInstaller.cs" />
     <Compile Include="Models\BssbConfig.cs" />
@@ -369,6 +370,7 @@
     <Compile Include="UI\Toolkit\Wrappers\TkButton.cs" />
     <Compile Include="Util\BssbColors.cs" />
     <Compile Include="Util\GameObjectExtensions.cs" />
+    <Compile Include="Util\ModCheck.cs" />
     <Compile Include="Util\Serialization\DnsEndPointConverter.cs" />
     <Compile Include="Util\Serialization\HiveVersionJsonConverter.cs" />
     <Compile Include="Util\StringUtils.cs" />

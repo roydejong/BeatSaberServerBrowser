@@ -163,5 +163,15 @@ namespace ServerBrowser.Models
                 return $"Quick Play ({difficultyText})";
             }
         }
+
+        [JsonIgnore]
+        public SongSelectionMode SongSelectionMode =>
+            GameplayMode is GameplayServerMode.Countdown ? SongSelectionMode.Vote : SongSelectionMode.OwnerPicks;
+
+        [JsonIgnore]
+        public bool IsDirectConnect => MasterGraphUrl == null && EndPoint != null;
+
+        [JsonIgnore]
+        public bool IsOfficial => MasterGraphUrl?.StartsWith("https://graph.oculus.com") ?? false;
     }
 }

@@ -14,8 +14,9 @@ namespace ServerBrowser.Installers
             
             Container.BindInterfacesAndSelfTo<BssbApi>().AsSingle();
             Container.BindInterfacesAndSelfTo<BssbSession>().AsSingle();
-            
+            Container.BindInterfacesAndSelfTo<MultiplayerConfigManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<ServerRepository>().AsSingle();
+            
             Container.BindInterfacesAndSelfTo<RemoteImageStore>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<DiscoveryClient>().FromNewComponentOnNewGameObject().AsSingle();

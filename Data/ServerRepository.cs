@@ -250,6 +250,14 @@ namespace ServerBrowser.Data
             /// </summary>
             public IPEndPoint? ServerEndPoint { get; init; }
             /// <summary>
+            /// Master server API URL (GameLift).
+            /// </summary>
+            public string? MasterServerGraphUrl { get; init; }
+            /// <summary>
+            /// Master server status API URL (multiplayer status check).
+            /// </summary>
+            public string? MasterServerStatusUrl { get; init; }
+            /// <summary>
             /// Server code. Required for public games that connect via GameLift / modded master servers.
             /// May be null in case of direct connections and password-protected servers. 
             /// </summary>
@@ -332,7 +340,7 @@ namespace ServerBrowser.Data
             }
 
             public bool UseDtlsEncryption =>
-                ConnectionMethod is ConnectionMethod.GameLiftOfficial or ConnectionMethod.GameLiftEncrypted;
+                ConnectionMethod is ConnectionMethod.GameLiftOfficial or ConnectionMethod.GameLiftModded;
         }
 
         public enum ConnectionMethod
@@ -342,17 +350,13 @@ namespace ServerBrowser.Data
             /// </summary>
             GameLiftOfficial = 1,
             /// <summary>
-            /// Modded servers using GameLift with encryption enabled.
+            /// Modded/custom master servers emulating the GameLift API.
             /// </summary>
-            GameLiftEncrypted = 2,
-            /// <summary>
-            /// Modded servers using GameLift with encryption disabled.
-            /// </summary>
-            GameLiftUnencrypted = 3,
+            GameLiftModded = 2,
             /// <summary>
             /// Modded servers using direct connect (no encryption).
             /// </summary>
-            DirectConnect = 4
+            DirectConnect = 3
         }
         
         public const float DiscoveryTickInterval = 1f;

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BeatSaber.AvatarCore;
@@ -18,8 +19,9 @@ namespace ServerBrowser.UI.Browser
     public class BrowserFlowCoordinator : FlowCoordinator, IAffinity
     {
         [Inject] private readonly SiraLog _log = null!;
-        [Inject] private readonly ServerRepository _serverRepository = null!;
         [Inject] private readonly BssbSession _session = null!;
+        [Inject] private readonly MultiplayerConfigManager _multiplayerConfigManager = null!;
+        [Inject] private readonly ServerRepository _serverRepository = null!;
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
@@ -52,6 +54,7 @@ namespace ServerBrowser.UI.Browser
         private bool _wasEverConnected;
         private DisconnectedReason? _realDisconnectReason;
         private ConnectionFailedReason? _connectionFailedReason;
+        private MultiplayerUnavailableReason? _multiplayerUnavailableReason;
 
         #region Setup / Flow coordinator
         
@@ -163,12 +166,12 @@ namespace ServerBrowser.UI.Browser
 
         private void HandleServerJoinRequested(ServerRepository.ServerInfo server)
         {
-            ConnectToServer(server);
+            _ = ConnectToServer(server);
         }
         
         private void HandleServerJoinByCodeRequested(string serverCode)
         {
-            ConnectToServer(new ServerRepository.ServerInfo()
+            _ = ConnectToServer(new ServerRepository.ServerInfo()
             {
                 ServerName = "Lobby",
                 ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial,
@@ -246,7 +249,7 @@ namespace ServerBrowser.UI.Browser
                 GameplayServerConfiguration = serverConfig,
             };
             
-            ConnectToServer(serverInfo);
+            _ = ConnectToServer(serverInfo);
         }
 
         public void CreateServer(CreateServerFormData formData)
@@ -280,10 +283,10 @@ namespace ServerBrowser.UI.Browser
                 GameplayServerConfiguration = serverConfig
             };
             
-            ConnectToServer(serverInfo);
+            _ = ConnectToServer(serverInfo);
         }
         
-        public void ConnectToServer(ServerRepository.ServerInfo serverInfo)
+        public async Task ConnectToServer(ServerRepository.ServerInfo serverInfo)
         {
             if (_multiplayerSessionManager.isConnectingOrConnected)
             {
@@ -291,23 +294,57 @@ namespace ServerBrowser.UI.Browser
                 return;
             }
             
-            if (serverInfo.ConnectionMethod == ServerRepository.ConnectionMethod.DirectConnect)
-            {
-                _log.Info($"Connecting to dedicated server (serverName={serverInfo.ServerName}, " +
-                          $"endPoint={serverInfo.ServerEndPoint}, connectionMethod={serverInfo.ConnectionMethod}");
-            }
-            else
-            {
-                _log.Info($"Connecting to lobby via master server (serverName={serverInfo.ServerName}, " +
-                          $"serverCode={serverInfo.ServerCode}, serverSecret={serverInfo.ServerSecret}, " +
-                          $"connectionMethod={serverInfo.ConnectionMethod}");
-            }
-
             _serverInfo = serverInfo;
-
             _wasEverConnected = false;
             _realDisconnectReason = null;
             _connectionFailedReason = null;
+            _multiplayerUnavailableReason = null;
+            _joiningLobbyCancellationTokenSource = new();
+            
+            ShowJoiningLobby(serverInfo);
+            
+            switch (serverInfo.ConnectionMethod)
+            {
+                case ServerRepository.ConnectionMethod.DirectConnect:
+                {
+                    _log.Info($"Direct Connecting to dedicated server (serverName={serverInfo.ServerName}, " +
+                              $"endPoint={serverInfo.ServerEndPoint})");
+                    break;
+                }
+                case ServerRepository.ConnectionMethod.GameLiftOfficial:
+                {
+                    _log.Info($"Connecting to lobby on Official GameLift (serverName={serverInfo.ServerName}, " +
+                              $"serverCode={serverInfo.ServerCode}, serverSecret={serverInfo.ServerSecret})");
+                    _multiplayerConfigManager.ConfigureOfficialGamelift();
+                    break;
+                }
+                case ServerRepository.ConnectionMethod.GameLiftModded:
+                {
+                    _log.Info($"Connecting to lobby via custom master server (serverName={serverInfo.ServerName}, " +
+                              $"serverCode={serverInfo.ServerCode}, serverSecret={serverInfo.ServerSecret}, " +
+                              $"masterGraphUrl={serverInfo.MasterServerGraphUrl})");
+                    
+                    var statusInfo = await _multiplayerConfigManager.ConfigureCustomMasterServer(serverInfo.MasterServerGraphUrl!,
+                        serverInfo.MasterServerStatusUrl, _joiningLobbyCancellationTokenSource.Token);
+
+                    if (MultiplayerUnavailableReasonMethods.TryGetMultiplayerUnavailableReason(statusInfo,
+                            out var mur))
+                    {
+                        _log.Warn($"Master server status check failed: {mur}");
+                        // TODO Handle MultiplayerCore MultiplayerUnavailableReasons here as an error
+                    }
+                    
+                    break;
+                }
+                default:
+                {
+                    throw new ArgumentOutOfRangeException(nameof(serverInfo.ConnectionMethod),
+                        serverInfo.ConnectionMethod, "Unsupported connection method");
+                }
+            }
+            
+            if (_joiningLobbyCancellationTokenSource.IsCancellationRequested)
+                return;
             
             // We are doing the "connect by server code" flow, providing secret/code as available
             // We'll set selection mask and configuration, but a master server may override it
@@ -319,17 +356,12 @@ namespace ServerBrowser.UI.Browser
                 secret = serverInfo.ServerSecret,
                 code = serverInfo.ServerCode,
             };
-            
-            _joiningLobbyCancellationTokenSource = new();
-            
             if (!_unifiedNetworkPlayerModel.CreatePartyConnection(partyConfig))
             {
                 // CFR-1: Failed to create party connection - should never happen
                 HandleSessionConnectionFailed(ConnectionFailedReason.Unknown);
                 return;
             }
-            
-            ShowJoiningLobby(serverInfo);
         }
 
         public void DisconnectFromServer(bool showError = true)
@@ -541,7 +573,7 @@ namespace ServerBrowser.UI.Browser
                     if (btnId == 1)
                     {
                         // Retry
-                        ConnectToServer(_serverInfo!);
+                        _ = ConnectToServer(_serverInfo!);
                     }
                     else
                     {
