@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using BGLib.Polyglot;
 using JetBrains.Annotations;
 using MultiplayerCore.Models;
 using MultiplayerCore.Patchers;
@@ -23,7 +24,7 @@ namespace ServerBrowser.Data
             _mpCoreNetworkConfig.UseOfficialServer();
         }
 
-        public async Task<MpStatusData?> ConfigureCustomMasterServer(string graphUrl, string? statusUrl,
+        public async Task<ConfigResult> ConfigureCustomMasterServer(string graphUrl, string? statusUrl,
             CancellationToken cancellationToken)
         {
             if (statusUrl == null)
@@ -31,25 +32,41 @@ namespace ServerBrowser.Data
                 // No status URL provided, we can only use basic config
                 _log.Info($"Apply network config: Modded Master Server (no status URL), {graphUrl}");
                 _mpCoreNetworkConfig.UseCustomApiServer(graphUrl, null);
-                return null;
+                return new ConfigResult();
             }
             
             var serverStatus = _mpCoreStatusRepository.GetStatusForUrl(statusUrl);
-            if (serverStatus == null)
-            {
-                _log.Info($"Checking master server status: {statusUrl}");
-                _mpCoreNetworkConfig.UseCustomApiServer(graphUrl, statusUrl);
-                var status = await _multiplayerStatusModel.GetMultiplayerStatusAsync(cancellationToken);
-                if (status is MpStatusData mpStatusData)
-                    serverStatus = mpStatusData;
-            }
-            if (serverStatus == null)
-                _log.Warn($"Failed to get master server status for {statusUrl}");
+
+            // Prefer to get fresh master server status
+            _log.Info($"Checking master server status: {statusUrl}");
+            _mpCoreNetworkConfig.UseCustomApiServer(graphUrl, statusUrl);
+            var status = await _multiplayerStatusModel.GetMultiplayerStatusAsync(cancellationToken);
             
+            if (status is MpStatusData mpStatusData)
+                serverStatus = mpStatusData;
+            else
+                _log.Warn($"Failed to get updated master server status for: {statusUrl}");
+
             _log.Info($"Apply network config: Modded Master Server, {graphUrl}");
             _mpCoreNetworkConfig.UseCustomApiServer(graphUrl, statusUrl, serverStatus?.maxPlayers, null,
                 serverStatus?.useSsl ?? false);
-            return serverStatus;
+
+            var isUnavailable = MultiplayerUnavailableReasonMethods.TryGetMultiplayerUnavailableReason(serverStatus,
+                out var multiplayerUnavailableReason);
+            
+            return new ConfigResult()
+            {
+                MpStatusData = serverStatus,
+                UnavailableReason = isUnavailable ? multiplayerUnavailableReason : null,
+                LocalizedMessage = serverStatus?.GetLocalizedMessage(Localization.Instance.SelectedLanguage)
+            };
+        }
+
+        public class ConfigResult
+        {
+            public MpStatusData? MpStatusData { get; init; }
+            public MultiplayerUnavailableReason? UnavailableReason { get; init; }
+            public string? LocalizedMessage { get; init; }
         }
     }
 }

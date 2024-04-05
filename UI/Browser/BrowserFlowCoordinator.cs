@@ -55,6 +55,8 @@ namespace ServerBrowser.UI.Browser
         private DisconnectedReason? _realDisconnectReason;
         private ConnectionFailedReason? _connectionFailedReason;
         private MultiplayerUnavailableReason? _multiplayerUnavailableReason;
+        private string? _multiplayerUnavailableMessage;
+        private long? _multiplayerMaintenanceEndTime;
 
         #region Setup / Flow coordinator
         
@@ -295,11 +297,14 @@ namespace ServerBrowser.UI.Browser
             }
             
             _serverInfo = serverInfo;
+            _joiningLobbyCancellationTokenSource = new();
+            
             _wasEverConnected = false;
             _realDisconnectReason = null;
             _connectionFailedReason = null;
             _multiplayerUnavailableReason = null;
-            _joiningLobbyCancellationTokenSource = new();
+            _multiplayerUnavailableMessage = null;
+            _multiplayerMaintenanceEndTime = null;
             
             ShowJoiningLobby(serverInfo);
             
@@ -323,15 +328,22 @@ namespace ServerBrowser.UI.Browser
                     _log.Info($"Connecting to lobby via custom master server (serverName={serverInfo.ServerName}, " +
                               $"serverCode={serverInfo.ServerCode}, serverSecret={serverInfo.ServerSecret}, " +
                               $"masterGraphUrl={serverInfo.MasterServerGraphUrl})");
-                    
-                    var statusInfo = await _multiplayerConfigManager.ConfigureCustomMasterServer(serverInfo.MasterServerGraphUrl!,
-                        serverInfo.MasterServerStatusUrl, _joiningLobbyCancellationTokenSource.Token);
 
-                    if (MultiplayerUnavailableReasonMethods.TryGetMultiplayerUnavailableReason(statusInfo,
-                            out var mur))
+                    var configResult = await _multiplayerConfigManager.ConfigureCustomMasterServer(
+                        serverInfo.MasterServerGraphUrl!, serverInfo.MasterServerStatusUrl,
+                        _joiningLobbyCancellationTokenSource.Token);
+
+                    if (configResult.UnavailableReason != null
+                        && configResult.UnavailableReason != MultiplayerUnavailableReason.NetworkUnreachable)
                     {
-                        _log.Warn($"Master server status check failed: {mur}");
-                        // TODO Handle MultiplayerCore MultiplayerUnavailableReasons here as an error
+                        // Multiplayer status check failed; server may be offline or in maintenance, client may not meet
+                        //  requirements, could even be a MultiplayerCore mod check failure. We ignore MUR-1 because
+                        //  who cares, we'll try to connect anyways.
+                        _multiplayerUnavailableReason = configResult.UnavailableReason;
+                        _multiplayerUnavailableMessage = configResult.LocalizedMessage;
+                        _multiplayerMaintenanceEndTime = configResult.MpStatusData!.maintenanceEndTime;
+                        DisconnectFromServer(); // will present error
+                        return;
                     }
                     
                     break;
@@ -343,8 +355,12 @@ namespace ServerBrowser.UI.Browser
                 }
             }
             
+            _log.Info("...");
+            
             if (_joiningLobbyCancellationTokenSource.IsCancellationRequested)
                 return;
+            
+            _log.Info("CreatePartyConnection");
             
             // We are doing the "connect by server code" flow, providing secret/code as available
             // We'll set selection mask and configuration, but a master server may override it
@@ -530,14 +546,14 @@ namespace ServerBrowser.UI.Browser
             var errMsg = $"{Localization.Get(errKey)} ({errCode})";
             var btnOk = Localization.Get("BUTTON_OK");
             var btnRetry = Localization.Get("BUTTON_RETRY");
-            
-            // If the connection failed due to a disconnect, we can provide more useful error messages than the game can  
+              
             if (_wasEverConnected && _realDisconnectReason != null)
             {
+                // Immediately disconnected from server (DCR)
                 errKey = _realDisconnectReason.Value.LocalizedKey();
                 errCode = _realDisconnectReason.Value.ErrorCode();
                 
-                // Won't use base game localized messages here because they're not helpful
+                // Won't use base game localized messages here because they're not helpful at all
                 errMsg = "Connection failed (disconnected)";
                 switch (_realDisconnectReason)
                 {
@@ -562,8 +578,24 @@ namespace ServerBrowser.UI.Browser
                 
                 _log.Error($"Multiplayer connection failed with disconnect error: {errCode} ({errKey}): \"{errMsg}\"");
             }
+            else if (_multiplayerUnavailableReason != null)
+            {
+                // Multiplayer unavailable (MUR, status check failure)
+                errKey = _multiplayerUnavailableReason.Value.LocalizedKey();
+                errCode = _multiplayerUnavailableReason.Value.ErrorCode();
+ 
+                if (_multiplayerUnavailableMessage != null)
+                    errMsg = _multiplayerUnavailableMessage;
+                else if (_multiplayerUnavailableReason == MultiplayerUnavailableReason.MaintenanceMode)
+                    errMsg = Localization.Instance.GetFormatOrKey(errKey, (_multiplayerMaintenanceEndTime.GetValueOrDefault().AsUnixTime() - DateTime.UtcNow).ToString("h':'mm"));
+                else
+                    errMsg = $"{Localization.Get(errKey)} ({errCode})";
+                
+                _log.Error($"Multiplayer unavailable error (status check failure): {errCode} ({errKey}): \"{errMsg}\"");
+            }
             else
             {
+                // Normal connection failure (CFR)
                 _log.Error($"Multiplayer connection failed error: {errCode} ({errKey}): \"{errMsg}\"");
             }
 
