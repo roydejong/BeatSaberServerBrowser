@@ -1,134 +1,60 @@
-using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using BeatSaberMarkupLanguage;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ServerBrowser.Assets
 {
-    /// <summary>
-    /// Utilities for using embedded and downloaded sprite assets in the UI.
-    /// </summary>
-    /// <remarks>
-    /// Helper code taken from BeatSaverDownloader
-    /// Copyright (c) 2018 andruzzzhka (MIT Licensed)
-    /// </remarks>
     internal static class Sprites
     {
-        /// Announce icon
-        /// Icon by RemixIcon (https://www.iconfinder.com/iconsets/remixicon-media)
-        /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
-        public static Sprite? Announce;
-        /// Announce icon, padded version
-        /// Icon by RemixIcon (https://www.iconfinder.com/iconsets/remixicon-media)
-        /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
-        public static Sprite? AnnouncePadded;
+        private const string ResourcePrefix = "ServerBrowser.Assets.Sprites.";
 
-        /// BSSB logo
-        public static Sprite? ServerBrowserLogo;
+        internal const string Avatar = "Avatar"; 
+        internal const string Checkmark = "Checkmark";
+        internal const string CircleDot = "CircleDot";
+        internal const string ComboCrown = "ComboCrown";
+        internal const string Crown = "Crown";
+        internal const string EnergyBolt = "EnergyBolt";
+        internal const string Friends = "Friends";
+        internal const string Ghost = "Ghost";
+        internal const string Global = "Global";
+        internal const string Lock = "Lock";
+        internal const string PlaceholderAvatar = "PlaceholderAvatar";
+        internal const string PlaceholderSabers = "PlaceholderSabers";
+        internal const string Player = "Player";
+        internal const string Plus = "Plus";
+        internal const string Random = "Random";
+        internal const string SaberClash = "SaberClash";
+        internal const string SaberUp = "SaberUp";
+        internal const string Search = "Search";
+        internal const string Spectator = "Spectator";
+        internal const string SuperFast = "SuperFast";
 
-        /// BeatSaver logo
-        public static Sprite? BeatSaverLogo;
+        private static readonly Dictionary<string, Sprite> _loadedSprites = new();
 
-        /// Crown icon
-        /// Icon by Ivan Boyko (https://www.iconfinder.com/visualpharm)
-        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
-        public static Sprite? Crown;
-
-        /// Pencil icon
-        /// Icon by Github, MIT Licensed
-        /// Copyright (c) 2020 GitHub Inc
-        public static Sprite? Pencil;
-
-        /// Person icon
-        /// Icon by Ivan Boyko (https://www.iconfinder.com/visualpharm)
-        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
-        public static Sprite? Person;
-
-        /// Portal icon
-        /// Straight Line icon set by designforeat (https://www.iconfinder.com/iconsets/technology-straight-line)
-        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
-        public static Sprite? Portal;
-
-        /// Portal user icon
-        /// Straight Line icon set by designforeat (https://www.iconfinder.com/iconsets/technology-straight-line)
-        /// Licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
-        public static Sprite? PortalUser;
-
-        /// Robot icon
-        /// Fluent Solid 24px vol.1 icon pack by Microsoft (https://www.iconfinder.com/iconsets/fluent-solid-24px-vol-1)
-        /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
-        public static Sprite? Robot;
-
-        public static bool IsInitialized { get; private set; }
-
-        public static void Initialize()
+        internal static async Task<Sprite?> LoadAsync(string spriteName)
         {
-            IsInitialized = true;
-
-            Announce = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Announce.png");
-            AnnouncePadded = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.AnnouncePadded.png");
-            ServerBrowserLogo = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BSSB.png");
-            BeatSaverLogo = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.BeatSaver.png");
-            Crown = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Crown.png");
-            Pencil = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Pencil.png");
-            Person = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Person.png");
-            Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
-            PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
-            Robot = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Robot.png");
-        }
-
-        private static Sprite? LoadSpriteFromResources(string resourcePath, float pixelsPerUnit = 100.0f)
-        {
-            var rawData = GetResource(Assembly.GetCallingAssembly(), resourcePath);
-
-            if (rawData is null)
-                return null;
-
-            var sprite = LoadSpriteRaw(rawData, pixelsPerUnit);
-
-            if (sprite is null)
-                return null;
-
-            sprite.name = resourcePath;
+            var spritePath = $"{ResourcePrefix}{spriteName}.png";
+            
+            if (_loadedSprites.TryGetValue(spritePath, out var cachedSprite))
+                if (cachedSprite != null)
+                    return cachedSprite;
+            
+            var sprite = await Utilities.LoadSpriteFromAssemblyAsync(spritePath);
+            if (sprite != null)
+                _loadedSprites[spritePath] = sprite;
             return sprite;
         }
 
-        private static byte[]? GetResource(Assembly asm, string resourceName)
+        internal static async Task SetAssetSpriteAsync(this Image image, string spriteName)
         {
-            var stream = asm.GetManifestResourceStream(resourceName);
+            var sprite = await LoadAsync(spriteName);
 
-            if (stream is null)
-                return null;
-
-            var data = new byte[stream.Length];
-            stream.Read(data, 0, (int) stream.Length);
-            return data;
-        }
-
-        internal static Sprite? LoadSpriteRaw(byte[] image, float pixelsPerUnit = 100.0f,
-            SpriteMeshType spriteMeshType = SpriteMeshType.Tight)
-        {
-            var texture = LoadTextureRaw(image);
-
-            if (texture is null)
-                return null;
-
-            return LoadSpriteFromTexture(texture, pixelsPerUnit, spriteMeshType);
-        }
-
-        private static Texture2D? LoadTextureRaw(byte[] file)
-        {
-            if (!file.Any())
-                return null;
-
-            var texture = new Texture2D(2, 2);
-            return texture.LoadImage(file) ? texture : null;
-        }
-
-        private static Sprite LoadSpriteFromTexture(Texture2D spriteTexture, float pixelsPerUnit = 100.0f,
-            SpriteMeshType spriteMeshType = SpriteMeshType.Tight)
-        {
-            return Sprite.Create(spriteTexture, new Rect(0, 0, spriteTexture.width, spriteTexture.height),
-                new Vector2(0, 0), pixelsPerUnit, 0, spriteMeshType);
+            if (sprite == null || image == null)
+                return;
+            
+            image.sprite = sprite;
         }
     }
 }
