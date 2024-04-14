@@ -1,5 +1,8 @@
-namespace ServerBrowser.Responses
+using JetBrains.Annotations;
+
+namespace ServerBrowser.Models.Responses
 {
+    [UsedImplicitly]
     public class BssbLoginResponse
     {
         /// <summary>

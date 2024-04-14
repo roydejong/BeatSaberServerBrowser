@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using ServerBrowser.Models;
+using JetBrains.Annotations;
 
-namespace ServerBrowser.Responses
+namespace ServerBrowser.Models.Responses
 {
+    [UsedImplicitly]
     public class BssbBrowseResponse
     {
         public List<BssbLobby> Lobbies { get; set; }

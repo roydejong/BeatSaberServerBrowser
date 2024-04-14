@@ -12,7 +12,7 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkToggleControl : LayoutComponent
     {
-        [Inject] private readonly SiraLog _logger = null!;
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly CloneHelper _cloneHelper = null!;
 
         private GameObject _toggleRoot = null!;

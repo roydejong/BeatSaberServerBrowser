@@ -12,7 +12,7 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkFilterButton : LayoutComponent
     {
-        [Inject] private readonly SiraLog _logger = null!;
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly LevelSearchViewController _levelSearchViewController = null!;
 
         private GameObject? _gameObject;
@@ -29,7 +29,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             var filterButton = _levelSearchViewController.transform.Find("Filters/FilterButton");
             if (filterButton == null)
             {
-                _logger.Error("Update needed: FilterButton base component not found!");
+                _log.Error("Update needed: FilterButton base component not found!");
                 return;
             }
 

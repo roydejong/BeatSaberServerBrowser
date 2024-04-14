@@ -323,6 +323,7 @@
     <Compile Include="Data\BssbSession.cs" />
     <Compile Include="Data\Discovery\BssbApiServerDiscovery.cs" />
     <Compile Include="Data\Discovery\LocalNetworkServerDiscovery.cs" />
+    <Compile Include="Data\MasterServerRepository.cs" />
     <Compile Include="Data\ServerRepository.cs" />
     <Compile Include="Data\MultiplayerConfigManager.cs" />
     <Compile Include="Installers\BssbAppInstaller.cs" />
@@ -333,6 +334,7 @@
     <Compile Include="Models\Requests\BssbEmptyRequest.cs" />
     <Compile Include="Models\Requests\BssbLoginRequest.cs" />
     <Compile Include="Models\Responses\BssbBrowseResponse.cs" />
+    <Compile Include="Models\Responses\BssbConfigResponse.cs" />
     <Compile Include="Models\Responses\BssbLoginResponse.cs" />
     <Compile Include="Models\ServerFilterParams.cs" />
     <Compile Include="Network\Discovery\DiscoveryClient.cs" />

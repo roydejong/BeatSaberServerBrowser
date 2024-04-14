@@ -21,6 +21,7 @@ namespace ServerBrowser.UI.Browser
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbSession _session = null!;
         [Inject] private readonly MultiplayerConfigManager _multiplayerConfigManager = null!;
+        [Inject] private readonly MasterServerRepository _masterServerRepository = null!;
         [Inject] private readonly ServerRepository _serverRepository = null!;
 
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
@@ -92,6 +93,8 @@ namespace ServerBrowser.UI.Browser
             }
 
             _serverRepository.StartDiscovery();
+
+            _ = _masterServerRepository.TryRemoteUpdate();
 
             _ = LoadAvatar();
         }

@@ -12,7 +12,7 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkLoadingControl : LayoutComponent
     {
-        [Inject] private readonly SiraLog _logger = null!;
+        [Inject] private readonly SiraLog _log = null!;
         // Note: GameServerBrowser is the base game's unused (or dev-only?) server browser, unrelated to the mod
         [Inject] private readonly GameServerBrowserViewController _gameServerBrowserViewController = null!;
         
@@ -26,7 +26,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         {
             if (_gameServerBrowserViewController == null)
             {
-                _logger.Error("Update needed: GameServerBrowserViewController not found!");
+                _log.Error("Update needed: GameServerBrowserViewController not found!");
                 return;
             }
 

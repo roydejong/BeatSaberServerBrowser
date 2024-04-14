@@ -12,7 +12,7 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkScrollView : LayoutComponent
     {
-        [Inject] protected readonly SiraLog _logger = null!;
+        [Inject] protected readonly SiraLog _log = null!;
         [Inject] protected readonly DiContainer _diContainer = null!;
         [Inject] protected readonly PrivacyPolicyDisplayViewController _policyViewController = null!;
 
@@ -25,7 +25,7 @@ namespace ServerBrowser.UI.Toolkit.Components
         {
             if (_policyViewController == null)
             {
-                _logger.Error("Update needed: PrivacyPolicyDisplayViewController base component not found!");
+                _log.Error("Update needed: PrivacyPolicyDisplayViewController base component not found!");
                 return;
             }
             

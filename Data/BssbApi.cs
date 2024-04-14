@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using ServerBrowser.Models;
+using ServerBrowser.Models.Responses;
 using ServerBrowser.Requests;
-using ServerBrowser.Responses;
 using SiraUtil.Logging;
 using Zenject;
 
@@ -43,12 +43,12 @@ namespace ServerBrowser.Data
         
         public void Initialize()
         {
-            _httpClient.BaseAddress = new Uri(_config.ApiServerUrl);
+            _httpClient.BaseAddress = new Uri(_config.BssbApiUrl);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
             _httpClient.DefaultRequestHeaders.Add("X-BSSB", "✔");
             _httpClient.Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
 
-            _log.Debug($"Initialized API client [{_config.ApiServerUrl}, {UserAgent}]");
+            _log.Debug($"Initialized API client [{_config.BssbApiUrl}, {UserAgent}]");
         }
         
         private async Task<TResponse?> Post<TRequest, TResponse>(string path, TRequest request)
@@ -77,10 +77,13 @@ namespace ServerBrowser.Data
             }
         }
         
+        public async Task<BssbConfigResponse?> SendConfigRequest()
+            => await Post<BssbEmptyRequest, BssbConfigResponse>("/api/v2/config", new());
+        
         public async Task<BssbLoginResponse?> SendLoginRequest(BssbLoginRequest request)
             => await Post<BssbLoginRequest, BssbLoginResponse>("/api/v2/login", request);
         
         public async Task<BssbBrowseResponse?> SendBrowseRequest()
-            => await Post<BssbEmptyRequest, BssbBrowseResponse>("/api/v2/browse", new BssbEmptyRequest());
+            => await Post<BssbEmptyRequest, BssbBrowseResponse>("/api/v2/browse", new());
     }
 }

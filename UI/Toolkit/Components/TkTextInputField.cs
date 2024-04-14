@@ -13,7 +13,7 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkTextInputField : LayoutComponent
     {
-        [Inject] private readonly SiraLog _logger = null!;
+        [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly LevelSearchViewController _levelSearchViewController = null!;
 
         private GameObject _gameObject = null!;
@@ -29,7 +29,7 @@ namespace ServerBrowser.UI.Toolkit.Components
             var searchInputField = _levelSearchViewController.transform.Find("Filters/SearchInputField");
             if (searchInputField == null)
             {
-                _logger.Error("Update needed: SearchInputField base component not found!");
+                _log.Error("Update needed: SearchInputField base component not found!");
                 return;
             }
 
