@@ -10,6 +10,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkTableView : LayoutComponent
     {
+        public override GameObject GameObject => _goTable;
+        
         private GameObject _goTable = null!;
         private RectTransform _rectTable = null!;
         private List<GameObject> _rowObjects = null!;

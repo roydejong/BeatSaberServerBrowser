@@ -10,6 +10,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkHorizontalSeparator : LayoutComponent
     {
+        public override GameObject GameObject => _layoutElement.gameObject;
+        
         private LayoutElement _layoutElement = null!;
         private ImageView _imageView = null!;
 

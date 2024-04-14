@@ -12,7 +12,9 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkIcon : LayoutComponent
     {
-        [Inject] protected readonly MaterialAccessor _materialAccessor = null!;
+        [Inject] private readonly MaterialAccessor _materialAccessor = null!;
+        
+        public override GameObject GameObject => _gameObject;
 
         protected GameObject? _gameObject;
         protected ImageView? _imageView;

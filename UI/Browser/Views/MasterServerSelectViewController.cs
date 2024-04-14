@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using HMUI;
-using ServerBrowser.Models;
 using ServerBrowser.UI.Toolkit;
-using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.Util;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,22 +8,12 @@ using Zenject;
 
 namespace ServerBrowser.UI.Browser.Views
 {
-    public class BrowserFilterViewController : ViewController, IInitializable
+    public class MasterServerSelectViewController : ViewController, IInitializable
     {
         [Inject] private readonly DiContainer _diContainer = null!;
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
 
-        private ServerFilterParams _filterParams = null!;
-        private Dictionary<string, TkToggleControl> _toggleControls = new();
-        public event Action<ServerFilterParams?> FinishedEvent;
-
-        public void Init(ServerFilterParams filterParams)
-        {
-            _filterParams = filterParams;
-
-            foreach (var toggleKv in _toggleControls)
-                toggleKv.Value.SetValue(_filterParams.GetValue(toggleKv.Key));
-        }
+        public event Action FinishedEvent;
         
         public void Initialize()
         {
@@ -52,26 +39,23 @@ namespace ServerBrowser.UI.Browser.Views
             var content = scrollRoot.Content!;
             content.InsertMargin(-1f, 6f);
             
-            foreach (var param in ServerFilterParams.AllParams)
-            {
-                var toggle = param.CreateControl(content);
-                toggle.ToggledEvent += value =>
-                {
-                    _filterParams.SetValue(param.Key, value);
-                };
-                _toggleControls[param.Key] = toggle;
-            }
+            // foreach (var param in ServerFilterParams.AllParams)
+            // {
+            //     var toggle = param.CreateControl(content);
+            //     toggle.ToggledEvent += value =>
+            //     {
+            //         _filterParams.SetValue(param.Key, value);
+            //     };
+            //     _toggleControls[param.Key] = toggle;
+            // }
 
             var bottomHorizontal = verticalSplit.AddHorizontalLayoutGroup("BottomControls");
             bottomHorizontal.PreferredWidth = 90f;
             bottomHorizontal.PreferredHeight = 10f;
             
-            var applyButton = bottomHorizontal.AddButton("Apply", true,
+            var applyButton = bottomHorizontal.AddButton("Select server", true,
                 preferredWidth: 40f, preferredHeight: 13f);
-            applyButton.AddClickHandler(() =>
-            {
-                FinishedEvent?.Invoke(_filterParams);
-            });
+            applyButton.AddClickHandler(() => FinishedEvent?.Invoke());
         }
     }
 }

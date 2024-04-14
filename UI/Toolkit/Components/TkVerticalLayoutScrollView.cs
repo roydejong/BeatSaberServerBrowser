@@ -8,9 +8,15 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkVerticalLayoutScrollView : TkScrollView
     {
+        public override GameObject GameObject => _rootGameObject;
+
+        private GameObject _rootGameObject = null!;
+        
         public override void AddToContainer(LayoutContainer container)
         {
             base.AddToContainer(container);
+
+            _rootGameObject = container.GameObject;
             
             var layoutGroup = Content!.GameObject.AddComponent<VerticalLayoutGroup>();
             layoutGroup.childForceExpandWidth = true;

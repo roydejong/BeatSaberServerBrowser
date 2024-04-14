@@ -12,6 +12,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     public class TkAccountTile : LayoutComponent
     {
         [Inject] private readonly MaterialAccessor _materialAccessor = null!;
+
+        public override GameObject GameObject => _rootGameObject;
         
         private GameObject _rootGameObject = null!;
         private TkImageView _selfAvatarImage = null!;

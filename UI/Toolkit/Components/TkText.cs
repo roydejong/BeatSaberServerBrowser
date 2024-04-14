@@ -10,6 +10,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkText : LayoutComponent
     {
+        public override GameObject GameObject => _gameObject;
+        
         private GameObject? _gameObject;
         private CurvedTextMeshPro? _textMesh;
         private LayoutElement? _layoutElement;

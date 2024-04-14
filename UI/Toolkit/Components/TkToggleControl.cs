@@ -14,6 +14,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly CloneHelper _cloneHelper = null!;
+        
+        public override GameObject GameObject => _toggleRoot;
 
         private GameObject _toggleRoot = null!;
         private CurvedTextMeshPro _label = null!;

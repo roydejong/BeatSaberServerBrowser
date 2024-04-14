@@ -1,6 +1,7 @@
 using ServerBrowser.UI;
 using ServerBrowser.UI.Browser;
 using ServerBrowser.UI.Browser.Views;
+using ServerBrowser.UI.Forms;
 using ServerBrowser.UI.Toolkit;
 using Zenject;
 
@@ -14,11 +15,16 @@ namespace ServerBrowser.Installers
             
             Container.Bind<MaterialAccessor>().AsSingle();
             Container.Bind<CloneHelper>().AsSingle();
+                
+            Container.BindInterfacesAndSelfTo<CreateServerFormExtender>().AsSingle();
+            Container.BindInterfacesAndSelfTo<QuickPlayFormExtender>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ServerCodeFormExtender>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<BrowserFilterViewController>().FromNewComponentAsViewController().AsSingle();
+            Container.BindInterfacesAndSelfTo<MasterServerSelectViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<MainBrowserViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<BrowserFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
-            
+
             Container.BindInterfacesAndSelfTo<MainMenuIntegrator>().AsSingle();
         }
     }

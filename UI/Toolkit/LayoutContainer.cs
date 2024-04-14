@@ -76,11 +76,12 @@ namespace ServerBrowser.UI.Toolkit
             var layoutElement = gameObject.AddComponent<LayoutElement>();
             layoutElement.preferredHeight = height;
             layoutElement.preferredWidth = width;
+            (layoutElement.transform as RectTransform)!.sizeDelta = new Vector2(width, height);
             return gameObject.transform;
         }
 
-        public void InsertParentMargin(float width, float height) => CreateSpacer(Transform.parent, width, height);
-        public void InsertMargin(float width, float height) => CreateSpacer(Transform, width, height);
+        public Transform InsertParentMargin(float width, float height) => CreateSpacer(Transform.parent, width, height);
+        public Transform InsertMargin(float width, float height) => CreateSpacer(Transform, width, height);
         
         public LayoutContainer AddLayoutGroup<T>(string name,
             ContentSizeFitter.FitMode horizontalFit = ContentSizeFitter.FitMode.Unconstrained,
@@ -302,17 +303,22 @@ namespace ServerBrowser.UI.Toolkit
             return accountTile;
         }
         
-        public TkToggleControl AddToggleControl()
+        public TkToggleControl AddToggleControl(string? label = null, bool initialValue = false)
         {
             var toggle = Builder.CreateComponent<TkToggleControl>();
             toggle.AddToContainer(this);
+            if (label != null)
+                toggle.SetLabel(label);
+            toggle.SetValue(initialValue);
             return toggle;
         }
         
-        public TkDropdownControl AddDropdownControl()
+        public TkDropdownControl AddDropdownControl(string? label = null)
         {
             var dropdown = Builder.CreateComponent<TkDropdownControl>();
             dropdown.AddToContainer(this);
+            if (label != null)
+                dropdown.SetLabel(label);
             return dropdown;
         }
     }

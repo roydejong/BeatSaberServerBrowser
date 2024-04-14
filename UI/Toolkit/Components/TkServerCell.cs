@@ -13,21 +13,23 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkServerCell : LayoutComponent
     {
+        public override GameObject GameObject => _rootGameObject;
+        
         public const int CellSpacing = 1;
         public const int CellPadding = 2;
 
-        private GameObject? _rootGameObject = null;
-        private StackLayoutGroup? _rootLayoutGroup = null;
-        private LayoutElement? _rootLayoutElement = null!;
-        private RectTransform? _rootRectTransform = null;
-        private ImageView? _contentBackground = null;
+        private GameObject _rootGameObject = null!;
+        private StackLayoutGroup _rootLayoutGroup = null!;
+        private LayoutElement _rootLayoutElement = null!;
+        private RectTransform _rootRectTransform = null!;
+        private ImageView _contentBackground = null!;
 
-        private ServerRepository.ServerInfo? _serverInfo = null;
-        private TkImageView? _serverImage = null;
-        private TkText? _serverNameText = null;
-        private TkText? _gameModeText = null;
-        private TkText? _playerCountText = null;
-        private TkText? _stateText = null;
+        private ServerRepository.ServerInfo _serverInfo = null!;
+        private TkImageView _serverImage = null!;
+        private TkText _serverNameText = null!;
+        private TkText _gameModeText = null!;
+        private TkText _playerCountText = null!;
+        private TkText _stateText = null!;
 
         public event Action<ServerRepository.ServerInfo>? ClickedEvent;
 

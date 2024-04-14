@@ -12,6 +12,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkLoadingControl : LayoutComponent
     {
+        public override GameObject GameObject => _gameObject;
+        
         [Inject] private readonly SiraLog _log = null!;
         // Note: GameServerBrowser is the base game's unused (or dev-only?) server browser, unrelated to the mod
         [Inject] private readonly GameServerBrowserViewController _gameServerBrowserViewController = null!;

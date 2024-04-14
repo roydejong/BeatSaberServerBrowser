@@ -15,6 +15,8 @@ namespace ServerBrowser.UI.Toolkit.Components
     {
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly LevelSearchViewController _levelSearchViewController = null!;
+        
+        public override GameObject GameObject => _gameObject;
 
         private GameObject _gameObject = null!;
         private InputFieldView _inputFieldView = null!;

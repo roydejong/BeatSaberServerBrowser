@@ -349,6 +349,11 @@
     <Compile Include="UI\Browser\Views\BrowserFilterViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.cs" />
     <Compile Include="UI\Browser\Views\MainBrowserViewController.Layout.cs" />
+    <Compile Include="UI\Browser\Views\MasterServerSelectViewController.cs" />
+    <Compile Include="UI\Forms\CreateServerFormExtender.cs" />
+    <Compile Include="UI\Forms\FormExtender.cs" />
+    <Compile Include="UI\Forms\QuickPlayFormExtender.cs" />
+    <Compile Include="UI\Forms\ServerCodeFormExtender.cs" />
     <Compile Include="UI\MainMenuIntegrator.cs" />
     <Compile Include="UI\Toolkit\CloneHelper.cs" />
     <Compile Include="UI\Toolkit\Components\TkAccountTile.cs" />

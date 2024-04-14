@@ -10,6 +10,8 @@ namespace ServerBrowser.UI.Toolkit
         
         protected static BasicUIAudioManager? BasicUIAudioManager;
         
+        public abstract GameObject GameObject { get; }
+        
         public abstract void AddToContainer(LayoutContainer container);
 
         protected void TriggerButtonClickEffect()

@@ -8,6 +8,7 @@ using IgnoranceCore;
 using ServerBrowser.Data;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Browser.Views;
+using ServerBrowser.UI.Forms;
 using ServerBrowser.Util;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
@@ -27,6 +28,7 @@ namespace ServerBrowser.UI.Browser
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly MainBrowserViewController _mainViewController = null!;
         [Inject] private readonly BrowserFilterViewController _filterViewController = null!;
+        [Inject] private readonly MasterServerSelectViewController _masterServerSelectViewController = null!;
         
         [Inject] private readonly JoiningLobbyViewController _joiningLobbyViewController = null!;
         [Inject] private readonly SimpleDialogPromptViewController _simpleDialogPromptViewController = null!;
@@ -46,6 +48,10 @@ namespace ServerBrowser.UI.Browser
         [Inject] private readonly LobbyDataModelsManager _lobbyDataModelsManager = null!;
         [Inject] private readonly AvatarSystemCollection _avatarSystemCollection = null!;
         [Inject] private readonly SongPackMasksModel _songPackMasksModel = null!;
+        
+        [Inject] private readonly CreateServerFormExtender _createServerFormExtender = null!;
+        [Inject] private readonly QuickPlayFormExtender _quickPlayFormExtender = null!;
+        [Inject] private readonly ServerCodeFormExtender _serverCodeFormExtender = null!;
 
         private ServerFilterParams _filterParams = new();
         private CancellationTokenSource? _joiningLobbyCancellationTokenSource;
@@ -58,6 +64,7 @@ namespace ServerBrowser.UI.Browser
         private MultiplayerUnavailableReason? _multiplayerUnavailableReason;
         private string? _multiplayerUnavailableMessage;
         private long? _multiplayerMaintenanceEndTime;
+        private MultiplayerModeSelectionViewController.MenuButton? _lastSelectedMode;
 
         #region Setup / Flow coordinator
         
@@ -70,8 +77,8 @@ namespace ServerBrowser.UI.Browser
                 _mainViewController.AvatarEditRequestedEvent += HandleAvatarEditRequested;
                 _mainViewController.FiltersClickedEvent += HandleFiltersClicked;
                 _mainViewController.FiltersClearedEvent += HandleFiltersCleared;
-                
                 _filterViewController.FinishedEvent += HandleFiltersViewFinished;
+                _masterServerSelectViewController.FinishedEvent += HandleMasterServerSelectFinished;
 
                 _joiningLobbyViewController.didCancelEvent += HandleJoinCanceled;
 
@@ -83,6 +90,10 @@ namespace ServerBrowser.UI.Browser
                 _multiplayerSessionManager.connectionFailedEvent += HandleSessionConnectionFailed;
                 _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent += HandleCpmCreated;
                 _unifiedNetworkPlayerModel.connectedPlayerManagerDestroyedEvent += HandleCpmDestroyed;
+                
+                _createServerFormExtender.MasterServerSwitchRequestedEvent += HandleMasterServerSwitchRequested;
+                _quickPlayFormExtender.MasterServerSwitchRequestedEvent += HandleMasterServerSwitchRequested;
+                _serverCodeFormExtender.MasterServerSwitchRequestedEvent += HandleMasterServerSwitchRequested;
             }
 
             if (firstActivation)
@@ -108,8 +119,8 @@ namespace ServerBrowser.UI.Browser
                 _mainViewController.AvatarEditRequestedEvent -= HandleAvatarEditRequested;
                 _mainViewController.FiltersClickedEvent -= HandleFiltersClicked;
                 _mainViewController.FiltersClearedEvent -= HandleFiltersCleared;
-                
                 _filterViewController.FinishedEvent -= HandleFiltersViewFinished;
+                _masterServerSelectViewController.FinishedEvent -= HandleMasterServerSelectFinished;
 
                 _joiningLobbyViewController.didCancelEvent -= HandleJoinCanceled;
             
@@ -120,6 +131,10 @@ namespace ServerBrowser.UI.Browser
                 _multiplayerSessionManager.connectedEvent -= HandleSessionConnected;
                 _multiplayerSessionManager.connectionFailedEvent -= HandleSessionConnectionFailed;
                 _unifiedNetworkPlayerModel.connectedPlayerManagerCreatedEvent -= HandleCpmCreated;
+                
+                _createServerFormExtender.MasterServerSwitchRequestedEvent -= HandleMasterServerSwitchRequested;
+                _quickPlayFormExtender.MasterServerSwitchRequestedEvent -= HandleMasterServerSwitchRequested;
+                _serverCodeFormExtender.MasterServerSwitchRequestedEvent -= HandleMasterServerSwitchRequested;
             }
 
             _serverRepository.StopDiscovery();
@@ -143,6 +158,12 @@ namespace ServerBrowser.UI.Browser
             {
                 // Sub view is active, dismiss to return to top view
                 ShowMainView();
+                return;
+            }
+
+            if (topViewController == _masterServerSelectViewController)
+            {
+                HandleMasterServerSelectFinished();
                 return;
             }
 
@@ -358,8 +379,6 @@ namespace ServerBrowser.UI.Browser
                 }
             }
             
-            _log.Info("...");
-            
             if (_joiningLobbyCancellationTokenSource.IsCancellationRequested)
                 return;
             
@@ -396,11 +415,14 @@ namespace ServerBrowser.UI.Browser
         #endregion
 
         #region Mode Selection Sub-views
+
+        private void HandleModeSelected(MultiplayerModeSelectionViewController.MenuButton mode) =>
+            HandleModeSelected(mode, false);
         
-        private void HandleModeSelected(MultiplayerModeSelectionViewController.MenuButton mode)
+        private void HandleModeSelected(MultiplayerModeSelectionViewController.MenuButton mode, bool exiting)
         {
-            if (topViewController != _mainViewController)
-                // Can only transition from main view
+            if (topViewController != _mainViewController && topViewController != _masterServerSelectViewController)
+                // Can only transition from main view or when finishing master server select
                 return;
 
             var multiplayerModeSettings = _playerDataModel.playerData.multiplayerModeSettings;
@@ -433,10 +455,16 @@ namespace ServerBrowser.UI.Browser
             
             if (nextViewController == null)
                 return;
-
+            
             showBackButton = true;
-            ReplaceTopViewController(nextViewController, animationDirection: ViewController.AnimationDirection.Vertical);
+            ReplaceTopViewController(nextViewController,
+                animationDirection: exiting
+                    ? ViewController.AnimationDirection.Vertical
+                    : ViewController.AnimationDirection.Horizontal,
+                animationType: exiting ? ViewController.AnimationType.Out : ViewController.AnimationType.In);
             SetTitle(nextTitle ?? "Online");
+            
+            _lastSelectedMode = mode;
         }
 
         private void HandleQuickPlayViewFinished(bool success)
@@ -494,6 +522,25 @@ namespace ServerBrowser.UI.Browser
             HandleServerJoinByCodeRequested(code);
         }
         
+        private void HandleMasterServerSwitchRequested()
+        {
+            showBackButton = false;
+            ReplaceTopViewController(_masterServerSelectViewController,
+                animationDirection: ViewController.AnimationDirection.Vertical);
+            SetTitle("Select Master Server");
+        }
+
+        private void HandleMasterServerSelectFinished()
+        {
+            if (_lastSelectedMode == null)
+            {
+                ShowMainView();
+                return;
+            }
+            
+            HandleModeSelected(_lastSelectedMode.Value, true);
+        }
+        
         #endregion
         
         #region Connection UI
@@ -502,11 +549,16 @@ namespace ServerBrowser.UI.Browser
         {
             if (topViewController == _mainViewController)
                 return;
+
+            var fromVerticalAnimation = topViewController is BrowserFilterViewController or
+                MasterServerSelectViewController or JoiningLobbyViewController or SimpleDialogPromptViewController;
+            var animationDirection = fromVerticalAnimation ? ViewController.AnimationDirection.Vertical
+                : ViewController.AnimationDirection.Horizontal;
             
             showBackButton = true;
             ReplaceTopViewController(_mainViewController, 
                 animationType: ViewController.AnimationType.Out,
-                animationDirection: ViewController.AnimationDirection.Vertical);
+                animationDirection: animationDirection);
             SetTitle("Online");
             ResetMenuLights();
         }

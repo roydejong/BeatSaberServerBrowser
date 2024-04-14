@@ -12,12 +12,14 @@ namespace ServerBrowser.UI.Toolkit.Components
     [UsedImplicitly]
     public class TkScrollView : LayoutComponent
     {
+        public override GameObject GameObject => _gameObject;
+        
         [Inject] protected readonly SiraLog _log = null!;
         [Inject] protected readonly DiContainer _diContainer = null!;
         [Inject] protected readonly PrivacyPolicyDisplayViewController _policyViewController = null!;
 
-        protected GameObject? _gameObject;
-        protected ScrollView? _scrollView;
+        protected GameObject _gameObject = null!;
+        protected ScrollView _scrollView = null!;
         
         public LayoutContainer? Content { get; private set; }
         
