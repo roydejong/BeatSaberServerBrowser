@@ -363,6 +363,7 @@
     <Compile Include="UI\Toolkit\Components\TkImageView.cs" />
     <Compile Include="UI\Toolkit\Components\TkIcon.cs" />
     <Compile Include="UI\Toolkit\Components\TkLoadingControl.cs" />
+    <Compile Include="UI\Toolkit\Components\TkMasterServerCell.cs" />
     <Compile Include="UI\Toolkit\Components\TkScrollView.cs" />
     <Compile Include="UI\Toolkit\Components\TkTextInputField.cs" />
     <Compile Include="UI\Toolkit\Components\TkServerCell.cs" />
@@ -434,6 +435,7 @@
     <EmbeddedResource Include="Assets\Sprites\Checkmark.png" />
     <EmbeddedResource Include="Assets\Sprites\EnergyBolt.png" />
     <EmbeddedResource Include="Assets\Sprites\CircleDot.png" />
+    <EmbeddedResource Include="Assets\Sprites\OfficialServerIcon.png" />
     <Content Include="v2.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -197,10 +197,14 @@ namespace ServerBrowser.UI.Browser
         
         private void HandleServerJoinByCodeRequested(string serverCode)
         {
+            var master = _masterServerRepository.SelectedMasterServer;
+            
             _ = ConnectToServer(new ServerRepository.ServerInfo()
             {
                 ServerName = "Lobby",
-                ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial,
+                ConnectionMethod = master.ConnectionMethod,
+                MasterServerGraphUrl = master.GraphUrl,
+                MasterServerStatusUrl = master.StatusUrl,
                 ServerCode = serverCode
             });
         }
@@ -247,13 +251,13 @@ namespace ServerBrowser.UI.Browser
         public void JoinQuickPlay(BeatmapDifficultyMask beatmapDifficultyMask, SongPackMask songPackMask,
             bool allowSongSelection = true)
         {
-            // TODO Master server select
-
+            var master = _masterServerRepository.SelectedMasterServer;
+            
             var selectionMask = new BeatmapLevelSelectionMask(beatmapDifficultyMask, GameplayModifierMask.NoFail,
                 songPackMask);
 
             var serverConfig = new GameplayServerConfiguration(
-                5,
+                master.MaxPlayers ?? 5,
                 DiscoveryPolicy.Public,
                 InvitePolicy.NobodyCanInvite,
                 allowSongSelection ? GameplayServerMode.Countdown : GameplayServerMode.QuickStartOneSong,
@@ -270,7 +274,9 @@ namespace ServerBrowser.UI.Browser
                 GameModeName = "Quick Play",
                 PlayerCount = 0,
                 PlayerLimit = serverConfig.maxPlayerCount,
-                ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial, // TODO Custom form value
+                ConnectionMethod = master.ConnectionMethod,
+                MasterServerGraphUrl = master.GraphUrl,
+                MasterServerStatusUrl = master.StatusUrl,
                 BeatmapLevelSelectionMask = selectionMask,
                 GameplayServerConfiguration = serverConfig,
             };
@@ -280,9 +286,9 @@ namespace ServerBrowser.UI.Browser
 
         public void CreateServer(CreateServerFormData formData)
         {
-            var randomSecret = NetworkUtility.GenerateId();
+            var master = _masterServerRepository.SelectedMasterServer;
             
-            // TODO Master server select
+            var randomSecret = NetworkUtility.GenerateId();
 
             var selectionMask = new BeatmapLevelSelectionMask(formData.difficulties, formData.modifiers,
                 formData.songPacks);
@@ -303,7 +309,9 @@ namespace ServerBrowser.UI.Browser
                 GameModeName = "Custom",  // TODO Custom form value
                 PlayerCount = 0,
                 PlayerLimit = formData.maxPlayers,
-                ConnectionMethod = ServerRepository.ConnectionMethod.GameLiftOfficial, // TODO Custom form value
+                ConnectionMethod = master.ConnectionMethod,
+                MasterServerGraphUrl = master.GraphUrl,
+                MasterServerStatusUrl = master.StatusUrl,
                 ServerSecret = randomSecret,
                 BeatmapLevelSelectionMask = selectionMask,
                 GameplayServerConfiguration = serverConfig
@@ -348,10 +356,11 @@ namespace ServerBrowser.UI.Browser
                     break;
                 }
                 case ServerRepository.ConnectionMethod.GameLiftModded:
+                case ServerRepository.ConnectionMethod.GameLiftModdedSsl:
                 {
                     _log.Info($"Connecting to lobby via custom master server (serverName={serverInfo.ServerName}, " +
                               $"serverCode={serverInfo.ServerCode}, serverSecret={serverInfo.ServerSecret}, " +
-                              $"masterGraphUrl={serverInfo.MasterServerGraphUrl})");
+                              $"masterGraphUrl={serverInfo.MasterServerGraphUrl}, mode={serverInfo.ConnectionMethod})");
 
                     var configResult = await _multiplayerConfigManager.ConfigureCustomMasterServer(
                         serverInfo.MasterServerGraphUrl!, serverInfo.MasterServerStatusUrl,

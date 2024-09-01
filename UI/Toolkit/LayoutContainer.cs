@@ -288,6 +288,13 @@ namespace ServerBrowser.UI.Toolkit
             serverCell.AddToContainer(this);
             return serverCell;
         }
+
+        public TkMasterServerCell AddMasterServerCell()
+        {
+            var serverCell = Builder.CreateComponent<TkMasterServerCell>();
+            serverCell.AddToContainer(this);
+            return serverCell;
+        }
         
         public TkTableView AddTableView()
         {

@@ -21,30 +21,43 @@ namespace ServerBrowser.Data
         private readonly Dictionary<string, MasterServerInfo> _masterServers = new();
         private MasterServerInfo? _selectedServer = null;
 
+        public IReadOnlyList<MasterServerInfo> All
+        {
+            get
+            {
+                var list = _masterServers.Values.ToList();
+                return list.Prepend(OfficialServer).ToList();
+            }
+        }
+
         public MasterServerInfo SelectedMasterServer
         {
             get
             {
                 if (_selectedServer != null)
                     return _selectedServer;
-
-                return new MasterServerInfo()
-                {
-                    GraphUrl = "https://graph.oculus.com",
-                    StatusUrl = "https://graph.oculus.com/beat_saber_multiplayer_status",
-                    Name = "Official Servers",
-                    MaxPlayers = 5,
-                    UseSsl = true
-                };
+                return OfficialServer;
             }
             set
             {
+                _log.Info($"Select master server: {value.DisplayName} ({value.GraphUrl})");
                 _selectedServer = !value.IsOfficial ? value : null;
-                SelectedMasterServerChangedEvent?.Invoke(SelectedMasterServer);
+                WriteConfig();
+                MasterServerSelectionChangedEvent?.Invoke(SelectedMasterServer);
             }
         }
+        
+        public static readonly MasterServerInfo OfficialServer = new()
+        {
+            GraphUrl = "https://graph.oculus.com",
+            StatusUrl = "https://graph.oculus.com/beat_saber_multiplayer_status",
+            Name = "Official Servers",
+            Description = "Beat Saber Official Multiplayer (OST/DLC Only)",
+            MaxPlayers = 5,
+            UseSsl = true
+        };
 
-        public event Action<MasterServerInfo>? SelectedMasterServerChangedEvent;
+        public event Action<MasterServerInfo>? MasterServerSelectionChangedEvent;
 
         private bool _remoteUpdateInProgress;
         private bool _remoteUpdateSuccess;
@@ -161,7 +174,7 @@ namespace ServerBrowser.Data
             /// Graph API URL for the master server.
             /// </summary>
             [JsonProperty("graphUrl")]
-            public string GraphUrl { get; init; }
+            public string GraphUrl { get; init; } = null!;
 
             /// <summary>
             /// Status API URL for the master server.
@@ -202,27 +215,62 @@ namespace ServerBrowser.Data
             /// <summary>
             /// Indicates when this data was last updated (from a status request, either by the client or the BSSB API).
             /// </summary>
+            [JsonProperty("lastUpdated")]
             public DateTime? LastUpdated { get; set; }
 
             /// <summary>
             /// Modded feature: per-player modifiers.
             /// </summary>
+            [JsonProperty("supportsPpModifiers")]
             public bool SupportsPpModifiers { get; set; }
 
             /// <summary>
             /// Modded feature: per-player difficulties.
             /// </summary>
+            [JsonProperty("supportsPpDifficulties")]
             public bool SupportsPpDifficulties { get; set; }
 
             /// <summary>
             /// Modded feature: per-player maps.
             /// </summary>
+            [JsonProperty("supportsPpMaps")]
             public bool SupportsPpMaps { get; set; }
 
             /// <summary>
             /// Indicates if this is the official master server (Oculus GameLift API).
             /// </summary>
+            [JsonIgnore]
             public bool IsOfficial => GraphUrl == "https://graph.oculus.com";
+
+            [JsonIgnore]
+            public string DisplayName => Name ?? GraphUrlNoProtocolNoPort;
+            
+            /// <summary>
+            /// Gets the graph URL without the protocol:// prefix.
+            /// </summary>
+            [JsonIgnore]
+            public string GraphUrlNoProtocol => GraphUrl
+                .Replace("https://", "")
+                .Replace("http://", "")
+                .Trim('/');
+            
+            [JsonIgnore]
+            public string GraphUrlNoProtocolNoPort => GraphUrlNoProtocol
+                .Split(':').First();
+
+            [JsonIgnore]
+            public ServerRepository.ConnectionMethod ConnectionMethod
+            {
+                get
+                {
+                    if (IsOfficial)
+                        return ServerRepository.ConnectionMethod.GameLiftOfficial;
+                    else if (UseSsl)
+                        return ServerRepository.ConnectionMethod.GameLiftModdedSsl;
+                    else
+                        return ServerRepository.ConnectionMethod.GameLiftModded;
+                }
+            }
         }
     }
 }

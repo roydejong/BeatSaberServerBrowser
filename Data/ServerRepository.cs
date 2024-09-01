@@ -190,7 +190,7 @@ namespace ServerBrowser.Data
         private void RaiseServersUpdated()
         {
             // Remove servers past the staleness threshold
-            var staleThreshold = DateTime.Now - ServerRepository.StaleServerThreshold;
+            var staleThreshold = DateTime.Now - StaleServerThreshold;
             foreach (var server in _servers.Values.Where(x => x.LastDiscovered < staleThreshold).ToList())
                 _servers.TryRemove(server.Key, out _);
             
@@ -340,7 +340,7 @@ namespace ServerBrowser.Data
             }
 
             public bool UseDtlsEncryption =>
-                ConnectionMethod is ConnectionMethod.GameLiftOfficial or ConnectionMethod.GameLiftModded;
+                ConnectionMethod is ConnectionMethod.GameLiftOfficial or ConnectionMethod.GameLiftModdedSsl;
         }
 
         public enum ConnectionMethod
@@ -350,13 +350,17 @@ namespace ServerBrowser.Data
             /// </summary>
             GameLiftOfficial = 1,
             /// <summary>
-            /// Modded/custom master servers emulating the GameLift API.
+            /// Modded/custom master servers emulating the GameLift API (standard; not encrypted).
             /// </summary>
             GameLiftModded = 2,
             /// <summary>
+            /// Modded/custom master servers emulating the GameLift API (using SSL/DTLS).
+            /// </summary>
+            GameLiftModdedSsl = 3,
+            /// <summary>
             /// Modded servers using direct connect (no encryption).
             /// </summary>
-            DirectConnect = 3
+            DirectConnect = 4
         }
         
         public const float DiscoveryTickInterval = 1f;

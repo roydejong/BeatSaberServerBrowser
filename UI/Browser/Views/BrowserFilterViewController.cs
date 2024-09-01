@@ -18,6 +18,7 @@ namespace ServerBrowser.UI.Browser.Views
 
         private ServerFilterParams _filterParams = null!;
         private Dictionary<string, TkToggleControl> _toggleControls = new();
+        
         public event Action<ServerFilterParams?> FinishedEvent;
 
         public void Init(ServerFilterParams filterParams)

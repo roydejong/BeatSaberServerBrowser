@@ -19,23 +19,20 @@ namespace ServerBrowser.UI.Toolkit.Components
             _remoteImageStore = container.Builder.RemoteImageStore;
         }
 
-        public async Task SetPlaceholderAvatar()
+        public async Task SetBuiltinSprite(string sprite)
         {
             if (_imageView == null)
                 return;
 
-            await _imageView.SetAssetSpriteAsync(Sprites.PlaceholderAvatar);
+            await _imageView.SetAssetSpriteAsync(sprite);
             _currentUrlValue = null;
         }
 
-        public async Task SetPlaceholderSabers()
-        {
-            if (_imageView == null)
-                return;
+        public async Task SetPlaceholderAvatar() =>
+            await SetBuiltinSprite(Sprites.PlaceholderAvatar);
 
-            await _imageView.SetAssetSpriteAsync(Sprites.PlaceholderSabers);
-            _currentUrlValue = null;
-        }
+        public async Task SetPlaceholderSabers() =>
+            await SetBuiltinSprite(Sprites.PlaceholderSabers);
 
         public async Task SetRemoteImage(string? url)
         {

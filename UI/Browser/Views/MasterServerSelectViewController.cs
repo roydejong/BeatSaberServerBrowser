@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using HMUI;
+using ServerBrowser.Data;
 using ServerBrowser.UI.Toolkit;
+using ServerBrowser.UI.Toolkit.Components;
 using ServerBrowser.Util;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +15,9 @@ namespace ServerBrowser.UI.Browser.Views
     {
         [Inject] private readonly DiContainer _diContainer = null!;
         [Inject] private readonly LayoutBuilder _layoutBuilder = null!;
+        [Inject] private readonly MasterServerRepository _masterServerRepository = null!;
+
+        private Dictionary<string, TkMasterServerCell> _cells = new();
 
         public event Action FinishedEvent;
         
@@ -35,19 +41,18 @@ namespace ServerBrowser.UI.Browser.Views
             verticalSplit.PreferredWidth = 100f;
             
             var scrollRoot = verticalSplit.AddVerticalLayoutScrollView();
+            scrollRoot.SetScrollPerCellHeight(9f);
             
             var content = scrollRoot.Content!;
-            content.InsertMargin(-1f, 6f);
+            content.InsertMargin(-1f, 4f);
             
-            // foreach (var param in ServerFilterParams.AllParams)
-            // {
-            //     var toggle = param.CreateControl(content);
-            //     toggle.ToggledEvent += value =>
-            //     {
-            //         _filterParams.SetValue(param.Key, value);
-            //     };
-            //     _toggleControls[param.Key] = toggle;
-            // }
+            foreach (var masterServer in _masterServerRepository.All)
+            {
+                var serverTile = content.AddMasterServerCell();
+                serverTile.SetData(masterServer);
+                serverTile.ClickedEvent += HandleMasterServerClicked;
+                _cells[masterServer.GraphUrl] = serverTile;
+            }
 
             var bottomHorizontal = verticalSplit.AddHorizontalLayoutGroup("BottomControls");
             bottomHorizontal.PreferredWidth = 90f;
@@ -56,6 +61,21 @@ namespace ServerBrowser.UI.Browser.Views
             var applyButton = bottomHorizontal.AddButton("Select server", true,
                 preferredWidth: 40f, preferredHeight: 13f);
             applyButton.AddClickHandler(() => FinishedEvent?.Invoke());
+
+            UpdateSelectionState();
+        }
+
+        private void HandleMasterServerClicked(MasterServerRepository.MasterServerInfo obj)
+        {
+            _masterServerRepository.SelectedMasterServer = obj;
+            UpdateSelectionState();
+        }
+
+        private void UpdateSelectionState()
+        {
+            var selectedServerUrl = _masterServerRepository.SelectedMasterServer.GraphUrl;
+            foreach (var cellKv in _cells)
+                cellKv.Value.SetIsSelected(cellKv.Key == selectedServerUrl);
         }
     }
 }

@@ -20,6 +20,7 @@ namespace ServerBrowser.Assets
         internal const string Ghost = "Ghost";
         internal const string Global = "Global";
         internal const string Lock = "Lock";
+        internal const string OfficialServerIcon = "OfficialServerIcon";
         internal const string PlaceholderAvatar = "PlaceholderAvatar";
         internal const string PlaceholderSabers = "PlaceholderSabers";
         internal const string Player = "Player";

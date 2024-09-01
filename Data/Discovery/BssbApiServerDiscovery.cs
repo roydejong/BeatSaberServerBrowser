@@ -27,6 +27,9 @@ namespace ServerBrowser.Data.Discovery
                 foreach (var server in browseResponse.Lobbies)
                 {
                     var connectionMethod = ServerRepository.ConnectionMethod.GameLiftModded;
+                    if (server.EncryptionMode == "enet_dtls")
+                        connectionMethod = ServerRepository.ConnectionMethod.GameLiftModdedSsl;
+                    
                     IPEndPoint? dedicatedEndPoint = null;
                     BeatmapLevelSelectionMask? beatmapLevelSelectionMask = null;
                     GameplayServerConfiguration? gameplayServerConfiguration = null;

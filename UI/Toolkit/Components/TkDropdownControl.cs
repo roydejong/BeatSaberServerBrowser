@@ -38,6 +38,12 @@ namespace ServerBrowser.UI.Toolkit.Components
             _label.SetText(text);
         }
 
+        public void SetValueText(string valueText)
+        {
+            Plugin.Log.Info("SetValueText: " + valueText);
+            _dropdown._text.SetText(valueText);
+        }
+
         public void RemoveAllOnClickActions()
         {
             _dropdown._button.onClick.RemoveAllListeners();
