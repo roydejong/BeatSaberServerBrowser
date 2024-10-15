@@ -898,7 +898,6 @@ namespace ServerBrowser.UI.Browser
             colorSo.SetColor(color);
             
             var presetSo = Instantiate(_menuLightsManager._defaultPreset);
-            presetSo._playersPlaceNeonsColor = colorSo;
             foreach (var pair in presetSo._lightIdColorPairs)
             {
                 pair.baseColor = colorSo;

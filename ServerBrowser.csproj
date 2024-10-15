@@ -69,6 +69,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Publicize>True</Publicize>
     </Reference>
+    <Reference Include="BeatSaber.ViewSystem">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
+      <Publicize>True</Publicize>
+    </Reference>
     <Reference Include="BGLib.AppFlow">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.AppFlow.dll</HintPath>
@@ -157,6 +161,10 @@
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
+    </Reference>
+    <Reference Include="MenuLightPreset">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\MenuLightPreset.dll</HintPath>
       <Publicize>True</Publicize>
     </Reference>
     <Reference Include="mscorlib">
