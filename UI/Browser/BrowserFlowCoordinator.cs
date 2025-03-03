@@ -5,6 +5,7 @@ using BeatSaber.AvatarCore;
 using BGLib.Polyglot;
 using HMUI;
 using IgnoranceCore;
+using MultiplayerCore.Players;
 using ServerBrowser.Data;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Browser.Views;
@@ -14,6 +15,7 @@ using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
+using Version = Hive.Versioning.Version;
 
 namespace ServerBrowser.UI.Browser
 {
@@ -719,6 +721,23 @@ namespace ServerBrowser.UI.Browser
             _lobbyDataModelsManager.Activate();
 
             _ = StartLobbyFlowCoordinator();
+            
+            // Send MpPlayerData, since MpCore doesn't do it anymore for some reason
+            // TODO Ask why - not sure why it was removed? BT sends it server-side now, but direct connect servers can't do that
+            if (_session.LocalUserInfo != null)
+            {
+                _multiplayerSessionManager.Send(new MpPlayerData()
+                {
+                    PlatformId = _session.LocalUserInfo.platformUserId,
+                    Platform = _session.LocalUserInfo.platform switch
+                    {
+                        UserInfo.Platform.Oculus => Platform.OculusPC,
+                        UserInfo.Platform.Steam => Platform.Steam,
+                        _ => Platform.Unknown
+                    },
+                    GameVersion = new Version(Application.version.Split('_')[0])
+                });
+            }
         }
 
         private async Task StartLobbyFlowCoordinator()
