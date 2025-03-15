@@ -1,5 +1,6 @@
 using System.Linq;
 using BeatSaber.AvatarCore;
+using BeatSaber.BeatAvatarAdapter;
 using Newtonsoft.Json;
 
 namespace ServerBrowser.Models
@@ -43,14 +44,18 @@ namespace ServerBrowser.Models
 
         public static BssbServerPlayer FromConnectedPlayer(IConnectedPlayer player)
         {
+            // Multiple avatar systems are supported; it looks like Meta avatars will be a thing in the future...
+            // For the website we're only really interested in "BeatAvatars".
             var userAvatar = player.multiplayerAvatarsData.multiplayerAvatarsData.FirstOrDefault(avatarData => 
                 avatarData.avatarTypeIdentifierHash == BeatAvatarSystemId.hash);
+            
+            var beatAvatarData = userAvatar.data != null ? userAvatar.CreateAvatarData() : null;
             
             return new BssbServerPlayer()
             {
                 UserId = player.userId,
                 UserName = player.userName,
-                AvatarData = userAvatar,
+                AvatarData = beatAvatarData,
                 SortIndex = player.sortIndex,
                 IsMe = player.isMe,
                 IsHost = player.isConnectionOwner,

@@ -53,7 +53,13 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BeatSaber.AvatarCore">
-      <HintPath>.$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.AvatarCore.dll</HintPath>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.AvatarCore.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarAdapter">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarAdapter.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarSDK">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarSDK.dll</HintPath>
     </Reference>
     <Reference Include="BeatSaber.ViewSystem">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
@@ -266,9 +272,9 @@
     <Compile Include="Models\BssbServerLevel.cs" />
     <Compile Include="Models\BssbServerPlayer.cs" />
     <Compile Include="Models\Enums\BssbDifficulty.cs" />
-    <Compile Include="Models\JsonConverters\HiveVersionJsonConverter.cs" />
-    <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
+    <Compile Include="Models\JsonConverters\HiveVersionConverter.cs" />
     <Compile Include="Models\JsonConverters\DnsEndPointConverter.cs" />
+    <Compile Include="Models\JsonConverters\UnityColorConverter.cs" />
     <Compile Include="Models\Requests\AnnounceResultsData.cs" />
     <Compile Include="Models\Requests\BrowseQueryParams.cs" />
     <Compile Include="Models\Requests\UnAnnounceParams.cs" />

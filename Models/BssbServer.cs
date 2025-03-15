@@ -124,21 +124,21 @@ namespace ServerBrowser.Models
         /// This field is not filled by the mod/client.
         /// The BSSB API derives it from the user agent.
         /// </remarks>
-        [JsonProperty("GameVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        [JsonProperty("GameVersion")] [JsonConverter(typeof(HiveVersionConverter))]
         public Version? GameVersion;
 
         /// <summary>
         /// The announcer's installed or compatibility version of MultiplayerCore.
         /// MultiplayerCore is required (for custom songs, and for this mod).
         /// </summary>
-        [JsonProperty("MpCoreVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        [JsonProperty("MpCoreVersion")] [JsonConverter(typeof(HiveVersionConverter))]
         public Version? MultiplayerCoreVersion;
 
         /// <summary>
         /// The announcer's installed or compatibility version of MultiplayerExtensions.
         /// MultiplayerExtensions is optional.
         /// </summary>
-        [JsonProperty("MpExVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        [JsonProperty("MpExVersion")] [JsonConverter(typeof(HiveVersionConverter))]
         public Version? MultiplayerExtensionsVersion;
         
         /// <summary>
