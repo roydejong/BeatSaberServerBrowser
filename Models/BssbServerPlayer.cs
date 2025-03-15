@@ -1,3 +1,5 @@
+using System.Linq;
+using BeatSaber.AvatarCore;
 using Newtonsoft.Json;
 
 namespace ServerBrowser.Models
@@ -39,13 +41,16 @@ namespace ServerBrowser.Models
             }
         }
 
-        public static BssbServerPlayer FromConnectedPlayer(IConnectedPlayer player, bool isPartyLeader = false)
+        public static BssbServerPlayer FromConnectedPlayer(IConnectedPlayer player)
         {
+            var userAvatar = player.multiplayerAvatarsData.multiplayerAvatarsData.FirstOrDefault(avatarData => 
+                avatarData.avatarTypeIdentifierHash == BeatAvatarSystemId.hash);
+            
             return new BssbServerPlayer()
             {
                 UserId = player.userId,
                 UserName = player.userName,
-                AvatarData = player.multiplayerAvatarData,
+                AvatarData = userAvatar,
                 SortIndex = player.sortIndex,
                 IsMe = player.isMe,
                 IsHost = player.isConnectionOwner,
@@ -54,5 +59,7 @@ namespace ServerBrowser.Models
                 CurrentLatency = player.currentLatency
             };
         }
+
+        private static readonly AvatarSystemIdentifier BeatAvatarSystemId = new("BeatAvatarSystem");
     }
 }

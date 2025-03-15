@@ -30,9 +30,8 @@ namespace ServerBrowser.Installers
             // Helpers
             Container.BindInterfacesAndSelfTo<BssbFloatingAlertMenuInit>().AsSingle();
             
-            // Inject LobbyConfigPanel dependencies
-            Container.Inject(LobbyConfigPanel.instance);
-            LobbyConfigPanel.instance.Initialize();
+            // LobbyConfigPanel
+            Container.BindInterfacesAndSelfTo<LobbyConfigPanel>().AsSingle();
             
             // UI Extras
             if (Plugin.Config.EnableJoiningLobbyExtender)

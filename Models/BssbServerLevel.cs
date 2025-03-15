@@ -26,36 +26,19 @@ namespace ServerBrowser.Models
             }
         }
 
-        public static BssbServerLevel FromLevelStartData(IPreviewBeatmapLevel previewBeatmapLevel,
-            BeatmapDifficulty difficulty, IDifficultyBeatmap? db = null, GameplayModifiers? modifiers = null,
-            string? characteristic = null)
+        public static BssbServerLevel FromLevelStartData(BeatmapLevel level, BeatmapDifficulty difficulty, 
+            GameplayModifiers? modifiers = null, string? characteristic = null)
         {
-            if (db != null)
-            {
-                return new BssbServerLevel()
-                {
-                    LevelId = db.level.levelID,
-                    SongName = db.level.songName,
-                    SongSubName = db.level.songSubName,
-                    SongAuthorName = db.level.songAuthorName,
-                    LevelAuthorName = db.level.levelAuthorName,
-                    Difficulty = db.difficulty,
-                    Modifiers = modifiers,
-                    Characteristic = characteristic
-                };
-            }
-
             return new BssbServerLevel()
             {
-                LevelId = previewBeatmapLevel.levelID,
-                SongName = previewBeatmapLevel.songName,
-                SongSubName = previewBeatmapLevel.songSubName,
-                SongAuthorName = previewBeatmapLevel.songAuthorName,
-                LevelAuthorName = previewBeatmapLevel.levelAuthorName,
+                LevelId = level.levelID,
+                SongName = level.songName,
+                SongSubName = level.songSubName,
+                SongAuthorName = level.songAuthorName,
                 Difficulty = difficulty,
                 Modifiers = modifiers,
                 Characteristic = characteristic
-            };  
+            };
         }
     }
 }

@@ -10,7 +10,6 @@ namespace ServerBrowser.Models
         [JsonProperty("SongName")] public string? SongName;
         [JsonProperty("SongSubName")] public string? SongSubName;
         [JsonProperty("SongAuthorName")] public string? SongAuthorName;
-        [JsonProperty("LevelAuthorName")] public string? LevelAuthorName;
         /// <summary>
         /// HTTP URL for the cover art associated with the level, if any.
         /// Provided by the API when querying lobbies.

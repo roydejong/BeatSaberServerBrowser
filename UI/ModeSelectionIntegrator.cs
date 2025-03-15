@@ -1,8 +1,8 @@
 using System;
+using BGLib.Polyglot;
 using HMUI;
 using IPA.Utilities;
 using MultiplayerCore.Patchers;
-using Polyglot;
 using ServerBrowser.Core;
 using ServerBrowser.Models;
 using ServerBrowser.UI.Utils;
@@ -34,8 +34,7 @@ namespace ServerBrowser.UI
 
         public void Initialize()
         {
-            _btnGameBrowser = _modeSelectionView.GetField<Button, MultiplayerModeSelectionViewController>
-                ("_gameBrowserButton");
+            _btnGameBrowser = _modeSelectionView._gameBrowserButton;
             _statusCheckComplete = false;
             _pendingMenuButtonTrigger = null;
         }

@@ -123,26 +123,7 @@ namespace ServerBrowser.UI.Utils
 
         private async Task<Sprite?> TryGetLocalCoverArtSprite(string levelId, CancellationToken token)
         {
-            try
-            {
-                var level = SongCore.Loader.GetLevelById(levelId);
-
-                if (level == null)
-                    return null;
-
-                // Official level, or installed custom level found
-                // The game already caches these and disposes of these on its own, so we can't cache them
-                return await level.GetCoverImageAsync(token);
-            }
-            catch (TaskCanceledException)
-            {
-                // Cancellation token was cancelled
-            }
-            catch (Exception ex)
-            {
-                _log.Warn($"Exception while trying to get local cover art (levelId={levelId}): {ex}");
-            }
-
+            // TODO Find an efficient way to do this in newer Beat Saber versions
             return null;
         }
 

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
@@ -26,7 +27,7 @@ namespace ServerBrowser.UI.Views
         [Inject] private readonly BssbBrowser _browser = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
         
-        [UIParams] private readonly BeatSaberMarkupLanguage.Parser.BSMLParserParams _parserParams = null!;
+        [UIParams] private readonly BSMLParserParams _parserParams = null!;
         
         [UIComponent("mainContentRoot")] private readonly VerticalLayoutGroup _mainContentRoot = null!;
         [UIComponent("refreshButton")] private readonly Button _refreshButton = null!;
@@ -134,8 +135,8 @@ namespace ServerBrowser.UI.Views
                 return;
 
             // Clear out table view completely
-            _serverList.data.Clear();
-            _serverList.tableView.DeleteCells(0, _serverList.tableView.numberOfCells);
+            _serverList.Data.Clear();
+            _serverList.TableView.DeleteCells(0, _serverList.TableView.numberOfCells);
 
             // Sometimes the non-primary buttons become disabled if the server browser
             //  isn't opened until after level selection, so let's ensure they're active
@@ -151,7 +152,7 @@ namespace ServerBrowser.UI.Views
             {
                 foreach (var lobby in _browser.PageData.Servers)
                 {
-                    _serverList.data.Add(new BssbServerCellInfo(lobby));
+                    _serverList.Data.Add(new BssbServerCellInfo(lobby));
                 }
             }
 
@@ -180,8 +181,8 @@ namespace ServerBrowser.UI.Views
         {
             CancelCoverArtLoading();
             
-            _serverList.tableView.selectionType = TableViewSelectionType.Single;
-            _serverList.tableView.ReloadData(); // should cause visibleCells to be updated
+            _serverList.TableView.selectionType = TableViewSelectionType.Single;
+            _serverList.TableView.ReloadData(); // should cause visibleCells to be updated
 
             TryRestoreSelection();
         }
@@ -193,17 +194,17 @@ namespace ServerBrowser.UI.Views
             
             var restoredSelection = false;
 
-            foreach (var cell in _serverList.tableView.visibleCells)
+            foreach (var cell in _serverList.TableView.visibleCells)
             {
                 var extensions = cell.gameObject.GetComponent<BssbServerCellExtensions>();
-                var cellInfo = _serverList.data[cell.idx] as BssbServerCellInfo;
+                var cellInfo = _serverList.Data[cell.idx] as BssbServerCellInfo;
 
                 if (cellInfo is null)
                     continue;
 
                 if (_selectedServer is not null && cellInfo.Server.Key == _selectedServer.Key)
                 {
-                    _serverList.tableView.SelectCellWithIdx(cell.idx);
+                    _serverList.TableView.SelectCellWithIdx(cell.idx);
                     restoredSelection = true;
                 }
 
@@ -256,7 +257,7 @@ namespace ServerBrowser.UI.Views
                 _connectButton.interactable = false;
                 _pageUpButton.interactable = false;
                 _pageDownButton.interactable = false;
-                _serverList.tableView.gameObject.SetActive(false);
+                _serverList.TableView.gameObject.SetActive(false);
                 _paginatorText.gameObject.SetActive(false);
                 
                 _parserParams.EmitEvent("closeSearchKeyboard");
@@ -275,7 +276,7 @@ namespace ServerBrowser.UI.Views
                 
                 _refreshButton.interactable = true;
                 _filterButton.interactable = true;
-                _serverList.tableView.gameObject.SetActive(true);
+                _serverList.TableView.gameObject.SetActive(true);
                 
                 if (_browser.PageData is not null && _browser.PageData.TotalResultCount > 0 &&
                     _browser.PageData.Servers is not null && !_browser.PageData.Servers.IsEmpty())
@@ -301,7 +302,7 @@ namespace ServerBrowser.UI.Views
         {
             if (_bsmlReady)
             {
-                _serverList.tableView.ClearSelection();
+                _serverList.TableView.ClearSelection();
                 _connectButton.interactable = false;
                 
                 // fix for CheckScrollInput (unity-beta nullrefs)

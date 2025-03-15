@@ -1,5 +1,7 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using IPA.Utilities;
 using ServerBrowser.Utils;
 using SiraUtil.Logging;
 using Zenject;
@@ -28,7 +30,7 @@ namespace ServerBrowser.Core
 
         #region Game Version
 
-        public string GameVersionRaw => IPA.Utilities.UnityGame.GameVersion.ToString();
+        public string GameVersionRaw => UnityGame.GameVersion.ToString();
 
         public string GameVersionNoSuffix
         {
@@ -103,12 +105,10 @@ namespace ServerBrowser.Core
         public UserInfo? PlatformUserInfo { get; private set; } = null!;
         public UserInfo.Platform? Platform => PlatformUserInfo?.platform;
         public string PlatformKey => Platform?.ToString() ?? "unknown";
-        public bool IsSteam => Platform == UserInfo.Platform.Steam;
-        public bool IsOculus => Platform == UserInfo.Platform.Oculus;
 
-        private async Task LoadPlatformUserInfo()
+        private async Task LoadPlatformUserInfo(CancellationToken ctx = default)
         {
-            PlatformUserInfo = await _platformUserModel.GetUserInfo();
+            PlatformUserInfo = await _platformUserModel.GetUserInfo(ctx);
 
             if (PlatformUserInfo == null)
             {

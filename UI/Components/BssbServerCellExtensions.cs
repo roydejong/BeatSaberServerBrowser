@@ -42,6 +42,7 @@ namespace ServerBrowser.UI.Components
 
         private void BindComponents()
         {
+            // Components
             _coverImage = transform.Find("CoverImage").GetComponent<ImageView>();
             _songName = _cell!.transform.Find("SongName").GetComponent<CurvedTextMeshPro>();
             _songAuthor = _cell.transform.Find("SongAuthor").GetComponent<CurvedTextMeshPro>();
@@ -51,7 +52,7 @@ namespace ServerBrowser.UI.Components
             _bpmIcon = _cell.transform.Find("BpmIcon").GetComponent<ImageView>();
             
             // Events
-            _cell.selectionDidChangeEvent += HandleCellSelectionChange;
+            _cell!.selectionDidChangeEvent += HandleCellSelectionChange;
         }
         
         private void HandleCellSelectionChange(SelectableCell x, SelectableCell.TransitionType y, object z)
