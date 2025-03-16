@@ -74,6 +74,7 @@ namespace ServerBrowser.UI.Views
             _scrollView._verticalScrollIndicator = _scrollIndicator;
             _scrollView._pageDownButton = _pageDownButton;
             _scrollView._pageUpButton = _pageUpButton;
+            _scrollView._verticalScrollIndicator.gameObject.SetActive(false); // hide initially because it bugs out
             _lastScrollPosApprox = _scrollView.position;
             
             _bsmlReady = true;
