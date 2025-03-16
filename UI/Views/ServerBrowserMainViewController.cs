@@ -21,7 +21,7 @@ using Zenject;
 namespace ServerBrowser.UI.Views
 {
     [HotReload]
-    public class ServerBrowserMainViewController : BSMLAutomaticViewController
+    public class ServerBrowserMainViewController : BSMLAutomaticViewController, IDisposable
     {
         [Inject] private readonly DiContainer _di = null!;
         [Inject] private readonly PluginConfig _config = null!;
@@ -54,6 +54,7 @@ namespace ServerBrowser.UI.Views
         private ScrollView? _scrollView;
         private float _lastScrollPosApprox;
         private float _lastScrollPosExact;
+        private float _restoreScrollPos;
 
         private bool _refreshPending;
         private float _lastRefreshTime;
@@ -76,8 +77,13 @@ namespace ServerBrowser.UI.Views
             _scrollView._pageUpButton = _pageUpButton;
             _scrollView._verticalScrollIndicator.gameObject.SetActive(false); // hide initially because it bugs out
             _lastScrollPosApprox = _scrollView.position;
-            
-            _bsmlReady = true;
+
+            if (!_bsmlReady)
+            {
+                _serverList.TableView.didReloadDataEvent += HandleTableViewDataReloaded;
+                
+                _bsmlReady = true;
+            }
 
             // Attach loading control
             _loadingControl = BssbLoadingControl.Create(_serverList.transform);
@@ -153,10 +159,15 @@ namespace ServerBrowser.UI.Views
                 _refreshPending = true;
             }
             
-            if (_refreshPending && Time.realtimeSinceStartup - _lastRefreshTime >= .1f)
+            if (_refreshPending && Time.realtimeSinceStartup - _lastRefreshTime >= .025f)
             {
                 RefreshCellContentsAndSelection();
             }
+        }
+
+        public void Dispose()
+        {
+            _serverList.TableView.didReloadDataEvent -= HandleTableViewDataReloaded;
         }
 
         #endregion
@@ -181,6 +192,9 @@ namespace ServerBrowser.UI.Views
                 return;
             
             // Fill data
+            _restoreScrollPos = _lastScrollPosExact;
+            Console.WriteLine("_restoreScrollPos = " + _restoreScrollPos);
+            
             SyncServerListData(_browser.AllServers);
             AfterCellsChanged();
 
@@ -238,7 +252,17 @@ namespace ServerBrowser.UI.Views
             _serverList.TableView.selectionType = TableViewSelectionType.Single;
             _serverList.TableView.ReloadData(); // should cause visibleCells to be updated
 
-            RefreshCellContentsAndSelection();    
+            RefreshCellContentsAndSelection();
+        }
+
+        private void HandleTableViewDataReloaded(TableView tableView)
+        {
+            RefreshCellContentsAndSelection();
+
+            if (_scrollView != null && _restoreScrollPos > 0f)
+            {
+                _scrollView.ScrollTo(_restoreScrollPos, false);
+            }
         }
 
         public void RefreshCellContentsAndSelection(BssbServer? overrideSelection = null)
