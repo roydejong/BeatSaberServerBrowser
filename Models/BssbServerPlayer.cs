@@ -1,3 +1,4 @@
+using System;
 using BeatSaber.AvatarCore;
 using BeatSaber.BeatAvatarAdapter;
 using BeatSaber.BeatAvatarSDK;
@@ -48,11 +49,18 @@ namespace ServerBrowser.Models
             // For the website we're only really interested in "BeatAvatars".
 
             AvatarData? beatAvatarData = null;
-            
-            foreach (var avatarData in player.multiplayerAvatarsData.multiplayerAvatarsData)
-                if (avatarData.avatarTypeIdentifierHash == BeatAvatarSystemId.hash)
-                    beatAvatarData = avatarData.data != null ? avatarData.CreateAvatarData() : null;
-            
+
+            try
+            {
+                foreach (var avatarData in player.multiplayerAvatarsData.multiplayerAvatarsData)
+                    if (avatarData.avatarTypeIdentifierHash == BeatAvatarSystemId.hash)
+                        beatAvatarData = avatarData.data != null ? avatarData.CreateAvatarData() : null;
+            }
+            catch (NullReferenceException)
+            {
+                // Unclear why this happens, can't null check value structs, whatever
+            }
+
             return new BssbServerPlayer()
             {
                 UserId = player.userId,
