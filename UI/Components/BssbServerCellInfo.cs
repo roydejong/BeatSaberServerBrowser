@@ -5,7 +5,7 @@ namespace ServerBrowser.UI.Components
 {
     public class BssbServerCellInfo : CustomListTableData.CustomCellInfo
     {
-        public readonly BssbServer Server;
+        public BssbServer Server { get; set; }
         
         public BssbServerCellInfo(BssbServer server)
             : base(server.Name, server.BrowserDetailTextWithDifficulty, null)

@@ -81,9 +81,7 @@ namespace ServerBrowser.UI.Utils
                     return fromCache;
 
                 // Check if cover art is available locally
-                var localCoverArt = await TryGetLocalCoverArtSprite(request.LevelId, request.CancellationToken);
-                if (localCoverArt != null)
-                    return localCoverArt;
+                // TODO Get local cover art if we can
 
                 // If we have a URL, try to download cover art (BSSB mirror or BeatSaver CDN) 
                 if (request.CoverArtUrl != null)
@@ -118,12 +116,6 @@ namespace ServerBrowser.UI.Utils
                 _log.Error($"CoverArtLoader failed with exception: {ex}");
             }
 
-            return null;
-        }
-
-        private async Task<Sprite?> TryGetLocalCoverArtSprite(string levelId, CancellationToken token)
-        {
-            // TODO Find an efficient way to do this in newer Beat Saber versions
             return null;
         }
 

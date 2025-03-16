@@ -4,7 +4,6 @@ namespace ServerBrowser.Models.Requests
 {
     public class BrowseQueryParams
     {
-        public int Offset;
         public string? TextSearch;
         public bool HideFullGames;
         public bool HideModdedGames;
@@ -32,12 +31,8 @@ namespace ServerBrowser.Models.Requests
         public string ToQueryString()
         {
             var queryString = new QueryString();
-
-            queryString.Set("limit", 7.ToString());
+            queryString.Set("limit", "69420");
             queryString.Set("includeLevel", "1");
-            
-            if (Offset > 0)
-                queryString.Set("offset", Offset.ToString());
             
             if (!string.IsNullOrEmpty(TextSearch))
                 queryString.Set("query", TextSearch);

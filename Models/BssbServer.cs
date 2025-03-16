@@ -17,7 +17,7 @@ namespace ServerBrowser.Models
         /// <summary>
         /// Server side identifier (hash key) for this lobby instance.
         /// </summary>
-        [JsonProperty("Key")] public string? Key;
+        [JsonProperty("Key")] public string Key = null!;
 
         /// <summary>
         /// Unique 5 character code assigned to the lobby by the master server.

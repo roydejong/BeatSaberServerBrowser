@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ServerBrowser.Models;
 using ServerBrowser.Models.Requests;
 using ServerBrowser.Models.Responses;
 using SiraUtil.Logging;
@@ -14,29 +16,28 @@ namespace ServerBrowser.Core
     // ReSharper disable once ClassNeverInstantiated.Global
     public class BssbBrowser
     {
-        public const int DefaultPageSize = 6;
-        
         [Inject] private readonly SiraLog _log = null!;
         [Inject] private readonly BssbApiClient _apiClient = null!;
-
-        public BrowseQueryParams QueryParams = new();
-        public BrowseResponse? PageData { get; private set; }
-
+        
         /// <summary>
         /// This event is raised when loading a page has finished or failed.
         /// </summary>
         public event EventHandler? UpdateEvent;
-        
-        private CancellationTokenSource? _loadingCts;
-        private int _pageIndex;
+
+        public BrowseQueryParams QueryParams = new();
+        public readonly Dictionary<string, BssbServer> AllServers = new();
+        public string? MessageOfTheDay { get; private set; } = null;
 
         public bool IsLoading { get; private set; }
-        public bool LoadingErrored { get; private set; }
+        public bool ApiRequestFailed { get; private set; }
 
+        private CancellationTokenSource? _loadingCts;
+
+        #region Refresh API
+        
         public async Task ResetRefresh()
         {
             CancelLoading();
-            _pageIndex = 0;
             await Refresh();
         }
 
@@ -45,65 +46,77 @@ namespace ServerBrowser.Core
             CancelLoading();
             TriggerUpdate(true);
 
-            // Calculate pagination offset
-            var pageSize = PageData?.PageSize ?? DefaultPageSize;
-            QueryParams.Offset = (_pageIndex * pageSize);
-            
             // Query API (load page)
+            BrowseResponse? apiResult = null;
+
             try
             {
-                PageData = await _apiClient.Browse(QueryParams, _loadingCts!.Token);
+                apiResult = await _apiClient.Browse(QueryParams, _loadingCts!.Token);
+
+                if (apiResult is null)
+                    _log.Warn($"Browser API request failed (request error, or invalid response)");
+                else if (apiResult.Servers == null)
+                    _log.Warn($"Browser API sent null server list");
+                else
+                    ProcessApiResponse(apiResult);
             }
             catch (TaskCanceledException)
             {
-                PageData = null;
+                _log.Info($"Browser API request cancelled");
             }
 
-            if (PageData is not null)
-                _log.Debug($"BrowseData loaded page (Index={_pageIndex}, TotalCount={PageData.TotalResultCount}, " +
-                          $"Limit={PageData.PageSize}, LobbiesCount={PageData.Servers?.Count ?? 0}, " +
-                          $"MOTD={PageData.MessageOfTheDay})");
-            else
-                _log.Error($"BrowseData page load failed - received null response (Index={_pageIndex})");
-            
             // Trigger update
-            TriggerUpdate(false, (PageData == null));
-        }
-
-        public async Task PageUp()
-        {
-            if (_pageIndex <= 0)
-                return;
-            
-            _pageIndex--;
-            await Refresh();
-        }
-
-        public async Task PageDown()
-        {
-            _pageIndex++;
-            await Refresh();
+            TriggerUpdate(false, apiResult == null);
         }
 
         public void CancelLoading()
         {
             _loadingCts?.Cancel();
             _loadingCts?.Dispose();
-            
             _loadingCts = new();
-
-            if (IsLoading)
-            {
-                TriggerUpdate(false, true);
-            }
         }
+        
+        #endregion
 
-        private void TriggerUpdate(bool isLoading, bool didError = false)
+        #region Refresh data
+        
+        private void ProcessApiResponse(BrowseResponse apiResponse)
+        {
+            MessageOfTheDay = apiResponse.MessageOfTheDay;
+
+            if (apiResponse.Servers == null)
+                return;
+
+            // Add or update servers, index missing servers
+            var keysMissing = new HashSet<string>(AllServers.Keys);
+            
+            foreach (var server in apiResponse.Servers)
+            {
+                AllServers[server.Key] = server;
+                keysMissing.Remove(server.Key);
+            }
+            
+            // Remove missing servers
+            foreach (var key in keysMissing)
+            {
+                AllServers.Remove(key);
+            }
+            
+            // TODO Sort, probably
+        }
+        
+        #endregion
+
+        #region Events
+
+        private void TriggerUpdate(bool isLoading, bool apiRequestFailed = false)
         {
             IsLoading = isLoading;
-            LoadingErrored = didError;
-            
+            ApiRequestFailed = apiRequestFailed;
+
             UpdateEvent?.Invoke(this, EventArgs.Empty);
         }
+        
+        #endregion
     }
 }

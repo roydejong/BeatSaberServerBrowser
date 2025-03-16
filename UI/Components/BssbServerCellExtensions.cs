@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BeatSaberMarkupLanguage;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Models;
@@ -25,6 +26,8 @@ namespace ServerBrowser.UI.Components
         private CurvedTextMeshPro? _songTime;
         private CurvedTextMeshPro? _songBpm;
         private ImageView? _bpmIcon;
+
+        public bool CoverArtRequested { get; set; } = false;
 
         public void SetData(TableCell cell, BssbServerCellInfo cellInfo, BssbServer server)
         {
@@ -125,31 +128,46 @@ namespace ServerBrowser.UI.Components
                 else
                     _songBpm.color = BssbColorScheme.Blue;
             }
+            
+            // Set default/fallback icon if unset or BSML did some bullshit
+            if (_cellInfo != null && (_cellInfo.Icon == null || _cellInfo.Icon == Utilities.ImageResources.BlankSprite)) 
+                _cellInfo.Icon = Sprites.PortalUser;
+            if (_coverImage != null && (_coverImage.sprite == null || _coverImage.sprite == Utilities.ImageResources.BlankSprite))
+                _coverImage.sprite = Sprites.PortalUser;
         }
 
         public async Task SetCoverArt(CancellationToken token)
         {
+            if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
+                return;
+            
+            CoverArtRequested = true;
+            
             try
             {
-                if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
-                    return;
-
+                var setSprite = Sprites.PortalUser; 
+                
                 if (_server.IsInLobby || _server.Level is null)
                 {
                     // Not in level, show lobby icon
-                    _coverImage.sprite = Sprites.PortalUser;
-                    return;
+                    setSprite = Sprites.PortalUser;
+                }
+                else
+                {
+                    // Playing level, show cover art
+                    setSprite = await _coverArtLoader.FetchCoverArtAsync(
+                        new CoverArtLoader.CoverArtRequest(_server, token)
+                    );
+
+                    if (setSprite == null)
+                    {
+                        setSprite = Sprites.BeatSaverLogo;
+                    }
                 }
                 
-                // Playing level, show cover art
-                _coverImage.sprite = Sprites.BeatSaverLogo;
-
-                var sprite = await _coverArtLoader.FetchCoverArtAsync(
-                    new CoverArtLoader.CoverArtRequest(_server, token)
-                );
-                
-                if (sprite != null && _coverImage != null)
-                    _coverImage.sprite = sprite;
+                // Keep icon in sync so BSML doesn't clear it on scroll
+                _cellInfo.Icon = setSprite;
+                _coverImage.sprite = setSprite;
             }
             catch (Exception)
             {
