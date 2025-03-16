@@ -76,8 +76,8 @@ namespace ServerBrowser.Core
                 _log.Debug("Detected a BeatTogether host");
             else if (Current.IsBeatUpServerHost)
                 _log.Debug("Detected a BeatUpServer host");
-            else if (Current.IsBeatDediHost)
-                _log.Debug("Detected a BeatDedi host");
+            else if (Current.IsBeatNetHost)
+                _log.Debug("Detected a BeatNet host");
             else if (Current.IsAwsGameLiftHost)
                 _log.Debug("Detected an Amazon GameLift host");
 
@@ -167,8 +167,8 @@ namespace ServerBrowser.Core
             if (Current.IsBeatUpServerHost)
                 return Current.IsQuickPlay ? "beatupserver_quickplay" : "beatupserver_dedicated";
             
-            if (Current.IsBeatDediHost)
-                return Current.IsQuickPlay ? "beatdedi_quickplay" : "beatdedi_custom";
+            if (Current.IsBeatNetHost)
+                return Current.IsQuickPlay ? "beatdedi_quickplay" : "beatdedi_custom"; // legacy name was beatdedi
 
             return "unknown";
         }

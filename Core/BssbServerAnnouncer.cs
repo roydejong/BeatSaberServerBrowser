@@ -113,7 +113,7 @@ namespace ServerBrowser.Core
 
         private bool GetShouldAnnounce()
         {
-            if (Data.IsDirectConnect || Data.IsBeatDediHost)
+            if (Data.IsDirectConnect || Data.IsBeatNetHost)
                 // Direct connect hosts handle their own announcements and may be intentionally private
                 return false;
             

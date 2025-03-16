@@ -84,7 +84,7 @@ namespace ServerBrowser.UI
         private async void HandleServerSelected(object sender, BssbServer? server)
         {
             if (server?.Key != null)
-                await _detailViewController.LoadDetailsAsync(server.Key);
+                await _detailViewController.LoadDetailsAsync(server.Key, server.IsLocallyDiscovered);
         }
 
         private void HandleConnectClicked(object sender, BssbServer server) =>

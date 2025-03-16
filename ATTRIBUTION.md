@@ -51,3 +51,9 @@ SOFTWARE.
 - `Assets/Sprites/Robot.png`
 
 [Icons by Microsoft](https://www.iconfinder.com/iconsets/fluent-solid-24px-vol-1), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+## Social Relationship icon pack by Freepik
+
+- `Assets/Sprites/SocialNetwork.png`
+
+[Social network icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/social-network), under Flaticon License.

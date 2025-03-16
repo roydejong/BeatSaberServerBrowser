@@ -289,6 +289,10 @@
     <Compile Include="Models\Responses\BrowseResponse.cs" />
     <Compile Include="Models\Responses\UnAnnounceResponse.cs" />
     <Compile Include="Models\Utils\JsonObject.cs" />
+    <Compile Include="Network\Discovery\DiscoveryClient.cs" />
+    <Compile Include="Network\Discovery\DiscoveryConsts.cs" />
+    <Compile Include="Network\Discovery\DiscoveryQueryPacket.cs" />
+    <Compile Include="Network\Discovery\DiscoveryResponsePacket.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -365,6 +369,7 @@
     <EmbeddedResource Include="Assets\Sprites\Portal.png" />
     <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
     <EmbeddedResource Include="Assets\Sprites\Robot.png" />
+    <EmbeddedResource Include="Assets\Sprites\SocialNetwork.png" />
     <Content Include="ATTRIBUTION.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

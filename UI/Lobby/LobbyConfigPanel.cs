@@ -166,7 +166,7 @@ namespace ServerBrowser.UI.Lobby
                 return;
             }
 
-            if ((SessionInfo?.IsDirectConnect ?? false) || (SessionInfo?.IsBeatDediHost ?? false))
+            if ((SessionInfo?.IsDirectConnect ?? false) || (SessionInfo?.IsBeatNetHost ?? false))
             {
                 _labelStatus.text = "This server controls its own announcements";
                 _labelStatus.color = BssbColorScheme.Gold;

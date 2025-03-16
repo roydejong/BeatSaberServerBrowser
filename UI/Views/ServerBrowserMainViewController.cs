@@ -111,6 +111,7 @@ namespace ServerBrowser.UI.Views
 
             RefreshFilterStates();
 
+            _browser.EnableDiscovery();
             await _browser.ResetRefresh();
         }
 
@@ -121,6 +122,7 @@ namespace ServerBrowser.UI.Views
             _parserParams.EmitEvent("closeSearchKeyboard");
 
             _browser.CancelLoading();
+            _browser.DisableDiscovery();
         }
 
         protected override void OnDestroy()
@@ -332,8 +334,13 @@ namespace ServerBrowser.UI.Views
                 _serverList.TableView.gameObject.SetActive(true);
 
                 var showCount = _browser.AllServers.Count > 0;
+                
                 if (showCount)
-                    _paginatorText.SetText($"Found {_browser.AllServers.Count} lobbies");
+                {
+                    var lobbiesForm = _browser.AllServers.Count == 1 ? "lobby" : "lobbies";
+                    _paginatorText.SetText($"Found {_browser.AllServers.Count} {lobbiesForm}");
+                }
+
                 _paginatorText.gameObject.SetActive(showCount);
             }
         }

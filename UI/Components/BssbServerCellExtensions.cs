@@ -117,14 +117,14 @@ namespace ServerBrowser.UI.Components
 
                 if (_cell != null && _cell.selected)
                     _songBpm.color = BssbColorScheme.White;
+                else if (_server.IsLocallyDiscovered)
+                    _songBpm.color = BssbColorScheme.Red;
                 else if (_server.IsOfficial)
                     _songBpm.color = BssbColorScheme.Gold;
                 else if (_server.IsBeatTogetherHost)
                     _songBpm.color = BssbColorScheme.Green;
                 else if (_server.IsBeatUpServerHost)
                     _songBpm.color = BssbColorScheme.Pinkish;
-                else if (_server.IsBeatDediHost)
-                    _songBpm.color = BssbColorScheme.Red;
                 else
                     _songBpm.color = BssbColorScheme.Blue;
             }
@@ -145,12 +145,17 @@ namespace ServerBrowser.UI.Components
             
             try
             {
-                var setSprite = Sprites.PortalUser; 
-                
-                if (_server.IsInLobby || _server.Level is null)
+                var setSprite = Sprites.PortalUser;
+
+                if (_server.IsLocallyDiscovered)
+                {
+                    // Local discovery server, we don't have level details so can't ever show cover art
+                    // Use special icon specifically for these servers
+                    setSprite = Sprites.SocialNetwork; 
+                }
+                else if (_server.IsInLobby || _server.Level is null)
                 {
                     // Not in level, show lobby icon
-                    setSprite = Sprites.PortalUser;
                 }
                 else
                 {

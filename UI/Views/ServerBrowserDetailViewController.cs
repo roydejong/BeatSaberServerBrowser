@@ -99,7 +99,7 @@ namespace ServerBrowser.UI.Views
             if (_currentDetail?.Key == null)
                 return;
 
-            await LoadDetailsAsync(_currentDetail.Key, soft);
+            await LoadDetailsAsync(_currentDetail.Key, false, soft);
         }
 
         private async void DelayedLayoutFix()
@@ -140,7 +140,7 @@ namespace ServerBrowser.UI.Views
             _currentDetail = null;
         }
 
-        public async Task LoadDetailsAsync(string serverKey, bool soft = false)
+        public async Task LoadDetailsAsync(string serverKey, bool isLocalDiscovery, bool soft = false)
         {
             CancelLoading();
 
@@ -150,6 +150,13 @@ namespace ServerBrowser.UI.Views
                 _idleRoot.gameObject.SetActive(false);
                 _loadRoot.gameObject.SetActive(true);
                 _mainRoot.gameObject.SetActive(false);
+            }
+
+            if (isLocalDiscovery)
+            {
+                // Can't show any details for local servers
+                ShowError("");
+                return;
             }
 
             var serverDetail = await _apiClient.BrowseDetail(serverKey, _loadingCts!.Token);

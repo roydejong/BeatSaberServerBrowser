@@ -179,7 +179,7 @@ namespace ServerBrowser.Models
         [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
         [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId?.StartsWith("beatupserver:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
-        [JsonIgnore] public bool IsBeatDediHost => RemoteUserId?.StartsWith("beatdedi:", 
+        [JsonIgnore] public bool IsBeatNetHost => RemoteUserId?.StartsWith("beatnet:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
         [JsonIgnore] public bool IsAwsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
 
@@ -283,6 +283,12 @@ namespace ServerBrowser.Models
         /// </summary>
         [JsonIgnore]
         public bool UseENetSSL => EncryptionMode == "enet_dtls";
+
+        /// <summary>
+        /// Flags whether this server was discovered via local discovery.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsLocallyDiscovered { get; set; }
 
         #endregion
     }
