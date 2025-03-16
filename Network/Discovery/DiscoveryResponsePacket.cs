@@ -19,7 +19,6 @@ namespace ServerBrowser.Network.Discovery
         public string GameModeName;
         public string ServerTypeName;
         public int PlayerCount;
-        public int MaxPlayerCount;
         public int LobbyState;
         public BeatmapLevelSelectionMask BeatmapLevelSelectionMask;
         public GameplayServerConfiguration GameplayServerConfiguration;
@@ -40,7 +39,6 @@ namespace ServerBrowser.Network.Discovery
             GameModeName = reader.GetString();
             ServerTypeName = reader.GetString();
             PlayerCount = reader.GetInt();
-            MaxPlayerCount = reader.GetInt();
             LobbyState = reader.GetInt();
             BeatmapLevelSelectionMask = BeatmapLevelSelectionMask.Deserialize(reader);
             GameplayServerConfiguration = GameplayServerConfiguration.Deserialize(reader);
@@ -55,7 +53,7 @@ namespace ServerBrowser.Network.Discovery
                 RemoteUserName = ServerName,
                 EndPoint = new DnsEndPoint(ServerEndPoint),
                 ReadOnlyPlayerCount = PlayerCount,
-                PlayerLimit = MaxPlayerCount,
+                PlayerLimit = GameplayServerConfiguration.maxPlayerCount,
                 LobbyState = (MultiplayerLobbyState)LobbyState,
                 Name = ServerName,
                 IsLocallyDiscovered = true,
