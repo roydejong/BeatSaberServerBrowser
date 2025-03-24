@@ -168,7 +168,7 @@ namespace ServerBrowser.Core
                 return Current.IsQuickPlay ? "beatupserver_quickplay" : "beatupserver_dedicated";
             
             if (Current.IsBeatNetHost)
-                return Current.IsQuickPlay ? "beatdedi_quickplay" : "beatdedi_custom"; // legacy name was beatdedi
+                return Current.IsQuickPlay ? "beatnet_quickplay" : "beatnet_custom";
 
             return "unknown";
         }
