@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using ServerBrowser.Models;
@@ -154,9 +155,9 @@ namespace ServerBrowser.Core
             // TODO Sort, probably
         }
         
-        private void HandleDiscoveryResponse(DiscoveryResponsePacket response)
+        private void HandleDiscoveryResponse(DiscoveryResponsePacket response, IPEndPoint source)
         {
-            var serverData = response.ToServerData();
+            var serverData = response.ToServerData(source);
             
             AllServers[serverData.Key] = serverData;
             _discoveryResponseAges[serverData.Key] = Time.realtimeSinceStartup;

@@ -22,7 +22,7 @@ namespace ServerBrowser.Network.Discovery
         
         public bool IsActive => _udpClient != null;
         
-        public event Action<DiscoveryResponsePacket>? ResponseReceived;
+        public event Action<DiscoveryResponsePacket, IPEndPoint>? ResponseReceived;
 
         public void StartBroadcast()
         {
@@ -75,6 +75,8 @@ namespace ServerBrowser.Network.Discovery
             var remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
             var data = _udpClient!.Receive(ref remoteEndpoint);
             
+            _log.Info($"Received local discovery response from {remoteEndpoint}");
+            
             _netDataReader.SetSource(data);
 
             while (_netDataReader.AvailableBytes > 0)
@@ -83,7 +85,7 @@ namespace ServerBrowser.Network.Discovery
                 {
                     var packet = new DiscoveryResponsePacket();
                     packet.Deserialize(_netDataReader);
-                    HandleResponse(packet);
+                    HandleResponse(packet, remoteEndpoint);
                 }
                 catch (Exception e)
                 {
@@ -92,12 +94,12 @@ namespace ServerBrowser.Network.Discovery
             }
         }
         
-        private void HandleResponse(DiscoveryResponsePacket packet)
+        private void HandleResponse(DiscoveryResponsePacket packet, IPEndPoint remoteEndpoint)
         {
             if (packet.Prefix != DiscoveryConsts.PacketPrefix)
                 return;
             
-            ResponseReceived?.Invoke(packet);
+            ResponseReceived?.Invoke(packet, remoteEndpoint);
         }
 
         private void SendBroadcast()

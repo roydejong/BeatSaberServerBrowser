@@ -13,7 +13,7 @@ namespace ServerBrowser.Network.Discovery
         public string Prefix;
         public int ProtocolVersion;
         
-        public IPEndPoint ServerEndPoint;
+        public int Port;
         public string ServerName;
         public string ServerUserId;
         public string GameModeName;
@@ -33,7 +33,7 @@ namespace ServerBrowser.Network.Discovery
             Prefix = reader.GetString();
             ProtocolVersion = reader.GetInt();
             
-            ServerEndPoint = reader.GetNetEndPoint();
+            Port = reader.GetInt();
             ServerName = reader.GetString();
             ServerUserId = reader.GetString();
             GameModeName = reader.GetString();
@@ -44,14 +44,16 @@ namespace ServerBrowser.Network.Discovery
             GameplayServerConfiguration = GameplayServerConfiguration.Deserialize(reader);
         }
 
-        public BssbServer ToServerData()
+        public BssbServer ToServerData(IPEndPoint source)
         {
+            var lobbyEndPoint = new IPEndPoint(source.Address, Port);
+            
             return new BssbServer()
             {
-                Key = "ld:" + ServerEndPoint.Address + ":" + ServerEndPoint.Port,
+                Key = "ld:" + source.Address + ":" + Port,
                 RemoteUserId = ServerUserId,
                 RemoteUserName = ServerName,
-                EndPoint = new DnsEndPoint(ServerEndPoint),
+                EndPoint = new DnsEndPoint(lobbyEndPoint),
                 ReadOnlyPlayerCount = PlayerCount,
                 PlayerLimit = GameplayServerConfiguration.maxPlayerCount,
                 LobbyState = (MultiplayerLobbyState)LobbyState,
