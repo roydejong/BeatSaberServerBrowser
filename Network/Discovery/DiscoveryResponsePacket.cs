@@ -53,6 +53,7 @@ namespace ServerBrowser.Network.Discovery
                 Key = "ld:" + source.Address + ":" + Port,
                 RemoteUserId = ServerUserId,
                 RemoteUserName = ServerName,
+                HostSecret = ServerUserId,
                 EndPoint = new DnsEndPoint(lobbyEndPoint),
                 ReadOnlyPlayerCount = PlayerCount,
                 PlayerLimit = GameplayServerConfiguration.maxPlayerCount,

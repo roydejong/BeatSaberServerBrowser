@@ -73,13 +73,13 @@ namespace ServerBrowser.Core
             }
 
             if (Current.IsBeatTogetherHost)
-                _log.Debug("Detected a BeatTogether host");
+                _log.Info("Detected a BeatTogether host");
             else if (Current.IsBeatUpServerHost)
-                _log.Debug("Detected a BeatUpServer host");
+                _log.Info("Detected a BeatUpServer host");
             else if (Current.IsBeatNetHost)
-                _log.Debug("Detected a BeatNet host");
+                _log.Info("Detected a BeatNet host");
             else if (Current.IsAwsGameLiftHost)
-                _log.Debug("Detected an Amazon GameLift host");
+                _log.Info("Detected an Amazon GameLift host");
 
             Current.ServerTypeCode = DetermineServerType();
 
@@ -187,7 +187,10 @@ namespace ServerBrowser.Core
             //  dedicated server for the actual multiplayer session - we're not yet actually successfully connected.
 
             _log.Info($"Game will connect to GameLift session (playerSessionId={playerSessionId}, "
-                      + $"hostName={hostName}, port={port}, gameSessionId={gameSessionId}, secret={secret}, code={code}, "
+                      + $"hostName={hostName}, " 
+                      + $"port={port}, "
+                      + $"gameSessionId/remoteUserId={gameSessionId}, "
+                      + $"secret={secret}, code={code}, "
                       + $"maxPlayerCount={configuration.maxPlayerCount}, "
                       + $"discoveryPolicy={configuration.discoveryPolicy}, "
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "

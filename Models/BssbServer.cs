@@ -183,7 +183,8 @@ namespace ServerBrowser.Models
             StringComparison.OrdinalIgnoreCase) ?? false;
         [JsonIgnore] public bool IsAwsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
 
-        [JsonIgnore] public bool IsDirectConnect => !IsOfficial && MasterGraphUrl is null && EndPoint is not null;
+        [JsonIgnore] public bool IsDirectConnect => (!IsOfficial && MasterGraphUrl is null && EndPoint is not null)
+                                                    || IsBeatNetHost;
 
         [JsonIgnore]
         public string LobbyStateText

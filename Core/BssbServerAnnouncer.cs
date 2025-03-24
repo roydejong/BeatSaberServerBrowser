@@ -40,6 +40,11 @@ namespace ServerBrowser.Core
             /// May transition to Announcing if the session starts, and we are allowed to announce.
             /// </summary>
             NotAnnouncing,
+            
+            /// <summary>
+            /// We are not announcing the server, but should send match results to the server.
+            /// </summary>
+            AnnouncingResultsOnly,
 
             /// <summary>
             /// Session was established, and we are now actively sending periodic announces.
@@ -123,6 +128,11 @@ namespace ServerBrowser.Core
             return _config.AnnounceParty && _dataCollector.IsPartyLeader;
         }
 
+        private bool GetShouldAnnounceResults()
+        {
+            return Data.IsDirectConnect || GetShouldAnnounce();
+        }
+
         public async void RefreshPreferences()
         {
             var isAnnouncing = State is AnnouncerState.Announcing;
@@ -181,6 +191,10 @@ namespace ServerBrowser.Core
                         _log.Warn($"Unannounce aborted: {_consecutiveErrors} consecutive errors");
                         State = AnnouncerState.NotAnnouncing;
                     }
+                }
+                else if (State == AnnouncerState.AnnouncingResultsOnly)
+                {
+                    await SendAnnounceResultsIfNeededNow();
                 }
             }
             else
@@ -337,11 +351,20 @@ namespace ServerBrowser.Core
             // Data established for a new session; begin announcing if appropriate for lobby and config
             _sessionEstablished = true;
 
-            if (!GetShouldAnnounce())
-                return;
-
-            _log.Info("Starting announcing (session established)");
-            State = AnnouncerState.Announcing;
+            if (GetShouldAnnounce())
+            {
+                _log.Info("Starting announcing (session established)");
+                State = AnnouncerState.Announcing;
+            }
+            else if (GetShouldAnnounceResults())
+            {
+                _log.Info("Announcing match results only for this server (session established)");
+                State = AnnouncerState.AnnouncingResultsOnly;
+            }
+            else
+            {
+                _log.Info("Will not send any announcements for this server");
+            }
         }
 
         private void HandleDataChanged(object sender, EventArgs e)
@@ -363,23 +386,19 @@ namespace ServerBrowser.Core
             _dirtyFlag = true;
         }
 
-        private async void HandleDataSessionEnded(object sender, EventArgs e)
+        private void HandleDataSessionEnded(object sender, EventArgs e)
         {
             _sessionEstablished = false;
 
-            if (State != AnnouncerState.Announcing)
-                // We are not announcing
-                return;
-            
-            if (!HaveAnnounceSuccess)
+            if (HaveAnnounceSuccess)
             {
-                // We do not have a successful announce to cancel
-                State = AnnouncerState.NotAnnouncing;
-                return;
+                State = AnnouncerState.Unannouncing;
+                _ = SendUnannounceNow();
             }
-
-            State = AnnouncerState.Unannouncing;
-            await SendUnannounceNow();
+            else
+            {
+                State = AnnouncerState.NotAnnouncing;
+            }
         }
 
         #endregion
