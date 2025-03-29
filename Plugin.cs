@@ -15,14 +15,10 @@ namespace ServerBrowser
     {
         // ReSharper disable once MemberCanBePrivate.Global
         internal static PluginConfig Config { get; private set; } = null!;
-        
-        private IPALogger _log = null!;
 
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, Config config)
         {
-            _log = logger;
-            
             Config = config.Generated<PluginConfig>();
 
             zenjector.UseMetadataBinder<Plugin>();

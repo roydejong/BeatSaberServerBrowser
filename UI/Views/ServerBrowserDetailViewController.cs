@@ -220,14 +220,14 @@ namespace ServerBrowser.UI.Views
             }
 
             // Cover art 
-            if (serverDetail.IsInLobby)
+            if (serverDetail.Level == null)
             {
-                // Not in game, show lobby icon
+                // No level data, show new lobby icon
                 _levelBar.SetImageSprite(Sprites.PortalUser);
             }
             else
             {
-                // In game, show cover art
+                // In game/has level data, show cover art
                 _levelBar.SetImageSprite(Sprites.BeatSaverLogo);
 
                 var sprite = await _coverArtLoader.FetchCoverArtAsync(

@@ -27,8 +27,6 @@ namespace ServerBrowser.UI.Components
         private CurvedTextMeshPro? _songBpm;
         private ImageView? _bpmIcon;
 
-        public bool CoverArtRequested { get; set; } = false;
-
         public void SetData(TableCell cell, BssbServerCellInfo cellInfo, BssbServer server)
         {
             if (_cell is null || _cell != cell)
@@ -123,8 +121,6 @@ namespace ServerBrowser.UI.Components
                     _songBpm.color = BssbColorScheme.Gold;
                 else if (_server.IsBeatTogetherHost)
                     _songBpm.color = BssbColorScheme.Green;
-                else if (_server.IsBeatUpServerHost)
-                    _songBpm.color = BssbColorScheme.Pinkish;
                 else
                     _songBpm.color = BssbColorScheme.Blue;
             }
@@ -141,8 +137,6 @@ namespace ServerBrowser.UI.Components
             if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
                 return;
             
-            CoverArtRequested = true;
-            
             try
             {
                 var setSprite = Sprites.PortalUser;
@@ -153,9 +147,9 @@ namespace ServerBrowser.UI.Components
                     // Use special icon specifically for these servers
                     setSprite = Sprites.SocialNetwork; 
                 }
-                else if (_server.IsInLobby || _server.Level is null)
+                else if (_server.Level is null)
                 {
-                    // Not in level, show lobby icon
+                    // Not level data, show new lobby icon
                 }
                 else
                 {
