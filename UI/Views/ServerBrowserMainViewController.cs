@@ -191,11 +191,11 @@ namespace ServerBrowser.UI.Views
                 // Only proceed with list sync on load completion
                 return;
             
-            // Fill data
+            // Retain this as our "before change" position
             _restoreScrollPos = _lastScrollPosExact;
-            Console.WriteLine("_restoreScrollPos = " + _restoreScrollPos);
             
-            SyncServerListData(_browser.AllServers);
+            // Fill data
+            SyncServerListData(_browser.GetAllServersSorted());
             AfterCellsChanged();
 
             // Service alert
@@ -217,32 +217,11 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void SyncServerListData(Dictionary<string, BssbServer> allServers)
+        private void SyncServerListData(List<BssbServer> sortedServers)
         {
-            var cellsByKey = _serverList.Data.Cast<BssbServerCellInfo>()
-                .ToDictionary(c => c.Server.Key);
-            
-            // Add and update cells, index missing cells
-            var missingKeys = new HashSet<string>(cellsByKey.Keys);
-            
-            foreach (var server in allServers)
-            {
-                if (cellsByKey.TryGetValue(server.Key, out var cellInfo))
-                {
-                    cellInfo.Server = server.Value;
-                    missingKeys.Remove(server.Key);
-                }
-                else
-                {
-                    _serverList.Data.Add(new BssbServerCellInfo(server.Value));
-                }
-            }
-            
-            // Remove cells for missing servers
-            foreach (var key in missingKeys)
-            {
-                _serverList.Data.Remove(cellsByKey[key]);
-            }
+            _serverList.Data = new List<CustomListTableData.CustomCellInfo>(
+                sortedServers.Select(s => new BssbServerCellInfo(s))
+            );
         }
 
         private void AfterCellsChanged()

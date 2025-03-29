@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -151,8 +152,6 @@ namespace ServerBrowser.Core
                     
                 AllServers.Remove(key);
             }
-            
-            // TODO Sort, probably
         }
         
         private void HandleDiscoveryResponse(DiscoveryResponsePacket response, IPEndPoint source)
@@ -177,6 +176,20 @@ namespace ServerBrowser.Core
             UpdateEvent?.Invoke(this, EventArgs.Empty);
         }
         
+        #endregion
+
+        #region Sort helper
+
+        public List<BssbServer> GetAllServersSorted()
+        {
+            return AllServers.Values
+                // Primary sort: preference, our guess on how likely the player wants to see/join it
+                .OrderByDescending(server => server.PreferentialSortScore)
+                // Secondary sort: prefer newer lobbies
+                .ThenByDescending(server => server.ReadOnlyFirstSeen)
+                .ToList();
+        }
+ 
         #endregion
     }
 }

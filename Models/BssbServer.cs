@@ -292,5 +292,49 @@ namespace ServerBrowser.Models
         public bool IsLocallyDiscovered { get; set; }
 
         #endregion
+
+        #region Sort
+
+        /// <summary>
+        /// Scores the lobby for preferential sorting; a guess on how likely it is the player wants to join.
+        /// </summary>
+        public int PreferentialSortScore
+        {
+            get
+            {
+                var score = 0;
+                
+                // Boost: locally discovered servers, very likely the player wants to see these
+                if (IsLocallyDiscovered)
+                    score += 1000;
+                
+                // Drop: full servers
+                if (ReadOnlyPlayerCount >= PlayerLimit)
+                    score -= 250;
+                // Boost: servers with only one player, they need us!
+                else if (ReadOnlyPlayerCount == 1)
+                    score += 125;
+                
+                // Boost: "all" difficulty lobbies
+                if (LobbyDifficulty == BssbDifficulty.All)
+                    score += 75;
+                
+                // Drop: games in progress
+                if (IsInGameplay)
+                    score -= 100;
+                
+                // Drop: official servers
+                if (IsOfficial)
+                    score -= 50;
+                
+                // Small differentiator: prefer "normal" sized lobbies, where we prefer higher slot counts
+                if (PlayerLimit is > 0 and < 5)
+                    score += 25 + (PlayerLimit.Value * 10);
+
+                return score;
+            }
+        }
+
+        #endregion
     }
 }
