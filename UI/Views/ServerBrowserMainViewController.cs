@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
-using IPA.Utilities;
+using JetBrains.Annotations;
 using ModestTree;
 using ServerBrowser.Assets;
 using ServerBrowser.Core;
@@ -19,15 +21,15 @@ using Zenject;
 namespace ServerBrowser.UI.Views
 {
     [HotReload]
-    public class ServerBrowserMainViewController : BSMLAutomaticViewController
+    public class ServerBrowserMainViewController : BSMLAutomaticViewController, IDisposable
     {
         [Inject] private readonly DiContainer _di = null!;
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly BssbBrowser _browser = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
-        
-        [UIParams] private readonly BeatSaberMarkupLanguage.Parser.BSMLParserParams _parserParams = null!;
-        
+
+        [UIParams] private readonly BSMLParserParams _parserParams = null!;
+
         [UIComponent("mainContentRoot")] private readonly VerticalLayoutGroup _mainContentRoot = null!;
         [UIComponent("refreshButton")] private readonly Button _refreshButton = null!;
         [UIComponent("filterButton")] private readonly Button _filterButton = null!;
@@ -48,7 +50,15 @@ namespace ServerBrowser.UI.Views
         private BssbServer? _selectedServer;
         private bool _selectionValid;
         private CancellationTokenSource? _coverArtCts;
+        
+        private ScrollView? _scrollView;
+        private float _lastScrollPosApprox;
+        private float _lastScrollPosExact;
+        private float _restoreScrollPos;
 
+        private bool _refreshPending;
+        private float _lastRefreshTime;
+        
         public event EventHandler<EventArgs>? RefreshStartedEvent;
         public event EventHandler<EventArgs>? CreateServerClickedEvent;
         public event EventHandler<BssbServer?>? ServerSelectedEvent;
@@ -57,16 +67,23 @@ namespace ServerBrowser.UI.Views
         #region Lifecycle
 
         [UIAction("#post-parse")]
+        [UsedImplicitly]
         private void PostParse()
         {
-            _bsmlReady = true;
+            // Connect CustomListTag's ScrollView to the up/down buttons and scrollbar
+            _scrollView = _serverList.gameObject.GetComponentInChildren<ScrollView>();
+            _scrollView._verticalScrollIndicator = _scrollIndicator;
+            _scrollView._pageDownButton = _pageDownButton;
+            _scrollView._pageUpButton = _pageUpButton;
+            _scrollView._verticalScrollIndicator.gameObject.SetActive(false); // hide initially because it bugs out
+            _lastScrollPosApprox = _scrollView.position;
 
-            // Hide scroll bar initially
-            DisableScrollBar(true);
-
-            // Enlarge scroll up/down buttons
-            _pageUpButton.GetComponentInChildren<ImageView>().rectTransform.sizeDelta = new Vector2(1.5f, 1.5f);
-            _pageDownButton.GetComponentInChildren<ImageView>().rectTransform.sizeDelta = new Vector2(1.5f, 1.5f);
+            if (!_bsmlReady)
+            {
+                _serverList.TableView.didReloadDataEvent += HandleTableViewDataReloaded;
+                
+                _bsmlReady = true;
+            }
 
             // Attach loading control
             _loadingControl = BssbLoadingControl.Create(_serverList.transform);
@@ -76,7 +93,7 @@ namespace ServerBrowser.UI.Views
                 _loadingControl.didPressRefreshButtonEvent += HandleRefreshButtonClick;
                 UpdateLoadingState();
             }
-            
+
             // Make entire main view background raycast target; makes it easier to aim, feels nicer
             var dummyBg = _mainContentRoot.gameObject.GetComponent<ImageView>()
                           ?? _mainContentRoot.gameObject.AddComponent<ImageView>();
@@ -85,31 +102,33 @@ namespace ServerBrowser.UI.Views
 
             // Filter states
             RefreshFilterStates();
-            
-            // Trigger refresh
+
+            // Trigger initial refresh
             if (!_browser.IsLoading)
                 HandleRefreshButtonClick();
         }
 
-        public async void OnEnable()
+        public void OnEnable()
         {
             ResetSelection();
 
             _browser.UpdateEvent += HandleBrowserUpdate;
-            _browser.QueryParams = _config.FilterSet ?? new(); 
-                
+            _browser.QueryParams = _config.FilterSet ?? new();
+
             RefreshFilterStates();
 
-            await _browser.ResetRefresh();
+            _browser.EnableDiscovery();
+            _ = _browser.ResetRefresh();
         }
 
         public void OnDisable()
         {
-            _parserParams.EmitEvent("closeSearchKeyboard");
-            
-            _browser.CancelLoading();
-
             _browser.UpdateEvent -= HandleBrowserUpdate;
+            
+            _parserParams.EmitEvent("closeSearchKeyboard");
+
+            _browser.CancelLoading(); 
+            _browser.DisableDiscovery();
         }
 
         protected override void OnDestroy()
@@ -124,6 +143,33 @@ namespace ServerBrowser.UI.Views
             base.OnDestroy();
         }
 
+        protected void Update()
+        {
+            if (!_bsmlReady)
+                return;
+            
+            // Manual scroll event detection; need to refresh cell extensions on scroll
+            // The refresh logic is not fast, so we need to avoid calling it too often
+
+            _lastScrollPosExact = _scrollView!.position;
+            var scrollPosDiff = Mathf.Abs(_lastScrollPosExact - _lastScrollPosApprox);
+            if (scrollPosDiff > 1f)
+            {
+                _lastScrollPosApprox = _scrollView.position;
+                _refreshPending = true;
+            }
+            
+            if (_refreshPending && Time.realtimeSinceStartup - _lastRefreshTime >= .025f)
+            {
+                RefreshCellContentsAndSelection();
+            }
+        }
+
+        public void Dispose()
+        {
+            _serverList.TableView.didReloadDataEvent -= HandleTableViewDataReloaded;
+        }
+
         #endregion
 
         #region Data/list
@@ -132,40 +178,35 @@ namespace ServerBrowser.UI.Views
         {
             if (!_bsmlReady)
                 return;
-
-            // Clear out table view completely
-            _serverList.data.Clear();
-            _serverList.tableView.DeleteCells(0, _serverList.tableView.numberOfCells);
-
+            
             // Sometimes the non-primary buttons become disabled if the server browser
             //  isn't opened until after level selection, so let's ensure they're active
             _refreshButton.gameObject.SetActive(true);
             _filterButton.gameObject.SetActive(true);
             _createButton.gameObject.SetActive(true);
 
-            // Update loading state + scroll indicator
             UpdateLoadingState();
 
-            // Fill data
-            if (_browser.PageData?.Servers is not null)
-            {
-                foreach (var lobby in _browser.PageData.Servers)
-                {
-                    _serverList.data.Add(new BssbServerCellInfo(lobby));
-                }
-            }
-
-            AfterCellsCreated();
+            if (_browser.IsLoading)
+                // Only proceed with list sync on load completion
+                return;
             
+            // Retain this as our "before change" position
+            _restoreScrollPos = _lastScrollPosExact;
+            
+            // Fill data
+            SyncServerListData(_browser.GetAllServersSorted());
+            AfterCellsChanged();
+
             // Service alert
-            if (_browser.PageData is not null && !string.IsNullOrWhiteSpace(_browser.PageData.MessageOfTheDay))
+            if (!string.IsNullOrWhiteSpace(_browser.MessageOfTheDay))
             {
                 _floatingAlert.DismissAllPending();
                 _floatingAlert.PresentNotification(new BssbFloatingAlert.NotificationData
                 (
                     Sprites.AnnouncePadded,
                     "Service Message",
-                    _browser.PageData.MessageOfTheDay!,
+                    _browser.MessageOfTheDay!,
                     BssbLevelBarClone.BackgroundStyle.SolidBlue,
                     true
                 ));
@@ -176,63 +217,91 @@ namespace ServerBrowser.UI.Views
             }
         }
 
-        private void AfterCellsCreated()
+        private void SyncServerListData(List<BssbServer> sortedServers)
+        {
+            _serverList.Data = new List<CustomListTableData.CustomCellInfo>(
+                sortedServers.Select(s => new BssbServerCellInfo(s))
+            );
+        }
+
+        private void AfterCellsChanged()
         {
             CancelCoverArtLoading();
             
-            _serverList.tableView.selectionType = TableViewSelectionType.Single;
-            _serverList.tableView.ReloadData(); // should cause visibleCells to be updated
+            _serverList.TableView.selectionType = TableViewSelectionType.Single;
+            _serverList.TableView.ReloadData(); // should cause visibleCells to be updated
 
-            TryRestoreSelection();
+            RefreshCellContentsAndSelection();
         }
 
-        public void TryRestoreSelection(BssbServer? overrideSelection = null)
+        private void HandleTableViewDataReloaded(TableView tableView)
         {
+            RefreshCellContentsAndSelection();
+
+            if (_scrollView != null && _restoreScrollPos > 0f)
+            {
+                _scrollView.ScrollTo(_restoreScrollPos, false);
+            }
+        }
+
+        public void RefreshCellContentsAndSelection(BssbServer? overrideSelection = null)
+        {
+            _refreshPending = false;
+            _lastRefreshTime = Time.realtimeSinceStartup;
+            
             if (overrideSelection != null)
                 _selectedServer = overrideSelection;
-            
+
             var restoredSelection = false;
 
-            foreach (var cell in _serverList.tableView.visibleCells)
+            foreach (var cell in _serverList.TableView.visibleCells.ToList())
             {
-                var extensions = cell.gameObject.GetComponent<BssbServerCellExtensions>();
-                var cellInfo = _serverList.data[cell.idx] as BssbServerCellInfo;
-
-                if (cellInfo is null)
+                if (cell == null)
                     continue;
 
-                if (_selectedServer is not null && cellInfo.Server.Key == _selectedServer.Key)
-                {
-                    _serverList.tableView.SelectCellWithIdx(cell.idx);
+                if (RefreshCell(cell))
                     restoredSelection = true;
-                }
-
-                if (extensions == null)
-                {
-                    extensions = cell.gameObject.AddComponent<BssbServerCellExtensions>();
-                    _di.Inject(extensions);
-                }
-
-                extensions.SetData(cell, cellInfo, cellInfo.Server);
-                _ = extensions.SetCoverArt(_coverArtCts!.Token);
             }
 
             if (restoredSelection)
                 _selectionValid = true;
             else
                 ResetSelection(false);
-            
+
             _connectButton.interactable = _selectionValid;
         }
-        
+
+        private bool RefreshCell(TableCell cell)
+        {
+            var extensions = cell.gameObject.GetComponent<BssbServerCellExtensions>();
+            var cellInfo = (_serverList.Data[cell.idx] as BssbServerCellInfo)!;
+            var restoredSelection = false;
+
+            if (_selectedServer is not null && cellInfo.Server.Key == _selectedServer.Key)
+            {
+                _serverList.TableView.SelectCellWithIdx(cell.idx);
+                restoredSelection = true;
+            }
+
+            if (extensions == null)
+            {
+                extensions = cell.gameObject.AddComponent<BssbServerCellExtensions>();
+                _di.Inject(extensions);
+            }
+
+            extensions.SetData(cell, cellInfo, cellInfo.Server);
+            _ = extensions.SetCoverArt(_coverArtCts!.Token);
+            return restoredSelection;
+        }
+
         private void UpdateLoadingState()
         {
             if (!_bsmlReady)
                 return;
 
             var showLoading = _browser.IsLoading;
-            var showError = !showLoading && _browser.LoadingErrored;
-            var showNoData = !showLoading && !showError && (_browser.PageData?.Servers?.Count ?? 0) == 0;
+            var showError = !showLoading && _browser.ApiRequestFailed;
+            var showNoData = !showLoading && !showError && _browser.AllServers.IsEmpty();
 
             if (_loadingControl != null)
             {
@@ -256,58 +325,35 @@ namespace ServerBrowser.UI.Views
                 _connectButton.interactable = false;
                 _pageUpButton.interactable = false;
                 _pageDownButton.interactable = false;
-                _serverList.tableView.gameObject.SetActive(false);
+                _serverList.TableView.gameObject.SetActive(false);
                 _paginatorText.gameObject.SetActive(false);
-                
-                _parserParams.EmitEvent("closeSearchKeyboard");
 
-                // Disable scroll bar, or hide it if we never initialized it with page data
-                DisableScrollBar(hide: _browser.PageData is null);
+                _parserParams.EmitEvent("closeSearchKeyboard");
             }
             else
             {
-                if (_browser.PageData is not null)
-                {
-                    UpdateScrollBar(_browser.PageData.TotalResultCount > 0, true,
-                        _browser.PageData.TotalResultCount, _browser.PageData.PageOffset,
-                        _browser.PageData.PageSize);
-                }
-                
                 _refreshButton.interactable = true;
                 _filterButton.interactable = true;
-                _serverList.tableView.gameObject.SetActive(true);
-                
-                if (_browser.PageData is not null && _browser.PageData.TotalResultCount > 0 &&
-                    _browser.PageData.Servers is not null && !_browser.PageData.Servers.IsEmpty())
-                {
-                    _paginatorText.SetText($"Showing {_browser.PageData.LowerBoundNumber} - {_browser.PageData.UpperBoundNumber} of {_browser.PageData.TotalResultCount} servers (Page {_browser.PageData.PageNumber} of {_browser.PageData.PageCount})");
-                    _paginatorText.gameObject.SetActive(true);
-                }
-                else
-                {
-                    _paginatorText.gameObject.SetActive(false);
-                }
-            }
+                _serverList.TableView.gameObject.SetActive(true);
 
-            // Fix scrollbar (requires a delay)
-            Task.Run(async () =>
-            {
-                await Task.Delay(100);
-                _scrollIndicator.InvokeMethod<object, VerticalScrollIndicator>("RefreshHandle");
-            });
+                var showCount = _browser.AllServers.Count > 0;
+                
+                if (showCount)
+                {
+                    var lobbiesForm = _browser.AllServers.Count == 1 ? "lobby" : "lobbies";
+                    _paginatorText.SetText($"Found {_browser.AllServers.Count} {lobbiesForm}");
+                }
+
+                _paginatorText.gameObject.SetActive(showCount);
+            }
         }
 
         private void ResetSelection(bool hard = true)
         {
             if (_bsmlReady)
             {
-                _serverList.tableView.ClearSelection();
+                _serverList.TableView.ClearSelection();
                 _connectButton.interactable = false;
-                
-                // fix for CheckScrollInput (unity-beta nullrefs)
-                var scrollView = _serverList.gameObject.GetComponentInChildren<ScrollView>();
-                if (scrollView != null)
-                    _di.Inject(scrollView);
             }
 
             if (hard)
@@ -318,79 +364,35 @@ namespace ServerBrowser.UI.Views
 
             _selectionValid = false;
         }
-        
+
         public void CancelCoverArtLoading()
         {
             _coverArtCts?.Cancel();
             _coverArtCts?.Dispose();
-            
+
             _coverArtCts = new();
         }
-
-        #endregion
-
-        #region UI Helpers
-
-        private void UpdateScrollBar(bool makeVisible, bool makeInteractable, int totalItems,
-            int currentOffset, int pageSize)
-        {
-            if (makeVisible && makeInteractable)
-            {
-                var canScrollUp = currentOffset > 0;
-                var pageUpperBound = currentOffset + pageSize;
-                var canScrollDown = pageUpperBound < totalItems;
-
-                _pageUpButton.interactable = canScrollUp;
-                _pageDownButton.interactable = canScrollDown;
-
-                if (totalItems > 0)
-                {
-                    // normalizedPageHeight = 0-1f range to control handle height, where 1f is the full scrollbar height
-                    _scrollIndicator.normalizedPageHeight = ((float) pageSize / (float) totalItems);
-                    
-                    // progress = 0-1f range to set middle(?) of handle position
-                    if (currentOffset <= 0)
-                        _scrollIndicator.progress = 0f;
-                    else if (pageUpperBound >= totalItems)
-                        _scrollIndicator.progress = 1f;
-                    else
-                        _scrollIndicator.progress = ((float) currentOffset / (float) totalItems);
-
-                    _scrollIndicator.SetField("_padding", .5f);
-                }
-            }
-            else if (!makeInteractable)
-            {
-                _pageUpButton.interactable = false;
-                _pageDownButton.interactable = false;
-            }
-
-            _pageUpButton.gameObject.SetActive(makeVisible);
-            _pageDownButton.gameObject.SetActive(makeVisible);
-            _scrollIndicator.gameObject.SetActive(makeVisible);
-        }
-
-        private void DisableScrollBar(bool hide) =>
-            UpdateScrollBar(!hide, false, 0, 0, 0);
 
         #endregion
 
         #region BSML Actions
 
         [UIAction("refreshButtonClick")]
-        private async void HandleRefreshButtonClick()
+        private void HandleRefreshButtonClick()
         {
             RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
-            await _browser.Refresh();
+            _ = _browser.Refresh();
         }
 
         [UIAction("createButtonClick")]
+        [UsedImplicitly]
         private void HandleCreateButtonClick()
         {
             CreateServerClickedEvent?.Invoke(this, EventArgs.Empty);
         }
 
         [UIAction("connectButtonClick")]
+        [UsedImplicitly]
         private void HandleConnectButtonClick()
         {
             if (_selectedServer is null || !_selectionValid)
@@ -399,22 +401,16 @@ namespace ServerBrowser.UI.Views
             ConnectClickedEvent?.Invoke(this, _selectedServer);
         }
 
-        [UIAction("pageUpButtonClick")]
-        private async void HandlePageUpButtonClick()
-        {
-            await _browser.PageUp();
-        }
-
-        [UIAction("pageDownButtonClick")]
-        private async void HandlePageDownButtonClick()
-        {
-            await _browser.PageDown();
-        }
-
         [UIAction("listSelect")]
+        [UsedImplicitly]
         private void ListSelect(TableView tableView, int row)
         {
-            _selectedServer = _browser.PageData?.Servers?[row];
+            var selectedCell = _serverList.Data[row] as BssbServerCellInfo;
+
+            if (selectedCell is null)
+                return;
+            
+            _selectedServer = selectedCell.Server;
 
             if (_selectedServer == null)
             {
@@ -427,6 +423,20 @@ namespace ServerBrowser.UI.Views
 
             ServerSelectedEvent?.Invoke(this, _selectedServer);
         }
+        
+        [UIAction("pageUpButtonClick")]
+        [UsedImplicitly]
+        private void HandlePageUpButtonClick()
+        {
+            _scrollView?.PageUpButtonPressed();
+        }
+
+        [UIAction("pageDownButtonClick")]
+        [UsedImplicitly]
+        private void HandlePageDownButtonClick()
+        {
+            _scrollView?.PageDownButtonPressed();
+        }
 
         #endregion
 
@@ -438,14 +448,16 @@ namespace ServerBrowser.UI.Views
             get => _browser.QueryParams.TextSearch ?? "";
             set => _browser.QueryParams.TextSearch = value;
         }
-        
+
         [UIAction("filterButtonClick")]
+        [UsedImplicitly]
         private void HandleFilterButtonClick()
         {
             _parserParams.EmitEvent("openSearchKeyboard");
         }
 
         [UIAction("filterFullClick")]
+        [UsedImplicitly]
         private void HandleFilterFullClick()
         {
             _browser.QueryParams.HideFullGames = !_browser.QueryParams.HideFullGames;
@@ -453,6 +465,7 @@ namespace ServerBrowser.UI.Views
         }
 
         [UIAction("filterInProgressClick")]
+        [UsedImplicitly]
         private void HandleFilterInProgressClick()
         {
             _browser.QueryParams.HideInProgressGames = !_browser.QueryParams.HideInProgressGames;
@@ -460,6 +473,7 @@ namespace ServerBrowser.UI.Views
         }
 
         [UIAction("filterVanillaClick")]
+        [UsedImplicitly]
         private void HandleFilterVanillaClick()
         {
             _browser.QueryParams.HideVanillaGames = !_browser.QueryParams.HideVanillaGames;
@@ -467,14 +481,16 @@ namespace ServerBrowser.UI.Views
         }
 
         [UIAction("filterQuickPlayClick")]
+        [UsedImplicitly]
         private void HandleFilterQuickPlayClick()
         {
             _browser.QueryParams.HideQuickPlay = !_browser.QueryParams.HideQuickPlay;
             RefreshFilterStates();
         }
-        
+
         [UIAction("searchKeyboardSubmit")]
-        private async void HandleSearchKeyboardSubmit(string text)
+        [UsedImplicitly]
+        private void HandleSearchKeyboardSubmit(string text)
         {
             _browser.QueryParams.TextSearch = text;
             RefreshFilterStates();
@@ -484,8 +500,8 @@ namespace ServerBrowser.UI.Views
 
             // Go back to first page & refresh
             RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
-            await _browser.ResetRefresh();
-            
+            _ = _browser.ResetRefresh();
+
             // Commit filter set to config
             _config.FilterSet = _browser.QueryParams;
         }
@@ -494,22 +510,27 @@ namespace ServerBrowser.UI.Views
         {
             if (!_bsmlReady)
                 return;
-            
+
             _filterSubButtonFull.gameObject.SetActive(true);
             _filterSubButtonInProgress.gameObject.SetActive(true);
             _filterSubButtonVanilla.gameObject.SetActive(true);
             _filterSubButtonQuickPlay.gameObject.SetActive(true);
 
             _filterButton.SetButtonFaceAndUnderlineColor(_browser.QueryParams.AnyFiltersActive
-                ? BssbColorScheme.Green : BssbColorScheme.White);
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
             _filterSubButtonFull.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideFullGames
-                ? BssbColorScheme.Green : BssbColorScheme.White);
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
             _filterSubButtonInProgress.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideInProgressGames
-                ? BssbColorScheme.Green : BssbColorScheme.White);
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
             _filterSubButtonVanilla.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideVanillaGames
-                ? BssbColorScheme.Green : BssbColorScheme.White);
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
             _filterSubButtonQuickPlay.SetButtonFaceAndUnderlineColor(_browser.QueryParams.HideQuickPlay
-                ? BssbColorScheme.Green : BssbColorScheme.White);
+                ? BssbColorScheme.Green
+                : BssbColorScheme.White);
         }
 
         #endregion

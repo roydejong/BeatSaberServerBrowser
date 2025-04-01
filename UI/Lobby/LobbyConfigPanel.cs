@@ -1,5 +1,5 @@
+using System;
 using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.GameplaySetup;
 using BeatSaberMarkupLanguage.Parser;
@@ -16,27 +16,41 @@ using Zenject;
 namespace ServerBrowser.UI.Lobby
 {
     [HotReload]
-    public class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>, IInitializable
+    public class LobbyConfigPanel : NotifiableSingleton<LobbyConfigPanel>, IInitializable, IDisposable
     {
         private const string ResourceName = "ServerBrowser.UI.Lobby.LobbyConfigPanel.bsml";
         private const string TabName = "Server Browser";
+        
+        [Inject] private readonly GameplaySetup _gameplaySetup = null!;
 
         [Inject] private readonly BssbDataCollector _dataCollector = null!;
         [Inject] private readonly BssbServerAnnouncer _serverAnnouncer = null!;
         [Inject] private readonly BssbFloatingAlert _floatingAlert = null!;
         [Inject] private readonly ServerBrowserClient _serverBrowserClient = null!;
 
-        #region Events
+        #region Events 
 
         public void Initialize()
         {
+            _gameplaySetup.AddTab(
+                name: TabName,
+                resource: ResourceName,
+                host: this,
+                menuType: MenuType.Online
+            );
+            
             _dataCollector.DataChanged += (sender, args) => Refresh();
 
             _serverAnnouncer.OnAnnounceResult += (sender, response) => Refresh();
             _serverAnnouncer.OnUnAnnounceResult += (sender, success) => Refresh();
             _serverAnnouncer.OnStateChange += (sender, state) => Refresh();
         }
-
+        
+        public void Dispose()
+        {
+            _gameplaySetup.RemoveTab(TabName);
+        }
+        
         #endregion
 
         #region BSML Instance
@@ -64,8 +78,9 @@ namespace ServerBrowser.UI.Lobby
                     Plugin.Config.AnnounceParty = value;
 
                 NotifyPropertyChanged();
-                _serverAnnouncer.RefreshPreferences();
                 Refresh();
+                    
+                _ = _serverAnnouncer.RefreshPreferences();
             }
         }
 
@@ -108,8 +123,9 @@ namespace ServerBrowser.UI.Lobby
                 Plugin.Config.ServerName = value;
 
                 NotifyPropertyChanged();
-                _serverAnnouncer.RefreshPreferences();
                 Refresh();
+                
+                _ = _serverAnnouncer.RefreshPreferences();
             }
         }
 
@@ -140,24 +156,24 @@ namespace ServerBrowser.UI.Lobby
             _toggleAnnounce.ReceiveValue();
             _toggleNotifications.ReceiveValue();
 
-            _toggleNotifications.interactable = true;
+            _toggleNotifications.Interactable = true;
 
             if (!SessionIsActive)
             {
                 _labelStatus.text = "Session not connected";
                 _labelStatus.color = BssbColorScheme.MutedGray;
 
-                _toggleAnnounce.interactable = false;
+                _toggleAnnounce.Interactable = false;
                 _buttonServerName.interactable = false;
                 return;
             }
 
-            if ((SessionInfo?.IsDirectConnect ?? false) || (SessionInfo?.IsBeatDediHost ?? false))
+            if ((SessionInfo?.IsDirectConnect ?? false) || (SessionInfo?.IsBeatNetHost ?? false))
             {
                 _labelStatus.text = "This server controls its own announcements";
                 _labelStatus.color = BssbColorScheme.Gold;
 
-                _toggleAnnounce.interactable = false;
+                _toggleAnnounce.Interactable = false;
                 _buttonServerName.interactable = false;
                 return;
             }
@@ -167,13 +183,13 @@ namespace ServerBrowser.UI.Lobby
                 _labelStatus.text = "You are not the party leader";
                 _labelStatus.color = BssbColorScheme.MutedGray;
 
-                _toggleAnnounce.interactable = false;
+                _toggleAnnounce.Interactable = false;
                 _buttonServerName.interactable = false;
                 return;
             }
 
             // Have control
-            _toggleAnnounce.interactable = true;
+            _toggleAnnounce.Interactable = true;
 
             switch (_serverAnnouncer.State)
             {
@@ -217,30 +233,6 @@ namespace ServerBrowser.UI.Lobby
                     break;
                 }
             }
-        }
-
-        #endregion
-
-        #region GameplaySetup tab
-
-        private static bool _tabRegistered = false;
-
-        public static void RegisterGameplayModifierTab()
-        {
-            if (_tabRegistered)
-                return;
-
-            GameplaySetup.instance.AddTab(TabName, ResourceName, instance, MenuType.Online);
-            _tabRegistered = true;
-        }
-
-        public static void RemoveGameplayModifierTab()
-        {
-            if (!_tabRegistered)
-                return;
-
-            GameplaySetup.instance.RemoveTab(TabName);
-            _tabRegistered = false;
         }
 
         #endregion

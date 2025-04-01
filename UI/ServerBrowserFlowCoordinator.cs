@@ -69,9 +69,9 @@ namespace ServerBrowser.UI
             ReturnToModeSelection();
         }
 
-        private async void HandleRefreshStartedEvent(object sender, EventArgs e)
+        private void HandleRefreshStartedEvent(object sender, EventArgs e)
         {
-            await _detailViewController.Refresh();
+            _ = _detailViewController.Refresh();
         }
 
         private void HandleCreateServerClicked(object sender, EventArgs e)
@@ -81,10 +81,10 @@ namespace ServerBrowser.UI
             ReturnToModeSelection(targetButton: MultiplayerModeSelectionViewController.MenuButton.CreateServer);
         }
 
-        private async void HandleServerSelected(object sender, BssbServer? server)
+        private void HandleServerSelected(object sender, BssbServer? server)
         {
             if (server?.Key != null)
-                await _detailViewController.LoadDetailsAsync(server.Key);
+                _ = _detailViewController.LoadDetailsAsync(server.Key, server.IsLocallyDiscovered);
         }
 
         private void HandleConnectClicked(object sender, BssbServer server) =>

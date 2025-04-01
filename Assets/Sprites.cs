@@ -58,6 +58,11 @@ namespace ServerBrowser.Assets
         /// Licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
         public static Sprite? Robot;
 
+        /// Social network icon
+        /// Social Relationship icon pack by Freepik (https://www.flaticon.com/packs/social-relationship-7)
+        /// Under Flaticon License
+        public static Sprite? SocialNetwork;
+
         public static bool IsInitialized { get; private set; }
 
         public static void Initialize()
@@ -74,6 +79,7 @@ namespace ServerBrowser.Assets
             Portal = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Portal.png");
             PortalUser = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.PortalUser.png");
             Robot = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.Robot.png");
+            SocialNetwork = LoadSpriteFromResources("ServerBrowser.Assets.Sprites.SocialNetwork.png");
         }
 
         private static Sprite? LoadSpriteFromResources(string resourcePath, float pixelsPerUnit = 100.0f)

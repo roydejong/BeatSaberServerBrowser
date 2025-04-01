@@ -52,20 +52,44 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="BeatSaber.AvatarCore">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.AvatarCore.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarAdapter">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarAdapter.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatSaber.BeatAvatarSDK">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.BeatAvatarSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="BeatSaber.ViewSystem">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="BGLib.Polyglot">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.Polyglot.dll</HintPath>
+    </Reference>
     <Reference Include="BGNet, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNet.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BGNetCore">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNetCore.dll</HintPath>
     </Reference>
     <Reference Include="BSML, Version=1.4.5.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="DataModels">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\DataModels.dll</HintPath>
+    </Reference>
     <Reference Include="GameplayCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Helpers">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Helpers.dll</HintPath>
     </Reference>
     <Reference Include="Hive.Versioning, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(BeatSaberDir)\Libs\Hive.Versioning.dll</HintPath>
@@ -80,19 +104,27 @@
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="Ignorance">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Ignorance.dll</HintPath>
+    </Reference>
+    <Reference Include="Interactable">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Interactable.dll</HintPath>
     </Reference>
     <Reference Include="IPA.Loader, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="LiteNetLib">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\LiteNetLib.dll</HintPath>
+    </Reference>
     <Reference Include="Main, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\mscorlib.dll</HintPath>
@@ -106,8 +138,11 @@
       <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Polyglot, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Polyglot.dll</HintPath>
+    <Reference Include="PlatformUserModel">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\PlatformUserModel.dll</HintPath>
+    </Reference>
+    <Reference Include="SegmentedControl">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\SegmentedControl.dll</HintPath>
     </Reference>
     <Reference Include="SiraUtil, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
@@ -244,9 +279,9 @@
     <Compile Include="Models\BssbServerLevel.cs" />
     <Compile Include="Models\BssbServerPlayer.cs" />
     <Compile Include="Models\Enums\BssbDifficulty.cs" />
-    <Compile Include="Models\JsonConverters\HiveVersionJsonConverter.cs" />
-    <Compile Include="Models\JsonConverters\IPEndPointConverter.cs" />
+    <Compile Include="Models\JsonConverters\HiveVersionConverter.cs" />
     <Compile Include="Models\JsonConverters\DnsEndPointConverter.cs" />
+    <Compile Include="Models\JsonConverters\UnityColorConverter.cs" />
     <Compile Include="Models\Requests\AnnounceResultsData.cs" />
     <Compile Include="Models\Requests\BrowseQueryParams.cs" />
     <Compile Include="Models\Requests\UnAnnounceParams.cs" />
@@ -254,6 +289,10 @@
     <Compile Include="Models\Responses\BrowseResponse.cs" />
     <Compile Include="Models\Responses\UnAnnounceResponse.cs" />
     <Compile Include="Models\Utils\JsonObject.cs" />
+    <Compile Include="Network\Discovery\DiscoveryClient.cs" />
+    <Compile Include="Network\Discovery\DiscoveryConsts.cs" />
+    <Compile Include="Network\Discovery\DiscoveryQueryPacket.cs" />
+    <Compile Include="Network\Discovery\DiscoveryResponsePacket.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -305,6 +344,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild">
+      <Version>0.4.1</Version>
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="description.md" />
@@ -325,6 +369,7 @@
     <EmbeddedResource Include="Assets\Sprites\Portal.png" />
     <EmbeddedResource Include="Assets\Sprites\PortalUser.png" />
     <EmbeddedResource Include="Assets\Sprites\Robot.png" />
+    <EmbeddedResource Include="Assets\Sprites\SocialNetwork.png" />
     <Content Include="ATTRIBUTION.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

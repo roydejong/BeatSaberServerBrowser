@@ -1,5 +1,4 @@
-using IPA.Utilities;
-using Polyglot;
+using BGLib.Polyglot;
 using SiraUtil.Affinity;
 using SiraUtil.Logging;
 using Zenject;
@@ -74,14 +73,14 @@ namespace ServerBrowser.UI
 
         #region View utils
 
-        private string? GetCurrentText() => _viewController.GetField<string, JoiningLobbyViewController>("_text");
+        private string? GetCurrentText() => _viewController._text;
 
         private void SetText(string text)
         {
             if (GetCurrentText() == text)
                 return;
 
-            var loadingControl = _viewController.GetField<LoadingControl, JoiningLobbyViewController>("_loadingControl");
+            var loadingControl = _viewController._loadingControl;
             if (loadingControl == null)
                 return;
 

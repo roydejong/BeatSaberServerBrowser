@@ -40,6 +40,11 @@ namespace ServerBrowser.Core
             /// May transition to Announcing if the session starts, and we are allowed to announce.
             /// </summary>
             NotAnnouncing,
+            
+            /// <summary>
+            /// We are not announcing the server, but should send match results to the server.
+            /// </summary>
+            AnnouncingResultsOnly,
 
             /// <summary>
             /// Session was established, and we are now actively sending periodic announces.
@@ -113,7 +118,7 @@ namespace ServerBrowser.Core
 
         private bool GetShouldAnnounce()
         {
-            if (Data.IsDirectConnect || Data.IsBeatDediHost)
+            if (Data.IsDirectConnect || Data.IsBeatNetHost)
                 // Direct connect hosts handle their own announcements and may be intentionally private
                 return false;
             
@@ -123,34 +128,46 @@ namespace ServerBrowser.Core
             return _config.AnnounceParty && _dataCollector.IsPartyLeader;
         }
 
-        public async void RefreshPreferences()
+        private bool GetShouldAnnounceResults()
         {
-            var isAnnouncing = State is AnnouncerState.Announcing;
-            var shouldAnnounce = GetShouldAnnounce();
+            return Data.IsDirectConnect || GetShouldAnnounce();
+        }
 
-            if (_sessionEstablished)
+        public async Task RefreshPreferences()
+        {
+            try
             {
-                if (shouldAnnounce && !isAnnouncing)
+                var isAnnouncing = State is AnnouncerState.Announcing;
+                var shouldAnnounce = GetShouldAnnounce();
+
+                if (_sessionEstablished)
                 {
-                    _log.Debug($"User preferences updated: starting announce");
-                    State = AnnouncerState.Announcing;
-                }
-                else if (!shouldAnnounce && isAnnouncing)
-                {
-                    _log.Debug($"User preferences updated: starting unannounce");
-                    State = AnnouncerState.Unannouncing;
+                    if (shouldAnnounce && !isAnnouncing)
+                    {
+                        _log.Debug($"User preferences updated: starting announce");
+                        State = AnnouncerState.Announcing;
+                    }
+                    else if (!shouldAnnounce && isAnnouncing)
+                    {
+                        _log.Debug($"User preferences updated: starting unannounce");
+                        State = AnnouncerState.Unannouncing;
+                    }
+
+                    var prefName = _serverBrowserClient.PreferredServerName;
+
+                    if ((Data.LocalPlayer?.IsPartyLeader ?? false) && Data.Name != prefName)
+                    {
+                        _log.Debug($"User preferences updated: set game name to {prefName}");
+                        Data.Name = prefName;
+                    }
                 }
 
-                var prefName = _serverBrowserClient.PreferredServerName;
-                    
-                if ((Data.LocalPlayer?.IsPartyLeader ?? false) && Data.Name != prefName)
-                {
-                    _log.Debug($"User preferences updated: set game name to {prefName}");
-                    Data.Name = prefName;
-                }
+                await RepeatingTick();
             }
-
-            await RepeatingTick();
+            catch (Exception ex)
+            {
+                _log.Error($"Failed to refresh preferences: {ex}");
+            }
         }
 
         private async Task RepeatingTick()
@@ -181,6 +198,10 @@ namespace ServerBrowser.Core
                         _log.Warn($"Unannounce aborted: {_consecutiveErrors} consecutive errors");
                         State = AnnouncerState.NotAnnouncing;
                     }
+                }
+                else if (State == AnnouncerState.AnnouncingResultsOnly)
+                {
+                    await SendAnnounceResultsIfNeededNow();
                 }
             }
             else
@@ -257,6 +278,19 @@ namespace ServerBrowser.Core
             if (_lastResultsSessionId == _dataCollector.LastResults.gameId)
                 // These results were already successfully announced
                 return false;
+
+            var ourResults = _dataCollector.LastResults.localPlayerResultData.multiplayerLevelCompletionResults;
+
+            if (!ourResults.hasAnyResults
+                || ourResults.playerLevelEndState is
+                    MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndState.NotStarted
+                || ourResults.playerLevelEndReason is
+                    MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.Quit
+                    or MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.ConnectedAfterLevelEnded
+                    or MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.StartupFailed
+                    or MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.WasInactive)
+                // Inactive players should not send results as they could be incomplete
+                return false;
             
             try
             {
@@ -292,7 +326,7 @@ namespace ServerBrowser.Core
             
             if (!unAnnounceRequest.IsComplete)
                 return false;
-            
+
             try
             {
                 _dirtyFlag = false;
@@ -304,7 +338,7 @@ namespace ServerBrowser.Core
                 {
                     _consecutiveErrors = 0;
                     _log.Info("Unannounce OK");
-                    
+
                     OnUnAnnounceResult?.Invoke(this, true);
                     return true;
                 }
@@ -317,10 +351,15 @@ namespace ServerBrowser.Core
                     {
                         _dirtyFlag = true;
                     }
-                    
+
                     OnUnAnnounceResult?.Invoke(this, false);
                     return false;
                 }
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"Unannounce failed: {ex.Message}");
+                return false;
             }
             finally
             {
@@ -337,11 +376,20 @@ namespace ServerBrowser.Core
             // Data established for a new session; begin announcing if appropriate for lobby and config
             _sessionEstablished = true;
 
-            if (!GetShouldAnnounce())
-                return;
-
-            _log.Info("Starting announcing (session established)");
-            State = AnnouncerState.Announcing;
+            if (GetShouldAnnounce())
+            {
+                _log.Info("Starting announcing (session established)");
+                State = AnnouncerState.Announcing;
+            }
+            else if (GetShouldAnnounceResults())
+            {
+                _log.Info("Announcing match results only for this server (session established)");
+                State = AnnouncerState.AnnouncingResultsOnly;
+            }
+            else
+            {
+                _log.Info("Will not send any announcements for this server");
+            }
         }
 
         private void HandleDataChanged(object sender, EventArgs e)
@@ -363,23 +411,19 @@ namespace ServerBrowser.Core
             _dirtyFlag = true;
         }
 
-        private async void HandleDataSessionEnded(object sender, EventArgs e)
+        private void HandleDataSessionEnded(object sender, EventArgs e)
         {
             _sessionEstablished = false;
 
-            if (State != AnnouncerState.Announcing)
-                // We are not announcing
-                return;
-            
-            if (!HaveAnnounceSuccess)
+            if (HaveAnnounceSuccess)
             {
-                // We do not have a successful announce to cancel
-                State = AnnouncerState.NotAnnouncing;
-                return;
+                State = AnnouncerState.Unannouncing;
+                _ = SendUnannounceNow();
             }
-
-            State = AnnouncerState.Unannouncing;
-            await SendUnannounceNow();
+            else
+            {
+                State = AnnouncerState.NotAnnouncing;
+            }
         }
 
         #endregion

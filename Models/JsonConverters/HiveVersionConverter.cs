@@ -4,7 +4,7 @@ using Version = Hive.Versioning.Version;
 
 namespace ServerBrowser.Models.JsonConverters
 {
-    public class HiveVersionJsonConverter : JsonConverter<Version?>
+    public class HiveVersionConverter : JsonConverter<Version?>
     {
         public override void WriteJson(JsonWriter writer, Version? value, JsonSerializer serializer)
         {

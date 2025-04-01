@@ -17,7 +17,7 @@ namespace ServerBrowser.Models
         /// <summary>
         /// Server side identifier (hash key) for this lobby instance.
         /// </summary>
-        [JsonProperty("Key")] public string? Key;
+        [JsonProperty("Key")] public string Key = null!;
 
         /// <summary>
         /// Unique 5 character code assigned to the lobby by the master server.
@@ -124,21 +124,21 @@ namespace ServerBrowser.Models
         /// This field is not filled by the mod/client.
         /// The BSSB API derives it from the user agent.
         /// </remarks>
-        [JsonProperty("GameVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        [JsonProperty("GameVersion")] [JsonConverter(typeof(HiveVersionConverter))]
         public Version? GameVersion;
 
         /// <summary>
         /// The announcer's installed or compatibility version of MultiplayerCore.
         /// MultiplayerCore is required (for custom songs, and for this mod).
         /// </summary>
-        [JsonProperty("MpCoreVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        [JsonProperty("MpCoreVersion")] [JsonConverter(typeof(HiveVersionConverter))]
         public Version? MultiplayerCoreVersion;
 
         /// <summary>
         /// The announcer's installed or compatibility version of MultiplayerExtensions.
         /// MultiplayerExtensions is optional.
         /// </summary>
-        [JsonProperty("MpExVersion")] [JsonConverter(typeof(HiveVersionJsonConverter))]
+        [JsonProperty("MpExVersion")] [JsonConverter(typeof(HiveVersionConverter))]
         public Version? MultiplayerExtensionsVersion;
         
         /// <summary>
@@ -179,11 +179,12 @@ namespace ServerBrowser.Models
         [JsonIgnore] public bool IsBeatTogetherHost => RemoteUserId == "ziuMSceapEuNN7wRGQXrZg";
         [JsonIgnore] public bool IsBeatUpServerHost => RemoteUserId?.StartsWith("beatupserver:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
-        [JsonIgnore] public bool IsBeatDediHost => RemoteUserId?.StartsWith("beatdedi:", 
+        [JsonIgnore] public bool IsBeatNetHost => RemoteUserId?.StartsWith("beatnet:", 
             StringComparison.OrdinalIgnoreCase) ?? false;
         [JsonIgnore] public bool IsAwsGameLiftHost => RemoteUserId?.StartsWith("arn:aws:gamelift:") ?? false;
 
-        [JsonIgnore] public bool IsDirectConnect => !IsOfficial && MasterGraphUrl is null && EndPoint is not null;
+        [JsonIgnore] public bool IsDirectConnect => (!IsOfficial && MasterGraphUrl is null && EndPoint is not null)
+                                                    || IsBeatNetHost;
 
         [JsonIgnore]
         public string LobbyStateText
@@ -283,6 +284,56 @@ namespace ServerBrowser.Models
         /// </summary>
         [JsonIgnore]
         public bool UseENetSSL => EncryptionMode == "enet_dtls";
+
+        /// <summary>
+        /// Flags whether this server was discovered via local discovery.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsLocallyDiscovered { get; set; }
+
+        #endregion
+
+        #region Sort
+
+        /// <summary>
+        /// Scores the lobby for preferential sorting; a guess on how likely it is the player wants to join.
+        /// </summary>
+        public int PreferentialSortScore
+        {
+            get
+            {
+                var score = 0;
+                
+                // Boost: locally discovered servers, very likely the player wants to see these
+                if (IsLocallyDiscovered)
+                    score += 1000;
+                
+                // Drop: full servers
+                if (ReadOnlyPlayerCount >= PlayerLimit)
+                    score -= 250;
+                // Boost: servers with only one player, they need us!
+                else if (ReadOnlyPlayerCount == 1)
+                    score += 125;
+                
+                // Boost: "all" difficulty lobbies
+                if (LobbyDifficulty == BssbDifficulty.All)
+                    score += 75;
+                
+                // Drop: games in progress
+                if (IsInGameplay)
+                    score -= 100;
+                
+                // Drop: official servers
+                if (IsOfficial)
+                    score -= 50;
+                
+                // Small differentiator: prefer "normal" sized lobbies, where we prefer higher slot counts
+                if (PlayerLimit is > 0 and < 5)
+                    score += 25 + (PlayerLimit.Value * 10);
+
+                return score;
+            }
+        }
 
         #endregion
     }

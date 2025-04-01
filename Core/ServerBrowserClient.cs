@@ -1,5 +1,7 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using IPA.Utilities;
 using ServerBrowser.Utils;
 using SiraUtil.Logging;
 using Zenject;
@@ -19,16 +21,15 @@ namespace ServerBrowser.Core
         [Inject] private readonly INetworkConfig _networkConfig = null!;
         [Inject] private readonly BssbDataCollector _dataCollector = null!;
 
-        public async void Initialize()
+        public void Initialize()
         {
             LoadModdedStatus();
-
-            await LoadPlatformUserInfo();
+            _ = LoadPlatformUserInfo();
         }
 
         #region Game Version
 
-        public string GameVersionRaw => IPA.Utilities.UnityGame.GameVersion.ToString();
+        public string GameVersionRaw => UnityGame.GameVersion.ToString();
 
         public string GameVersionNoSuffix
         {
@@ -103,23 +104,28 @@ namespace ServerBrowser.Core
         public UserInfo? PlatformUserInfo { get; private set; } = null!;
         public UserInfo.Platform? Platform => PlatformUserInfo?.platform;
         public string PlatformKey => Platform?.ToString() ?? "unknown";
-        public bool IsSteam => Platform == UserInfo.Platform.Steam;
-        public bool IsOculus => Platform == UserInfo.Platform.Oculus;
 
-        private async Task LoadPlatformUserInfo()
+        private async Task LoadPlatformUserInfo(CancellationToken ctx = default)
         {
-            PlatformUserInfo = await _platformUserModel.GetUserInfo();
-
-            if (PlatformUserInfo == null)
+            try
             {
-                _log.Warn("Failed to load platform user info!");
-                return;
+                PlatformUserInfo = await _platformUserModel.GetUserInfo(ctx);
+
+                if (PlatformUserInfo == null)
+                {
+                    _log.Warn("Failed to load platform user info!");
+                    return;
+                }
+
+                _log.Debug($"Loaded platform user info (platform={PlatformUserInfo.platform}, " +
+                           $"userName={PlatformUserInfo.userName}, platformUserId={PlatformUserInfo.platformUserId})");
+
+                _dataCollector.Current.ReportingPlatformKey = PlatformKey;
             }
-
-            _log.Debug($"Loaded platform user info (platform={PlatformUserInfo.platform}, " +
-                      $"userName={PlatformUserInfo.userName}, platformUserId={PlatformUserInfo.platformUserId})");
-
-            _dataCollector.Current.ReportingPlatformKey = PlatformKey;
+            catch (Exception ex)
+            {
+                _log.Error($"Failed to load platform user info: {ex}");
+            }
         }
 
         #endregion

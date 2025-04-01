@@ -73,6 +73,9 @@ namespace ServerBrowser.UI.Components
             _titleText = _textContainer.Find("SongNameText").GetComponent<CurvedTextMeshPro>();
             _secondaryText = _textContainer.Find("AuthorNameText").GetComponent<CurvedTextMeshPro>();
             
+            // Disable version indicator on artwork
+            _image.transform.Find("BeatmapLevelVersions").gameObject.SetActive(false);
+            
             // Enable rich text for detail text
             _secondaryText.richText = true;
         }

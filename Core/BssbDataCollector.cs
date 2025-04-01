@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using IgnoranceCore;
-using IPA.Utilities;
 using MultiplayerCore.Players;
 using ServerBrowser.Models;
 using ServerBrowser.Models.Enums;
@@ -74,13 +73,13 @@ namespace ServerBrowser.Core
             }
 
             if (Current.IsBeatTogetherHost)
-                _log.Debug("Detected a BeatTogether host");
+                _log.Info("Detected a BeatTogether host");
             else if (Current.IsBeatUpServerHost)
-                _log.Debug("Detected a BeatUpServer host");
-            else if (Current.IsBeatDediHost)
-                _log.Debug("Detected a BeatDedi host");
+                _log.Info("Detected a BeatUpServer host");
+            else if (Current.IsBeatNetHost)
+                _log.Info("Detected a BeatNet host");
             else if (Current.IsAwsGameLiftHost)
-                _log.Debug("Detected an Amazon GameLift host");
+                _log.Info("Detected an Amazon GameLift host");
 
             Current.ServerTypeCode = DetermineServerType();
 
@@ -168,8 +167,8 @@ namespace ServerBrowser.Core
             if (Current.IsBeatUpServerHost)
                 return Current.IsQuickPlay ? "beatupserver_quickplay" : "beatupserver_dedicated";
             
-            if (Current.IsBeatDediHost)
-                return Current.IsQuickPlay ? "beatdedi_quickplay" : "beatdedi_custom";
+            if (Current.IsBeatNetHost)
+                return Current.IsQuickPlay ? "beatnet_quickplay" : "beatnet_custom";
 
             return "unknown";
         }
@@ -182,14 +181,16 @@ namespace ServerBrowser.Core
         [AffinityPostfix]
         [AffinityPatch(typeof(GameLiftConnectionManager), "HandleConnectToServerSuccess")]
         private void HandleGameLiftPreConnect(string playerSessionId, string hostName, int port, string gameSessionId,
-            string secret, string code, BeatmapLevelSelectionMask selectionMask, 
-            GameplayServerConfiguration configuration)
+            string secret, string code, BeatmapLevelSelectionMask selectionMask, GameplayServerConfiguration configuration)
         {
             // nb: HandleConnectToServerSuccess means handshake is complete, and we are about to reconnect to the
             //  dedicated server for the actual multiplayer session - we're not yet actually successfully connected.
 
             _log.Info($"Game will connect to GameLift session (playerSessionId={playerSessionId}, "
-                      + $"hostName={hostName}, port={port}, gameSessionId={gameSessionId}, secret={secret}, code={code}, "
+                      + $"hostName={hostName}, " 
+                      + $"port={port}, "
+                      + $"gameSessionId/remoteUserId={gameSessionId}, "
+                      + $"secret={secret}, code={code}, "
                       + $"maxPlayerCount={configuration.maxPlayerCount}, "
                       + $"discoveryPolicy={configuration.discoveryPolicy}, "
                       + $"gameplayServerMode={configuration.gameplayServerMode}, "
@@ -232,22 +233,27 @@ namespace ServerBrowser.Core
         [AffinityPostfix]
         [AffinityPatch(typeof(LobbyGameStateController), "StartMultiplayerLevel")]
         private void HandleStartMultiplayerLevel(ILevelGameplaySetupData gameplaySetupData,
-            IDifficultyBeatmap? difficultyBeatmap, Action beforeSceneSwitchCallback)
+            IBeatmapLevelData beatmapLevelData, Action beforeSceneSwitchCallback, LobbyGameStateController __instance)
         {
-            var previewBeatmapLevel = gameplaySetupData.beatmapLevel.beatmapLevel;
-            var beatmapDifficulty = gameplaySetupData.beatmapLevel.beatmapDifficulty;
-            var beatmapCharacteristic = gameplaySetupData.beatmapLevel.beatmapCharacteristic;
+            var levelId = gameplaySetupData.beatmapKey.levelId;
+            var beatmapLevel = __instance._beatmapLevelsModel.GetBeatmapLevel(levelId)!;
+            
+            var beatmapDifficulty = gameplaySetupData.beatmapKey.difficulty;
+            var beatmapCharacteristic = gameplaySetupData.beatmapKey.beatmapCharacteristic;
             var gameplayModifiers = gameplaySetupData.gameplayModifiers;
             
-            _log.Info($"Starting multiplayer level (levelID={previewBeatmapLevel.levelID}, " +
-                      $"songName={previewBeatmapLevel.songName}, songSubName={previewBeatmapLevel.songSubName}, " +
-                      $"songAuthorName={previewBeatmapLevel.songAuthorName}, " +
-                      $"levelAuthorName={previewBeatmapLevel.levelAuthorName}, " +
-                      $"difficulty={beatmapDifficulty}, characteristic={beatmapCharacteristic}, " +
-                      $"modifiers={gameplayModifiers})");
+            _log.Info($"Starting multiplayer level (" +
+                      $"levelID={levelId}, " +
+                      $"songName={beatmapLevel.songName}, " +
+                      $"songSubName={beatmapLevel.songSubName}, " +
+                      $"songAuthorName={beatmapLevel.songAuthorName}, " +
+                      $"difficulty={beatmapDifficulty}, " +
+                      $"characteristic={beatmapCharacteristic}, " +
+                      $"modifiers={gameplayModifiers}" +
+                      $")");
 
-            Current.Level = BssbServerLevel.FromLevelStartData(previewBeatmapLevel, beatmapDifficulty, difficultyBeatmap, 
-                gameplayModifiers, beatmapCharacteristic.serializedName);
+            Current.Level = BssbServerLevel.FromLevelStartData(beatmapLevel, beatmapDifficulty, gameplayModifiers,
+                beatmapCharacteristic.serializedName);
 
             if (Current.Level.Difficulty.HasValue && Current.LobbyDifficulty != BssbDifficulty.All)
                 Current.LobbyDifficulty = Current.Level.Difficulty.Value.ToBssbDifficulty();
@@ -308,7 +314,7 @@ namespace ServerBrowser.Core
         private void HandleSongStartSync(MultiplayerPlayerStartState localPlayerSyncState,
             MultiplayerController __instance)
         {
-            var sessionGameId = __instance.GetField<string, MultiplayerController>("_sessionGameId");
+            var sessionGameId = __instance._sessionGameId;
 
             _log.Info($"Multiplayer song started (sessionGameId={sessionGameId}, " +
                       $"localPlayerSyncState={localPlayerSyncState})");

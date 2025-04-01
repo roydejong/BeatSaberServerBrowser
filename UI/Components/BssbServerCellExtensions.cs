@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BeatSaberMarkupLanguage;
 using HMUI;
 using ServerBrowser.Assets;
 using ServerBrowser.Models;
@@ -42,6 +43,7 @@ namespace ServerBrowser.UI.Components
 
         private void BindComponents()
         {
+            // Components
             _coverImage = transform.Find("CoverImage").GetComponent<ImageView>();
             _songName = _cell!.transform.Find("SongName").GetComponent<CurvedTextMeshPro>();
             _songAuthor = _cell.transform.Find("SongAuthor").GetComponent<CurvedTextMeshPro>();
@@ -51,7 +53,7 @@ namespace ServerBrowser.UI.Components
             _bpmIcon = _cell.transform.Find("BpmIcon").GetComponent<ImageView>();
             
             // Events
-            _cell.selectionDidChangeEvent += HandleCellSelectionChange;
+            _cell!.selectionDidChangeEvent += HandleCellSelectionChange;
         }
         
         private void HandleCellSelectionChange(SelectableCell x, SelectableCell.TransitionType y, object z)
@@ -113,42 +115,58 @@ namespace ServerBrowser.UI.Components
 
                 if (_cell != null && _cell.selected)
                     _songBpm.color = BssbColorScheme.White;
+                else if (_server.IsLocallyDiscovered)
+                    _songBpm.color = BssbColorScheme.Red;
                 else if (_server.IsOfficial)
                     _songBpm.color = BssbColorScheme.Gold;
                 else if (_server.IsBeatTogetherHost)
                     _songBpm.color = BssbColorScheme.Green;
-                else if (_server.IsBeatUpServerHost)
-                    _songBpm.color = BssbColorScheme.Pinkish;
-                else if (_server.IsBeatDediHost)
-                    _songBpm.color = BssbColorScheme.Red;
                 else
                     _songBpm.color = BssbColorScheme.Blue;
             }
+            
+            // Set default/fallback icon if unset or BSML did some bullshit
+            if (_cellInfo != null && (_cellInfo.Icon == null || _cellInfo.Icon == Utilities.ImageResources.BlankSprite)) 
+                _cellInfo.Icon = Sprites.PortalUser;
+            if (_coverImage != null && (_coverImage.sprite == null || _coverImage.sprite == Utilities.ImageResources.BlankSprite))
+                _coverImage.sprite = Sprites.PortalUser;
         }
 
         public async Task SetCoverArt(CancellationToken token)
         {
+            if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
+                return;
+            
             try
             {
-                if (_cell == null || _cellInfo == null || _server == null || _coverImage == null)
-                    return;
+                var setSprite = Sprites.PortalUser;
 
-                if (_server.IsInLobby || _server.Level is null)
+                if (_server.IsLocallyDiscovered)
                 {
-                    // Not in level, show lobby icon
-                    _coverImage.sprite = Sprites.PortalUser;
-                    return;
+                    // Local discovery server, we don't have level details so can't ever show cover art
+                    // Use special icon specifically for these servers
+                    setSprite = Sprites.SocialNetwork; 
+                }
+                else if (_server.Level is null)
+                {
+                    // Not level data, show new lobby icon
+                }
+                else
+                {
+                    // Playing level, show cover art
+                    setSprite = await _coverArtLoader.FetchCoverArtAsync(
+                        new CoverArtLoader.CoverArtRequest(_server, token)
+                    );
+
+                    if (setSprite == null)
+                    {
+                        setSprite = Sprites.BeatSaverLogo;
+                    }
                 }
                 
-                // Playing level, show cover art
-                _coverImage.sprite = Sprites.BeatSaverLogo;
-
-                var sprite = await _coverArtLoader.FetchCoverArtAsync(
-                    new CoverArtLoader.CoverArtRequest(_server, token)
-                );
-                
-                if (sprite != null && _coverImage != null)
-                    _coverImage.sprite = sprite;
+                // Keep icon in sync so BSML doesn't clear it on scroll
+                _cellInfo.Icon = setSprite;
+                _coverImage.sprite = setSprite;
             }
             catch (Exception)
             {

@@ -53,14 +53,14 @@ namespace ServerBrowser.UI.Forms
             // Value
             _value = initialValue;
             
-            _stringSetting.modalKeyboard.clearOnOpen = false;
-            _stringSetting.modalKeyboard.keyboard.KeyboardText.text = _value;
-            _stringSetting.text.text = _value;
-            _stringSetting.text.richText = false;
-            _stringSetting.text.alignment = TextAlignmentOptions.Center;
+            _stringSetting.ModalKeyboard.ClearOnOpen = false;
+            _stringSetting.ModalKeyboard.Keyboard.KeyboardText.text = _value;
+            _stringSetting.TextMesh.text = _value;
+            _stringSetting.TextMesh.richText = false; 
+            _stringSetting.TextMesh.alignment = TextAlignmentOptions.Center;
 
             // Event
-            _stringSetting.modalKeyboard.keyboard.EnterPressed += (async delegate (string newValue)
+            _stringSetting.ModalKeyboard.Keyboard.EnterPressed += (async delegate (string newValue)
             {
                 _value = newValue;
                 await Task.Delay(1); // we need to run OnChange after BSML's own EnterPressed, and this, well, it works

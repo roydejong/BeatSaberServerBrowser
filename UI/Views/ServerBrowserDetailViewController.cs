@@ -96,22 +96,31 @@ namespace ServerBrowser.UI.Views
 
         public async Task Refresh(bool soft = false)
         {
-            if (_currentDetail?.Key == null)
-                return;
+            try
+            {
+                if (_currentDetail?.Key == null)
+                    return;
 
-            await LoadDetailsAsync(_currentDetail.Key, soft);
+                await LoadDetailsAsync(_currentDetail.Key, false, soft);
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"Detail view refresh failed: {ex}");
+            }
         }
 
-        private async void DelayedLayoutFix()
+        private async Task DelayedLayoutFix()
         {
             // This magically fixes a variety of layout issues :)
+            // - misaligned images 
+            // - messed up scrollables
             
             await Task.Delay(100).ConfigureAwait(true);
             
             if (_currentDetail is null)
                 return;
             
-            SetData(_currentDetail, true);
+            await SetData(_currentDetail, true);
         }
 
         #endregion
@@ -140,31 +149,46 @@ namespace ServerBrowser.UI.Views
             _currentDetail = null;
         }
 
-        public async Task LoadDetailsAsync(string serverKey, bool soft = false)
+        public async Task LoadDetailsAsync(string serverKey, bool isLocalDiscovery, bool soft = false)
         {
-            CancelLoading();
-
-            if (!soft)
+            try
             {
-                _errorRoot.gameObject.SetActive(false);
-                _idleRoot.gameObject.SetActive(false);
-                _loadRoot.gameObject.SetActive(true);
-                _mainRoot.gameObject.SetActive(false);
+                CancelLoading();
+
+                if (!soft)
+                {
+                    _errorRoot.gameObject.SetActive(false);
+                    _idleRoot.gameObject.SetActive(false);
+                    _loadRoot.gameObject.SetActive(true);
+                    _mainRoot.gameObject.SetActive(false);
+                }
+
+                if (isLocalDiscovery)
+                {
+                    // Can't show any details for local servers
+                    ShowError("");
+                    return;
+                }
+
+                var serverDetail = await _apiClient.BrowseDetail(serverKey, _loadingCts!.Token);
+
+                if (serverDetail == null)
+                {
+                    ShowError("Failed to load server details");
+                    return;
+                }
+
+                if (_loadingCts.IsCancellationRequested)
+                    return;
+
+                await SetData(serverDetail, soft);
+                await DelayedLayoutFix();
             }
-
-            var serverDetail = await _apiClient.BrowseDetail(serverKey, _loadingCts!.Token);
-
-            if (serverDetail == null)
+            catch (Exception ex)
             {
+                _log.Error($"Loading details failed: {ex}");
                 ShowError("Failed to load server details");
-                return;
             }
-
-            if (_loadingCts.IsCancellationRequested)
-                return;
-
-            SetData(serverDetail, soft);
-            DelayedLayoutFix();
         }
 
         public void CancelLoading()
@@ -175,7 +199,7 @@ namespace ServerBrowser.UI.Views
             _loadingCts = new();
         }
 
-        public void SetData(BssbServerDetail serverDetail, bool soft)
+        private async Task SetData(BssbServerDetail serverDetail, bool soft)
         {
             try
             {
@@ -186,14 +210,15 @@ namespace ServerBrowser.UI.Views
                 _loadRoot.gameObject.SetActive(false);
                 _mainRoot.gameObject.SetActive(true);
                 
-                _ = SetHeaderData(serverDetail);
                 SetInfoTabData(serverDetail);
                 SetPlayerData(serverDetail.Players, soft);
-                _ = SetLevelHistoryData(serverDetail.LevelHistory, soft);
+                
+                await SetHeaderData(serverDetail);
+                await SetLevelHistoryData(serverDetail.LevelHistory, soft);
             }
             catch (Exception ex)
             {
-                _log.Error(ex);
+                _log.Error("Error while setting data in detail view: {ex}");
                 ShowError("Error while presenting data");
             }
         }
@@ -213,14 +238,14 @@ namespace ServerBrowser.UI.Views
             }
 
             // Cover art 
-            if (serverDetail.IsInLobby)
+            if (serverDetail.Level == null)
             {
-                // Not in game, show lobby icon
+                // No level data, show new lobby icon
                 _levelBar.SetImageSprite(Sprites.PortalUser);
             }
             else
             {
-                // In game, show cover art
+                // In game/has level data, show cover art
                 _levelBar.SetImageSprite(Sprites.BeatSaverLogo);
 
                 var sprite = await _coverArtLoader.FetchCoverArtAsync(
@@ -358,7 +383,7 @@ namespace ServerBrowser.UI.Views
         [UIAction("tabSelectorChange")]
         private void HandleTabSelectorChange(SegmentedControl control, int index)
         {
-            DelayedLayoutFix();
+            _ = DelayedLayoutFix();
         }
 
         #endregion

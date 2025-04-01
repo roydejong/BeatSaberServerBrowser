@@ -1,3 +1,4 @@
+using BeatSaber.BeatAvatarSDK;
 using Newtonsoft.Json;
 using ServerBrowser.Models.Utils;
 
@@ -13,6 +14,6 @@ namespace ServerBrowser.Models
         [JsonProperty("UserName")] public string? UserName;
         [JsonProperty("PlatformType")] public string? PlatformType;
         [JsonProperty("PlatformUserId")] public string? PlatformUserId;
-        [JsonProperty("AvatarData")] public MultiplayerAvatarData? AvatarData;
+        [JsonProperty("AvatarData")] public AvatarData? AvatarData;
     }
 }

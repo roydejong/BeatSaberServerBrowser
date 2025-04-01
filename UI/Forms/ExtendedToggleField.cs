@@ -16,19 +16,13 @@ namespace ServerBrowser.UI.Forms
             set => _toggleSetting.gameObject.SetActive(value);
         }
 
-        public string Label
-        {
-            get => _toggleSetting.text.text;
-            set => _toggleSetting.text.SetText(value);
-        }
-
         public override bool Value
         {
             get => _value;
             set
             {
                 _value = value;
-                _toggleSetting.toggle.isOn = value;
+                _toggleSetting.Toggle.isOn = value;
             }
         }
         
@@ -42,16 +36,16 @@ namespace ServerBrowser.UI.Forms
             _toggleSetting = toggleTagObj.GetComponent<ToggleSetting>();
 
             // Label
-            _toggleSetting.text.SetText(label);
+            _toggleSetting.TextMesh.SetText(label);
 
             // Value
-            _toggleSetting.toggle.isOn = initialValue;
+            _toggleSetting.Toggle.isOn = initialValue;
 
             // Event
-            _toggleSetting.toggle.onValueChanged.RemoveAllListeners();
-            _toggleSetting.toggle.onValueChanged.AddListener(delegate (bool newValue)
+            _toggleSetting.Toggle.onValueChanged.RemoveAllListeners();
+            _toggleSetting.Toggle.onValueChanged.AddListener(delegate (bool newValue)
             {
-                _toggleSetting.toggle.isOn = newValue;
+                _toggleSetting.Toggle.isOn = newValue;
                 OnChange?.Invoke(this, newValue);
             });
         }

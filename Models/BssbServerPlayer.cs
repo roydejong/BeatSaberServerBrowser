@@ -1,3 +1,7 @@
+using System;
+using BeatSaber.AvatarCore;
+using BeatSaber.BeatAvatarAdapter;
+using BeatSaber.BeatAvatarSDK;
 using Newtonsoft.Json;
 
 namespace ServerBrowser.Models
@@ -39,13 +43,29 @@ namespace ServerBrowser.Models
             }
         }
 
-        public static BssbServerPlayer FromConnectedPlayer(IConnectedPlayer player, bool isPartyLeader = false)
+        public static BssbServerPlayer FromConnectedPlayer(IConnectedPlayer player)
         {
+            // Multiple avatar systems are supported; it looks like Meta avatars will be a thing in the future...
+            // For the website we're only really interested in "BeatAvatars".
+
+            AvatarData? beatAvatarData = null;
+
+            try
+            {
+                foreach (var avatarData in player.multiplayerAvatarsData.multiplayerAvatarsData)
+                    if (avatarData.avatarTypeIdentifierHash == BeatAvatarSystemId.hash)
+                        beatAvatarData = avatarData.data != null ? avatarData.CreateAvatarData() : null;
+            }
+            catch (NullReferenceException)
+            {
+                // Unclear why this happens, can't null check value structs, whatever
+            }
+
             return new BssbServerPlayer()
             {
                 UserId = player.userId,
                 UserName = player.userName,
-                AvatarData = player.multiplayerAvatarData,
+                AvatarData = beatAvatarData,
                 SortIndex = player.sortIndex,
                 IsMe = player.isMe,
                 IsHost = player.isConnectionOwner,
@@ -54,5 +74,7 @@ namespace ServerBrowser.Models
                 CurrentLatency = player.currentLatency
             };
         }
+
+        private static readonly AvatarSystemIdentifier BeatAvatarSystemId = new("BeatAvatarSystem");
     }
 }

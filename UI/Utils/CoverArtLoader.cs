@@ -81,9 +81,7 @@ namespace ServerBrowser.UI.Utils
                     return fromCache;
 
                 // Check if cover art is available locally
-                var localCoverArt = await TryGetLocalCoverArtSprite(request.LevelId, request.CancellationToken);
-                if (localCoverArt != null)
-                    return localCoverArt;
+                // TODO Get local cover art if we can
 
                 // If we have a URL, try to download cover art (BSSB mirror or BeatSaver CDN) 
                 if (request.CoverArtUrl != null)
@@ -116,31 +114,6 @@ namespace ServerBrowser.UI.Utils
             catch (Exception ex)
             {
                 _log.Error($"CoverArtLoader failed with exception: {ex}");
-            }
-
-            return null;
-        }
-
-        private async Task<Sprite?> TryGetLocalCoverArtSprite(string levelId, CancellationToken token)
-        {
-            try
-            {
-                var level = SongCore.Loader.GetLevelById(levelId);
-
-                if (level == null)
-                    return null;
-
-                // Official level, or installed custom level found
-                // The game already caches these and disposes of these on its own, so we can't cache them
-                return await level.GetCoverImageAsync(token);
-            }
-            catch (TaskCanceledException)
-            {
-                // Cancellation token was cancelled
-            }
-            catch (Exception ex)
-            {
-                _log.Warn($"Exception while trying to get local cover art (levelId={levelId}): {ex}");
             }
 
             return null;
