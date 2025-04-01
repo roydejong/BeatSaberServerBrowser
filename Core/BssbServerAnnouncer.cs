@@ -278,6 +278,19 @@ namespace ServerBrowser.Core
             if (_lastResultsSessionId == _dataCollector.LastResults.gameId)
                 // These results were already successfully announced
                 return false;
+
+            var ourResults = _dataCollector.LastResults.localPlayerResultData.multiplayerLevelCompletionResults;
+
+            if (!ourResults.hasAnyResults
+                || ourResults.playerLevelEndState is
+                    MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndState.NotStarted
+                || ourResults.playerLevelEndReason is
+                    MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.Quit
+                    or MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.ConnectedAfterLevelEnded
+                    or MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.StartupFailed
+                    or MultiplayerLevelCompletionResults.MultiplayerPlayerLevelEndReason.WasInactive)
+                // Inactive players should not send results as they could be incomplete
+                return false;
             
             try
             {
