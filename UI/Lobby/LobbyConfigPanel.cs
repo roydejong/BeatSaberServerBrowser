@@ -78,8 +78,9 @@ namespace ServerBrowser.UI.Lobby
                     Plugin.Config.AnnounceParty = value;
 
                 NotifyPropertyChanged();
-                _serverAnnouncer.RefreshPreferences();
                 Refresh();
+                    
+                _ = _serverAnnouncer.RefreshPreferences();
             }
         }
 
@@ -122,8 +123,9 @@ namespace ServerBrowser.UI.Lobby
                 Plugin.Config.ServerName = value;
 
                 NotifyPropertyChanged();
-                _serverAnnouncer.RefreshPreferences();
                 Refresh();
+                
+                _ = _serverAnnouncer.RefreshPreferences();
             }
         }
 

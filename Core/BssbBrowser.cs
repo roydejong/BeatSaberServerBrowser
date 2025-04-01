@@ -66,30 +66,38 @@ namespace ServerBrowser.Core
 
         public async Task Refresh()
         {
-            CancelLoading();
-            TriggerUpdate(true);
-
-            // Query API (load page)
-            BrowseResponse? apiResult = null;
-
             try
             {
-                apiResult = await _apiClient.Browse(QueryParams, _loadingCts!.Token);
+                CancelLoading();
+                TriggerUpdate(true);
 
-                if (apiResult is null)
-                    _log.Warn($"Browser API request failed (request error, or invalid response)");
-                else if (apiResult.Servers == null)
-                    _log.Warn($"Browser API sent null server list");
-                else
-                    ProcessApiResponse(apiResult);
+                // Query API (load page)
+                BrowseResponse? apiResult = null;
+
+                try
+                {
+                    apiResult = await _apiClient.Browse(QueryParams, _loadingCts!.Token);
+
+                    if (apiResult is null)
+                        _log.Warn($"Browser API request failed (request error, or invalid response)");
+                    else if (apiResult.Servers == null)
+                        _log.Warn($"Browser API sent null server list");
+                    else
+                        ProcessApiResponse(apiResult);
+                }
+                catch (TaskCanceledException)
+                {
+                    _log.Info($"Browser API request cancelled");
+                }
+
+                // Trigger update
+                TriggerUpdate(false, apiResult == null);
             }
-            catch (TaskCanceledException)
+            catch (Exception ex)
             {
-                _log.Info($"Browser API request cancelled");
+                _log.Error($"Browser refresh failed: {ex}");
+                TriggerUpdate(false, true);
             }
-
-            // Trigger update
-            TriggerUpdate(false, apiResult == null);
         }
 
         public void CancelLoading()

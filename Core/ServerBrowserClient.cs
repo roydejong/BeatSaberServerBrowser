@@ -21,11 +21,10 @@ namespace ServerBrowser.Core
         [Inject] private readonly INetworkConfig _networkConfig = null!;
         [Inject] private readonly BssbDataCollector _dataCollector = null!;
 
-        public async void Initialize()
+        public void Initialize()
         {
             LoadModdedStatus();
-
-            await LoadPlatformUserInfo();
+            _ = LoadPlatformUserInfo();
         }
 
         #region Game Version
@@ -108,18 +107,25 @@ namespace ServerBrowser.Core
 
         private async Task LoadPlatformUserInfo(CancellationToken ctx = default)
         {
-            PlatformUserInfo = await _platformUserModel.GetUserInfo(ctx);
-
-            if (PlatformUserInfo == null)
+            try
             {
-                _log.Warn("Failed to load platform user info!");
-                return;
+                PlatformUserInfo = await _platformUserModel.GetUserInfo(ctx);
+
+                if (PlatformUserInfo == null)
+                {
+                    _log.Warn("Failed to load platform user info!");
+                    return;
+                }
+
+                _log.Debug($"Loaded platform user info (platform={PlatformUserInfo.platform}, " +
+                           $"userName={PlatformUserInfo.userName}, platformUserId={PlatformUserInfo.platformUserId})");
+
+                _dataCollector.Current.ReportingPlatformKey = PlatformKey;
             }
-
-            _log.Debug($"Loaded platform user info (platform={PlatformUserInfo.platform}, " +
-                      $"userName={PlatformUserInfo.userName}, platformUserId={PlatformUserInfo.platformUserId})");
-
-            _dataCollector.Current.ReportingPlatformKey = PlatformKey;
+            catch (Exception ex)
+            {
+                _log.Error($"Failed to load platform user info: {ex}");
+            }
         }
 
         #endregion

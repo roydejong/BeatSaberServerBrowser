@@ -108,7 +108,7 @@ namespace ServerBrowser.UI.Views
                 HandleRefreshButtonClick();
         }
 
-        public async void OnEnable()
+        public void OnEnable()
         {
             ResetSelection();
 
@@ -118,7 +118,7 @@ namespace ServerBrowser.UI.Views
             RefreshFilterStates();
 
             _browser.EnableDiscovery();
-            await _browser.ResetRefresh();
+            _ = _browser.ResetRefresh();
         }
 
         public void OnDisable()
@@ -127,7 +127,7 @@ namespace ServerBrowser.UI.Views
             
             _parserParams.EmitEvent("closeSearchKeyboard");
 
-            _browser.CancelLoading();
+            _browser.CancelLoading(); 
             _browser.DisableDiscovery();
         }
 
@@ -378,10 +378,10 @@ namespace ServerBrowser.UI.Views
         #region BSML Actions
 
         [UIAction("refreshButtonClick")]
-        private async void HandleRefreshButtonClick()
+        private void HandleRefreshButtonClick()
         {
             RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
-            await _browser.Refresh();
+            _ = _browser.Refresh();
         }
 
         [UIAction("createButtonClick")]
@@ -490,7 +490,7 @@ namespace ServerBrowser.UI.Views
 
         [UIAction("searchKeyboardSubmit")]
         [UsedImplicitly]
-        private async void HandleSearchKeyboardSubmit(string text)
+        private void HandleSearchKeyboardSubmit(string text)
         {
             _browser.QueryParams.TextSearch = text;
             RefreshFilterStates();
@@ -500,7 +500,7 @@ namespace ServerBrowser.UI.Views
 
             // Go back to first page & refresh
             RefreshStartedEvent?.Invoke(this, EventArgs.Empty);
-            await _browser.ResetRefresh();
+            _ = _browser.ResetRefresh();
 
             // Commit filter set to config
             _config.FilterSet = _browser.QueryParams;

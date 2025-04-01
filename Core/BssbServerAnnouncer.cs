@@ -133,34 +133,41 @@ namespace ServerBrowser.Core
             return Data.IsDirectConnect || GetShouldAnnounce();
         }
 
-        public async void RefreshPreferences()
+        public async Task RefreshPreferences()
         {
-            var isAnnouncing = State is AnnouncerState.Announcing;
-            var shouldAnnounce = GetShouldAnnounce();
-
-            if (_sessionEstablished)
+            try
             {
-                if (shouldAnnounce && !isAnnouncing)
+                var isAnnouncing = State is AnnouncerState.Announcing;
+                var shouldAnnounce = GetShouldAnnounce();
+
+                if (_sessionEstablished)
                 {
-                    _log.Debug($"User preferences updated: starting announce");
-                    State = AnnouncerState.Announcing;
-                }
-                else if (!shouldAnnounce && isAnnouncing)
-                {
-                    _log.Debug($"User preferences updated: starting unannounce");
-                    State = AnnouncerState.Unannouncing;
+                    if (shouldAnnounce && !isAnnouncing)
+                    {
+                        _log.Debug($"User preferences updated: starting announce");
+                        State = AnnouncerState.Announcing;
+                    }
+                    else if (!shouldAnnounce && isAnnouncing)
+                    {
+                        _log.Debug($"User preferences updated: starting unannounce");
+                        State = AnnouncerState.Unannouncing;
+                    }
+
+                    var prefName = _serverBrowserClient.PreferredServerName;
+
+                    if ((Data.LocalPlayer?.IsPartyLeader ?? false) && Data.Name != prefName)
+                    {
+                        _log.Debug($"User preferences updated: set game name to {prefName}");
+                        Data.Name = prefName;
+                    }
                 }
 
-                var prefName = _serverBrowserClient.PreferredServerName;
-                    
-                if ((Data.LocalPlayer?.IsPartyLeader ?? false) && Data.Name != prefName)
-                {
-                    _log.Debug($"User preferences updated: set game name to {prefName}");
-                    Data.Name = prefName;
-                }
+                await RepeatingTick();
             }
-
-            await RepeatingTick();
+            catch (Exception ex)
+            {
+                _log.Error($"Failed to refresh preferences: {ex}");
+            }
         }
 
         private async Task RepeatingTick()
@@ -306,7 +313,7 @@ namespace ServerBrowser.Core
             
             if (!unAnnounceRequest.IsComplete)
                 return false;
-            
+
             try
             {
                 _dirtyFlag = false;
@@ -318,7 +325,7 @@ namespace ServerBrowser.Core
                 {
                     _consecutiveErrors = 0;
                     _log.Info("Unannounce OK");
-                    
+
                     OnUnAnnounceResult?.Invoke(this, true);
                     return true;
                 }
@@ -331,10 +338,15 @@ namespace ServerBrowser.Core
                     {
                         _dirtyFlag = true;
                     }
-                    
+
                     OnUnAnnounceResult?.Invoke(this, false);
                     return false;
                 }
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"Unannounce failed: {ex.Message}");
+                return false;
             }
             finally
             {
